@@ -1,0 +1,18 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 20px;
+}
+
+h1 {
+    color: #333;
+}
+
+form {
+    margin-bottom: 20px;
+}
+
+#fileContent {
+    border: 1px solid #ccc;
+    padding: 10px;
+    white-space: pre-wrap;
+}
