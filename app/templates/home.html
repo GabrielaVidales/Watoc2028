@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script type="module" src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+    <script type="module" src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='home.css') }}">
+    <title>WATOC 2028 - Mérida, Mx</title>
+
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+    <style>
+        #map {
+            height: 300px;
+            width: 400px;
+        }
+    </style>
+</head>
+
+<body>
+    <header class="header">
+        <div class="header-content h-100 container-fluid d-flex align-items-center justify-content-between px-4">
+            <img src="{{ url_for('static', filename='img/watoc2028.png') }}" alt="Watoc 2028" height="75px">
+
+            <div style="display: flex; column-gap: 4em;">
+                <p class="header-navlink m-0">Home</p>
+                <p class="header-navlink m-0">Registration</p>
+                <p class="header-navlink m-0">Schedule</p>
+                <p class="header-navlink m-0">Contact</p>
+                <p class="header-navlink m-0">About</p>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <div class="main-container">
+            <div class="img-content">
+                <p class="title" style="font-size: 2em;">World Association of Theoretical and Computational Chemists</p>
+                <p class="title">Merida 2028</p>
+                <p class="title" style="font-size: 1em;">January 9-14, 2028</p>
+                <p class="title" style="font-size: 1em;">Young WATOC on 8th January</p>
+            </div>
+
+        </div>
+        <div class="min-vh-100 ">
+            <h3>World Association of Theoretical and Computational Chemists</h3>
+            <p>The WATOC 2028 congress will be held in Merida, Mexico on January 9-14, 2028, preceded by Young WATOC on
+                8th January and will be organised by Profs. Gabriel Merino and Annia Galano. The last congress WATOC
+                2025 and Young WATOC were held in Oslo from 21-27 June 2025 and were organised by Prof. Trygve Helgaker.
+                WATOC2020 was held in Vancouver, Canada on July 3 - 8, 2022.
+            </p>
+        </div>
+    </main>
+
+    <div id="map"></div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
+    <script>
+        // 1. Crear el mapa centrado [lat, lng] y zoom
+        const map = L.map('map').setView([21.033327030976494, -89.63017531534561], 13); // Ej: Mérida
+
+        // 2. Capa de tiles de OpenStreetMap
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '© OpenStreetMap contributors'
+        }).addTo(map);
+
+        // 3. Un marcador de ejemplo
+        const marker = L.marker([21.033327030976494, -89.63017531534561]).addTo(map);
+        marker.bindPopup('Centro de Convenciones Siglo XXI.').openPopup();
+    </script>
+
+
+    <script>
+        const navbar = document.querySelector('.header');
+        const THRESHOLD = 200;
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > THRESHOLD) {
+                navbar.classList.add('navbar-hidden');
+            } else {
+                navbar.classList.remove('navbar-hidden');
+            }
+        });
+    </script>
+</body>
+
+
+</html>

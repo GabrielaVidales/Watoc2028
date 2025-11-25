@@ -1,0 +1,52 @@
+.header {
+    position: fixed;
+    top: 0;
+    z-index: 9999;
+    background: transparent;
+    transition: transform 0.3s ease;
+    width: 100%;
+    height: 100px;
+}
+
+.navbar-hidden {
+    transform: translateY(-100%);
+}
+
+.header-navlink {
+    font-size: 20px;
+}
+
+.header-content {
+    background-color: white;
+}
+
+.main-container {
+    background-image:
+        linear-gradient(to bottom, transparent 90%, rgb(255, 255, 255) 100%),
+        url('img/merida.webp');
+    background-size: cover;
+    background-position: 50% 20%;
+    height: 40rem;
+
+
+    display: flex;
+    flex-flow: column nowrap;
+    justify-content: center;
+    align-items: center;
+}
+
+.img-content {
+    display: flex;
+    flex-flow: column nowrap;
+    justify-content: start;
+    text-align: center;
+}
+
+.title {
+    color: #ffffff;
+    text-shadow: 3px 3px 7px #000000;
+    font-size: 5em;
+    font-weight: 600;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+}
