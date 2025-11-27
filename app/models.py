@@ -1,4 +1,5 @@
 from flask_login import UserMixin
+from werkzeug.security import check_password_hash, generate_password_hash
 import mongoengine as mongo
 from datetime import datetime, timezone
 
@@ -25,10 +26,17 @@ class Transaction(mongo.EmbeddedDocument):
         max_length=256
     )
 
-class Assistant(mongo.Document):
+"""
+Se puede renombrar a User y crear una subclase que
+herede de User llamada Assistant (los datos se guardarían)
+en el mismo Document de MongoDB pero con atributos dinámicos
+según la clase
+"""
+class User(mongo.Document, UserMixin):
+    email = mongo.EmailField(required=True, unique=True, max_length=128)
+    password = mongo.StringField(required=True, min_length=8, max_length=256)
     first_name = mongo.StringField(required=True, max_length=128, min_length=1)
     last_name = mongo.StringField(required=True, max_length=128, min_length=1)
-    email = mongo.EmailField(required=True, unique=True)
     category = mongo.StringField(choices=Categorias, default='participant')
     tier = mongo.StringField(choices=Tiers, default='regular')
     cena_congreso = mongo.BooleanField(required=True, default=False)
@@ -37,13 +45,17 @@ class Assistant(mongo.Document):
     fecha_registro = mongo.DateTimeField(default=datetime.now(timezone.utc))
 
     meta = {
-        'collection': 'registros',  
+        'collection': 'users',  
         'db_alias': 'default',  
+        'allow_inheritance': True,
     }
+
+    def check_password(self, value) -> bool:
+        return check_password_hash(self.password, value)
 
     def __init__(self, first_name=None, last_name=None, email=None,
                  category='participant', tier='regular', cena_congreso=False,
-                 visa=None, transaccion=None, *args, **kwargs):
+                 visa=None, transaccion=None, *args, **kwargs) -> str:
         super().__init__(
             *args,
             first_name=first_name,
@@ -69,6 +81,13 @@ class Assistant(mongo.Document):
             f")"
         )
 
+
+"""
+Esta subclase hereda de usuario pero además
+se le pondrían atributos únicos para los Assistant
+"""
+class Assistant(User):
+    pass
 
 class ContactRequest(mongo.Document):
     first_name = mongo.StringField(required=True, max_length=128)
@@ -98,7 +117,7 @@ class ContactRequest(mongo.Document):
         ) 
 
 
-class Sponsor:
+class Sponsor(mongo.Document):
     first_name = mongo.StringField()
     last_name = mongo.StringField() 
     organization = mongo.StringField()

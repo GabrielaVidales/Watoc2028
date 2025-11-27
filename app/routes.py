@@ -6,6 +6,7 @@ from werkzeug.utils import secure_filename
 from .extensions import login_manager, mail, get_mongo_client, get_mongo_db
 from .models import *
 from mongoengine import ValidationError, FieldDoesNotExist
+from werkzeug.security import generate_password_hash, check_password_hash
 
 bp = Blueprint(
     name='main',
@@ -17,13 +18,19 @@ bp = Blueprint(
 
 @login_manager.user_loader
 def load_user(user_id):
-    return user_id
-    # return User.query.get(int(user_id))
+    return Assistant.objects(pk=user_id).first()
 
 
 # Ruta para servir el archivo index.html
 @bp.route('/')
 def serve_index():
+    user = Assistant(
+        email='blablabla@gmail.com',
+        password = generate_password_hash('password'),
+        first_name = 'Eduardo',
+        last_name = 'Escalante',
+    )
+    user.validate()
     return render_template('home.html')
 
 
@@ -90,7 +97,20 @@ def api_assistant():
     return make_response({ 'error': 'No se creó correctamente el recurso'}, 500)
 
 
+@bp.route('/test', methods=['GET'])
+def test_pdf():
+    from reportlab.lib.pagesizes import letter
+    from reportlab.pdfgen import canvas
 
+    c = canvas.Canvas('ejemplo.pdf', pagesize=letter)
+
+    c.drawString(100, 750, 'Hola mundo!')
+    c.drawString(100, 770, 'Este pdf fue generado por chatgpt')
+
+    c.rect(100, 700, 250, 50)
+    c.save()
+
+    return render_template('home.html')
 
 # Ruta para servir archivos estáticos (CSS, JS)
 # @bp.route('/<path:filename>')
