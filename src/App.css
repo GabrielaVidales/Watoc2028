@@ -1,0 +1,88 @@
+#root {
+  width: 100%;
+  min-height: 100dvh;
+  height: 100dvh;
+  margin: 0;
+  padding: 0rem;
+  /* text-align: center; */
+}
+
+
+/* Estilo por defecto para pantallas grandes */
+h1 {
+  font-size: 4rem;
+}
+
+h2 {
+  font-size: 3rem;
+}
+
+h3 {
+  font-size: 2.5rem;
+}
+
+h4 {
+  font-size: 2rem;
+}
+
+h5 {
+  font-size: 1.5rem;
+}
+
+h6 {
+  font-size: 1.25rem;
+}
+
+body, p, span {
+  font-size: 1rem;
+}
+
+/* Estilos para pantallas medianas (por ejemplo, tabletas) */
+@media (max-width: 1024px) {
+  h1 {
+    font-size: 3rem;
+  }
+  h2 {
+    font-size: 2.5rem;
+  }
+  h3 {
+    font-size: 2rem;
+  }
+  h4 {
+    font-size: 1.75rem;
+  }
+  h5 {
+    font-size: 1.25rem;
+  }
+  h6 {
+    font-size: 1.125rem;
+  }
+  body, p, span {
+    font-size: 0.875rem;
+  }
+}
+
+/* Estilos para pantallas pequeñas (por ejemplo, teléfonos móviles) */
+@media (max-width: 600px) {
+  h1 {
+    font-size: 2rem;
+  }
+  h2 {
+    font-size: 1.75rem;
+  }
+  h3 {
+    font-size: 1.5rem;
+  }
+  h4 {
+    font-size: 1.25rem;
+  }
+  h5 {
+    font-size: 1rem;
+  }
+  h6 {
+    font-size: 0.875rem;
+  }
+  body, p, span {
+    font-size: 0.875rem; /* Reducir un poco el tamaño del texto en móviles */
+  }
+}
