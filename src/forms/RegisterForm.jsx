@@ -4,12 +4,19 @@ import React from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import CustomTextField from '../components/CustomTextField'
 import { REGEX_EMAIL, REGEX_NAME } from '../utils/formRegex'
+import { useNavigate } from 'react-router'
 
 export default function RegisterForm() {
+    const navigate = useNavigate()
     const { control, formState: { errors }, handleSubmit } = useForm()
 
     const onValidatedData = (data) => {
         console.log(data);
+        navigate('/register/account', {
+            state: {
+                data
+            }
+        })
     }
 
     return (

@@ -1,30 +1,31 @@
 import React from 'react'
 import NavBar from '../../components/NavBar'
+import { Box, Divider } from '@mui/material'
 import Footer from '../../components/Footer'
-import { Box } from '@mui/material'
-import AbstractsSection from './sections/AbstractsSection'
-import { AbstractSubmissionHeroContent } from './components/AbstractSubmissionHeroContent'
+import { Link } from 'react-router'
 import { GenericHeroContent } from '../../components/GenericHeroContent'
-import ExampleSection from './sections/ExampleSection'
+import VisaMainSection from './sections/VisaMainSection'
+import GenericCTASection from '../../components/GenericCTASection'
+import VisaInvitationSection from './sections/VisaInvitationSection'
 import { HeroSection } from '../../components/HeroSection'
 
-export default function AbstractSubmissionInfo() {
+export default function VisaRequirements() {
     return (
         <>
             <NavBar />
             <Box component='main'>
                 <HeroSection
-                    backgroundImgSrc="/field.png"
-                    height="70vh"
+                    backgroundImgSrc='/field.png'
                     enableParticles={true}
                     enableRadialGradient={true}
-                    disableLinearGradient={false}
-                    enableWave={true}
+                    height='70dvh'
                 >
                     <GenericHeroContent />
                 </HeroSection>
-                <AbstractsSection />
-                <ExampleSection />
+                <VisaMainSection/>
+                <GenericCTASection/>
+                <VisaInvitationSection/>
+                <GenericCTASection/>
             </Box>
             <Footer />
         </>

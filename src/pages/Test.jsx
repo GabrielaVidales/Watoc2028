@@ -1,17 +1,10 @@
-import React, { useEffect } from 'react'
+import React, { use, useEffect } from 'react'
 import WizardRegistration from '../components/wizard registration/WizardRegistration'
 import { useAPI } from '../contexts/APIContext'
 import { Button } from '@mui/material'
+import { useLocation } from 'react-router'
 
 export default function Test() {
-  const api = useAPI()
-
-  const handleMierda = async () => {
-    const send = await api.post({ url: '/protected' })
-    console.log(send)
-    console.log('--------------------');
-  }
-
   return (
     <div className='container-fluid h-100'>
       <div className='row h-100 justify-content-center'>

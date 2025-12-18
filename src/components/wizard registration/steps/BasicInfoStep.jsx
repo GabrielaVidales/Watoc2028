@@ -1,4 +1,4 @@
-import { Avatar, Box, Button, InputAdornment, Toolbar, Typography } from '@mui/material'
+import { Avatar, Box, Button, Divider, InputAdornment, Toolbar, Typography } from '@mui/material'
 import { useForm } from 'react-hook-form'
 import { REGEX_EMAIL, REGEX_NAME } from '../../../utils/formRegex'
 import { DriveFileRenameOutline, LocationCity, MailOutline, Person, Phone, Public, School } from '@mui/icons-material'
@@ -9,12 +9,15 @@ import RenderInput from '../inputs/RenderInput'
 import RenderCheckbox from '../inputs/RenderCheckbox'
 import CustomSelect from '../inputs/CustomSelect'
 import StepTemplate from './StepTemplate'
+import FormSectionTitle from '../inputs/FormSectionTitle'
 
 export default function BasicInfoStep({ data = {}, stepName = '_', onNext = null }) {
     const { handleSubmit, formState: { errors }, control, reset } = useForm()
 
     useEffect(() => {
+        console.log('1')
         if (data.personalData) {
+            console.log('2')
             reset(data.personalData)
         }
     }, [data.personalData, reset])
@@ -22,17 +25,6 @@ export default function BasicInfoStep({ data = {}, stepName = '_', onNext = null
     const onValidData = (data) => {
         onNext?.(data, stepName)
     }
-
-    const SectionTitle = ({ icon, text }) => (
-        <Box display='flex' alignItems='center' gap={1.5}>
-            <Avatar sx={{ bgcolor: 'primary.light', height: 'auto', width: 35, aspectRatio: '1 / 1' }}>
-                {icon}
-            </Avatar>
-            <Typography variant='h6' fontWeight='bold'>
-                {text}
-            </Typography>
-        </Box>
-    )
 
     return (
         <StepTemplate onSubmit={handleSubmit(onValidData)} stepActions={(
@@ -42,14 +34,14 @@ export default function BasicInfoStep({ data = {}, stepName = '_', onNext = null
                 </Button>
             </>
         )}>
-            <SectionTitle
+            <FormSectionTitle
                 icon={<Person fontSize='small' />}
                 text='Personal data'
             />
             <Box display='flex' flexDirection={{ xs: 'column', sm: 'row' }} justifyContent='space-between' gap={3}>
                 <CustomSelect
                     name='title'
-                    label='Título *'
+                    label='Prefix *'
                     control={control}
                     id='title'
                     options={[{
@@ -121,64 +113,9 @@ export default function BasicInfoStep({ data = {}, stepName = '_', onNext = null
                 />
             </Box>
 
-            <Toolbar />
+            <Divider />
 
-            <SectionTitle
-                icon={<School fontSize='small' />}
-                text='Proffesional Information'
-            />
-            <Box display='flex' flexDirection={{ xs: 'column', sm: 'row' }} justifyContent='space-between' gap={3}>
-                <RenderInput
-                    id='institution'
-                    name='institution'
-                    label='Affiliation *'
-                    control={control}
-                    rules={{
-                        required: 'Required *',
-                    }}
-                    placeholder='Ej. Universidad de la Antártida'
-                    defaultValue={data[stepName]?.institution || ''}
-                    error={!!errors?.institution}
-                    helperText={errors?.institution?.message}
-                />
-                <RenderInput
-                    id='department'
-                    name='department'
-                    label='Departamento / Facultad'
-                    control={control}
-                    placeholder='Ej. Depto. de Física Aplicada'
-                    defaultValue={data[stepName]?.department || ''}
-                    error={!!errors?.department}
-                    helperText={errors?.department?.message}
-                />
-            </Box>
-            <Box display='flex' flexDirection={{ xs: 'column', sm: 'row' }} justifyContent='space-between' gap={3}>
-                <RenderInput
-                    id='cargo'
-                    name='cargo'
-                    label='Cargo / Posición'
-                    control={control}
-                    placeholder='Ej. Investigador Principal'
-                    defaultValue={data[stepName]?.cargo || ''}
-                    error={!!errors?.cargo}
-                    helperText={errors?.cargo?.message}
-                />
-                <RenderCheckbox
-                    name='student'
-                    control={control}
-                    label='Soy estudiante (Pregrado / Máster / Doctorado)'
-                    defaultValue={data[stepName]?.student || ''}
-                    boxProps={{
-                        flex: 1,
-                        display: 'flex',
-                        flexDirection: 'column'
-                    }}
-                />
-            </Box>
-
-            <Toolbar />
-
-            <SectionTitle
+            <FormSectionTitle
                 icon={<Public fontSize='small' />}
                 text='Contact Information'
             />

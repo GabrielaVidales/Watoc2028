@@ -103,8 +103,9 @@ export default function NavBar({ invertImg = true }) {
                         <Box
                             component="img"
                             alt="WATOC 2028 Logo"
-                            src="/watoc2028logo.png"
+                            src="/WatocPNGLogo.png"
                             sx={{
+                                filter: (trigger || !invertImg) ? 'none' : 'invert()',
                                 maxHeight: { xs: 60, sm: 70, md: 80 },
                                 padding: { xs: 0, sm: 1, md: 0 },
                                 width: 'auto'
@@ -158,10 +159,10 @@ export default function NavBar({ invertImg = true }) {
                                 }}
                             >
                                 {[
-                                    ['/program', 'Program'],
-                                    ['/schedule', 'Schedule'],
+                                    ['/watoc', 'WATOC'],
                                     ['/hotel-booking', 'Hotel Booking'],
-                                    ['/abstract-submission', 'Abstract Submission']
+                                    ['/abstract-submission', 'Abstract Submission'],
+                                    ['/visa', 'Visa Requirements'],
                                 ].map((item, index) => (
                                     <Link key={index} to={item[0]} style={{ textDecoration: 'none', color: 'black' }}>
                                         <MenuItem onClick={handleOnMouseLeave}>

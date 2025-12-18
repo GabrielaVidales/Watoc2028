@@ -23,7 +23,7 @@ export default function Register() {
                             sx={{
                                 width: '100%',
                                 minHeight: '100dvh',
-                                backgroundImage: 'url("/field.png")', // URL de la imagen
+                                backgroundImage: 'url("/field.png")', 
                                 backgroundSize: 'cover',
                                 display: 'flex',
                                 alignItems: 'center'
@@ -39,9 +39,6 @@ export default function Register() {
                             </div>
                         </Box>
                     </Grid>
-                    {/* <Grid size={{ sm: 2, md: 0 }} display={{ sm: 'block', xs: 'block', md: 'none' }}>
-                        <Toolbar />
-                    </Grid> */}
                     <Grid size={{ sm: 1, md: 1 }} width={'100%'}>
                         <Box
                             component='main'

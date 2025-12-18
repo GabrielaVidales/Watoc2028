@@ -1,17 +1,20 @@
 import './App.css'
-import Home from './pages/Home'
 import { Routes } from 'react-router'
 import { Route } from 'react-router'
-import Contact from './pages/Contact'
 import Login from './pages/Login'
 
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import Register from './pages/Register'
 import Test from './pages/Test'
-import VenuePage from './pages/VenuePage'
-import HotelBooking from './pages/HotelBooking'
+import Home from './pages/home/Home'
+import VenuePage from './pages/venue/VenuePage'
+import HotelBooking from './pages/hotelBooking/HotelBooking'
 import AbstractSubmissionInfo from './pages/abstractSubmission/AbstractSubmissionInfo'
+import VisaRequirements from './pages/visa/VisaRequirements'
+import AboutWATOC from './pages/aboutWATOC/AboutWATOC'
+import Contact from './pages/contact/Contact';
+import RegistrationPage from './pages/regsitration/RegistrationPage';
 
 const darkTheme = createTheme({
 	palette: {
@@ -87,7 +90,10 @@ function App() {
 					<Route path='/venue' element={<VenuePage />} />
 					<Route path='/hotel-booking' element={<HotelBooking />} />
 					<Route path='/abstract-submission' element={<AbstractSubmissionInfo />} />
+					<Route path='/watoc' element={<AboutWATOC />} />
+					<Route path='/visa' element={<VisaRequirements />} />
 					<Route path='/contact' element={<Contact />} />
+					<Route path='/register/account' element={<RegistrationPage />} />
 
 
 					<Route path='/test' element={<Test />} />

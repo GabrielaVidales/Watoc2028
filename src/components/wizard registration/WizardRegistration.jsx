@@ -3,11 +3,23 @@ import { useEffect, useState } from 'react'
 import BasicInfoStep from './steps/BasicInfoStep'
 import SecondStep from './steps/SecondStep'
 import LastStep from './steps/LastStep'
+import { useLocation } from 'react-router'
 
 export default function WizardRegistration() {
+    const location = useLocation()
+
     const [activeStep, setActiveStep] = useState(0)
     const [orientation, _] = useState('horizontal')
     const [formData, setFormData] = useState({})
+
+    useEffect(() => {
+        console.log(location.state)
+        if (location.state?.data) {
+            setFormData({
+                personalData: location.state.data
+            })
+        }
+    }, [])
 
     useEffect(() => {
         console.log('Current form data:');
@@ -16,17 +28,19 @@ export default function WizardRegistration() {
 
     const onDebugData = () => {
         setFormData({
-            "title": "Dr.",
-            "firstName": "Eduardo",
-            "lastName": "Escalante Pacheco",
-            "email": "eduardo1582000@gmail.com",
-            "phone": "9993914295",
-            "country": "MX",
-            "city": "Mérida",
-            "institution": "TecNM",
-            "department": "Dirección Académica",
-            "cargo": "Director General",
-            "student": false
+            personalData: {
+                "title": "Dr.",
+                "firstName": "Eduardo",
+                "lastName": "Escalante Pacheco",
+                "email": "eduardo1582000@gmail.com",
+                "phone": "9993914295",
+                "country": "MX",
+                "city": "Mérida",
+                "institution": "TecNM",
+                "department": "Dirección Académica",
+                "cargo": "Director General",
+                "student": false
+            }
         })
     }
 
@@ -77,7 +91,6 @@ export default function WizardRegistration() {
 
     return (
         <Grow in timeout={800}>
-            {/* {debug ? null : null} */}
             <Paper className='d-flex flex-column p-3 h-100' elevation={7} sx={{ height: 630, borderTop: 12, borderColor: '#6a45ffff', }}>
                 <Button onClick={onDebugData}>Debug data</Button>
                 <Stepper

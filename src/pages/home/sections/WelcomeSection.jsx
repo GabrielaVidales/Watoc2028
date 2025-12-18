@@ -139,7 +139,6 @@ const WelcomeMessage = ({ organizer, isReversed = false }) => (
                 </Box>
             </Box>
         </Grid>
-
     </Grid>
 );
 

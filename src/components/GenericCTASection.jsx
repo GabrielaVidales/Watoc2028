@@ -24,6 +24,8 @@ const GenericCTASection = ({ maxWidth = "md", spacing=3, alignItems="center", te
                 backgroundImage: 'url(/field.png)',
                 backgroundSize: 'cover',
                 backgroundPosition: 'center',
+                backgroundAttachment: 'fixed', 
+                pointerEvents: 'none',
             }}
         />
 

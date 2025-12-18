@@ -1,52 +1,10 @@
 import { Box, FormControl, FormControlLabel, FormHelperText, Grow, InputAdornment, InputLabel, Paper, Radio, RadioGroup, Stack, TextField, Typography } from '@mui/material'
 import { Controller, useForm } from 'react-hook-form'
-import { MailOutline } from '@mui/icons-material'
+import { MailOutline, School } from '@mui/icons-material'
 import StepTemplate from './StepTemplate'
 import RenderInput from '../inputs/RenderInput'
-
-const Category = ({ data, control, errors }) => {
-    return (
-        <FormControl component='fieldset'>
-            <Controller
-                name="category"
-                control={control}
-                defaultValue={data?.category || ''}
-                rules={{
-                    required: 'Please choose one option.'
-                }}
-                render={({ field }) => (
-                    <>
-                        <FormControl error={!!errors?.category} >
-                            <RadioGroup {...field} >
-                                <FormControlLabel
-                                    value='participant'
-                                    control={<Radio />}
-                                    label={
-                                        <Typography>Participant</Typography>
-                                    }
-                                />
-                                <FormControlLabel
-                                    value='student'
-                                    control={<Radio />}
-                                    label={
-                                        <Typography>Student</Typography>
-                                    }
-                                />
-                            </RadioGroup>
-                            <FormHelperText>
-                                <Grow in={!!errors?.category} timeout={500}>
-                                    <span>
-                                        {errors?.category?.message}
-                                    </span>
-                                </Grow>
-                            </FormHelperText>
-                        </FormControl>
-                    </>
-                )}
-            />
-        </FormControl>
-    )
-}
+import FormSectionTitle from '../inputs/FormSectionTitle'
+import RenderCheckbox from '../inputs/RenderCheckbox'
 
 export default function SecondStep({ data = {}, stepName = '_', onNext = null, onBack = null }) {
     const { handleSubmit, formState: { errors }, control, getValues } = useForm()
@@ -63,11 +21,58 @@ export default function SecondStep({ data = {}, stepName = '_', onNext = null, o
 
     return (
         <StepTemplate onBack={onCurrentData} onSubmit={handleSubmit(onValidData)}>
-            <Typography variant='h5'>
-                Category
-            </Typography>
-
-            <Category control={control} errors={errors} data={data[stepName]} />
+            <FormSectionTitle
+                icon={<School fontSize='small' />}
+                text='Proffesional Information'
+            />
+            <Box display='flex' flexDirection={{ xs: 'column', sm: 'row' }} justifyContent='space-between' gap={3}>
+                <RenderInput
+                    id='institution'
+                    name='institution'
+                    label='Affiliation *'
+                    control={control}
+                    rules={{
+                        required: 'Required *',
+                    }}
+                    placeholder='Ej. Universidad de la Antártida'
+                    defaultValue={data[stepName]?.institution || ''}
+                    error={!!errors?.institution}
+                    helperText={errors?.institution?.message}
+                />
+                <RenderInput
+                    id='department'
+                    name='department'
+                    label='Departamento / Facultad'
+                    control={control}
+                    placeholder='Ej. Depto. de Física Aplicada'
+                    defaultValue={data[stepName]?.department || ''}
+                    error={!!errors?.department}
+                    helperText={errors?.department?.message}
+                />
+            </Box>
+            <Box display='flex' flexDirection={{ xs: 'column', sm: 'row' }} justifyContent='space-between' gap={3}>
+                <RenderInput
+                    id='cargo'
+                    name='cargo'
+                    label='Cargo / Posición'
+                    control={control}
+                    placeholder='Ej. Investigador Principal'
+                    defaultValue={data[stepName]?.cargo || ''}
+                    error={!!errors?.cargo}
+                    helperText={errors?.cargo?.message}
+                />
+                <RenderCheckbox
+                    name='student'
+                    control={control}
+                    label='Soy estudiante (Pregrado / Máster / Doctorado)'
+                    defaultValue={data[stepName]?.student || ''}
+                    boxProps={{
+                        flex: 1,
+                        display: 'flex',
+                        flexDirection: 'column'
+                    }}
+                />
+            </Box>
         </StepTemplate>
     )
 }
