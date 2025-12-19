@@ -14,7 +14,6 @@ export default function AbstractSubmissionInfo() {
             <NavBar />
             <Box component='main'>
                 <HeroSection
-                    backgroundImgSrc="/field.png"
                     height="70vh"
                     enableParticles={true}
                     enableRadialGradient={true}

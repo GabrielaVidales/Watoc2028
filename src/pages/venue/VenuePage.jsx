@@ -130,7 +130,7 @@ export default function VenuePage() {
             <NavBar />
             <Box component='main'>
                 <HeroSection
-                    backgroundImgSrc="/congresoEntrada.webp"
+                    backgroundImgSrc={["/congresoEntrada.webp"]}
                     height="90vh"
                     enableParticles={true}
                     enableRadialGradient={true}

@@ -3,15 +3,12 @@ import { AppBar, Box, Toolbar, Typography, useScrollTrigger, IconButton, Menu, M
 import { useMemo, useRef, useState } from 'react';
 import { Link } from 'react-router';
 import { ScrollTop } from './ScrollTop';
+import CustomDropdownMenu from './CustomDropdownMenu';
 
 export default function NavBar({ invertImg = true }) {
     const [mobileMenuAnchorEl, setMobileMenuAnchorEl] = useState(null);
-    const [anchorAbout, setAnchorAbout] = useState(null)
-    const aboutMenuOpen = Boolean(anchorAbout)
-    const scrollRef = useRef(null)
     const open = Boolean(mobileMenuAnchorEl)
-    const [timer, setTimer] = useState(null);
-
+    const scrollRef = useRef(null)
 
     const handleOpen = (event) => {
         setMobileMenuAnchorEl(event.currentTarget);
@@ -20,7 +17,6 @@ export default function NavBar({ invertImg = true }) {
     const handleClose = () => {
         setMobileMenuAnchorEl(null);
     };
-
 
     const trigger = useScrollTrigger({
         disableHysteresis: true,
@@ -49,25 +45,27 @@ export default function NavBar({ invertImg = true }) {
             transform: 'scaleX(1)',
             transition: '.3s ease',
             backgroundColor: (trigger || !invertImg) ? 'black' : 'white',
-
         }
     }
 
-
     const aboutSubmenus = useMemo(() => [
         {
+            id: 0,
             url: '/watoc',
             label: 'WATOC',
         },
         {
+            id: 1,
             url: '/hotel-booking',
             label: 'Hotel Booking',
         },
         {
+            id: 2,
             url: '/abstract-submission',
             label: 'Abstract Submission',
         },
         {
+            id: 3,
             url: '/visa',
             label: 'Visa Requirements',
         },
@@ -85,14 +83,6 @@ export default function NavBar({ invertImg = true }) {
                 </Link>
             </Box>
         )
-    }
-
-    const handleOnMouseOver = ({ currentTarget }) => {
-        setAnchorAbout(currentTarget)
-    }
-
-    function handleOnMouseLeave() {
-        setAnchorAbout(null);
     }
 
     return (
@@ -141,49 +131,19 @@ export default function NavBar({ invertImg = true }) {
                         <HomeMenuLink path='/' label='Home' />
                         <HomeMenuLink path='/venue' label='Venue' />
                         <HomeMenuLink path='/young-watoc' label='Young WATOC' />
-                        <Box
-                            onMouseEnter={handleOnMouseOver}
-                            sx={{
-                                color: (trigger || !invertImg) ? 'black' : 'white',
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: 0.5,
-                                cursor: 'pointer',
-                                transition: '0.3s ease',
-                                transform: aboutMenuOpen ? 'translateY(-5px) scale(1.05)' : 'none',
-                            }}
-                        >
-                            <Typography variant="h6" component="div" >
-                                About
-                            </Typography>
-                            <KeyboardArrowDown />
-                        </Box>
-                        {/* <HomeMenuLink path='/contact' label='Contact' /> */}
-                        <HomeMenuLink path='/register' label='Registration' />
-                        <Menu
-                            disableScrollLock
-                            disableAutoFocusItem
-                            disableEnforceFocus
-                            open={aboutMenuOpen}
-                            anchorEl={anchorAbout}
-                            anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
-                            transformOrigin={{ vertical: 'top', horizontal: 'center' }}
-                            slotProps={{
-                                list: {
-                                    onMouseLeave: handleOnMouseLeave,
-                                },
-                            }}
-                        >
-                            {aboutSubmenus.map((item, index) => (
-                                <Link key={index} to={item.url} style={{ textDecoration: 'none', }}>
-                                    <MenuItem onClick={handleOnMouseLeave}>
+                        <CustomDropdownMenu textBlack={trigger || !invertImg} >
+                            {aboutSubmenus.map((item) => (
+                                <MenuItem>
+                                    <Link key={item.id} to={item.url} style={{ textDecoration: 'none', }}>
                                         <ListItemText sx={{ gap: 3, color: '#383838ff' }}>
                                             {item.label}
                                         </ListItemText>
-                                    </MenuItem>
-                                </Link>
+                                    </Link>
+                                </MenuItem>
                             ))}
-                        </Menu>
+                        </CustomDropdownMenu>
+                        {/* <HomeMenuLink path='/contact' label='Contact' /> */}
+                        <HomeMenuLink path='/register' label='Registration' />
                     </Box>
                     <Box
                         sx={{
@@ -236,8 +196,8 @@ export default function NavBar({ invertImg = true }) {
                     </MenuItem>
 
                     <Divider />
-                    {aboutSubmenus.map((item, index) => (
-                        <MenuItem key={index} onClick={handleOnMouseLeave}>
+                    {aboutSubmenus.map((item) => (
+                        <MenuItem key={item.id} onClick={handleClose}>
                             <Link to={item.url} style={{ textDecoration: 'none', color: 'black' }}>
                                 {item.label}
                             </Link>

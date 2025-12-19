@@ -15,7 +15,6 @@ export default function VisaRequirements() {
             <NavBar />
             <Box component='main'>
                 <HeroSection
-                    backgroundImgSrc='/field.png'
                     enableParticles={true}
                     enableRadialGradient={true}
                     height='70dvh'

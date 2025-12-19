@@ -53,6 +53,19 @@ const globalTheme = createTheme({
 				},
 			},
 		},
+		// Mui:{
+		// 	styleOverrides: {
+		// 		root: {
+		// 			'& fieldset': {
+		// 				borderColor: '#a0a4aeff',
+		// 			},
+		// 			'& .MuiOutlinedInput-root': {
+		// 				borderRadius: 15,
+		// 				backgroundColor: '#f5f8ffff', // azul muy suave
+		// 			},
+		// 		},
+		// 	},
+		// },
 		MuiCssBaseline: {
 			styleOverrides: {
 				body: {

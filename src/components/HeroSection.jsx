@@ -40,21 +40,48 @@ const FloatingParticles = memo(({ count = 20, color = 'rgba(255,255,255,0.3)' })
 ))
 
 export const HeroSection = ({
-    backgroundImgSrc = '/field.png',
+    backgroundImgSrc = ['/field.png'],
     height = '70vh',
     disableLinearGradient = false,
     enableParticles = false,
     enableRadialGradient = true,
-    gradientColors = 'rgba(13, 27, 42, 0.45) 0%, rgba(27, 38, 59, 0.25) 50%, rgba(13, 27, 42, 0.45) 100%',
+    gradientColors = 'rgba(13, 27, 42, 0.5) 0%, rgba(27, 38, 59, 0.25) 50%, rgba(13, 27, 42, 0.5) 100%',
     enableWave = true,
     fadeTimeout = 1000,
+    transitionDuration = 1000,
+    slideshowInterval = 10000,
     children,
 }) => {
     const [isVisible, setIsVisible] = useState(false);
+    const [currentImageIndex, setCurrentImageIndex] = useState(0)
+    const [isTransitioning, setIsTransitioning] = useState(false)
 
     useEffect(() => {
         setIsVisible(true);
     }, []);
+
+    useEffect(() => {
+        if (backgroundImgSrc.length <= 1) return;
+
+        const interval = setInterval(() => {
+            setIsTransitioning(true);
+
+            setTimeout(() => {
+                setCurrentImageIndex((prev) => (prev + 1) % backgroundImgSrc.length);
+                setTimeout(() => setIsTransitioning(false), 100);
+            }, transitionDuration / 2);
+        }, slideshowInterval);
+
+        return () => clearInterval(interval);
+    }, [backgroundImgSrc.length, slideshowInterval, transitionDuration]);
+
+
+    const getBackgroundStyle = (imageUrl) => ({
+        background: `${disableLinearGradient ? '' : `linear-gradient(135deg, ${gradientColors}),`} url("${imageUrl}")`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundAttachment: 'fixed',
+    })
 
     return (
         <>
@@ -68,10 +95,10 @@ export const HeroSection = ({
                                     dur="8s"
                                     repeatCount="indefinite"
                                     values="
-                    M0 0 H1 V0.96 C0.9 1.0 0.8 0.92 0.65 0.96 C0.5 1.0 0.35 0.92 0.2 0.96 C0.1 0.99 0.05 0.97 0 0.98 Z;
-                    M0 0 H1 V0.97 C0.9 0.92 0.8 1.0 0.65 0.97 C0.5 0.92 0.35 1.0 0.2 0.97 C0.1 0.95 0.05 0.96 0 0.97 Z;
-                    M0 0 H1 V0.96 C0.9 1.0 0.8 0.92 0.65 0.96 C0.5 1.0 0.35 0.92 0.2 0.96 C0.1 0.99 0.05 0.97 0 0.98 Z
-                  "
+                                        M0 0 H1 V0.96 C0.9 1.0 0.8 0.92 0.65 0.96 C0.5 1.0 0.35 0.92 0.2 0.96 C0.1 0.99 0.05 0.97 0 0.98 Z;
+                                        M0 0 H1 V0.97 C0.9 0.92 0.8 1.0 0.65 0.97 C0.5 0.92 0.35 1.0 0.2 0.97 C0.1 0.95 0.05 0.96 0 0.97 Z;
+                                        M0 0 H1 V0.96 C0.9 1.0 0.8 0.92 0.65 0.96 C0.5 1.0 0.35 0.92 0.2 0.96 C0.1 0.99 0.05 0.97 0 0.98 Z
+                                    "
                                 />
                             </path>
                         </clipPath>
@@ -85,10 +112,7 @@ export const HeroSection = ({
                     position: 'relative',
                     width: '100%',
                     minHeight: height,
-                    background: `${disableLinearGradient
-                        ? ''
-                        : `linear-gradient(135deg, ${gradientColors}), `
-                        }url("${backgroundImgSrc}")`,
+                    background: `url("/field.png")`,
                     backgroundSize: 'cover',
                     backgroundPosition: 'center',
                     backgroundAttachment: 'fixed',
@@ -98,6 +122,20 @@ export const HeroSection = ({
                     overflow: 'hidden',
                 }}
             >
+                {backgroundImgSrc.map((img, index) => (
+                    <Box
+                        key={index}
+                        sx={{
+                            position: 'absolute',
+                            inset: 0,
+                            ...getBackgroundStyle(img),
+                            opacity: index === currentImageIndex ? (isTransitioning ? 0 : 1) : 0,
+                            transition: `opacity ${transitionDuration}ms ease-in-out`,
+                            zIndex: index === currentImageIndex ? 1 : 0,
+                        }}
+                    />
+                ))}
+
                 {enableParticles && <FloatingParticles />}
 
                 {enableRadialGradient && (

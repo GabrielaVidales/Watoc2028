@@ -75,8 +75,9 @@ const WelcomeMessage = ({ organizer, isReversed = false }) => (
                     Welcome to WATOC 2028
                 </Typography>
 
-                {organizer.paragraphs.map(text => (
+                {organizer.paragraphs.map((text, index) => (
                     <Typography
+                        key={index}
                         variant="body1"
                         gutterBottom
                         sx={{
@@ -192,7 +193,7 @@ function WelcomeSection() {
                 <Stack spacing={8}>
                     {organizers.map((organizer, index) => (
                         <WelcomeMessage
-                            key={index}
+                            key={organizer.url}
                             organizer={organizer}
                             isReversed={index % 2 !== 0}
                         />
