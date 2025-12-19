@@ -1,6 +1,7 @@
 import { Typography, Button, Stack, Chip, Box } from '@mui/material';
 import { CalendarToday, LocationOn, ArrowDownward } from '@mui/icons-material';
 import { useState, useEffect } from 'react';
+import { Link } from 'react-router';
 
 const QuickCountdown = () => {
     const [days, setDays] = useState(0);
@@ -19,7 +20,7 @@ const QuickCountdown = () => {
 
     return (
         <Chip
-            icon={<CalendarToday />}
+            icon={<CalendarToday color='white' fontSize='0.8rem' />}
             label={`${days} days until WATOC 2028`}
             sx={{
                 bgcolor: 'rgba(255,255,255,0.15)',
@@ -74,10 +75,10 @@ export const HomeHeroContent = () => {
                         spacing={2}
                         justifyContent="center"
                         alignItems="center"
-                        sx={{ mb: 2 }}
+                        sx={{ mb: 1 }}
                     >
                         <Chip
-                            icon={<LocationOn />}
+                            icon={<LocationOn color='white' fontSize='0.8rem' />}
                             label="Mérida, México"
                             sx={{
                                 bgcolor: 'rgba(255,255,255,0.1)',
@@ -85,6 +86,9 @@ export const HomeHeroContent = () => {
                                 backdropFilter: 'blur(5px)',
                                 border: '1px solid rgba(255,255,255,0.2)',
                                 fontSize: { xs: '0.9rem', md: '1.1rem' },
+                                '&>span': {
+                                    fontSize: { xs: '0.8rem', md: '0.9rem' },
+                                }
                             }}
                         />
                         <Typography
@@ -97,7 +101,7 @@ export const HomeHeroContent = () => {
                             •
                         </Typography>
                         <Chip
-                            icon={<CalendarToday />}
+                            icon={<CalendarToday color='white' fontSize='0.8rem' />}
                             label="January 9-14, 2028"
                             sx={{
                                 bgcolor: 'rgba(255,255,255,0.1)',
@@ -105,6 +109,32 @@ export const HomeHeroContent = () => {
                                 backdropFilter: 'blur(5px)',
                                 border: '1px solid rgba(255,255,255,0.2)',
                                 fontSize: { xs: '0.9rem', md: '1.1rem' },
+                                '&>span': {
+                                    fontSize: { xs: '0.8rem', md: '0.9rem' },
+                                }
+                            }}
+                        />
+                        <Typography
+                            sx={{
+                                color: 'rgba(255,255,255,0.8)',
+                                fontSize: { xs: '0.9rem', md: '1.1rem' },
+                                display: { xs: 'none', sm: 'block' },
+                            }}
+                        >
+                            •
+                        </Typography>
+                        <Chip
+                            icon={<CalendarToday color='white' fontSize='0.8rem' />}
+                            label="Young WATOC January 9th, 2028"
+                            sx={{
+                                bgcolor: 'rgba(255,255,255,0.1)',
+                                color: 'white',
+                                backdropFilter: 'blur(5px)',
+                                border: '1px solid rgba(255,255,255,0.2)',
+                                fontSize: { xs: '0.9rem', md: '1.1rem' },
+                                '&>span': {
+                                    fontSize: { xs: '0.8rem', md: '0.9rem' },
+                                },
                             }}
                         />
                     </Stack>
@@ -123,55 +153,19 @@ export const HomeHeroContent = () => {
                     14th Triennial Congress of the World Association of Theoretical and
                     Computational Chemists
                 </Typography>
+                <Typography
+                    sx={{
+                        color: 'rgba(255,255,255,0.95)',
+                        fontSize: { xs: '1rem', sm: '1.2rem', md: '1.3rem' },
+                        maxWidth: 700,
+                        lineHeight: 1.6,
+                        fontWeight: 300,
+                        textShadow: '0 2px 10px rgba(0,0,0,0.3)',
+                    }}
+                >
+                    Preceded by Young WATOC on January 8th
+                </Typography>
 
-                <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} sx={{ mt: 2 }}>
-                    <Button
-                        variant="contained"
-                        size="large"
-                        sx={{
-                            bgcolor: 'primary.main',
-                            px: 4,
-                            py: 1.5,
-                            fontSize: '1.1rem',
-                            fontWeight: 600,
-                            textTransform: 'none',
-                            borderRadius: 3,
-                            '&:hover': {
-                                bgcolor: 'primary.light',
-                                transform: 'translateY(-2px)',
-                            },
-                            transition: 'all 0.3s ease',
-                        }}
-                    >
-                        Register Now
-                    </Button>
-                    <Button
-                        variant="outlined"
-                        size="large"
-                        sx={{
-                            borderColor: 'white',
-                            color: 'white',
-                            px: 4,
-                            py: 1.5,
-                            fontSize: '1.1rem',
-                            fontWeight: 600,
-                            textTransform: 'none',
-                            borderRadius: 3,
-                            borderWidth: 2,
-                            backdropFilter: 'blur(10px)',
-                            bgcolor: 'rgba(255,255,255,0.05)',
-                            '&:hover': {
-                                borderColor: 'white',
-                                bgcolor: 'rgba(255,255,255,0.15)',
-                                borderWidth: 2,
-                                transform: 'translateY(-2px)',
-                            },
-                            transition: 'all 0.3s ease',
-                        }}
-                    >
-                        Learn More
-                    </Button>
-                </Stack>
             </Stack>
 
             <Box

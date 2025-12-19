@@ -8,7 +8,10 @@ export default function VisaInvitationSection() {
             sx={{
                 py: { xs: 6, md: 8 },
                 px: { xs: 2, sm: 3, md: 4 },
-                background: 'white',
+                bgcolor: 'grey.50',
+                borderTop: '1px solid',
+                borderBottom: '1px solid',
+                borderColor: 'divider',
             }}
         >
             <Container maxWidth="lg">

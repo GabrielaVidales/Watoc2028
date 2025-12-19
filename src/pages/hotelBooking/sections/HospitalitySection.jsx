@@ -145,7 +145,7 @@ export default function HospitalitySection() {
                                     transition: 'all 0.3s ease',
                                 }}
                             >
-                                Discover Visit Yucatán
+                                Hotels in Mérida
                             </Button>
                         </Link>
                     </Stack>

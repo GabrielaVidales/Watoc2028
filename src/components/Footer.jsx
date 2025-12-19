@@ -5,29 +5,17 @@ import { Link } from 'react-router';
 export default function Footer() {
     const navigation = {
         congress: [
-            { label: 'About WATOC', href: '/about' },
-            { label: 'Program', href: '/program' },
-            { label: 'Speakers', href: '/speakers' },
-            { label: 'Registration', href: '/registration' },
+            { label: "What's WATOC?", href: '/watoc' },
+            { label: 'Abstract Submission', href: '/abstract-submission' },
+            { label: 'Visa Requirements', href: '/visa' },
+            { label: 'Registration', href: '/register' },
         ],
         venue: [
             { label: 'Venue Information', href: '/venue' },
-            { label: 'Accommodations', href: '/hotels' },
-            { label: 'Transportation', href: '/transportation' },
-            { label: 'Mérida City Guide', href: '/guide' },
-        ],
-        participants: [
-            { label: 'Abstract Submission', href: '/abstract' },
-            { label: 'Important Dates', href: '/dates' },
-            { label: 'Travel Grants', href: '/grants' },
-            { label: 'FAQ', href: '/faq' },
+            { label: 'Hotel Booking', href: '/hotel-booking' },
+            { label: 'Mérida City Guide', href: 'https://visitmerida.mx/' },
         ],
     };
-
-    const organizers = [
-        { name: 'Dr. José Gabriel Merino Hernández', institution: 'Cinvestav Mérida' },
-        { name: 'Dr. Annia Galano Jiménez', institution: 'UAM Iztapalapa' },
-    ];
 
     return (
         <Box
@@ -37,12 +25,30 @@ export default function Footer() {
                 color: 'white',
                 pt: 6,
                 pb: 3,
-                background: `url(/field.png)`,
+                backgroundPositionY: 'bottom',
+                position: 'relative',
+                zIndex:-1,
             }}
         >
+            <Box
+                sx={{
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    opacity: 0.5,
+                    backgroundImage: 'url(/field.png)',
+                    backgroundSize: 'cover',
+                    backgroundPosition: 'center',
+                    backgroundAttachment: 'fixed',
+                    pointerEvents: 'none',
+                    zIndex:-1,
+                }}
+            />
             <Container maxWidth="lg">
                 <Grid container spacing={4}>
-                    <Grid size={{ xs: 12, md: 4 }}>
+                    <Grid size={{ xs: 12, md: 5 }}>
                         <Stack spacing={2}>
                             <Typography variant="h5" fontWeight="bold" color="primary.light">
                                 WATOC 2028
@@ -135,33 +141,7 @@ export default function Footer() {
                         </Stack>
                     </Grid>
 
-                    <Grid size={{ xs: 12, md: 2 }}>
-                        <Typography variant="subtitle1" fontWeight="bold" mb={2} color="primary.light">
-                            Participants
-                        </Typography>
-                        <Stack spacing={1}>
-                            {navigation.participants.map((item, index) => (
-                                <MUILink
-                                    key={index}
-                                    href={item.href}
-                                    underline="none"
-                                    sx={{
-                                        color: 'rgba(255,255,255,0.8)',
-                                        fontSize: '0.875rem',
-                                        transition: 'all 0.2s',
-                                        '&:hover': {
-                                            color: 'primary.light',
-                                            pl: 1,
-                                        },
-                                    }}
-                                >
-                                    {item.label}
-                                </MUILink>
-                            ))}
-                        </Stack>
-                    </Grid>
-
-                    <Grid size={{ xs: 12, md: 2 }}>
+                    <Grid size={{ xs: 12, md: 3 }}>
                         <Typography variant="subtitle1" fontWeight="bold" mb={2} color="primary.light">
                             Contact
                         </Typography>
@@ -190,34 +170,6 @@ export default function Footer() {
                 </Grid>
 
                 <Divider sx={{ my: 4, borderColor: 'rgba(255,255,255,0.1)' }} />
-
-                <Box mb={4}>
-                    <Typography variant="subtitle2" fontWeight="bold" mb={2} color="primary.light">
-                        Organizing Committee Chairs
-                    </Typography>
-                    <Grid container spacing={2}>
-                        {organizers.map((organizer, index) => (
-                            <Grid size={{ xs: 12, sm: 6 }} key={index}>
-                                <Box
-                                    sx={{
-                                        p: 2,
-                                        bgcolor: 'rgba(255,255,255,0.05)',
-                                        borderRadius: 2,
-                                        borderLeft: '3px solid',
-                                        borderColor: 'primary.main',
-                                    }}
-                                >
-                                    <Typography variant="body2" fontWeight="600" sx={{ mb: 0.5 }}>
-                                        {organizer.name}
-                                    </Typography>
-                                    <Typography variant="caption" sx={{ opacity: 0.7 }}>
-                                        {organizer.institution}
-                                    </Typography>
-                                </Box>
-                            </Grid>
-                        ))}
-                    </Grid>
-                </Box>
 
                 <Divider sx={{ my: 3, borderColor: 'rgba(255,255,255,0.1)' }} />
 

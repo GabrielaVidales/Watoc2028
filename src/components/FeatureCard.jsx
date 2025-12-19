@@ -1,7 +1,7 @@
 import { Box, Card, CardContent, Typography } from '@mui/material';
 import React from 'react'
 
-const FeatureCard = ({ icon: Icon, text, title = null, label = null, color }) => (
+const FeatureCard = React.memo(({ icon: Icon, text, title = null, label = null, color }) => (
     <Card
         elevation={0}
         sx={{
@@ -54,6 +54,6 @@ const FeatureCard = ({ icon: Icon, text, title = null, label = null, color }) =>
             </Typography>
         </CardContent>
     </Card>
-);
+))
 
 export default FeatureCard

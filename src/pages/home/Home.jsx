@@ -10,6 +10,7 @@ import NewsletterSection from './sections/NewsletterSection'
 import { HomeHeroContent } from './components/HomeHeroContent'
 import GenericCTASection from '../../components/GenericCTASection'
 import { HeroSection } from '../../components/HeroSection'
+import { Link } from 'react-router'
 
 export const MainCTA = () => (
     <GenericCTASection>
@@ -26,50 +27,53 @@ export const MainCTA = () => (
                 spacing={2}
                 sx={{ mt: 3 }}
             >
-                <Button
-                    variant="contained"
-                    size="large"
-                    endIcon={<ArrowForward />}
-                    sx={{
-                        bgcolor: 'white',
-                        color: 'primary.main',
-                        px: 4,
-                        py: 1.5,
-                        fontSize: '1.1rem',
-                        textTransform: 'none',
-                        fontWeight: 'bold',
-                        '&:hover': {
-                            bgcolor: 'grey.100',
-                            transform: 'translateY(-2px)',
-                            boxShadow: 4,
-                        },
-                        transition: 'all 0.3s',
-                    }}
-                >
-                    Register Now
-                </Button>
-
-                <Button
-                    variant="outlined"
-                    size="large"
-                    sx={{
-                        borderColor: 'white',
-                        color: 'white',
-                        px: 4,
-                        py: 1.5,
-                        fontSize: '1.1rem',
-                        textTransform: 'none',
-                        fontWeight: 'bold',
-                        '&:hover': {
+                <Link to='/register'>
+                    <Button
+                        variant="contained"
+                        size="large"
+                        endIcon={<ArrowForward />}
+                        sx={{
+                            bgcolor: 'white',
+                            color: 'primary.main',
+                            px: 4,
+                            py: 1.5,
+                            fontSize: '1.1rem',
+                            textTransform: 'none',
+                            fontWeight: 'bold',
+                            '&:hover': {
+                                bgcolor: 'grey.100',
+                                transform: 'translateY(-2px)',
+                                boxShadow: 4,
+                            },
+                            transition: 'all 0.3s',
+                        }}
+                    >
+                        Register Now
+                    </Button>
+                </Link>
+                <Link to='/abstract-submission'>
+                    <Button
+                        variant="outlined"
+                        size="large"
+                        sx={{
                             borderColor: 'white',
-                            bgcolor: 'rgba(255,255,255,0.1)',
-                            transform: 'translateY(-2px)',
-                        },
-                        transition: 'all 0.3s',
-                    }}
-                >
-                    Submit Abstract
-                </Button>
+                            color: 'white',
+                            px: 4,
+                            py: 1.5,
+                            fontSize: '1.1rem',
+                            textTransform: 'none',
+                            fontWeight: 'bold',
+                            '&:hover': {
+                                borderColor: 'white',
+                                bgcolor: 'rgba(255,255,255,0.1)',
+                                transform: 'translateY(-2px)',
+                            },
+                            transition: 'all 0.3s',
+                        }}
+                    >
+                        Submit Abstract
+                    </Button>
+                </Link>
             </Stack>
         </Stack>
     </GenericCTASection>
@@ -146,6 +150,7 @@ const CounterCard = () => {
         </Box>
     )
 }
+
 export default function Home() {
     return (
         <>
@@ -163,6 +168,7 @@ export default function Home() {
                 </HeroSection>
 
                 <WelcomeSection />
+                <MainCTA />
                 <Box component='section' justifyContent='center' textAlign='center' sx={{
                     px: { xs: 1, sm: 3, md: 10, lg: 15 },
                     py: { xs: 2, md: 3 },
@@ -172,9 +178,8 @@ export default function Home() {
                     </Typography>
                     <CounterCard />
                 </Box>
-                <MainCTA />
                 <VenueSection />
-                <NewsletterSection />
+                {/* <NewsletterSection /> */}
                 <CollaboratorsSection />
             </Box>
             <Footer />

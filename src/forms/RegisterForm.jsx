@@ -22,8 +22,6 @@ export default function RegisterForm() {
     return (
         <form action="#" onSubmit={handleSubmit(onValidatedData)} className='w-100 p-3'>
             <Stack spacing={3}>
-                <h3 className='text-center'>Join WATOC 2028</h3>
-                <p className='text-center'>Create an account to access your dashboard and conference materials</p>
                 <Stack spacing={1}>
                     <InputLabel htmlFor='emailInput'>Full name</InputLabel>
                     <Controller
@@ -43,15 +41,6 @@ export default function RegisterForm() {
                                 id='firstNameInput'
                                 fullWidth
                                 placeholder='First name'
-                                slotProps={{
-                                    input: {
-                                        startAdornment: (
-                                            <InputAdornment position="start">
-                                                <ContactEmergency />
-                                            </InputAdornment>
-                                        )
-                                    }
-                                }}
                                 error={!!errors?.firstName}
                                 helperText={
                                     <Grow in={!!errors?.firstName} timeout={500} id='putajajajaja'>
@@ -83,15 +72,6 @@ export default function RegisterForm() {
                                 id='lastNameInput'
                                 fullWidth
                                 placeholder='Last name'
-                                slotProps={{
-                                    input: {
-                                        startAdornment: (
-                                            <InputAdornment position="start">
-                                                <ContactEmergency />
-                                            </InputAdornment>
-                                        )
-                                    }
-                                }}
                                 error={!!errors?.lastName}
                                 helperText={
                                     <Grow in={!!errors?.lastName} timeout={500} id='putajajajaja'>

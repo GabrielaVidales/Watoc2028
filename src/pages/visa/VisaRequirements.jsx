@@ -23,9 +23,7 @@ export default function VisaRequirements() {
                     <GenericHeroContent />
                 </HeroSection>
                 <VisaMainSection/>
-                <GenericCTASection/>
                 <VisaInvitationSection/>
-                <GenericCTASection/>
             </Box>
             <Footer />
         </>

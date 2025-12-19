@@ -1,7 +1,7 @@
-import { Box, Card, CardContent, Container, Grid, Icon, Stack, Typography } from '@mui/material'
-import { Link } from 'react-router'
+import { Box, Container, Stack, Typography } from '@mui/material'
+import React from 'react'
 
-export default function VisaMainSection() {
+export default function AboutYoungWATOCSection() {
     return (
         <Box
             component="section"
@@ -22,7 +22,7 @@ export default function VisaMainSection() {
                         fontWeight="bold"
                         sx={{ fontSize: '1rem', letterSpacing: 2 }}
                     >
-                        VISA
+                        About
                     </Typography>
                     <Typography
                         variant="h3"
@@ -33,7 +33,7 @@ export default function VisaMainSection() {
                             fontSize: { xs: '2rem', md: '2.5rem' },
                         }}
                     >
-                        Visa Requirements
+                        Young WATOC 2028
                     </Typography>
                     <Box
                         sx={{
@@ -55,7 +55,7 @@ export default function VisaMainSection() {
                                 lineHeight: 1.7,
                             }}
                         >
-                            Participants from countries outside Mexico may require a visa to enter Mexico to attend WATOC 2028.
+                            Young WATOC will take place on January 8th, 2028, as a special pre-conference event held prior to the WATOC 2028 Congress.
                         </Typography>
                         <Typography
                             sx={{
@@ -64,7 +64,7 @@ export default function VisaMainSection() {
                                 lineHeight: 1.7,
                             }}
                         >
-                            Please consult the <b>Mexican Ministry of Foreign Affairs</b> (<b>Secretaría de Relaciones Exteriores – SRE</b>) to verify whether you need a visa to enter Mexico, based on your nationality.
+                            Young WATOC is a one-day event dedicated to early-career researchers, providing selected young scientists the opportunity to present their work and engage with an international community of peers and senior researchers. The event is designed to highlight emerging research and foster scientific exchange in a focused and supportive environment.
                         </Typography>
                         <Typography
                             sx={{
@@ -73,33 +73,21 @@ export default function VisaMainSection() {
                                 lineHeight: 1.7,
                             }}
                         >
-                            Many participants may enter Mexico without a visa for short stays (tourism, academic events, or conferences). If a visa is required, we recommend applying for a <b>Visitor Visa</b> (<i>Visa de Visitante sin permiso para realizar actividades remuneradas</i>) and indicating that the purpose of travel is attendance at an international academic congress.
+                            Further details regarding eligibility, abstract submission, and participation will be announced closer to the congress.
                         </Typography>
                         <Typography
                             sx={{
                                 fontSize: { xs: '1rem', md: '1.15rem' },
-                                opacity: 0.95,
+                                opacity: 0.6,
+                                textAlign: 'center',
                                 lineHeight: 1.7,
                             }}
                         >
-                            Invitation letters for visa purposes can only be issued to participants who have completed the registration process.
+                            Please note that registration and abstract submission for Young WATOC 2028 are not yet open.
                         </Typography>
-                        <Link to={'https://embamex.sre.gob.mx/finlandia/index.php/traveling/visas'} target="_blank"  rel="noreferrer noopener">
-                            <Typography
-                                sx={{
-                                    fontSize: { xs: '1rem', md: '1.15rem' },
-                                    opacity: 0.95,
-                                    lineHeight: 1.7,
-                                }}
-                            >
-                                Further information regarding visa requirements can be found on the official SRE website.
-                            </Typography>
-                        </Link>
                     </Stack>
                 </Container>
             </Container>
         </Box>
     )
 }
-
-

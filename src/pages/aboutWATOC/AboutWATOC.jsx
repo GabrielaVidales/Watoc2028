@@ -14,7 +14,6 @@ export default function AboutWATOC() {
                 <HeroSection>
                     <GenericHeroContent />
                 </HeroSection>
-
                 <AboutWATOCSection />
             </Box>
             <Footer />

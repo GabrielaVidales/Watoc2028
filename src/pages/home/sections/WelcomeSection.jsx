@@ -75,34 +75,19 @@ const WelcomeMessage = ({ organizer, isReversed = false }) => (
                     Welcome to WATOC 2028
                 </Typography>
 
-                <Typography
-                    variant="body1"
-                    gutterBottom
-                    sx={{
-                        fontSize: '1.05rem',
-                        lineHeight: 1.8,
-                        textAlign: 'justify',
-                    }}
-                >
-                    It is with great pleasure that we invite you to participate in the 14th
-                    Triennial Congress of the World Association of Theoretical and
-                    Computational Chemists (WATOC 2028), to be held in the beautiful city
-                    of Mérida, Yucatán, Mexico.
-                </Typography>
-
-                <Typography
-                    variant="body1"
-                    gutterBottom
-                    sx={{
-                        fontSize: '1.05rem',
-                        lineHeight: 1.8,
-                        textAlign: 'justify',
-                    }}
-                >
-                    This congress will bring together leading researchers from around the
-                    world to share groundbreaking advances in theoretical and computational
-                    chemistry, fostering collaboration and innovation in our field.
-                </Typography>
+                {organizer.paragraphs.map(text => (
+                    <Typography
+                        variant="body1"
+                        gutterBottom
+                        sx={{
+                            fontSize: '1.05rem',
+                            lineHeight: 1.8,
+                            textAlign: 'justify',
+                        }}
+                    >
+                        {text}
+                    </Typography>
+                ))}
 
                 <Box
                     sx={{
@@ -149,13 +134,17 @@ function WelcomeSection() {
             name: 'Prof. José Gabriel Merino Hernández',
             subtitle: 'Physical & Theoretical Chemistry',
             text: 'Chair of WATOC 2028',
+            paragraphs: [
+                'It is with great pleasure that we invite you to participate in the 14th Triennial Congress of the World Association of Theoretical and Computational Chemists (WATOC 2028), to be held in the beautiful city of Mérida, Yucatán, Mexico.',
+                'This congress will bring together leading researchers from around the world to share groundbreaking advances in theoretical and computational chemistry, fostering collaboration and innovation in our field.',
+            ]
         },
-        {
-            url: '/galano.jpg',
-            name: 'Prof. Annia Galano Jiménez',
-            subtitle: 'Theoretical Chemistry',
-            text: 'Chair of WATOC 2028',
-        },
+        // {
+        //     url: '/galano.jpg',
+        //     name: 'Prof. Annia Galano Jiménez',
+        //     subtitle: 'Theoretical Chemistry',
+        //     text: 'Chair of WATOC 2028',
+        // },
     ];
 
     return (

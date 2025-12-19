@@ -1,9 +1,7 @@
-import React from 'react'
 import NavBar from '../../components/NavBar'
 import Footer from '../../components/Footer'
-import { ScrollTop } from '../../components/ScrollTop'
-import { Box, Card, CardContent, CardMedia, Container, Divider, Fab, Fade, Grid, Paper, Stack, Toolbar, Typography } from '@mui/material'
-import { EnergySavingsLeaf, Flight, Groups2, Hotel, Lens, Room, WifiTethering } from '@mui/icons-material'
+import { Box, Card, CardContent, Container, Grid, Paper, Stack, Typography } from '@mui/material'
+import { EnergySavingsLeaf, Flight, Groups2, Hotel, Room, WifiTethering } from '@mui/icons-material'
 import { VenueHeroContent } from './components/VenueHeroContent'
 import GenericCTASection from '../../components/GenericCTASection'
 import { HeroSection } from '../../components/HeroSection'
@@ -156,7 +154,7 @@ export default function VenuePage() {
                                 fontWeight="bold"
                                 sx={{ fontSize: { xs: '1.8rem', md: '2.5rem' } }}
                             >
-                                Modernidad y Sustentabilidad
+                                Modernity & Sustainability
                             </Typography>
                             <Typography
                                 variant="h6"
@@ -173,22 +171,22 @@ export default function VenuePage() {
                                 <Grid size={{ xs: 12, sm: 6, md: 4 }}>
                                     <FeatureCard
                                         icon={<Groups2 />}
-                                        title='Gran Capacidad'
-                                        text='Con una superficie de 10,000 m² y 26 salones, puede albergar hasta 10,000 asistentes.'
+                                        title='High Capacity'
+                                        text='With a total event area of 10,000 m² and 26 meeting rooms, the venue can accommodate up to 10,000 attendees.'
                                     />
                                 </Grid>
                                 <Grid size={{ xs: 12, sm: 6, md: 4 }}>
                                     <FeatureCard
                                         icon={<EnergySavingsLeaf />}
-                                        title='Certificación LEED'
-                                        text='Primer edificio en México con certificación LEED Platino en su categoría, prioritizando la eficiencia energética.'
+                                        title='LEED Certification'
+                                        text='The first building in Mexico to receive LEED Platinum certification in its category, prioritizing energy efficiency and sustainable design.'
                                     />
                                 </Grid>
                                 <Grid size={{ xs: 12, sm: 6, md: 4 }}>
                                     <FeatureCard
                                         icon={<WifiTethering />}
-                                        title='Alta Conectividad'
-                                        text='Infraestructura de fibra óptica y Wi-Fi de alta calidad para soportar miles de asistentes simultáneos.'
+                                        title='Advanced Connectivity'
+                                        text='State-of-the-art fiber-optic infrastructure and high-quality Wi-Fi designed to support thousands of simultaneous attendees.'
                                     />
                                 </Grid>
                             </Grid>
@@ -206,27 +204,26 @@ export default function VenuePage() {
                         <Grid container spacing={3}>
                             <Grid size={{ xs: 12, sm: 5, md: 5 }}>
                                 <Typography variant="h4" fontWeight="bold" gutterBottom>
-                                    Ubicación privilegiada
+                                    Strategic Location
                                 </Typography>
                                 <Typography variant="body1" color="text.secondary" mb={4}>
-                                    Situado en el corazón del Distrito de Congresos de Yucatán,
-                                    rodeado de hoteles, restaurantes y puntos culturales.
+                                    Located in the heart of Yucatán's Convention District, surrounded by hotels, restaurants, and cultural venues.
                                 </Typography>
 
                                 <LocationItem
                                     icon={<Room />}
-                                    title='Dirección'
-                                    text='C-62 #294 entre Av. Cupules y Av. Colón, Centro. Mérida, Yucatán.'
+                                    title='Address'
+                                    text='62 No. 294, between Av. Cupules and Av. Colón, Centro, Mérida, Yucatán, Mexico.'
                                 />
                                 <LocationItem
                                     icon={<Hotel />}
-                                    title='Alojamiento'
-                                    text='Más de 2,000 habitaciones de hotel a pocas calles de distancia.'
+                                    title='Accommodation'
+                                    text='More than 2,000 hotel rooms available within walking distance'
                                 />
                                 <LocationItem
                                     icon={<Flight />}
-                                    title='Transporte'
-                                    text='A solo 20 minutos del Aeropuerto Internacional de Mérida (MID).'
+                                    title='Transportation'
+                                    text='Approximately 20 minutes from Mérida International Airport (MID).'
                                 />
                             </Grid>
                             <Grid size={{ xs: 12, sm: 7, md: 7 }}>
@@ -253,28 +250,28 @@ export default function VenuePage() {
                             <ImageStatCard
                                 image="/centro1.jpg"
                                 value="26"
-                                label="Salones multifuncionales"
+                                label="Lounges"
                             />
                         </Grid>
                         <Grid size={{ xs: 12, sm: 5 }}>
                             <ImageStatCard
                                 image="/centro2.jpg"
                                 value="10,000"
-                                label="Asistentes simultáneos"
+                                label="Capacity of assistants"
                             />
                         </Grid>
                         <Grid size={{ xs: 12, sm: 4 }}>
                             <ImageStatCard
                                 image="/centro3.jpg"
                                 value="9,430 m²"
-                                label="Área para eventos"
+                                label="Event area"
                             />
                         </Grid>
                         <Grid size={{ xs: 12, sm: 8 }}>
                             <ImageStatCard
                                 image="/centroconvenciones.webp"
                                 value="50,000 m²"
-                                label="Superficie total"
+                                label="Total construction"
                             />
                         </Grid>
                     </Grid>

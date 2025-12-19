@@ -1,7 +1,7 @@
 import { Box, Container, Fade, Toolbar } from '@mui/material';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, memo } from 'react';
 
-const FloatingParticles = ({ count = 20, color = 'rgba(255,255,255,0.3)' }) => (
+const FloatingParticles = memo(({ count = 20, color = 'rgba(255,255,255,0.3)' }) => (
     <Box
         sx={{
             position: 'absolute',
@@ -37,7 +37,7 @@ const FloatingParticles = ({ count = 20, color = 'rgba(255,255,255,0.3)' }) => (
             />
         ))}
     </Box>
-);
+))
 
 export const HeroSection = ({
     backgroundImgSrc = '/field.png',
@@ -86,8 +86,8 @@ export const HeroSection = ({
                     width: '100%',
                     minHeight: height,
                     background: `${disableLinearGradient
-                            ? ''
-                            : `linear-gradient(135deg, ${gradientColors}), `
+                        ? ''
+                        : `linear-gradient(135deg, ${gradientColors}), `
                         }url("${backgroundImgSrc}")`,
                     backgroundSize: 'cover',
                     backgroundPosition: 'center',

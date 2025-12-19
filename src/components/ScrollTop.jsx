@@ -19,7 +19,7 @@ export function ScrollTop({ ref }) {
 
     return (
         <Fade in={trigger}>
-            <Box role="presentation" sx={{ position: 'fixed', bottom: 16, right: 16 }} >
+            <Box role="presentation" sx={{ position: 'fixed', bottom: 16, right: 16, zIndex: 10000 }} >
                 <Fab
                     ref={ref}
                     onClick={handleClick}

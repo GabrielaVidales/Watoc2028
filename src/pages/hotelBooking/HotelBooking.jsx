@@ -69,27 +69,26 @@ export default function HotelBooking() {
                         <Grid container spacing={3}>
                             <Grid size={{ xs: 12, sm: 5, md: 5 }}>
                                 <Typography variant="h4" fontWeight="bold" gutterBottom>
-                                    Ubicación privilegiada
+                                    Strategic Location
                                 </Typography>
                                 <Typography variant="body1" color="text.secondary" mb={4}>
-                                    Situado en el corazón del Distrito de Congresos de Yucatán,
-                                    rodeado de hoteles, restaurantes y puntos culturales.
+                                    Located in the heart of Yucatán's Convention District, surrounded by hotels, restaurants, and cultural venues.
                                 </Typography>
 
                                 <LocationItem
                                     icon={<Room />}
-                                    title='Dirección'
-                                    text='C-62 #294 entre Av. Cupules y Av. Colón, Centro. Mérida, Yucatán.'
+                                    title='Address'
+                                    text='62 No. 294, between Av. Cupules and Av. Colón, Centro, Mérida, Yucatán, Mexico.'
                                 />
                                 <LocationItem
                                     icon={<Hotel />}
-                                    title='Alojamiento'
-                                    text='Más de 2,000 habitaciones de hotel a pocas calles de distancia.'
+                                    title='Accommodation'
+                                    text='More than 2,000 hotel rooms available within walking distance'
                                 />
                                 <LocationItem
                                     icon={<Flight />}
-                                    title='Transporte'
-                                    text='A solo 20 minutos del Aeropuerto Internacional de Mérida (MID).'
+                                    title='Transportation'
+                                    text='Approximately 20 minutes from Mérida International Airport (MID).'
                                 />
                             </Grid>
                             <Grid size={{ xs: 12, sm: 7, md: 7 }}>

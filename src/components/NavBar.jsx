@@ -1,15 +1,17 @@
-import { KeyboardArrowDown, Menu as MenuIcon } from '@mui/icons-material';
-import { AppBar, Box, Toolbar, Typography, useScrollTrigger, IconButton, Menu, MenuItem, ListItemText } from '@mui/material';
-import { useRef, useState } from 'react';
+import { ArrowRight, ArrowRightSharp, KeyboardArrowDown, Menu as MenuIcon } from '@mui/icons-material';
+import { AppBar, Box, Toolbar, Typography, useScrollTrigger, IconButton, Menu, MenuItem, ListItemText, ListItemIcon, ClickAwayListener, MenuList, Divider } from '@mui/material';
+import { useMemo, useRef, useState } from 'react';
 import { Link } from 'react-router';
 import { ScrollTop } from './ScrollTop';
 
 export default function NavBar({ invertImg = true }) {
     const [mobileMenuAnchorEl, setMobileMenuAnchorEl] = useState(null);
+    const [anchorAbout, setAnchorAbout] = useState(null)
+    const aboutMenuOpen = Boolean(anchorAbout)
     const scrollRef = useRef(null)
+    const open = Boolean(mobileMenuAnchorEl)
+    const [timer, setTimer] = useState(null);
 
-    const [anchorProgram, setAnchorProgram] = useState(null)
-    const programMenuOpen = Boolean(anchorProgram)
 
     const handleOpen = (event) => {
         setMobileMenuAnchorEl(event.currentTarget);
@@ -19,7 +21,6 @@ export default function NavBar({ invertImg = true }) {
         setMobileMenuAnchorEl(null);
     };
 
-    const open = Boolean(mobileMenuAnchorEl)
 
     const trigger = useScrollTrigger({
         disableHysteresis: true,
@@ -28,7 +29,7 @@ export default function NavBar({ invertImg = true }) {
 
     const linkStyle = {
         color: (trigger || !invertImg) ? 'black' : 'white',
-        transition: '0.35s ease',
+        transition: '0.3s ease',
         '&:hover': {
             transition: '.3s ease',
             transform: 'translateY(-5px) scale(1.05)'
@@ -52,11 +53,31 @@ export default function NavBar({ invertImg = true }) {
         }
     }
 
+
+    const aboutSubmenus = useMemo(() => [
+        {
+            url: '/watoc',
+            label: 'WATOC',
+        },
+        {
+            url: '/hotel-booking',
+            label: 'Hotel Booking',
+        },
+        {
+            url: '/abstract-submission',
+            label: 'Abstract Submission',
+        },
+        {
+            url: '/visa',
+            label: 'Visa Requirements',
+        },
+    ], [])
+
     const HomeMenuLink = ({ path = '#', label = '' }) => {
         return (
             <Box>
                 <Link to={path} style={{ textDecoration: 'none' }} onClick={() => {
-                    console.log(scrollRef.current.click())
+                    scrollRef.current.click()
                 }}>
                     <Typography variant="h6" component="div" sx={linkStyle} >
                         {label}
@@ -67,13 +88,11 @@ export default function NavBar({ invertImg = true }) {
     }
 
     const handleOnMouseOver = ({ currentTarget }) => {
-        console.log('PUTA');
-        setAnchorProgram(currentTarget)
+        setAnchorAbout(currentTarget)
     }
 
     function handleOnMouseLeave() {
-        console.log('MIERDA');
-        setAnchorProgram(null);
+        setAnchorAbout(null);
     }
 
     return (
@@ -90,8 +109,6 @@ export default function NavBar({ invertImg = true }) {
                     }}
                 >
                     <Box
-                        component='a'
-                        href='/'
                         sx={{
                             position: { xs: 'absolute', md: 'static' },
                             left: { xs: '50%', md: 'auto' },
@@ -100,17 +117,19 @@ export default function NavBar({ invertImg = true }) {
                             justifyContent: 'center'
                         }}
                     >
-                        <Box
-                            component="img"
-                            alt="WATOC 2028 Logo"
-                            src="/WatocPNGLogo.png"
-                            sx={{
-                                filter: (trigger || !invertImg) ? 'none' : 'invert()',
-                                maxHeight: { xs: 60, sm: 70, md: 80 },
-                                padding: { xs: 0, sm: 1, md: 0 },
-                                width: 'auto'
-                            }}
-                        />
+                        <Link to='/'>
+                            <Box
+                                component="img"
+                                alt="WATOC 2028 Logo"
+                                src="/WatocPNGLogo.png"
+                                sx={{
+                                    filter: (trigger || !invertImg) ? 'none' : 'invert()',
+                                    maxHeight: { xs: 60, sm: 70, md: 80 },
+                                    padding: { xs: 0, sm: 1, md: 0 },
+                                    width: 'auto'
+                                }}
+                            />
+                        </Link>
                     </Box>
                     <Box
                         sx={{
@@ -121,62 +140,50 @@ export default function NavBar({ invertImg = true }) {
                     >
                         <HomeMenuLink path='/' label='Home' />
                         <HomeMenuLink path='/venue' label='Venue' />
+                        <HomeMenuLink path='/young-watoc' label='Young WATOC' />
                         <Box
-                            aria-haspopup="true"
                             onMouseEnter={handleOnMouseOver}
-                            onMouseLeave={handleOnMouseLeave}
                             sx={{
+                                color: (trigger || !invertImg) ? 'black' : 'white',
                                 display: 'flex',
                                 alignItems: 'center',
                                 gap: 0.5,
                                 cursor: 'pointer',
                                 transition: '0.3s ease',
-                                transform: programMenuOpen ? 'translateY(-5px) scale(1.05)' : 'none',
-                                '&:hover .menu-link': {
-                                    transform: 'translateY(-5px) scale(1.05)',
-                                },
-
-                                '&:hover .menu-link::after': {
-                                    transform: 'scaleX(1)',
+                                transform: aboutMenuOpen ? 'translateY(-5px) scale(1.05)' : 'none',
+                            }}
+                        >
+                            <Typography variant="h6" component="div" >
+                                About
+                            </Typography>
+                            <KeyboardArrowDown />
+                        </Box>
+                        {/* <HomeMenuLink path='/contact' label='Contact' /> */}
+                        <HomeMenuLink path='/register' label='Registration' />
+                        <Menu
+                            disableScrollLock
+                            disableAutoFocusItem
+                            disableEnforceFocus
+                            open={aboutMenuOpen}
+                            anchorEl={anchorAbout}
+                            anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+                            transformOrigin={{ vertical: 'top', horizontal: 'center' }}
+                            slotProps={{
+                                list: {
+                                    onMouseLeave: handleOnMouseLeave,
                                 },
                             }}
                         >
-                            <Typography variant="h6" className='menu-link' component="div" sx={linkStyle} >
-                                About
-                            </Typography>
-                            <KeyboardArrowDown sx={linkStyle} />
-                            <Menu
-                                disableScrollLock
-                                open={programMenuOpen}
-                                anchorEl={anchorProgram}
-                                anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
-                                transformOrigin={{ vertical: 'top', horizontal: 'center' }}
-                                slotProps={{
-                                    list: {
-                                        onMouseEnter: () => setAnchorProgram(anchorProgram),
-                                        onMouseLeave: () => setAnchorProgram(null),
-                                    },
-                                }}
-                            >
-                                {[
-                                    ['/watoc', 'WATOC'],
-                                    ['/hotel-booking', 'Hotel Booking'],
-                                    ['/abstract-submission', 'Abstract Submission'],
-                                    ['/visa', 'Visa Requirements'],
-                                ].map((item, index) => (
-                                    <Link key={index} to={item[0]} style={{ textDecoration: 'none', color: 'black' }}>
-                                        <MenuItem onClick={handleOnMouseLeave}>
-                                            <ListItemText>
-                                                {item[1]}
-                                            </ListItemText>
-                                        </MenuItem>
-                                    </Link>
-                                ))}
-                            </Menu>
-                        </Box>
-                        <HomeMenuLink path='/contact' label='Contact' />
-                        <HomeMenuLink path='/register' label='Registration' />
-                        <HomeMenuLink path='/login' label='Login' />
+                            {aboutSubmenus.map((item, index) => (
+                                <Link key={index} to={item.url} style={{ textDecoration: 'none', }}>
+                                    <MenuItem onClick={handleOnMouseLeave}>
+                                        <ListItemText sx={{ gap: 3, color: '#383838ff' }}>
+                                            {item.label}
+                                        </ListItemText>
+                                    </MenuItem>
+                                </Link>
+                            ))}
+                        </Menu>
                     </Box>
                     <Box
                         sx={{
@@ -209,35 +216,47 @@ export default function NavBar({ invertImg = true }) {
                     },
                 }}
             >
-                <MenuItem onClick={handleClose}>
-                    <Link to="/" style={{ textDecoration: 'none', color: 'black' }}>
-                        Home
-                    </Link>
-                </MenuItem>
+                <MenuList dense>
+                    <MenuItem onClick={handleClose}>
+                        <Link to="/" style={{ textDecoration: 'none', color: 'black' }}>
+                            Home
+                        </Link>
+                    </MenuItem>
 
-                <MenuItem onClick={handleClose}>
-                    <Link to="/program" style={{ textDecoration: 'none', color: 'black' }}>
-                        Program
-                    </Link>
-                </MenuItem>
+                    <MenuItem onClick={handleClose}>
+                        <Link to="/venue" style={{ textDecoration: 'none', color: 'black' }}>
+                            Venue
+                        </Link>
+                    </MenuItem>
 
-                <MenuItem onClick={handleClose}>
-                    <Link to="/contact" style={{ textDecoration: 'none', color: 'black' }}>
-                        Contact
-                    </Link>
-                </MenuItem>
+                    <MenuItem onClick={handleClose}>
+                        <Link to="/young-watoc" style={{ textDecoration: 'none', color: 'black' }}>
+                            Young WATOC
+                        </Link>
+                    </MenuItem>
 
-                <MenuItem onClick={handleClose}>
-                    <Link to="/login" style={{ textDecoration: 'none', color: 'black' }}>
-                        Login
-                    </Link>
-                </MenuItem>
+                    <Divider />
+                    {aboutSubmenus.map((item, index) => (
+                        <MenuItem key={index} onClick={handleOnMouseLeave}>
+                            <Link to={item.url} style={{ textDecoration: 'none', color: 'black' }}>
+                                {item.label}
+                            </Link>
+                        </MenuItem>
+                    ))}
+                    <Divider />
 
-                <MenuItem onClick={handleClose}>
-                    <Link to="/register" style={{ textDecoration: 'none', color: 'black' }}>
-                        Registration
-                    </Link>
-                </MenuItem>
+                    {/* <MenuItem onClick={handleClose}>
+                        <Link to="/contact" style={{ textDecoration: 'none', color: 'black' }}>
+                            Contact
+                        </Link>
+                    </MenuItem> */}
+
+                    <MenuItem onClick={handleClose}>
+                        <Link to="/register" style={{ textDecoration: 'none', color: 'black' }}>
+                            Registration
+                        </Link>
+                    </MenuItem>
+                </MenuList>
             </Menu>
             <ScrollTop ref={scrollRef} />
         </>

@@ -14,7 +14,9 @@ import AbstractSubmissionInfo from './pages/abstractSubmission/AbstractSubmissio
 import VisaRequirements from './pages/visa/VisaRequirements'
 import AboutWATOC from './pages/aboutWATOC/AboutWATOC'
 import Contact from './pages/contact/Contact';
-import RegistrationPage from './pages/regsitration/RegistrationPage';
+import RegistrationPage from './pages/registration/RegistrationPage';
+import NotFound from './pages/error/NotFound';
+import YoungWatoc from './pages/youngWATOC/YoungWatoc';
 
 const darkTheme = createTheme({
 	palette: {
@@ -86,11 +88,12 @@ function App() {
 				<CssBaseline />
 				<Routes>
 					<Route path='' element={<Home />} />
-					<Route path='*' element={<Home />} />
+					<Route path='*' element={<NotFound />} />
 					<Route path='/venue' element={<VenuePage />} />
 					<Route path='/hotel-booking' element={<HotelBooking />} />
 					<Route path='/abstract-submission' element={<AbstractSubmissionInfo />} />
 					<Route path='/watoc' element={<AboutWATOC />} />
+					<Route path='/young-watoc' element={<YoungWatoc />} />
 					<Route path='/visa' element={<VisaRequirements />} />
 					<Route path='/contact' element={<Contact />} />
 					<Route path='/register/account' element={<RegistrationPage />} />
@@ -104,10 +107,10 @@ function App() {
 						</ThemeProvider>
 					</>} />
 					<Route path='/register' element={<>
-						<ThemeProvider theme={darkTheme}>
-							<CssBaseline />
+						{/* <ThemeProvider theme={darkTheme}> */}
+							{/* <CssBaseline /> */}
 							<Register />
-						</ThemeProvider>
+						{/* </ThemeProvider> */}
 					</>} />
 				</Routes>
 			</ThemeProvider>
