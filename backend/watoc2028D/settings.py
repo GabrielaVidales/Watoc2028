@@ -24,12 +24,22 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-vh-cd41aajhex3sq5l!vh161=z61a5guse-14y@6el^ufu7665'
+SECRET_KEY = os.getenv('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS').split(',')
+print("holaaaaaaaaaaaaaaaaaaaaaaaaaaaa",ALLOWED_HOSTS)
+SECURE_SSL_REDIRECT = os.getenv('SECURE_SSL_REDIRECT')
+
+SESSION_COOKIE_SECURE = os.getenv('SESSION_COOKIE_SECURE')
+CSRF_COOKIE_SECURE = os.getenv('CSRF_COOKIE_SECURE')
+
+SECURE_PROXY_SSL_HEADER = os.getenv('SECURE_PROXY_SSL_HEADER').split(',')
+
+
+CSRF_TRUSTED_ORIGINS = os.getenv('CSRF_TRUSTED_ORIGINS').split(',')
 
 AUTH_USER_MODEL = 'users.CustomUser'
 # Application definition
@@ -77,6 +87,7 @@ SIMPLE_JWT = {
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     "corsheaders.middleware.CorsMiddleware",
     'django.middleware.common.CommonMiddleware',
@@ -85,11 +96,8 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
-
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:5173",
-    "http://localhost:3000",
-]
+CORS_ALLOW_ALL_ORIGINS = False
+CORS_ALLOWED_ORIGINS = os.getenv('CORS_ALLOWED_ORIGINS').split(',')
 
 ROOT_URLCONF = 'watoc2028D.urls'
 
@@ -166,15 +174,26 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+
+STORAGES = {
+    "default": {
+        "BACKEND": "django.core.files.storage.FileSystemStorage",
+    },
+    "staticfiles": {
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+    },
+}
+
 #Ruta en la cual se guardarán las imagenes de usuario
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 #Para el envío de los datos de contact_request a una cuenta 
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True 
-EMAIL_HOST_USER = 'soporte.techome@gmail.com'  
-EMAIL_HOST_PASSWORD = 'dwzkvraeistdwwbo' 
+EMAIL_BACKEND = os.getenv('EMAIL_BACKEND')
+EMAIL_HOST = os.getenv('EMAIL_HOST')
+EMAIL_PORT = os.getenv('EMAIL_PORT')
+EMAIL_USE_TLS = os.getenv('EMAIL_USE_TLS') 
+EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')  
+EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
