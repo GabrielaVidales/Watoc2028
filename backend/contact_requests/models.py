@@ -4,26 +4,25 @@ from django.db import models
 
 class ContactRequest(models.Model):
     # Opciones para el campo ENUM
-    class ContactType(models.TextChoices):
-        POSTERS = 'posters', 'Posters'
-        TALKS = 'talks', 'Talks'
-        VISA_LETTERS = 'visa_letters', 'Visa Letters'
-        PAYMENTS = 'payments', 'Payments'
-        OTHERS = 'others', 'Others'
+    class ContactType(models.IntegerChoices):
+        POSTERS = 0, 'Posters'
+        TALKS = 1, 'Talks'
+        VISA_LETTERS = 2, 'Visa Letters'
+        PAYMENTS = 3, 'Payments'
+        OTHERS = 4, 'Others'
 
     # ID (PK) lo maneja Django automáticamente
-    first_name = models.CharField(max_length=100)
-    last_name = models.CharField(max_length=100)
+    firstName = models.CharField(max_length=100)
+    lastName = models.CharField(max_length=100)
     email = models.EmailField()
     
     # Campo tipo ENUM usando choices
-    type = models.CharField(
-        max_length=20,
+    subject = models.PositiveSmallIntegerField(
         choices=ContactType.choices,
         default=ContactType.OTHERS
     )
     
-    question = models.TextField()
+    description = models.TextField()
     
     # contact_date (DEFAULT)
     contact_date = models.DateTimeField(auto_now_add=True)

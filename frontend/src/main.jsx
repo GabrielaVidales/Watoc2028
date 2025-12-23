@@ -29,7 +29,7 @@ if (import.meta.env.MODE === 'development') {
     return worker.start()
   }
 
-  enableMocking()
+  // enableMocking()
 }
 
 createRoot(document.getElementById('root')).render(

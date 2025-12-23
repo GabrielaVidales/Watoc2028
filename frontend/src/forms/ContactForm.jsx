@@ -7,6 +7,7 @@ import HCaptcha from '@hcaptcha/react-hcaptcha'
 import { useEffect } from 'react'
 import axiosClient from '../clients/axiosClient'
 
+
 function RenderControlledInput({
     name,
     label,
@@ -68,7 +69,7 @@ export default function ContactForm() {
         await sleep(1000)
 
         try {
-            const response = await api.post('/api/v1/contact/', data)
+            const response = await axiosClient.post('contact/', data)
             if (response.status === 201) {
                 // console.log(response);
                 reset()
@@ -91,23 +92,23 @@ export default function ContactForm() {
 
     const contactType = [
         {
-            id: 'posters',
+            id: 0,
             label: 'Posters'
         },
         {
-            id: 'talks',
+            id: 1,
             label: 'Talks'
         },
         {
-            id: 'visa_letters',
+            id: 2,
             label: 'visa letters'
         },
         {
-            id: 'payments',
+            id: 3,
             label: 'Payment'
         },
         {
-            id: 'others',
+            id: 4,
             label: 'Other'
         },
     ]
@@ -193,7 +194,7 @@ export default function ContactForm() {
                     <Grid container spacing={2} display={'flex'} justifyContent={'space-between'}>
                         <Grid size={{ lg: 6, md: 12, sm: 12, xs: 12 }}>
                             <RenderControlledInput
-                                name="first_name"
+                                name="firstName"
                                 label="First name *"
                                 control={control}
                                 error={!!errors.firstName}
@@ -209,7 +210,7 @@ export default function ContactForm() {
                         </Grid>
                         <Grid size={{ lg: 6, md: 12, sm: 12, xs: 12 }} >
                             <RenderControlledInput
-                                name="last_name"
+                                name="lastName"
                                 label="Last name *"
                                 control={control}
                                 error={!!errors.lastName}
@@ -253,7 +254,7 @@ export default function ContactForm() {
                                 Subject *
                             </FormLabel>
                             <Controller
-                                name="type"
+                                name="subject"
                                 control={control}
                                 defaultValue={-1}
                                 disabled={isSubmitSuccessful}
@@ -286,7 +287,7 @@ export default function ContactForm() {
                         </Grid>
                         <Grid size={12} >
                             <RenderControlledInput
-                                name="question"
+                                name="description"
                                 label="Description *"
                                 control={control}
                                 error={!!errors.description}
