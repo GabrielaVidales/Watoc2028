@@ -13,13 +13,14 @@ export default function WizardRegistration() {
     const [formData, setFormData] = useState({})
 
     useEffect(() => {
-        console.log(location.state)
-        if (location.state?.data) {
-            setFormData({
-                personalData: location.state.data
-            })
-        }
-    }, [])
+        (async () => {
+            if (location.state?.data) {
+                setFormData({
+                    personalData: location.state.data
+                })
+            }
+        })()
+    }, [location.state])
 
     useEffect(() => {
         console.log('Current form data:');

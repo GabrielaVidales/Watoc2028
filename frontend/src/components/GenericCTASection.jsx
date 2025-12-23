@@ -1,5 +1,4 @@
 import { Box, Container, Stack } from '@mui/material'
-import React, { Children } from 'react'
 
 const GenericCTASection = ({ maxWidth = "md", spacing=3, alignItems="center", textAlign="center", children }) => (
     <Box

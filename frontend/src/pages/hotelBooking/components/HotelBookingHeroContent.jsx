@@ -1,4 +1,4 @@
-import { Typography, Button, Stack, Chip, Box } from '@mui/material';
+import { Typography, Stack, Chip, Box } from '@mui/material';
 import { CalendarToday, LocationOn, ArrowDownward } from '@mui/icons-material';
 import { useState, useEffect } from 'react';
 

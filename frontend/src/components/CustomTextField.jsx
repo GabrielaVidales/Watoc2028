@@ -1,6 +1,6 @@
 import { ErrorOutline } from '@mui/icons-material'
-import { Box, FormHelperText, InputAdornment, TextField, Typography } from '@mui/material'
-import { useEffect, useRef, useState } from 'react'
+import { Box, TextField, Typography } from '@mui/material'
+import { useRef } from 'react'
 
 export default function CustomTextField({ value, onChange, maxLenght = 64, hideLengthLabel = false, multiline = false, error = false, helperText = null, ...props }) {
     const textFieldRef = useRef()

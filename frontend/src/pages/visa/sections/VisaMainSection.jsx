@@ -1,4 +1,4 @@
-import { Box, Card, CardContent, Container, Grid, Icon, Stack, Typography } from '@mui/material'
+import { Box, Container, Stack, Typography } from '@mui/material'
 import { Link } from 'react-router'
 
 export default function VisaMainSection() {

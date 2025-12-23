@@ -1,4 +1,4 @@
-import { Box, Button, Card, CardContent, Container, Grid, Icon, Stack, Typography } from '@mui/material'
+import { Box, Button, Container, Stack, Typography } from '@mui/material'
 import { ArrowForward, Hotel, LocationOn, Star } from '@mui/icons-material'
 import FeatureCard from '../../../components/FeatureCard'
 import { Link } from 'react-router'

@@ -1,5 +1,5 @@
-import { Box, Container, Grid, Stack, Typography, IconButton, Divider, Link as MUILink } from '@mui/material';
-import { Email, Phone, LocationOn, Facebook, Twitter, LinkedIn, Instagram } from '@mui/icons-material';
+import { Box, Container, Grid, Stack, Typography, IconButton, Divider } from '@mui/material';
+import { Email, LocationOn, Facebook, Twitter, LinkedIn, Instagram } from '@mui/icons-material';
 import { Link } from 'react-router';
 
 export default function Footer() {
