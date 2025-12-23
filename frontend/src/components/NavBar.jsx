@@ -127,11 +127,21 @@ export default function NavBar({ invertImg = true }) {
         },
         {
             id: 2,
+            url: '/restaurants',
+            label: 'Restaurants',
+        },
+        {
+            id: 3,
+            url: '/transportation',
+            label: 'Transportation',
+        },
+        {
+            id: 4,
             url: '/abstract-submission',
             label: 'Abstract Submission',
         },
         {
-            id: 3,
+            id: 5,
             url: '/visa',
             label: 'Visa Requirements',
         },

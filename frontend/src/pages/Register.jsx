@@ -4,6 +4,8 @@ import NavBar from '../components/NavBar';
 import RegisterForm from '../forms/RegisterForm';
 import React, { useMemo } from 'react';
 import Footer from '../components/Footer';
+import Lottie from 'lottie-react';
+import comingSoonAnimation from '../assets/under-maintenance.json';
 
 const FeatureBadge = React.memo(({ icon: Icon, title, description }) => (
     <Stack direction="row" spacing={2} alignItems="flex-start">
@@ -70,18 +72,18 @@ export default function Register() {
                         left: 0,
                         right: 0,
                         bottom: 0,
-                        background: 'radial-gradient(circle at 20% 50%, rgba(25, 118, 210, 0.1) 0%, transparent 50%)',
+                        background: 'radial-gradient(circle at 50% 40%, rgba(25,118,210,0.15), transparent 60%)',
                         pointerEvents: 'none',
                     }}
                 />
                 <Container maxWidth="md" sx={{ position: 'relative', zIndex: 1, mt: 15 }}>
-                    <Stack spacing={4} sx={{ position: 'relative', zIndex: 1 }}>
+                    <Stack spacing={4} alignItems="center" textAlign="center" sx={{ position: 'relative', zIndex: 1 }}>
                         <Box>
                             <Typography
                                 variant="h2"
                                 sx={{
                                     color: 'white',
-                                    fontWeight: 700,
+                                    fontWeight: 800,
                                     fontSize: { xs: '2rem', md: '3rem' },
                                     mb: 2,
                                     lineHeight: 1.2,
@@ -112,34 +114,14 @@ export default function Register() {
                             </Typography>
                         </Box>
 
-                        <Box
-                            sx={{
-                                display: { xs: 'none', md: 'block' },
-                                p: 3,
-                                bgcolor: 'rgba(255,255,255,0.03)',
-                                borderRadius: 3,
-                                border: '1px solid rgba(255,255,255,0.1)',
-                            }}
-                        >
-                            <Typography
-                                variant="body1"
-                                sx={{
-                                    color: 'rgba(255,255,255,0.8)',
-                                    lineHeight: 1.8,
-                                    mb: 3,
-                                }}
-                            >
-                                WATOC 2028 will bring together leading scientists, emerging researchers, and cutting-edge research in theoretical and computational chemistry.
-                            </Typography>
-
-                            <Stack spacing={3}>
-                                {features.map((feature, index) => (
-                                    <FeatureBadge key={index} {...feature} />
-                                ))}
-                            </Stack>
+                          <Box sx={{ width: '100%', maxWidth: 320, mt: 2 }}>
+                            <Lottie
+                            animationData={comingSoonAnimation}
+                            loop
+                            />
                         </Box>
 
-                        <Box sx={{ display: { xs: 'none', md: 'block' } }}>
+                        <Box sx={{ display: { xs: 'block', md: 'block' } }}>
                             <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.4)' }}>
                                 Stay tuned — registration will be available shortly.
                             </Typography>

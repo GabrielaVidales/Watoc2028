@@ -5,6 +5,7 @@ import { EnergySavingsLeaf, Flight, Groups2, Hotel, Room, WifiTethering } from '
 import { VenueHeroContent } from './components/VenueHeroContent'
 import GenericCTASection from '../../components/GenericCTASection'
 import { HeroSection } from '../../components/HeroSection'
+import CountUp from 'react-countup';
 
 const FeatureCard = ({ icon, title, text }) => (
     <Paper elevation={5} sx={{
@@ -79,7 +80,7 @@ const LocationItem = ({ icon, title, text }) => (
     </Box>
 )
 
-const ImageStatCard = ({ image, value, label }) => (
+const ImageStatCard = ({ image, value, unit, label }) => (
     <Card
         sx={{
             height: '100%',
@@ -115,7 +116,15 @@ const ImageStatCard = ({ image, value, label }) => (
             }}
         >
             <Typography variant="h3" fontWeight="bold" lineHeight={1}>
-                {value}
+                <CountUp
+                    end={value}
+                    duration={2}
+                    separator=","
+                    enableScrollSpy
+                    scrollSpyOnce
+                    style={{ fontSize: 'inherit', fontWeight: 'inherit' }}
+                />
+                {unit && ` ${unit}`}
             </Typography>
             <Typography variant="subtitle2" sx={{ opacity: 0.9 }}>
                 {label}
@@ -248,28 +257,30 @@ export default function VenuePage() {
                         <Grid size={{ xs: 12, sm: 7 }}>
                             <ImageStatCard
                                 image="/centro1.jpg"
-                                value="26"
+                                value={26}
                                 label="Lounges"
                             />
                         </Grid>
                         <Grid size={{ xs: 12, sm: 5 }}>
                             <ImageStatCard
                                 image="/centro2.jpg"
-                                value="10,000"
+                                value={10000}
                                 label="Capacity of assistants"
                             />
                         </Grid>
                         <Grid size={{ xs: 12, sm: 4 }}>
                             <ImageStatCard
                                 image="/centro3.jpg"
-                                value="9,430 m²"
+                                value={9430}
+                                unit="m²"
                                 label="Event area"
                             />
                         </Grid>
                         <Grid size={{ xs: 12, sm: 8 }}>
                             <ImageStatCard
                                 image="/centroconvenciones.webp"
-                                value="50,000 m²"
+                                value={50000}
+                                unit="m²"
                                 label="Total construction"
                             />
                         </Grid>

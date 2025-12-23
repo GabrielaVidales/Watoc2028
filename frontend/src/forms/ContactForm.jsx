@@ -7,6 +7,7 @@ import HCaptcha from '@hcaptcha/react-hcaptcha'
 import { useEffect } from 'react'
 import axiosClient from '../clients/axiosClient'
 
+
 function RenderControlledInput({
     name,
     label,
@@ -62,12 +63,13 @@ export default function ContactForm() {
 
     const onSubmit = async (data) => {
         const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
-
+        delete data.captcha;
+        console.log(data)
         // console.log(data);
         await sleep(1000)
 
         try {
-            const response = await axiosClient.post('/contact', data)
+            const response = await axiosClient.post('contact/', data)
             if (response.status === 201) {
                 // console.log(response);
                 reset()
@@ -99,7 +101,7 @@ export default function ContactForm() {
         },
         {
             id: 2,
-            label: 'Invitation letter'
+            label: 'visa letters'
         },
         {
             id: 3,

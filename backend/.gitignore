@@ -1,0 +1,46 @@
+# --- Python General ---
+__pycache__/
+*.py[cod]
+*$py.class
+
+# --- Distribución / Paquetes ---
+dist/
+build/
+*.egg-info/
+
+# --- Entornos Virtuales (Virtual Environments) ---
+# Nombres comunes para la carpeta del entorno
+venv/
+env/
+.env/
+.venv/
+myvenv/
+
+# --- Django ---
+*.log
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
+media/
+staticfiles/
+
+# Nota: Si usas una carpeta 'static' para tus archivos fuente, 
+# NO la ignores. Solo ignora 'staticfiles' (donde hace collectstatic).
+
+# --- Seguridad / Variables de Entorno ---
+.env
+.env.local
+.env.*
+secrets.json
+
+# --- IDEs y Editores de Texto ---
+# VS Code
+.vscode/
+# PyCharm
+.idea/
+# Sublime Text
+*.sublime-workspace
+
+# --- Sistema Operativo ---
+.DS_Store
+Thumbs.db
