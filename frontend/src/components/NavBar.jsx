@@ -32,9 +32,9 @@ const MobileNavMenu = ({ open, anchorEl, handleClose, aboutSubmenus }) => {
                     <ListItemText primary='Home' />
                 </MenuItem>
             </Link>
-            <Link to="/venue" style={{ textDecoration: 'none', color: 'black' }}>
+            <Link to="/watoc" style={{ textDecoration: 'none', color: 'black' }}>
                 <MenuItem onClick={handleClose}>
-                    <ListItemText primary='Venue' />
+                    <ListItemText primary='WATOC' />
                 </MenuItem>
             </Link>
             <Link to="/young-watoc" style={{ textDecoration: 'none', color: 'black' }}>
@@ -117,8 +117,8 @@ export default function NavBar({ invertImg = true }) {
     const aboutSubmenus = useMemo(() => [
         {
             id: 0,
-            url: '/watoc',
-            label: 'WATOC',
+            url: '/venue',
+            label: 'Venue',
         },
         {
             id: 1,
@@ -195,7 +195,7 @@ export default function NavBar({ invertImg = true }) {
                         }}
                     >
                         <HomeMenuLink path='/' label='Home' />
-                        <HomeMenuLink path='/venue' label='Venue' />
+                        <HomeMenuLink path='/watoc' label='WATOC' />
                         <HomeMenuLink path='/young-watoc' label='Young WATOC' />
 
                         <CustomDropdownMenu textBlack={trigger || !invertImg} >

@@ -54,7 +54,7 @@ export default function ContactForm() {
 
     useEffect(() => {
         register('captcha', {
-            required: 'Please complete the captcha.'
+            required: 'Captcha required *'
         })
     }, [register])
 
@@ -200,7 +200,7 @@ export default function ContactForm() {
                                 maxLenght={64}
                                 placeholder="First name"
                                 rules={{
-                                    required: 'First name is required',
+                                    required: 'First name is required *',
                                     maxLength: { value: 64, message: 'Max length is 64 characters' },
                                     pattern: { value: REGEX_NAME, message: 'Invalid name' }
                                 }}
@@ -216,7 +216,7 @@ export default function ContactForm() {
                                 maxLenght={64}
                                 placeholder="Last name"
                                 rules={{
-                                    required: 'Last name is required',
+                                    required: 'Last name is required *',
                                     maxLength: { value: 64, message: 'Max length is 64 characters' },
                                     pattern: { value: REGEX_NAME, message: 'Invalid name' }
                                 }}
@@ -230,7 +230,7 @@ export default function ContactForm() {
                                 maxLenght={128}
                                 placeholder="example@domain.com"
                                 rules={{
-                                    required: 'Required',
+                                    required: 'Required *',
                                     maxLength: { value: 128, message: 'Max length is 128 characters' },
                                     pattern: { value: REGEX_EMAIL, message: 'Invalid email' }
                                 }}
@@ -257,7 +257,7 @@ export default function ContactForm() {
                                 defaultValue={-1}
                                 disabled={isSubmitSuccessful}
                                 rules={{
-                                    required: 'Este campo es obligatorio',
+                                    required: 'Required *',
                                     validate: validateOption
                                 }}
                                 render={({ field }) => (
@@ -293,7 +293,7 @@ export default function ContactForm() {
                                 maxLenght={600}
                                 placeholder="Description"
                                 rules={{
-                                    required: 'Required',
+                                    required: 'Required *',
                                     maxLength: { value: 600, message: 'Max length is 600 characters' },
                                 }}
                                 multiline
