@@ -12,6 +12,7 @@ export default function YoungWatoc() {
             <NavBar />
             <Box component='main'>
                 <HeroSection
+                    offset={3}
                     enableParticles
                     enableRadialGradient
                 >

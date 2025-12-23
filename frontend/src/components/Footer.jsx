@@ -13,8 +13,8 @@ export default function Footer() {
         venue: [
             { label: 'Venue Information', href: '/venue' },
             { label: 'Hotel Booking', href: '/hotel-booking' },
-            { label: 'Restaurants', href: '/restaurants'},
-            { label: 'Transportation', href: '/transportation'},
+            { label: 'Restaurants', href: '/restaurants' },
+            { label: 'Transportation', href: '/transportation' },
             { label: 'Mérida City Guide', href: 'https://visitmerida.mx/' },
         ],
     };
@@ -64,7 +64,7 @@ export default function Footer() {
                                 Mérida, Yucatán, México
                             </Typography>
 
-                            <Stack direction="row" spacing={1} sx={{ pt: 2 }}>
+                            {/* <Stack direction="row" spacing={1} sx={{ pt: 2 }}>
                                 {[
                                     { icon: <Facebook />, href: '#' },
                                     { icon: <Twitter />, href: '#' },
@@ -87,7 +87,7 @@ export default function Footer() {
                                         {social.icon}
                                     </IconButton>
                                 ))}
-                            </Stack>
+                            </Stack> */}
                         </Stack>
                     </Grid>
 
@@ -177,9 +177,40 @@ export default function Footer() {
                             </Box>
                         </Stack>
                     </Grid>
-                </Grid>
 
-                <Divider sx={{ my: 3, borderColor: 'rgba(255,255,255,0.1)' }} />
+                    <Grid size={{ xs: 12, md: 6 }}>
+                        <Typography variant="subtitle1" fontWeight="bold" mb={2} color="primary.light">
+                            Webmasters
+                        </Typography>
+
+                        <Stack spacing={{ xs: 1, sm: 3 }} width={{ xs: '50%', sm: '100%' }} direction={{ xs: 'column', sm: 'row' }}>
+                            {[
+                                { name: 'Brishel Acosta', },
+                                { name: 'Eduardo Bojórquez', },
+                                { name: 'Eduardo Escalante', },
+                                { name: 'Gabriela Vidales', },
+                            ].map((item, index) => (
+                                <Link to={item.href}
+                                    key={index}
+                                >
+                              
+                                    <Typography sx={{
+                                        color: 'rgba(255,255,255,0.8)',
+                                        fontSize: '0.875rem',
+                                        '&:hover': {
+                                            bgcolor: 'primary.main',
+                                            transform: 'translateY(-2px)',
+                                        },
+                                        transition: 'all 0.3s',
+                                    }}>
+                                        {item.name}
+                                    </Typography>
+
+                                </Link>
+                            ))}
+                        </Stack>
+                    </Grid>
+                </Grid>
 
                 <Stack
                     direction={{ xs: 'column', sm: 'row' }}
@@ -188,15 +219,34 @@ export default function Footer() {
                     spacing={2}
                     sx={{ opacity: 0.7 }}
                 >
+                    <Stack direction="row" spacing={1} sx={{ pt: 2 }}>
+                        {[
+                            { icon: <Facebook />, href: '#' },
+                            { icon: <Twitter />, href: '#' },
+                            { icon: <LinkedIn />, href: '#' },
+                            { icon: <Instagram />, href: '#' },
+                        ].map((social, index) => (
+                            <IconButton
+                                key={index}
+                                size="small"
+                                sx={{
+                                    color: 'white',
+                                    bgcolor: 'rgba(255,255,255,0.1)',
+                                    '&:hover': {
+                                        bgcolor: 'primary.main',
+                                        transform: 'translateY(-2px)',
+                                    },
+                                    transition: 'all 0.3s',
+                                }}
+                            >
+                                {social.icon}
+                            </IconButton>
+                        ))}
+                    </Stack>
+
                     <Typography variant="caption">
                         © 2025 WATOC 2028. All rights reserved.
                     </Typography>
-
-                    {/* <Link to='/privacy-policy'>
-                        <Typography variant="caption">
-                            Privacy Policy.
-                        </Typography>
-                    </Link> */}
 
                     <Typography variant="caption" sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
                         Powered by
@@ -205,6 +255,7 @@ export default function Footer() {
                                 Cinvestav
                             </Box>
                         </Link>
+                        ©
                     </Typography>
                 </Stack>
             </Container>

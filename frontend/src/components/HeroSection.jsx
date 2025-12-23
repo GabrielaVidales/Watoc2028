@@ -54,10 +54,11 @@ export const HeroSection = ({
     fadeTimeout = 1000,
     transitionDuration = 1000,
     slideshowInterval = 10000,
+    offset = 0,
     children,
 }) => {
     const [isVisible, setIsVisible] = useState(false);
-    const [currentImageIndex, setCurrentImageIndex] = useState(0)
+    const [currentImageIndex, setCurrentImageIndex] = useState(offset)
     const [isTransitioning, setIsTransitioning] = useState(false)
 
     useEffect(() => {
