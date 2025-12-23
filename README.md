@@ -13,13 +13,13 @@
     <img alt="made by Brishel Acosta" src="https://img.shields.io/badge/made%20by-Brishel%20Acosta-ff1b63">
   </a>
   <a href="https://github.com/edescal/">
-    <img alt="Eduardo Escalante" src="https://img.shields.io/badge/made%20by-Eduardo%20Escalante-ff1b63">
+    <img alt="Eduardo Escalante" src="https://img.shields.io/badge/Eduardo%20Escalante-ff1b63">
   </a>
   <a href="https://github.com/cebojorquez/">
-    <img alt="Eduardo Bojórquez" src="https://img.shields.io/badge/made%20by-Eduardo%20Bojorquez-ff1b63">
+    <img alt="Eduardo Bojórquez" src="https://img.shields.io/badge/Eduardo%20Bojorquez-ff1b63">
   </a>
   <a href="https://github.com/gabrielavidales/">
-    <img alt="Gabriela Vidales" src="https://img.shields.io/badge/made%20by-Gabriela%20Vidales-ff1b63">
+    <img alt="Gabriela Vidales" src="https://img.shields.io/badge/Gabriela%20Vidales-ff1b63">
   </a>
 </p>
 
