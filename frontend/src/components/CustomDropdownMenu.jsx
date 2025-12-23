@@ -1,7 +1,6 @@
-import React, { useState } from "react";
-import { Box, Button, createTheme, Menu, MenuList, ThemeProvider, Typography } from "@mui/material";
-import './CustomDropdownMenu.css'
+import { Box, Typography } from "@mui/material";
 import { KeyboardArrowDown } from "@mui/icons-material";
+import './CustomDropdownMenu.css'
 
 const CustomDropdownMenu = ({ textBlack = false, children }) => {
 

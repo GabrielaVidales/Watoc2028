@@ -1,6 +1,6 @@
 import { Box, Typography, Stack, Chip, Button } from '@mui/material';
-import { LocationOn, EmojiEvents, Verified, ArrowDownward } from '@mui/icons-material';
-import { Link, useNavigate } from 'react-router';
+import { LocationOn, ArrowDownward } from '@mui/icons-material';
+import { Link } from 'react-router';
 
 export const VenueHeroContent = () => {
     const scrollToContent = () => {

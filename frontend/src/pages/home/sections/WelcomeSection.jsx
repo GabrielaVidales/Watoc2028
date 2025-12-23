@@ -1,4 +1,4 @@
-import { Box, Container, Grid, Stack, Typography, Avatar, CardContent, CardMedia, Card } from '@mui/material'
+import { Box, Container, Grid, Stack, Typography, Avatar, CardContent, Card } from '@mui/material'
 import { FormatQuote } from '@mui/icons-material';
 
 const CongressCard = ({ url, name, subtitle, text }) => (

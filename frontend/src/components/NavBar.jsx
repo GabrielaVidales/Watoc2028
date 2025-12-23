@@ -1,6 +1,6 @@
-import { ArrowRight, ArrowRightSharp, ExpandLess, ExpandMore, KeyboardArrowDown, Menu as MenuIcon } from '@mui/icons-material';
-import { AppBar, Box, Toolbar, Typography, useScrollTrigger, IconButton, Menu, MenuItem, ListItemText, ListItemIcon, ClickAwayListener, MenuList, Divider, ListItemButton, Collapse, List } from '@mui/material';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { ExpandLess, ExpandMore, Menu as MenuIcon } from '@mui/icons-material';
+import { AppBar, Box, Toolbar, Typography, useScrollTrigger, IconButton, Menu, MenuItem, ListItemText, MenuList, ListItemButton, Collapse, List } from '@mui/material';
+import { useMemo, useRef, useState } from 'react';
 import { Link } from 'react-router';
 import { ScrollTop } from './ScrollTop';
 import CustomDropdownMenu from './CustomDropdownMenu';
@@ -127,11 +127,21 @@ export default function NavBar({ invertImg = true }) {
         },
         {
             id: 2,
+            url: '/restaurants',
+            label: 'Restaurants',
+        },
+        {
+            id: 3,
+            url: '/transportation',
+            label: 'Transportation',
+        },
+        {
+            id: 4,
             url: '/abstract-submission',
             label: 'Abstract Submission',
         },
         {
-            id: 3,
+            id: 5,
             url: '/visa',
             label: 'Visa Requirements',
         },

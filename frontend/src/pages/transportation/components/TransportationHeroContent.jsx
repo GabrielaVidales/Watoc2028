@@ -40,7 +40,7 @@ const QuickCountdown = () => {
     );
 };
 
-export const GenericHeroContent = () => {
+export const TransportationHeroContent = () => {
     const scrollToContent = () => {
         window.scrollTo({
             top: window.innerHeight - 100,
@@ -110,7 +110,6 @@ export const GenericHeroContent = () => {
                     </Stack>
                 </Box>
             </Stack>
-
             <Box
                 onClick={scrollToContent}
                 sx={{

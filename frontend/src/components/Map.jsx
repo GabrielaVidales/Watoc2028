@@ -1,6 +1,4 @@
-import { useEffect, useState } from "react";
-import { MapContainer, TileLayer, Marker, Popup, ZoomControl, ScaleControl } from "react-leaflet";
-import L from "leaflet";
+import { MapContainer, TileLayer, Marker, Popup, ScaleControl } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import { Link } from "react-router";
 

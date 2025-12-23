@@ -1,8 +1,4 @@
-import { Box, Button, Grow, InputAdornment, InputLabel, Stack, TextField, Typography } from '@mui/material'
-import { Controller, useForm } from 'react-hook-form'
-import CustomTextField from '../../CustomTextField'
-import { REGEX_EMAIL, REGEX_NAME } from '../../../utils/formRegex'
-import { ContactEmergency, MailOutline } from '@mui/icons-material'
+import { Box, Button, Stack } from '@mui/material'
 
 export default function StepTemplate({ children = null, onSubmit = null, onBack = null, stepActions = null }) {
     return (

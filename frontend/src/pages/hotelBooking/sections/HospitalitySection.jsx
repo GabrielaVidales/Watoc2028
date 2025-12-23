@@ -1,11 +1,12 @@
-import { Box, Button, Card, CardContent, Container, Grid, Icon, Stack, Typography } from '@mui/material'
+import { Box, Button, Container, Stack, Typography } from '@mui/material'
 import { ArrowForward, Hotel, LocationOn, Star } from '@mui/icons-material'
 import FeatureCard from '../../../components/FeatureCard'
 import { Link } from 'react-router'
+import CountUp from 'react-countup';
 
 const stats = [
     {
-        title: '2,000+',
+        title: (<><CountUp end={2000} separator="," duration={2} enableScrollSpy scrollSpyOnce style={{ fontSize: 'inherit', fontWeight: 'inherit' }}/>+</>),
         label: 'Hotel Rooms',
         text: 'Within 600 meters of the venue',
         icon: Hotel,
@@ -19,7 +20,7 @@ const stats = [
         color: '#2e7d32',
     },
     {
-        title: '6,000',
+        title: (<><CountUp end={6000} separator="," duration={2} enableScrollSpy scrollSpyOnce style={{ fontSize: 'inherit', fontWeight: 'inherit' }}/>+</>),
         label: 'Rooms in Mérida',
         text: 'City-wide capacity',
         icon: LocationOn,

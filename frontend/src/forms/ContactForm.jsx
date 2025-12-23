@@ -1,11 +1,11 @@
-import { Button, TextField, Grid, MenuItem, Typography, Stack, Divider, Box, InputAdornment, FormLabel, Alert, Snackbar, Fade, Collapse, IconButton, AlertTitle, FormControl, useMediaQuery, useTheme } from '@mui/material'
+import { Button, TextField, Grid, MenuItem, Typography, Stack, Divider, Box, InputAdornment, FormLabel, Alert, Collapse, IconButton, AlertTitle, FormControl, useMediaQuery, useTheme } from '@mui/material'
 import { Controller, useForm } from 'react-hook-form'
 import { Close, ErrorOutline, MailOutline, Send } from '@mui/icons-material'
 import CustomTextField from '../components/CustomTextField'
-import { useAPI } from '../contexts/APIContext'
 import { REGEX_EMAIL, REGEX_NAME } from '../utils/formRegex'
 import HCaptcha from '@hcaptcha/react-hcaptcha'
 import { useEffect } from 'react'
+import axiosClient from '../clients/axiosClient'
 
 function RenderControlledInput({
     name,
@@ -51,7 +51,6 @@ export default function ContactForm() {
     const theme = useTheme()
     const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
     const { control, handleSubmit, reset, setError, register, setValue, clearErrors, formState: { errors, isSubmitSuccessful, isSubmitting } } = useForm()
-    const api = useAPI()
 
     useEffect(() => {
         register('captcha', {
@@ -146,7 +145,6 @@ export default function ContactForm() {
                                 borderRadius: 2,
                             }}
                         />
-
                     </Box>
 
                     <Divider />
@@ -313,10 +311,12 @@ export default function ContactForm() {
                                         clearErrors('captcha')
                                     }}
                                     onExpire={() => {
-                                        setError('captcha', {
-                                            type: 'manual',
-                                            message: 'Captcha expired, please verify again'
-                                        })
+                                        if (!isSubmitSuccessful) {
+                                            setError('captcha', {
+                                                type: 'manual',
+                                                message: 'Captcha expired, please verify again'
+                                            })
+                                        }
                                     }}
                                 />
                                 {errors?.captcha && (

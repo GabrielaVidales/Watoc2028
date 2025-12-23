@@ -3,10 +3,9 @@ import { Routes, useLocation } from 'react-router'
 import { Route } from 'react-router'
 import Login from './pages/Login'
 
-import { ThemeProvider, createTheme } from '@mui/material/styles';
+import { ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import Register from './pages/Register'
-import Test from './pages/Test'
 import Home from './pages/home/Home'
 import VenuePage from './pages/venue/VenuePage'
 import HotelBooking from './pages/hotelBooking/HotelBooking'
@@ -17,9 +16,10 @@ import Contact from './pages/contact/Contact';
 import RegistrationPage from './pages/registration/RegistrationPage';
 import NotFound from './pages/error/NotFound';
 import YoungWatoc from './pages/youngWATOC/YoungWatoc';
+import Restaurants from './pages/restaurants/RestaurantsPage';
+import Transportation from './pages/transportation/TransportationPage';
 import { useEffect } from 'react';
 import globalTheme from './themes/Themes';
-import PrivacyPolicy from './pages/privacyPolicy/PrivacyPolicy';
 
 function App() {
 	const { pathname } = useLocation()
@@ -45,11 +45,13 @@ function App() {
 					<Route path='/watoc' element={<AboutWATOC />} />
 					<Route path='/young-watoc' element={<YoungWatoc />} />
 					<Route path='/visa' element={<VisaRequirements />} />
+					<Route path='/restaurants' element={<Restaurants />} />
+					<Route path='/transportation' element={<Transportation />} />
 					<Route path='/contact' element={<Contact />} />
 					<Route path='/register/account' element={<RegistrationPage />} />
 					{/* <Route path='/privacy-policy' element={<PrivacyPolicy />} /> */}
 
-					<Route path='/test' element={<Test />} />
+					{/* <Route path='/test' element={<Test />} /> */}
 					<Route path='/login' element={<Login />} />
 					<Route path='/register' element={<Register />} />
 				</Routes>
