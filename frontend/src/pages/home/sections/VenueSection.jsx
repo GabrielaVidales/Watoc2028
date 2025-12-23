@@ -1,6 +1,7 @@
 import { Box, Button, Card, CardContent, Container, Grid, Paper, Stack, Typography, Chip } from '@mui/material';
 import { Flight, Hotel, Room, ArrowForward, LocationOn } from '@mui/icons-material';
 import { useNavigate } from 'react-router';
+import CountUp from 'react-countup';
 import FeatureCard from '../../../components/FeatureCard';
 
 export default function VenueSection() {
@@ -8,8 +9,8 @@ export default function VenueSection() {
 
     const features = [
         { icon: Room, text: 'Downtown Mérida', color: '#1976d2' },
-        { icon: Flight, text: '20 min from airport', color: '#2e7d32' },
-        { icon: Hotel, text: '2,000+ hotel rooms', color: '#ed6c02' },
+        { icon: Flight, text: (<><CountUp end={20} separator="," duration={2} enableScrollSpy scrollSpyOnce style={{ fontSize: 'inherit', fontWeight: 'inherit' }}/> min from airport</>), color: '#2e7d32' },
+        { icon: Hotel, text: (<><CountUp end={2000} separator="," duration={2} enableScrollSpy scrollSpyOnce style={{ fontSize: 'inherit', fontWeight: 'inherit' }}/>+ hotel rooms</>), color: '#ed6c02' },
     ];
 
     return (

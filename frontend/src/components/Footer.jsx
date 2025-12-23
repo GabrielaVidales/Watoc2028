@@ -13,6 +13,8 @@ export default function Footer() {
         venue: [
             { label: 'Venue Information', href: '/venue' },
             { label: 'Hotel Booking', href: '/hotel-booking' },
+            { label: 'Restaurants', href: '/restaurants'},
+            { label: 'Transportation', href: '/transportation'},
             { label: 'Mérida City Guide', href: 'https://visitmerida.mx/' },
         ],
     };
