@@ -1,5 +1,6 @@
-import { Box, Container, Grid, Stack, Typography, Avatar, CardContent, Card } from '@mui/material'
-import { FormatQuote } from '@mui/icons-material';
+import { Box, Container, Grid, Stack, Typography, Avatar, CardContent, Card, Collapse, ListItemButton, ListItemText } from '@mui/material'
+import { ExpandLess, ExpandMore, FormatQuote } from '@mui/icons-material';
+import { useState } from 'react';
 
 const CongressCard = ({ url, name, subtitle, text }) => (
     <Card
@@ -48,8 +49,10 @@ const CongressCard = ({ url, name, subtitle, text }) => (
     </Card>
 );
 
-const WelcomeMessage = ({ organizer, isReversed = false }) => (
-    <Grid
+const WelcomeMessage = ({ organizer, isReversed = false }) => {
+    const [open, setOpen] = useState(false)
+
+    return <Grid
         container
         spacing={4}
         justifyContent="center"
@@ -75,20 +78,62 @@ const WelcomeMessage = ({ organizer, isReversed = false }) => (
                     Welcome to WATOC 2028
                 </Typography>
 
-                {organizer.paragraphs.map((text, index) => (
+                {organizer.paragraphs.length > 0 && (
                     <Typography
-                        key={index}
                         variant="body1"
                         gutterBottom
+                        marginBottom={3}
                         sx={{
                             fontSize: '1.05rem',
-                            lineHeight: 1.8,
-                            textAlign: 'justify',
+                            lineHeight: 1.6,
+                            textAlign: open ? 'justify' : 'left',
+                            wordSpacing: '6px',
                         }}
                     >
-                        {text}
+                        {organizer.paragraphs[0]}
                     </Typography>
-                ))}
+                )}
+
+                {/* Caja colapsable para texto */}
+                <Box
+                    sx={{
+                        position: 'relative',
+                    }}
+                >
+                    <Collapse in={open} timeout={1000} unmountOnExit>
+                        {organizer.paragraphs.length > 1 && organizer.paragraphs.map((text, index) => {
+                            if (index === 0) return null
+                            return (
+                                <Typography
+                                    key={index}
+                                    variant="body1"
+                                    gutterBottom
+                                    marginBottom={3}
+                                    sx={{
+                                        fontSize: '1.05rem',
+                                        lineHeight: 1.6,
+                                        textAlign: 'justify',
+                                        wordSpacing: '6px'
+                                    }}
+                                >
+                                    {text}
+                                </Typography>
+                            )
+                        })}
+                    </Collapse>
+                    <Box
+                        sx={{
+                            display: 'flex',
+                            justifyContent: 'flex-end',
+                            mt: 1,
+                        }}
+                    >
+                        <ListItemButton onClick={() => setOpen(!open)}>
+                            <ListItemText secondary={open ? "Show less..." : "Show more..."} />
+                            {open ? <ExpandLess /> : <ExpandMore />}
+                        </ListItemButton>
+                    </Box>
+                </Box>
 
                 <Box
                     sx={{
@@ -112,13 +157,16 @@ const WelcomeMessage = ({ organizer, isReversed = false }) => (
                         }}
                     />
                     <Box>
-                        <Typography variant="subtitle1" fontWeight="bold" lineHeight={1.3} gutterBottom>
+                        <Typography variant="body2" color="text.secondary" gutterBottom>
+                            On behalf of the local scientific and organizing committees,
+                        </Typography>
+                        <Typography variant="subtitle1" fontWeight="bold">
                             {organizer.name}
                         </Typography>
-                        <Typography variant="subtitle2" color="text.secondary">
+                        <Typography variant="subtitle2" color="text.secondary" gutterBottom>
                             {organizer.subtitle}
                         </Typography>
-                        <Typography variant="caption" color="text.secondary">
+                        <Typography variant="body2" color="text.secondary">
                             {organizer.text}
                         </Typography>
                     </Box>
@@ -126,26 +174,24 @@ const WelcomeMessage = ({ organizer, isReversed = false }) => (
             </Box>
         </Grid>
     </Grid>
-);
+}
 
 function WelcomeSection() {
     const organizers = [
         {
             url: '/drmerino.jpg',
-            name: 'Prof. José Gabriel Merino Hernández',
+            name: 'Professor Gabriel Merino',
             subtitle: 'Physical & Theoretical Chemistry',
             text: 'Chair of WATOC 2028',
             paragraphs: [
-                'It is with great pleasure that we invite you to participate in the 14th Triennial Congress of the World Association of Theoretical and Computational Chemists (WATOC 2028), to be held in the beautiful city of Mérida, Yucatán, Mexico.',
-                'This congress will bring together leading researchers from around the world to share groundbreaking advances in theoretical and computational chemistry, fostering collaboration and innovation in our field.',
+                "On behalf of the local scientific and organizing committees, it is a great pleasure to invite you to the 14th Triennial Congress of the World Association of Theoretical and Computational Chemists (WATOC 2028), which will be held in January 2028 in Mérida.",
+                "WATOC 2028 will once again bring together the global theoretical and computational chemistry community in what will be one of the major international scientific events of the year. The congress is expected to attract participants from all regions of the world, providing a forum for presenting frontier research, exchanging ideas, and strengthening collaborations across disciplines and career stages.",
+                "The scientific program will maintain a structure similar to that of recent WATOC congresses, combining plenary lectures, invited contributions, oral communications, and poster sessions. A broad range of thematic sessions will cover the full spectrum of contemporary theoretical and computational chemistry, from fundamental electronic-structure theory and molecular dynamics to catalysis, spectroscopy, materials science, medicinal chemistry, machine learning, and quantum computing. This format is designed to balance depth and breadth while encouraging interaction across subfields.",
+                "Following its very successful debut in Oslo, Young WATOC will remain a central component of the meeting. Taking place immediately prior to the main congress, this event will highlight the work of early-career researchers who have recently completed their PhD studies. While presentations will be delivered exclusively by young scientists, Young WATOC will be open to all congress participants, fostering dialogue between generations and reinforcing WATOC’s long-standing commitment to nurturing emerging leaders in the field.",
+                "WATOC 2028 will be hosted in Mérida, the cultural and scientific hub of southeastern Mexico. Often referred to as the “White City,” Mérida is renowned for its strong Mayan heritage, elegant colonial architecture, and vibrant contemporary cultural life. The city offers excellent infrastructure, a safe and welcoming environment, and convenient access to world-class archaeological sites such as Uxmal and Chichén Itzá, as well as to the Gulf of Mexico coastline. The congress venue, a modern convention center, will provide an ideal setting for scientific exchange, networking, and collaboration.",
+                "",
             ]
         },
-        // {
-        //     url: '/galano.jpg',
-        //     name: 'Prof. Annia Galano Jiménez',
-        //     subtitle: 'Theoretical Chemistry',
-        //     text: 'Chair of WATOC 2028',
-        // },
     ];
 
     return (
@@ -166,7 +212,7 @@ function WelcomeSection() {
                         fontWeight="bold"
                         sx={{ fontSize: '1rem', letterSpacing: 2 }}
                     >
-                        From the Organizers
+                        From the Organizer
                     </Typography>
                     <Typography
                         variant="h3"
@@ -212,10 +258,9 @@ function WelcomeSection() {
                     <Typography
                         variant="body1"
                         color="text.secondary"
-                        sx={{ fontStyle: 'italic', maxWidth: 600, mx: 'auto' }}
+                        sx={{ fontStyle: 'italic', maxWidth: 700, mx: 'auto' }}
                     >
-                        "We look forward to welcoming you to Mérida and sharing an
-                        unforgettable scientific experience together."
+                        "We look forward to welcoming you to Mérida for what promises to be a scientifically stimulating, intellectually enriching, and culturally memorable WATOC congress."
                     </Typography>
                 </Box>
             </Container>

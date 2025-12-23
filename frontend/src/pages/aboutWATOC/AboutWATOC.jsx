@@ -11,7 +11,9 @@ export default function AboutWATOC() {
         <>
             <NavBar />
             <Box component='main'>
-                <HeroSection>
+                <HeroSection
+                    offset={1}
+                >
                     <GenericHeroContent />
                 </HeroSection>
                 <AboutWATOCSection />
