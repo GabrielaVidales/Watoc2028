@@ -10,7 +10,6 @@
 
 <p align="center">
   <a href="https://github.com/evelinsteiger/">
-    <img alt="made by Brishel Acosta" src="https://img.shields.io/badge/made%Brishel%20Acosta-ff1b63">
     <img alt="made by Eduardo Escalante" src="https://img.shields.io/badge/made%20by-Eduardo%20Escalante-ff1b63">
   </a>
 </p>
