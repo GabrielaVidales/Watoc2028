@@ -63,12 +63,13 @@ export default function ContactForm() {
 
     const onSubmit = async (data) => {
         const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
-
+        delete data.captcha;
+        console.log(data)
         // console.log(data);
         await sleep(1000)
 
         try {
-            const response = await api.post('/contact', data)
+            const response = await api.post('/api/v1/contact/', data)
             if (response.status === 201) {
                 // console.log(response);
                 reset()
@@ -91,23 +92,23 @@ export default function ContactForm() {
 
     const contactType = [
         {
-            id: 0,
+            id: 'posters',
             label: 'Posters'
         },
         {
-            id: 1,
+            id: 'talks',
             label: 'Talks'
         },
         {
-            id: 2,
-            label: 'Invitation letter'
+            id: 'visa_letters',
+            label: 'visa letters'
         },
         {
-            id: 3,
+            id: 'payments',
             label: 'Payment'
         },
         {
-            id: 4,
+            id: 'others',
             label: 'Other'
         },
     ]
@@ -194,7 +195,7 @@ export default function ContactForm() {
                     <Grid container spacing={2} display={'flex'} justifyContent={'space-between'}>
                         <Grid size={{ lg: 6, md: 12, sm: 12, xs: 12 }}>
                             <RenderControlledInput
-                                name="firstName"
+                                name="first_name"
                                 label="First name *"
                                 control={control}
                                 error={!!errors.firstName}
@@ -210,7 +211,7 @@ export default function ContactForm() {
                         </Grid>
                         <Grid size={{ lg: 6, md: 12, sm: 12, xs: 12 }} >
                             <RenderControlledInput
-                                name="lastName"
+                                name="last_name"
                                 label="Last name *"
                                 control={control}
                                 error={!!errors.lastName}
@@ -254,7 +255,7 @@ export default function ContactForm() {
                                 Subject *
                             </FormLabel>
                             <Controller
-                                name="subject"
+                                name="type"
                                 control={control}
                                 defaultValue={-1}
                                 disabled={isSubmitSuccessful}
@@ -287,7 +288,7 @@ export default function ContactForm() {
                         </Grid>
                         <Grid size={12} >
                             <RenderControlledInput
-                                name="description"
+                                name="question"
                                 label="Description *"
                                 control={control}
                                 error={!!errors.description}
