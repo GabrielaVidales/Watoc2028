@@ -27,14 +27,14 @@ urlpatterns = [
     # URL secreta, la verdadera
     path('admin-Watoc-SC/', admin.site.urls),
 
-    path('api/', include('users.urls')),
-    path('api/', include('payment.urls')),
-    path('api/', include('abstract.urls')),
-    path('api/', include('contact_requests.urls')),
-    path('api/', include('participants.urls')),
-    path('api/', include('payment.urls')),
-    path('api/', include('students.urls')),
-    path('api/', include('visas.urls')),
+    path('api/v1/', include('users.urls')),
+    path('api/v1/', include('payment.urls')),
+    path('api/v1/', include('abstract.urls')),
+    path('api/v1/', include('contact_requests.urls')),
+    path('api/v1/', include('participants.urls')),
+    path('api/v1/', include('payment.urls')),
+    path('api/v1/', include('students.urls')),
+    path('api/v1/', include('visas.urls')),
 ]
 
 # Esto permite a Django servir las imágenes en modo DEBUG (desarrollo)

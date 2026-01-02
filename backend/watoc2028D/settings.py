@@ -27,10 +27,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.getenv('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.getenv('DEBUG', 'False') == 'True'
 
 ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS').split(',')
-print("holaaaaaaaaaaaaaaaaaaaaaaaaaaaa",ALLOWED_HOSTS)
+
 SECURE_SSL_REDIRECT = os.getenv('SECURE_SSL_REDIRECT')
 
 SESSION_COOKIE_SECURE = os.getenv('SESSION_COOKIE_SECURE')
