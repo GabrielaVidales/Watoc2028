@@ -18,7 +18,7 @@ export default function RenderInput({
 }) {
     return (
         <Box flex={1}>
-            {label && <InputLabel htmlFor={id}>{label}</InputLabel>}
+            {label && <InputLabel htmlFor={id} >{label}</InputLabel>}
             <Controller
                 name={name}
                 control={control}

@@ -4,6 +4,7 @@ import meridaWebp from './../assets/merida.webp'
 import meridaJpg from './../assets/merida.jpg'
 import hotel from './../assets/hotel.webp'
 import congresoEntrada from './../assets/congresoEntrada.webp'
+import mayaBackground from './../assets/maya_background.png'
 
 const FloatingParticles = memo(({ count = 20, color = 'rgba(255,255,255,0.3)' }) => (
     <Box
@@ -53,7 +54,7 @@ export const HeroSection = ({
     enableWave = true,
     fadeTimeout = 1000,
     transitionDuration = 1000,
-    slideshowInterval = 10000,
+    timeBetweenImages = 7000,
     offset = 0,
     children,
 }) => {
@@ -70,15 +71,14 @@ export const HeroSection = ({
 
         const interval = setInterval(() => {
             setIsTransitioning(true);
-
             setTimeout(() => {
                 setCurrentImageIndex((prev) => (prev + 1) % backgroundImgSrc.length);
                 setTimeout(() => setIsTransitioning(false), 100);
-            }, transitionDuration / 2);
-        }, slideshowInterval);
+            }, transitionDuration);
+        }, timeBetweenImages);
 
         return () => clearInterval(interval);
-    }, [backgroundImgSrc.length, slideshowInterval, transitionDuration]);
+    }, [backgroundImgSrc.length, timeBetweenImages, transitionDuration]);
 
 
     const getBackgroundStyle = (imageUrl) => ({
@@ -117,7 +117,7 @@ export const HeroSection = ({
                     position: 'relative',
                     width: '100%',
                     minHeight: height,
-                    background: `url("/field.png")`,
+                    background: `url(${mayaBackground})`,
                     backgroundSize: 'cover',
                     backgroundPosition: 'center',
                     backgroundAttachment: 'fixed',

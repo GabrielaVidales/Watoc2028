@@ -4,6 +4,7 @@ import { useMemo, useRef, useState } from 'react';
 import { Link } from 'react-router';
 import { ScrollTop } from './ScrollTop';
 import CustomDropdownMenu from './CustomDropdownMenu';
+import logo from '../assets/WatocPNGLogo.png';
 
 const MobileNavMenu = ({ open, anchorEl, handleClose, aboutSubmenus }) => {
     const [submenuOpen, setSubmenuOpen] = useState(false)
@@ -91,9 +92,10 @@ export default function NavBar({ invertImg = true }) {
 
     const linkStyle = {
         color: (trigger || !invertImg) ? 'black' : 'white',
-        transition: '0.3s ease',
+        transition: 'color 0.3s ease',
+
         '&:hover': {
-            transition: '.3s ease',
+            transition: 'all .3s ease',
             transform: 'translateY(-5px) scale(1.05)'
         },
         '&::after': {
@@ -104,12 +106,12 @@ export default function NavBar({ invertImg = true }) {
             transformOrigin: 'bottom',
             height: 2,
             borderRadius: 10,
-            transition: '.3s ease',
+            transition: 'all .3s ease',
         },
         '&:hover::after': {
             content: '""',
             transform: 'scaleX(1)',
-            transition: '.3s ease',
+            transition: 'all .3s ease',
             backgroundColor: (trigger || !invertImg) ? 'black' : 'white',
         }
     }
@@ -165,7 +167,7 @@ export default function NavBar({ invertImg = true }) {
         <>
             <AppBar position='fixed' elevation={5} sx={{
                 backgroundColor: (trigger || !invertImg) ? 'white' : 'transparent',
-                transition: '0.35s ease',
+                transition: 'all 0.3s ease',
             }}>
                 <Toolbar
                     sx={{
@@ -187,7 +189,7 @@ export default function NavBar({ invertImg = true }) {
                             <Box
                                 component="img"
                                 alt="WATOC 2028 Logo"
-                                src="/WatocPNGLogo.png"
+                                src={logo}
                                 sx={{
                                     filter: (trigger || !invertImg) ? 'none' : 'invert()',
                                     maxHeight: { xs: 50, sm: 70, md: 80 },

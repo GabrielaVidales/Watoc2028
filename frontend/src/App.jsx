@@ -20,6 +20,7 @@ import Restaurants from './pages/restaurants/RestaurantsPage';
 import Transportation from './pages/transportation/TransportationPage';
 import { useEffect } from 'react';
 import globalTheme from './themes/Themes';
+import Test from './pages/Test';
 
 function App() {
 	const { pathname } = useLocation()
@@ -51,7 +52,7 @@ function App() {
 					<Route path='/register/account' element={<RegistrationPage />} />
 					{/* <Route path='/privacy-policy' element={<PrivacyPolicy />} /> */}
 
-					{/* <Route path='/test' element={<Test />} /> */}
+					<Route path='/test' element={<Test />} />
 					<Route path='/login' element={<Login />} />
 					<Route path='/register' element={<Register />} />
 				</Routes>

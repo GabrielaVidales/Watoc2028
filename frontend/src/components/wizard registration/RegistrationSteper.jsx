@@ -5,7 +5,7 @@ import SecondStep from './steps/SecondStep'
 import LastStep from './steps/LastStep'
 import { useLocation } from 'react-router'
 
-export default function WizardRegistration() {
+export default function RegistrationSteper() {
     const location = useLocation()
 
     const [activeStep, setActiveStep] = useState(0)
@@ -21,11 +21,6 @@ export default function WizardRegistration() {
             }
         })()
     }, [location.state])
-
-    useEffect(() => {
-        console.log('Current form data:');
-        console.log(formData);
-    }, [formData])
 
     const onDebugData = () => {
         setFormData({
@@ -92,7 +87,7 @@ export default function WizardRegistration() {
 
     return (
         <Grow in timeout={800}>
-            <Paper className='d-flex flex-column p-3 h-100' elevation={7} sx={{ height: 630, borderTop: 12, borderColor: '#6a45ffff', }}>
+            <Paper className='d-flex flex-column p-3 h-100' elevation={7} sx={{ height: 630, borderTop: 12, borderColor: 'primary.light', }}>
                 <Button onClick={onDebugData}>Debug data</Button>
                 <Stepper
                     className='p-3'

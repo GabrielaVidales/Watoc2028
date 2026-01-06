@@ -66,7 +66,7 @@ export default function BasicInfoStep({ data = {}, stepName = '_', onNext = null
                         },
                         maxLength: {
                             value: 100,
-                            message: 'No seas puta',
+                            message: 'Max',
                         },
                     }}
                     defaultValue={data[stepName]?.firstName || ''}

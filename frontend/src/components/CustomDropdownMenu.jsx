@@ -11,7 +11,6 @@ const CustomDropdownMenu = ({ textBlack = false, children }) => {
                 alignItems: 'center',
                 gap: 0.5,
                 cursor: 'pointer',
-                transition: '0.3s ease',
                 color: (textBlack) ? 'black' : 'white',
             }} >
                 <Typography variant="h6" component="div" sx={{
