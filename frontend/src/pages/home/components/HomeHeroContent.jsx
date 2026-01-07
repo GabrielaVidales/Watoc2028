@@ -62,9 +62,9 @@ export const HomeHeroContent = () => {
                             fontSize: { xs: '2.5rem', sm: '4rem', md: '6rem' },
                             letterSpacing: { xs: '3px', md: '5px' },
                             textShadow: '0 4px 20px rgba(0,0,0,0.5)',
-                            mb: 2,
                             background: 'linear-gradient(to right, #ffffff, #90caf9)',
                             backgroundClip: 'text',
+                            mb: 2,
                         }}
                     >
                         WATOC 2028
@@ -173,10 +173,7 @@ export const HomeHeroContent = () => {
             <Box
                 onClick={scrollToContent}
                 sx={{
-                    position: 'absolute',
-                    bottom: 30,
-                    left: '50%',
-                    transform: 'translateX(-50%)',
+                    position: 'relative',
                     cursor: 'pointer',
                     animation: 'bounce 2s ease-in-out infinite',
                     '@keyframes bounce': {

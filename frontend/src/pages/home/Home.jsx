@@ -6,7 +6,6 @@ import { ArrowForward } from '@mui/icons-material'
 import WelcomeSection from './sections/WelcomeSection'
 import VenueSection from './sections/VenueSection'
 import CollaboratorsSection from './sections/CollaboratorsSection'
-import NewsletterSection from './sections/NewsletterSection'
 import { HomeHeroContent } from './components/HomeHeroContent'
 import GenericCTASection from '../../components/GenericCTASection'
 import { HeroSection } from '../../components/HeroSection'
@@ -135,7 +134,6 @@ const CounterCard = () => {
                 gap: { xs: 1, sm: 2, md: 3 },
                 maxWidth: 800,
                 mx: 'auto',
-                //  minWidth: { xs: 60, sm: 80, md: 100 },
                 textAlign: 'center',
                 bgcolor: 'white',
                 color: 'white',

@@ -13,8 +13,10 @@ const CustomDropdownMenu = ({ textBlack = false, children }) => {
                 cursor: 'pointer',
                 color: (textBlack) ? 'black' : 'white',
             }} >
-                <Typography variant="h6" component="div" sx={{
-
+                <Typography component="div" sx={{
+                    fontSize: '1.2rem',
+                    fontWeight: 500,
+                    textAlign: 'center',
                 }} >
                     About
                 </Typography>

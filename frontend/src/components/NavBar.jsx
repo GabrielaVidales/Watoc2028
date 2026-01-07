@@ -91,6 +91,9 @@ export default function NavBar({ invertImg = true }) {
     });
 
     const linkStyle = {
+        fontSize: '1.2rem',
+        fontWeight: 500,
+        textAlign: 'center',
         color: (trigger || !invertImg) ? 'black' : 'white',
         transition: 'color 0.3s ease',
 
@@ -155,7 +158,7 @@ export default function NavBar({ invertImg = true }) {
                 <Link to={path} style={{ textDecoration: 'none' }} onClick={() => {
                     scrollRef.current.click()
                 }}>
-                    <Typography variant="h6" component="div" sx={linkStyle} >
+                    <Typography component="div" sx={linkStyle} >
                         {label}
                     </Typography>
                 </Link>
