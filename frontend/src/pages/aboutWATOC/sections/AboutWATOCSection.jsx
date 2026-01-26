@@ -78,11 +78,10 @@ export default function AboutWATOCSection() {
             component="section"
             sx={{
                 py: { xs: 6, md: 8 },
-                px: { xs: 2, sm: 3, md: 4 },
-                background: 'white',
+                px: { xs: 2, md: 4 },
             }}
         >
-            <Container maxWidth="lg">
+            <Container maxWidth={'md'}>
                 <Box textAlign="center" mb={6}>
 
                     <Typography
@@ -115,31 +114,29 @@ export default function AboutWATOCSection() {
                     />
                 </Box>
 
-                <Container maxWidth='lg'>
-                    <Stack spacing={4} textAlign="left" alignItems="center">
-                        <Typography
-                            sx={{
-                                maxWidth: 1000,
-                                fontSize: { xs: '1rem', md: '1.15rem' },
-                                opacity: 0.95,
-                                lineHeight: 1.7,
-                            }}
-                        >
-                            The World Association of Theoretical and Computational Chemists (<Link to='https://www.watoc.net/index.html'>WATOC</Link>) is an international scientific organization dedicated to the promotion and advancement of theoretical and computational chemistry worldwide.
-                        </Typography>
-                        <Typography
-                            sx={{
-                                maxWidth: 1000,
-                                fontSize: { xs: '1rem', md: '1.15rem' },
-                                opacity: 0.95,
-                                lineHeight: 1.7,
-                            }}
-                        >
-                            WATOC fosters global collaboration, scientific exchange, and the development of theoretical methods and computational tools that support research across all areas of chemistry.
-                        </Typography>
-                        <Text></Text>
-                    </Stack>
-                </Container>
+                <Stack spacing={4} textAlign="left" alignItems="center">
+                    <Typography
+                        sx={{
+                            maxWidth: 1000,
+                            fontSize: { xs: '1rem', md: '1.15rem' },
+                            opacity: 0.95,
+                            lineHeight: 1.7,
+                        }}
+                    >
+                        The World Association of Theoretical and Computational Chemists (<Link to='https://www.watoc.net/index.html'>WATOC</Link>) is an international scientific organization dedicated to the promotion and advancement of theoretical and computational chemistry worldwide.
+                    </Typography>
+                    <Typography
+                        sx={{
+                            maxWidth: 1000,
+                            fontSize: { xs: '1rem', md: '1.15rem' },
+                            opacity: 0.95,
+                            lineHeight: 1.7,
+                        }}
+                    >
+                        WATOC fosters global collaboration, scientific exchange, and the development of theoretical methods and computational tools that support research across all areas of chemistry.
+                    </Typography>
+                    <Text></Text>
+                </Stack>
             </Container>
         </Box>
     )

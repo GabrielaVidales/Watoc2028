@@ -6,7 +6,7 @@ const GenericCTASection = ({ maxWidth = "md", spacing=3, alignItems="center", te
         sx={{
             py: { xs: 6, md: 8 },
             px: { xs: 2, sm: 3, md: 10, lg: 15 },
-            background: 'linear-gradient(135deg, #1976d2 0%, #1565c0 100%)',
+            background: '#2a2a50',
             color: 'white',
             position: 'relative',
             overflow: 'hidden',

@@ -10,6 +10,7 @@ import centro1 from '../../assets/centro1.jpg'
 import centro2 from '../../assets/centro2.jpg'
 import centro3 from '../../assets/centro3.jpg'
 import centroConvenciones from '../../assets/centroconvenciones.webp'
+import { MainLayout } from '../../components/MainLayout'
 
 const FeatureCard = ({ icon, title, text }) => (
     <Paper elevation={5} sx={{
@@ -140,17 +141,7 @@ const ImageStatCard = ({ image, value, unit, label }) => (
 export default function VenuePage() {
     return (
         <>
-            <NavBar />
-            <Box component='main'>
-                <HeroSection
-                    offset={2}
-                    height="90vh"
-                    enableParticles={true}
-                    enableRadialGradient={true}
-                >
-                    <VenueHeroContent />
-                </HeroSection>
-
+            <MainLayout heroContent={<VenueHeroContent />}>
                 <Box
                     component="section"
                     sx={{
@@ -291,8 +282,7 @@ export default function VenuePage() {
                         </Grid>
                     </Grid>
                 </Box>
-            </Box>
-            <Footer />
+            </MainLayout>
         </>
     )
 }

@@ -17,7 +17,7 @@ const WelcomeMessage = ({ organizer, isReversed = false }) => {
         }}
     >
         <Grid size={{ xs: 12, md: 10 }}>
-            <Box sx={{ position: 'relative', pl: { xs: 2, md: 4 }, pr: { xs: 2, md: 3 } }}>
+            <Box sx={{ position: 'relative', px: { xs: 2, md: 4 } }}>
                 <FormatQuote
                     sx={{
                         position: 'absolute',
@@ -104,9 +104,6 @@ const WelcomeMessage = ({ organizer, isReversed = false }) => {
                         }}
                     />
                     <Box>
-                        <Typography variant="body2" color="text.secondary" gutterBottom>
-                            On behalf of the local scientific and organizing committees,
-                        </Typography>
                         <Typography variant="subtitle1" fontWeight="bold">
                             {organizer.name}
                         </Typography>
@@ -128,8 +125,8 @@ function WelcomeSection() {
         {
             url: drMerino,
             name: 'Professor Gabriel Merino',
-            subtitle: 'Physical & Theoretical Chemistry',
-            text: 'Chair of WATOC 2028',
+            subtitle: 'Applied Physics Department',
+            text: 'Cinvestav Mérida',
             paragraphs: [
                 "On behalf of the local scientific and organizing committees, it is a great pleasure to invite you to the 14th Triennial Congress of the World Association of Theoretical and Computational Chemists (WATOC 2028), which will be held in January 2028 in Mérida.",
                 "WATOC 2028 will once again bring together the global theoretical and computational chemistry community in what will be one of the major international scientific events of the year. The congress is expected to attract participants from all regions of the world, providing a forum for presenting frontier research, exchanging ideas, and strengthening collaborations across disciplines and career stages.",
@@ -215,8 +212,7 @@ function WelcomeSection() {
 
                 <Box
                     sx={{
-                        mt: 8,
-                        pt: 4,
+                        mt: 4,
                         textAlign: 'center',
                         borderTop: '1px solid',
                         borderColor: 'divider',

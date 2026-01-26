@@ -6,33 +6,8 @@ import React, { useMemo } from 'react';
 import Footer from '../components/Footer';
 import Lottie from 'lottie-react';
 import comingSoonAnimation from '../assets/under-maintenance.json';
-
-const FeatureBadge = React.memo(({ icon: Icon, title, description }) => (
-    <Stack direction="row" spacing={2} alignItems="flex-start">
-        <Box
-            sx={{
-                width: 48,
-                height: 48,
-                borderRadius: 2,
-                bgcolor: 'rgba(25, 118, 210, 0.15)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                flexShrink: 0,
-            }}
-        >
-            <Icon sx={{ color: 'primary.main', fontSize: 24 }} />
-        </Box>
-        <Box>
-            <Typography variant="subtitle1" fontWeight="600" color="white" gutterBottom>
-                {title}
-            </Typography>
-            <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.7)' }}>
-                {description}
-            </Typography>
-        </Box>
-    </Stack>
-))
+import UserRegisterForm from '../forms/registration/UserRegisterForm';
+import GenericCTASection from '../components/GenericCTASection';
 
 export default function Register() {
     const features = useMemo(() => [
@@ -59,25 +34,26 @@ export default function Register() {
             <Box
                 component='main'
                 sx={{
-                    minHeight: '100vh',
                     bgcolor: '#0a0e27',
                     position: 'relative',
-                    overflow: 'hidden',
-                }}
-            >
-                <Box
-                    sx={{
-                        position: 'absolute',
-                        top: 0,
-                        left: 0,
-                        right: 0,
-                        bottom: 0,
-                        background: 'radial-gradient(circle at 50% 40%, rgba(25,118,210,0.15), transparent 60%)',
-                        pointerEvents: 'none',
-                    }}
-                />
-                <Container maxWidth="md" sx={{ position: 'relative', zIndex: 1, mt: 15 }}>
-                    <Stack spacing={4} alignItems="center" textAlign="center" sx={{ position: 'relative', zIndex: 1 }}>
+                }}>
+
+                <Box sx={{
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    background: 'radial-gradient(circle at 50% 40%, rgba(25,118,210,0.15), transparent 60%)',
+                    pointerEvents: 'none',
+                }} />
+
+                <Container maxWidth="md" sx={{ position: 'relative', py: 3, zIndex: 1 }}>
+                    <Toolbar />
+                    <Toolbar />
+                    <UserRegisterForm />
+
+                    <Stack spacing={4} alignItems="center" textAlign="center" sx={{ position: 'relative', py: 3, zIndex: 1 }}>
                         <Box>
                             <Typography
                                 variant="h2"
@@ -114,10 +90,10 @@ export default function Register() {
                             </Typography>
                         </Box>
 
-                          <Box sx={{ width: '100%', maxWidth: 320, mt: 2 }}>
+                        <Box sx={{ width: { xs: '50%', sm: '50%', md: '100%' }, maxWidth: 320, mt: 2 }}>
                             <Lottie
-                            animationData={comingSoonAnimation}
-                            loop
+                                animationData={comingSoonAnimation}
+                                loop
                             />
                         </Box>
 
@@ -129,6 +105,7 @@ export default function Register() {
                     </Stack>
                 </Container>
             </Box>
+            <Footer />
         </>
     );
 }

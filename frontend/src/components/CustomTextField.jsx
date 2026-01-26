@@ -2,19 +2,19 @@ import { ErrorOutline } from '@mui/icons-material'
 import { Box, TextField, Typography } from '@mui/material'
 import { useRef } from 'react'
 
-export default function CustomTextField({ value, onChange, maxLenght = 64, hideLengthLabel = false, multiline = false, error = false, helperText = null, ...props }) {
+export default function CustomTextField({ value, onChange, maxLenght: maxLength = 64, hideLengthLabel = false, multiline = false, error = false, helperText, ...props }) {
     const textFieldRef = useRef()
 
     const handleOnChange = (evt) => {
-        if (evt.target.value.length <= maxLenght) {
+        if (evt.target.value.length <= maxLength) {
             onChange?.(evt)
         }
     }
 
     const setValueColor = () => (
-        value.length === maxLenght
+        value.length === maxLength
             ? 'error.main'
-            : value.length >= Math.floor(maxLenght * 0.75)
+            : value.length >= Math.floor(maxLength * 0.75)
                 ? '#ff8800ff'
                 : 'text.secondary'
     )
@@ -37,10 +37,13 @@ export default function CustomTextField({ value, onChange, maxLenght = 64, hideL
                         width: '100%',
                     }}
                 >
-                    <Typography variant="caption">
-                        {helperText && <>
-                            <ErrorOutline fontSize='small' /> {helperText}
-                        </>}
+                    <Typography component="small" sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                        {helperText && (
+                            <>
+                                <ErrorOutline sx={{ fontSize: 'inherit' }} />
+                                {helperText}
+                            </>
+                        )}
                     </Typography>
 
                     {!hideLengthLabel && (
@@ -48,7 +51,7 @@ export default function CustomTextField({ value, onChange, maxLenght = 64, hideL
                             variant="caption"
                             sx={{ color: setValueColor() }}
                         >
-                            {value.length}/{maxLenght}
+                            {value.length}/{maxLength}
                         </Typography>
                     )}
                 </Box>

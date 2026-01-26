@@ -25,19 +25,21 @@ if (import.meta.env.MODE === 'development') {
   async function enableMocking() {
     if (!import.meta.env.DEV) return
 
-    const { worker } = await import('./mocks/browser')
+    const { worker } = await import('../mocks/browser.js')
     return worker.start()
   }
 
-  // enableMocking()
+  // esto es porque congela la inicialización de la app hasta que se levante el mock, para que no 
+  // haya ninguna llamada en React que intente acceder al backend falso antes de que se inicialize
+  await enableMocking()
 }
 
 createRoot(document.getElementById('root')).render(
-  <StrictMode>
+  // <StrictMode>
     <AuthProvider>
       <BrowserRouter>
         <App style={{ color: '#bfff00ff' }} />
       </BrowserRouter>
     </AuthProvider>
-  </StrictMode>,
+  // </StrictMode>,
 )

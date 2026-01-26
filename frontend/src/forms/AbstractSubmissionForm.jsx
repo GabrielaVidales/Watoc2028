@@ -108,7 +108,6 @@ export default function AbstractSubmissionForm() {
     // #endregion
 
     return (
-        // <Paper className='d-flex flex-column h-100' elevation={7} sx={{ height: 630, borderTop: 12, borderColor: 'primary.main', padding: { xs: 2, sm: 3, md: 5 } }}>
             <Stack spacing={2} component='form' onSubmit={handleSubmit(onValidData, onInvalidData)}>
                 <Button type='submit' >
                     botón para testear funcioamiento
@@ -311,7 +310,6 @@ export default function AbstractSubmissionForm() {
                     </Reorder.Group>
                 </Paper>
             </Stack>
-        // </Paper>
     )
 }
 

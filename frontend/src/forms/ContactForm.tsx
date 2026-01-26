@@ -1,52 +1,40 @@
 import { Button, TextField, Grid, MenuItem, Typography, Stack, Divider, Box, InputAdornment, FormLabel, Alert, Collapse, IconButton, AlertTitle, FormControl, useMediaQuery, useTheme } from '@mui/material'
-import { Controller, useForm } from 'react-hook-form'
+import { Controller, FormProvider, useForm } from 'react-hook-form'
 import { Close, ErrorOutline, MailOutline, Send } from '@mui/icons-material'
 import CustomTextField from '../components/CustomTextField'
 import { REGEX_EMAIL, REGEX_NAME } from '../utils/formRegex'
 import HCaptcha from '@hcaptcha/react-hcaptcha'
 import { useEffect } from 'react'
 import axiosClient from '../clients/axiosClient'
+import { ControlledSelect, ControlledTextField } from './components/ControlledInputs'
 
-
-function RenderControlledInput({
-    name,
-    label,
-    control,
-    rules,
-    errors,
-    defaultValue = '',
-    placeholder = '',
-    error = false,
-    helperText = '',
-    ...props
-}) {
-
-    return <>
-        {label &&
-            <FormLabel htmlFor={name}>
-                {label}
-            </FormLabel>
-        }
-        <Controller
-            name={name}
-            control={control}
-            defaultValue={defaultValue}
-            rules={rules}
-            render={({ field }) => (
-                <CustomTextField {...field}
-                    onBlur={(event) => {
-                        field.onChange(event.currentTarget.value.trim())
-                    }}
-                    id={name}
-                    placeholder={placeholder}
-                    error={error}
-                    helperText={helperText}
-                    {...props}
-                />
-            )}
-        />
-    </>
+type ContactType = {
+    id: number
+    label: string
 }
+
+const contactType: ContactType[] = [
+    {
+        id: 0,
+        label: 'Posters'
+    },
+    {
+        id: 1,
+        label: 'Talks'
+    },
+    {
+        id: 2,
+        label: 'visa letters'
+    },
+    {
+        id: 3,
+        label: 'Payment'
+    },
+    {
+        id: 4,
+        label: 'Other'
+    },
+]
 
 export default function ContactForm() {
     const theme = useTheme()
@@ -59,13 +47,13 @@ export default function ContactForm() {
         })
     }, [register])
 
-    const validateOption = (value) => (value !== -1 || 'Required *')
+    const validateOption = (value: any) => (value !== -1 || 'Required *')
 
-    const onSubmit = async (data) => {
-        const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+    const methods = useForm()
+
+    const onSubmit = methods.handleSubmit(async (data: any) => {
+        const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
         delete data.captcha;
-        console.log(data)
-        // console.log(data);
         await sleep(1000)
 
         try {
@@ -88,33 +76,10 @@ export default function ContactForm() {
                 behavior: 'smooth'
             })
         }
-    }
-
-    const contactType = [
-        {
-            id: 0,
-            label: 'Posters'
-        },
-        {
-            id: 1,
-            label: 'Talks'
-        },
-        {
-            id: 2,
-            label: 'visa letters'
-        },
-        {
-            id: 3,
-            label: 'Payment'
-        },
-        {
-            id: 4,
-            label: 'Other'
-        },
-    ]
+    })
 
     return (
-        <form onSubmit={handleSubmit(onSubmit)}>
+        <form onSubmit={onSubmit}>
             <fieldset disabled={isSubmitSuccessful}>
                 <Stack spacing={3}>
                     <Box textAlign="center" mb={6} >
@@ -191,10 +156,167 @@ export default function ContactForm() {
                         </Alert>
                     </Collapse>
 
-                    <Grid container spacing={2} display={'flex'} justifyContent={'space-between'}>
+                    <FormProvider {...methods}>
+                        <Stack spacing={3}>
+                            <Stack direction={{ xs: 'column', md: 'row' }} spacing={3}>
+                                <ControlledTextField
+                                    defaultValue=''
+                                    id='firstName'
+                                    name='firstName'
+                                    label='First name *'
+                                    placeholder="First name"
+                                    rules={{
+                                        required: 'First name is required *',
+                                        maxLength: { value: 64, message: 'Max length is 64 characters' },
+                                        pattern: { value: REGEX_NAME, message: 'Invalid name' }
+                                    }}
+                                    maxLength={64}
+                                />
+                                <ControlledTextField
+                                    defaultValue=''
+                                    id='lastName'
+                                    name='lastName'
+                                    label='Last name *'
+                                    placeholder="Last name"
+                                    rules={{
+                                        required: 'Last name is required *',
+                                        maxLength: { value: 64, message: 'Max length is 64 characters' },
+                                        pattern: { value: REGEX_NAME, message: 'Invalid name' }
+                                    }}
+                                    maxLength={64}
+                                />
+                            </Stack>
+                            <ControlledTextField
+                                id='email'
+                                name="email"
+                                label="Email *"
+                                placeholder="example@domain.com"
+                                defaultValue=''
+                                rules={{
+                                    required: 'Required *',
+                                    maxLength: { value: 128, message: 'Max length is 128 characters' },
+                                    pattern: { value: REGEX_EMAIL, message: 'Invalid email' }
+                                }}
+                                maxLength={128}
+                                inputAdornment={{
+                                    endAdornment: (
+                                        <InputAdornment position="end">
+                                            <MailOutline />
+                                        </InputAdornment>
+                                    )
+                                }}
+                            />
+                            <ControlledSelect
+                                id='subject'
+                                name='subject'
+                                label='Subject *'
+                                rules={{
+                                    required: 'Required *',
+                                    validate: validateOption
+                                }}
+                                defaultValue={-1}
+                                options={contactType}
+                                getOptionLabel={(option: ContactType) => option.label}
+                                optionRender={(option: ContactType) => option.label}
+                            />
+                            <ControlledTextField
+                                id="description"
+                                name="description"
+                                label="Description *"
+                                maxLength={600}
+                                multiline
+                                minRows={4}
+                                defaultValue=''
+                                placeholder="Description"
+                                rules={{
+                                    required: 'Required *',
+                                    maxLength: { value: 600, message: 'Max length is 600 characters' },
+                                }}
+                            />
+                            <FormControl>
+                                <HCaptcha
+                                    size={isMobile ? 'compact' : 'normal'}
+                                    sitekey="ad963da0-1c32-45a2-a4ae-409600422f34"
+                                    onVerify={(token) => {
+                                        setValue('captcha', token, { shouldValidate: true })
+                                        clearErrors('captcha')
+                                    }}
+                                    onExpire={() => {
+                                        if (!isSubmitSuccessful) {
+                                            setError('captcha', {
+                                                type: 'manual',
+                                                message: 'Captcha expired, please verify again'
+                                            })
+                                        }
+                                    }}
+                                />
+                                {errors?.captcha && (
+                                    <Typography color="error" variant="caption">
+                                        <ErrorOutline fontSize='small' /> {errors?.captcha?.message?.toString()}
+                                    </Typography>
+                                )}
+                            </FormControl>
+                            <Button type='submit' variant='contained' loading={isSubmitting} disabled={isSubmitSuccessful} size='large' endIcon={<Send />} >Submit</Button>
+
+                        </Stack>
+                    </FormProvider>
+
+
+
+
+                </Stack>
+            </fieldset>
+        </form >
+    )
+}
+
+/*
+
+function RenderControlledInput({
+    name,
+    label,
+    control,
+    rules,
+    errors,
+    defaultValue = '',
+    placeholder = '',
+    error = false,
+    helperText = '',
+    ...props
+}) {
+
+    return <>
+        {label &&
+            <FormLabel htmlFor={name}>
+                {label}
+            </FormLabel>
+        }
+        <Controller
+            name={name}
+            control={control}
+            defaultValue={defaultValue}
+            rules={rules}
+            render={({ field }) => (
+                <CustomTextField {...field}
+                    onBlur={(event) => {
+                        field.onChange(event.currentTarget.value.trim())
+                    }}
+                    id={name}
+                    placeholder={placeholder}
+                    error={error}
+                    helperText={helperText}
+                    {...props}
+                />
+            )}
+        />
+    </>
+}
+
+
+ <Grid container spacing={2} display={'flex'} justifyContent={'space-between'}>
                         <Grid size={{ lg: 6, md: 12, sm: 12, xs: 12 }}>
                             <RenderControlledInput
-                                name="firstName"
+                                name="firstName0"
                                 label="First name *"
                                 control={control}
                                 error={!!errors.firstName}
@@ -322,7 +444,7 @@ export default function ContactForm() {
                                 />
                                 {errors?.captcha && (
                                     <Typography color="error" variant="caption">
-                                        <ErrorOutline fontSize='small' /> {errors?.captcha?.message}
+                                        <ErrorOutline fontSize='small' /> {errors?.captcha?.message?.toString()}
                                     </Typography>
                                 )}
                             </FormControl>
@@ -331,8 +453,4 @@ export default function ContactForm() {
                             <Button type='submit' variant='contained' loading={isSubmitting} disabled={isSubmitSuccessful} size='large' endIcon={<Send />} >Submit</Button>
                         </Grid>
                     </Grid>
-                </Stack>
-            </fieldset>
-        </form >
-    )
-}
+*/

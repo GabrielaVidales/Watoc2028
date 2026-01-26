@@ -1,0 +1,25 @@
+import * as React from 'react';
+import { useAuth, User } from './AuthContext';
+import { Navigate, Outlet } from 'react-router';
+
+type ProtectedRouteProps = React.PropsWithChildren & {
+    allowedRoles?: User['role'][]
+}
+
+export function ProtectedRoute({ allowedRoles }: ProtectedRouteProps) {
+    const { currentUser } = useAuth()
+
+    if (currentUser === undefined) {
+        return <div>Loading...</div>
+    }
+
+    if (currentUser === null || (allowedRoles && !allowedRoles.includes(currentUser?.role))) {
+        return <Navigate to='login' />
+    }
+
+    if (!currentUser?.data?.emailConfirmed) {
+        return <div>You must confirm your email!</div>
+    }
+
+    return <Outlet />;
+}
