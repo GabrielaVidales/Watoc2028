@@ -1,4 +1,4 @@
-import { Paper } from '@mui/material';
+import { Container, Paper } from '@mui/material';
 import AbstractSubmissionForm from '../../forms/AbstractSubmissionForm';
 
 interface IAbstractSubmissionPortalProps {
@@ -6,9 +6,11 @@ interface IAbstractSubmissionPortalProps {
 
 const AbstractSubmissionPortal = ({ }: IAbstractSubmissionPortalProps) => {
 	return <>
-		<Paper className='d-flex flex-column h-100' elevation={5} sx={{ height: 630, borderTop: 12, borderColor: 'primary.main', padding: { xs: 2, sm: 3, md: 5 } }}>
-			<AbstractSubmissionForm />
-		</Paper>
+		<Container maxWidth='md' sx={{ height:'100%', mt:2 }}>
+			<Paper  elevation={5} sx={{ borderTop: 12, borderColor: 'primary.main', padding: { xs: 2, sm: 3, md: 5 } }}>
+				<AbstractSubmissionForm />
+			</Paper>
+		</Container>
 	</>
 };
 

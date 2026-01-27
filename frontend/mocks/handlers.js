@@ -70,17 +70,6 @@ export const handlers = [
             id: 'pk_alskjd@ajskdhasjdhasjkdh',
         })
     }),
-
-    http.post('/api/v1/perra', () => {
-        return new HttpResponse(null, {
-            headers: {
-                // Setting the "Set-Cookie" header on the mocked response
-                // will set the cookies on the `document` as if they were
-                // received from the server.
-                'set-cookie': "goodCookie=goodCookie; SameSite=None; Secure; Max-Age=20;",
-            },
-        })
-    })
 ]
 
 const userData = {

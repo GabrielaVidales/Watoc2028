@@ -1,7 +1,7 @@
 import './App.css'
 import { createBrowserRouter, Routes, useLocation } from 'react-router'
 import { Route } from 'react-router'
-import { ProtectedRoute } from './contexts/ProtectedRoute'
+import { GuestRoute, ProtectedRoute } from './contexts/ProtectedRoute'
 
 import Login from './pages/Login'
 import { ThemeProvider } from '@mui/material/styles';
@@ -54,9 +54,12 @@ function App() {
 					<Route path='/transportation' element={<Transportation />} />
 					<Route path='/contact' element={<Contact />} />
 
-					<Route path='/test' element={<Test />} />
-					<Route path='/login' element={<Login />} />
-					<Route path='/register' element={<Register />} />
+					{/* Rutas sólo para usuarios no loggeados */}
+					<Route element={<GuestRoute />}>
+						<Route path='/test' element={<Test />} />
+						<Route path='/login' element={<Login />} />
+						<Route path='/register' element={<Register />} />
+					</Route>
 
 					{/* Rutas protegidas van aquí */}
 					<Route element={<ProtectedRoute allowedRoutes={'admin'} />} >

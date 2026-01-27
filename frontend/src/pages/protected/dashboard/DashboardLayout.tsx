@@ -1,12 +1,11 @@
-import { CardTravel, Description, Help, Inbox, Logout, Mail, Menu, MenuOpen, Payment, Person, Person2 } from '@mui/icons-material';
+import { CardTravel, Description, Help, Logout, Menu, MenuOpen, Payment, Person, Person2 } from '@mui/icons-material';
 import { AppBar, Avatar, Box, Button, Divider, Drawer, IconButton, List, ListItem, ListItemButton, ListItemIcon, ListItemText, SxProps, Theme, Toolbar } from '@mui/material';
 import { Link, Outlet, useNavigate } from 'react-router';
 import logo from '../../../assets/WatocPNGLogo.png';
 import { useState } from 'react';
 import { useAuth } from '../../../contexts/AuthContext';
 
-interface IDashboardLayoutProps { }
-
+const MAX_DRAWER_WIDTH = 230;
 const lateralBtns = [
     {
         label: 'Profile',
@@ -40,7 +39,8 @@ const lateralBtns = [
     },
 ]
 
-const MAX_DRAWER_WIDTH = 230;
+interface IDashboardLayoutProps { }
+
 const DashboardLayout = ({ }: IDashboardLayoutProps) => {
     const [openDrawer, setOpenDrawer] = useState(true)
     const [drawerWidth, setDrawerWidth] = useState(MAX_DRAWER_WIDTH);
@@ -73,7 +73,7 @@ const DashboardLayout = ({ }: IDashboardLayoutProps) => {
             await handleLogout()
             navigate('/')
         } catch (error) {
-            console.error("Logout fallido jajajjajaja");
+            console.error("Eldritch error");
         }
     }
 
@@ -175,7 +175,7 @@ const DashboardLayout = ({ }: IDashboardLayoutProps) => {
                 </Box>
             </Drawer>
 
-            <Box component="main" sx={{ p: 3, width: '100%' }}>
+            <Box component="main" sx={{ width: '100%' }}>
                 <Outlet />
             </Box>
         </Box>

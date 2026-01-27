@@ -1,12 +1,12 @@
 import * as React from 'react';
-import { Autocomplete, Box, Checkbox, CheckboxProps,  FormControlLabel, FormGroup, FormHelperText, Grow, InputLabel, TextField, TextFieldProps, Typography } from '@mui/material';
+import { Autocomplete, Box, Checkbox, CheckboxProps, FormControl, FormControlLabel, FormGroup, FormHelperText, Grow, InputLabel, MenuItem, Select, TextField, TextFieldProps, Typography } from '@mui/material';
 import { Controller, FieldValues, Path, RegisterOptions, useFormContext } from 'react-hook-form';
 import CustomTextField from '../../components/CustomTextField';
 
 //#region Controlled Inputs
 export interface BaseControlledProps {
     name: Path<FieldValues>;
-    id: string;
+    id: string | React.ReactNode;
     label?: string;
     rules?: Omit<RegisterOptions<FieldValues, string>, "disabled" | "valueAsNumber" | "valueAsDate" | "setValueAs">;
     defaultValue?: any;
@@ -21,7 +21,7 @@ type IControlledTextFieldProps = BaseControlledProps & TextFieldProps & {
     hideLengthLabel?: boolean;
 };
 
-export const ControlledTextField = ({ label, name, id, defaultValue, placeholder, rules, inputAdornment, maxLength, hideLengthLabel, ...props }: IControlledTextFieldProps) => {
+export const ControlledTextField = ({ label, name, id, defaultValue='', placeholder, rules, inputAdornment, maxLength, hideLengthLabel, ...props }: IControlledTextFieldProps) => {
     const { control } = useFormContext()
 
     return <Box flex={1}>
@@ -49,7 +49,7 @@ export const ControlledTextField = ({ label, name, id, defaultValue, placeholder
                     }}
                     slotProps={{
                         input: inputAdornment ?? {},
-                        
+
                         formHelperText: {
                             component: 'div'
                         }
@@ -61,14 +61,19 @@ export const ControlledTextField = ({ label, name, id, defaultValue, placeholder
     </Box>
 };
 
-type IControlledAutocompleteProps = BaseControlledProps & Omit<TextFieldProps, 'name'> & {
-    options: any[];
-    optionRender: (option: any) => React.ReactNode;
-    getOptionLabel: (option: any) => string;
+
+export interface BaseOption {
+    value: string | number
+}
+
+type IControlledAutocompleteProps<T extends BaseOption> = BaseControlledProps & Omit<TextFieldProps, 'name'> & {
+    options: T[];
+    optionRender: (option: T) => React.ReactNode;
+    getOptionLabel: (option: T) => string;
     boxProps?: object;
 };
 
-export const ControlledSelect = ({ label, name, id, defaultValue, placeholder, rules, options, optionRender, getOptionLabel, boxProps }: IControlledAutocompleteProps) => {
+export const ControlledSelect = <T extends BaseOption>({ label, name, id, defaultValue, placeholder, rules, options, optionRender, getOptionLabel, boxProps }: IControlledAutocompleteProps<T>) => {
     const { control } = useFormContext();
 
     return (
@@ -87,11 +92,11 @@ export const ControlledSelect = ({ label, name, id, defaultValue, placeholder, r
                         getOptionLabel={getOptionLabel} //Este es lo que se muestra como elegido
                         value={
                             // Esto indica el valor que almacena el input para submit
-                            options.find(c => c.code === field.value) || null
+                            options.find((c) => c.value === field.value) || null
                         }
                         onChange={(_, option) => {
                             // Eleva el evento onChange al del Controller
-                            field.onChange(option ? option.code : null)
+                            field.onChange(option ? option.value : null)
                         }}
                         renderOption={(props, option) => {
                             const { key, ...optionProps } = props;
@@ -132,6 +137,44 @@ export const ControlledSelect = ({ label, name, id, defaultValue, placeholder, r
         </Box>
     );
 }
+
+export const ControlledDropdown = <T extends BaseOption>({ label, name, id, defaultValue='', placeholder, rules, options, optionRender, boxProps }: IControlledAutocompleteProps<T>) => {
+    const { control } = useFormContext();
+
+    return (
+        <Box {...boxProps}>
+            {label && <InputLabel htmlFor={id}>{label}</InputLabel>}
+            <Controller
+                name={name}
+                control={control}
+                rules={rules ?? { required: 'Required *' }}
+                defaultValue={defaultValue}
+                render={({ field, fieldState }) => (
+                    <FormControl fullWidth error={!!fieldState.error}>
+                        <Select
+                            {...field}
+                            labelId={`${id}-label`}
+                            id={id}
+                            displayEmpty
+                        >
+                            <MenuItem value="" disabled>
+                                <em>{placeholder || 'Choose an option'}</em>
+                            </MenuItem>
+                            {options.map((option) => (
+                                <MenuItem key={option.value} value={option.value}>
+                                    {optionRender(option)}
+                                </MenuItem>
+                            ))}
+                        </Select>
+                        {fieldState.error && (
+                            <FormHelperText>{fieldState.error.message}</FormHelperText>
+                        )}
+                    </FormControl>
+                )}
+            />
+        </Box>
+    );
+};
 
 type IControlledCheckBox = BaseControlledProps & CheckboxProps & {
     small?: boolean

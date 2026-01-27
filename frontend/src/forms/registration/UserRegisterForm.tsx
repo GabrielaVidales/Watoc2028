@@ -6,10 +6,12 @@ import { REGEX_EMAIL } from '../../utils/formRegex';
 import { countries } from '../../utils/countriesInfo';
 import axiosClient from '../../clients/axiosClient';
 import { ControlledCheckBox, ControlledSelect, ControlledTextField } from '../components/ControlledInputs';
+import { useNavigate } from 'react-router';
 
 export interface IUserRegisterFormProps { }
 
 export default function UserRegisterForm({ }: IUserRegisterFormProps) {
+    const navigate = useNavigate()
     const methods = useForm({
         mode: 'onChange'
     })
@@ -34,32 +36,54 @@ export default function UserRegisterForm({ }: IUserRegisterFormProps) {
     }
 
     const onSubmit = methods.handleSubmit(async (data) => {
-        // TODO: LLAMAR A LA API DE REGISTRO Y PASARLE LOS DATOS
-        console.log(data);
-        await new Promise(resolve => setTimeout(resolve, 2000))
-        console.log("Finished");
-
-        const res = await axiosClient.post('register', data)
-        console.log(res);
-
+        try {
+            await axiosClient.post('register', data)
+            navigate('/login')
+        } catch (error) {
+            console.log("Registro falló");
+        }
     })
 
     return (
         <FormProvider {...methods}>
             <Paper elevation={5} sx={{ py: 6, px: { xs: 3, sm: 6, md: 9 }, borderTop: 12, borderColor: 'primary.main', }}>
                 <Box component='fieldset' disabled={methods.formState.isSubmitting}>
-                    <Button fullWidth onClick={handleDebugData}>Debug data</Button>
-                    <Typography
-                        variant="h3"
-                        fontWeight="bold"
-                        sx={{ fontSize: { xs: '1.8rem', md: '2.5rem' } }}
-                    >
-                        Join WATOC 2028
+                    {import.meta.env.DEV && (
+                        <Button fullWidth onClick={handleDebugData}>Debug data</Button>
+                    )}
+                    <Box textAlign="center" mb={3} >
+                        <Typography
+                            variant="overline"
+                            color="primary"
+                            fontWeight="bold"
+                            sx={{ fontSize: '1rem', letterSpacing: 2 }}
+                        >
+                            Join WATOC 2028
+                        </Typography>
+                        <Typography
+                            variant="h3"
+                            fontWeight="bold"
+                            sx={{
+                                mt: 1,
+                                mb: 2,
+                                fontSize: { xs: '2rem', md: '2.5rem' },
+                            }}
+                        >
+                            Join WATOC 2028
+                        </Typography>
+                        <Box
+                            sx={{
+                                width: 100,
+                                height: 4,
+                                bgcolor: 'primary.main',
+                                mx: 'auto',
+                                borderRadius: 2,
+                            }}
+                        />
+                    </Box>
+                    <Typography textAlign='center'>
+                        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
                     </Typography>
-                    <Typography>
-                        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-                    </Typography>
-
                     <hr />
                     <PersonalInfo />
                     <hr />
@@ -70,7 +94,7 @@ export default function UserRegisterForm({ }: IUserRegisterFormProps) {
                     <PasswordInfo />
                     <hr />
                     <Box display='flex' flex={1} justifyContent='flex-end'>
-                        <Button variant='contained' onClick={onSubmit} loading={methods.formState.isSubmitting}  >
+                        <Button variant='contained' onClick={onSubmit} loading={methods.formState.isSubmitting} size='large' >
                             Create account
                         </Button>
                     </Box>
@@ -83,13 +107,13 @@ export default function UserRegisterForm({ }: IUserRegisterFormProps) {
 
 const PersonalInfo = () => {
     const prefixOptions = [
-        { code: 'Mr.', label: 'Mr.' },       // Hombre (independiente de estado civil)
-        { code: 'Mrs.', label: 'Mrs.' },     // Mujer casada
-        { code: 'Ms.', label: 'Ms.' },       // Mujer (neutral/independiente de estado civil)
-        { code: 'Miss', label: 'Miss' },     // Mujer soltera
-        { code: 'Dr.', label: 'Doctor' },    // Profesional (neutral)
-        { code: 'Prof.', label: 'Professor' }, // Académico
-        { code: 'Mx.', label: 'Mx.' }        // Género neutro
+        { value: 'Mr.', label: 'Mr.' },       // Hombre (independiente de estado civil)
+        { value: 'Mrs.', label: 'Mrs.' },     // Mujer casada
+        { value: 'Ms.', label: 'Ms.' },       // Mujer (neutral/independiente de estado civil)
+        { value: 'Miss', label: 'Miss' },     // Mujer soltera
+        { value: 'Dr.', label: 'Doctor' },    // Profesional (neutral)
+        { value: 'Prof.', label: 'Professor' }, // Académico
+        { value: 'Mx.', label: 'Mx.' }        // Género neutro
     ];
 
     return <>
@@ -105,8 +129,8 @@ const PersonalInfo = () => {
                 defaultValue=''
                 options={prefixOptions}
                 rules={{ required: 'Required *' }}
-                getOptionLabel={option => (`${option.code} (${option.label})`)}
-                optionRender={option => (`${option.code} (${option.label})`)}
+                getOptionLabel={option => (`${option.value} (${option.label})`)}
+                optionRender={option => (`${option.value} (${option.label})`)}
             />
             <ControlledTextField
                 defaultValue=''
@@ -174,16 +198,16 @@ const ContactInfo = () => {
                 label='Select your country *'
                 options={countries}
                 rules={{ required: 'Required *' }}
-                getOptionLabel={option => (`${option.label} (${option.code})`)}
+                getOptionLabel={option => (`${option.label} (${option.value})`)}
                 optionRender={(option) => (<>
                     <img
                         loading="lazy"
                         width="20"
-                        srcSet={`https://flagcdn.com/w40/${option.code.toLowerCase()}.png 2x`}
-                        src={`https://flagcdn.com/w20/${option.code.toLowerCase()}.png`}
+                        srcSet={`https://flagcdn.com/w40/${option.value.toString().toLowerCase()}.png 2x`}
+                        src={`https://flagcdn.com/w20/${option.value.toString().toLowerCase()}.png`}
                         alt=""
                     />
-                    {option.label} ({option.code})
+                    {option.label} ({option.value})
                 </>)}
             />
             <ControlledTextField
@@ -297,13 +321,6 @@ const PasswordInfo = () => {
                     name='acceptTerms'
                     rules={{ required: 'Required *' }}
                     label='Aceptar los términos y condiciones *'
-                    small
-                />
-                <ControlledCheckBox
-                    id='newsletter'
-                    name='newsletter'
-                    rules={{}}
-                    label='Suscribe to newsletter to receive updates'
                     small
                 />
             </Box>

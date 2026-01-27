@@ -1,5 +1,5 @@
-import { Dehaze, DeleteOutline, DragHandle, PersonOutline } from '@mui/icons-material'
-import { Box, IconButton, InputAdornment, Stack, Tooltip } from '@mui/material'
+import { BorderStyle, Dehaze, DeleteOutline, DragHandle, DragIndicator, PersonOutline } from '@mui/icons-material'
+import { Box, IconButton, InputAdornment, Paper, Stack, Tooltip } from '@mui/material'
 import { Reorder, transform, useDragControls } from 'motion/react'
 import React, { useState } from 'react'
 import RenderInput from '../components/wizard registration/inputs/RenderInput'
@@ -14,10 +14,9 @@ export default function ReorderableItem({ field, index, children, onRemove, disa
         setStyle({
             zIndex: 0,
             transform: 'translateY(0)',
-            backgroundColor: '#fff',
         })
     }
-    
+
     const handlePointerDown = (event) => {
         dragControls.start(event)
         setStyle({
@@ -47,41 +46,49 @@ export default function ReorderableItem({ field, index, children, onRemove, disa
                 listStyle: 'none',
             }}
         >
-            <Box sx={{
-                display: 'flex',
-                alignItems: { xs: 'start', sm: 'start' },
-                justifyContent: 'space-between',
-                flexDirection: { xs: 'row', sm: 'row' },
-                gap: { xs: 2, sm: 2 },
-                px: 2,
-                py: 1,
-                transition: 'backgroundColor 0.2s ease-out, transform 0.2s ease-out',
+            <Paper elevation={2} variant='outlined' sx={{
+                mb: 2,
+                borderRadius: 3,
+                borderWidth: 'medium',
+                borderStyle: 'dashed',
+                backgroundColor: 'rgb(248, 249, 255)',
                 ...style
             }}>
-
-                <IconButton onPointerDown={handlePointerDown} sx={{
-                    cursor: 'grab',
-                    touchAction: 'none',
+                <Box sx={{
+                    display: 'flex',
+                    alignItems: { xs: 'start', sm: 'start' },
+                    justifyContent: 'space-between',
+                    flexDirection: { xs: 'row', sm: 'row' },
+                    transition: 'backgroundColor 0.2s ease-out, transform 0.2s ease-out',
+                    pt: 2, pb: 1,
                 }}>
-                    <Dehaze fontSize='medium' />
-                </IconButton>
 
-                <Box display={'flex'} alignItems={'center'} flex={1} gap={{ xs: 0, sm: 2 }} flexDirection={{ xs: 'column', sm: 'row' }}>
-                    {children}
+                    <IconButton size='large' onPointerDown={handlePointerDown} sx={{
+                        cursor: 'grab',
+                        touchAction: 'none',
+                    }}>
+                        <DragIndicator fontSize='medium' />
+                    </IconButton>
+
+                    <Box display={'flex'} alignItems={'center'} flex={1} gap={{ xs: 0, sm: 1 }} flexDirection={{ xs: 'column', sm: 'row' }}>
+                        {children}
+                    </Box>
+                    <Box display={'flex'} alignSelf={'center'}>
+                        <Tooltip title={disableRemove && "At least one author is required"} disableInteractive>
+                            {disableRemove ? (<span>
+                                <IconButton size='large' onClick={() => onRemove(index)} color='black' disabled={disableRemove}>
+                                    <DeleteOutline fontSize='medium' />
+                                </IconButton>
+                            </span>) : (
+                                <IconButton size='large' onClick={() => onRemove(index)} color='black' disabled={disableRemove}>
+                                    <DeleteOutline fontSize='medium' />
+                                </IconButton>
+                            )}
+                        </Tooltip>
+                    </Box>
+
                 </Box>
-
-                <Tooltip title={disableRemove && "At least one author is required"} disableInteractive>
-                    {disableRemove ? (<span>
-                        <IconButton onClick={() => onRemove(index)} color='black' disabled={disableRemove}>
-                            <DeleteOutline fontSize='medium' />
-                        </IconButton>
-                    </span>) : (
-                        <IconButton onClick={() => onRemove(index)} color='black' disabled={disableRemove}>
-                            <DeleteOutline fontSize='medium' />
-                        </IconButton>
-                    )}
-                </Tooltip>
-            </Box>
+            </Paper>
         </Reorder.Item >
     )
 }

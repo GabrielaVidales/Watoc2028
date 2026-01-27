@@ -23,3 +23,13 @@ export function ProtectedRoute({ allowedRoles }: ProtectedRouteProps) {
 
     return <Outlet />;
 }
+
+export function GuestRoute() {
+    const { currentUser } = useAuth()
+
+    if (currentUser) {
+        return <Navigate to="/user/my-profile" replace />;
+    }
+
+    return <Outlet />;
+}

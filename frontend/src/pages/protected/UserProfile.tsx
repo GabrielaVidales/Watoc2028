@@ -1,4 +1,4 @@
-import { Avatar, Box, Button, ButtonBase, Container, Divider, Grid, InputAdornment, Paper, Stack, TextField, Typography } from '@mui/material';
+import { Avatar, Box, Button, ButtonBase, Grid, InputAdornment, Paper, Stack, TextField, Typography } from '@mui/material';
 import * as React from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { Edit, Phone, Work } from '@mui/icons-material';
@@ -71,7 +71,7 @@ const UserProfile = ({ }: IUserProfileProps) => {
                         <h5>{currentUser?.data?.prefix} {currentUser?.data?.firstName} {currentUser?.data?.lastName} </h5>
                         <p>{currentUser?.data?.cargo}</p>
                         <p>{currentUser?.data?.affiliation} | {currentUser?.data?.department} </p>
-                        <Button variant='contained' startIcon={<Edit/>}>
+                        <Button variant='contained' startIcon={<Edit />}>
                             Edit profile
                         </Button>
                     </Stack>
@@ -199,7 +199,7 @@ const UserProfile = ({ }: IUserProfileProps) => {
                                             readOnly: true,
                                             startAdornment: (
                                                 <InputAdornment position="start">
-                                                    {getCountryImage(currentUser?.data?.country)}
+                                                    {getCountryImage(currentUser?.data?.country ?? '')}
                                                 </InputAdornment>
                                             )
                                         },

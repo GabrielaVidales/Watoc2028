@@ -26,7 +26,7 @@ export default function LoginForm() {
 
     return (
         <FormProvider {...methods}>
-            <Paper elevation={5} sx={{ py: 6, px: { xs: 3, sm: 6, md: 9 }, borderTop: 12, borderColor: 'primary.main', }}>
+            <Paper component='form' onSubmit={onSubmit} elevation={5} sx={{ py: 6, px: { xs: 3, sm: 6, md: 9 }, borderTop: 12, borderColor: 'primary.main', }}>
                 <Box component='fieldset' disabled={methods.formState.isSubmitting}>
                     <Stack spacing={2} py={2}>
                         <Typography variant='h4' fontWeight={500} textAlign='center'>
@@ -93,7 +93,7 @@ export default function LoginForm() {
                             Forgot password?
                         </Link>
 
-                        <Button variant='contained' onClick={onSubmit} loading={methods.formState.isSubmitting} sx={{ borderRadius: 5, width: '70%', alignSelf: 'center' }} >
+                        <Button type='submit' variant='contained' loading={methods.formState.isSubmitting} sx={{ borderRadius: 5, width: '70%', alignSelf: 'center' }} >
                             Submit
                         </Button>
 
