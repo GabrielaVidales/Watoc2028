@@ -1,5 +1,6 @@
 from django.contrib.auth.models import AbstractUser, BaseUserManager
 from django.db import models
+from django.conf import settings
 
 class CustomUserManager(BaseUserManager):
     def create_user(self, email, password=None, **extra_fields):
@@ -33,7 +34,7 @@ class CustomUserManager(BaseUserManager):
 
         return self.create_user(email, password, **extra_fields)
 
-# 2. Modificamos el Modelo de Usuario
+# Modelo de Usuario
 class CustomUser(AbstractUser):
     class NationalityType(models.TextChoices):
         # Norteamérica
@@ -73,8 +74,9 @@ class CustomUser(AbstractUser):
         OTHER = 'OTHER', 'Otro'
 
     class UserType(models.TextChoices):
-        STUDENT = 'STUDENT', 'Student'
         PARTICIPANT = 'PARTICIPANT', 'Participant'
+        STUDENT = 'STUDENT', 'Student'
+        
 
     class PrefixType(models.TextChoices):
         MISS = 'Miss', 'Miss'
@@ -90,8 +92,6 @@ class CustomUser(AbstractUser):
     middle_name = models.CharField(max_length=150, blank=True, null=True)
     prefix = models.CharField(max_length=10, choices=PrefixType.choices, blank=True, null=True)
     pronouns = models.CharField(max_length=50, blank=True, null=True)
-    secondary_email = models.EmailField(unique=True, blank=True, null=True)
-    phone_number = models.CharField(max_length=20, unique=True, blank=True, null=True)
 
     nationality = models.CharField(
         max_length=5,
@@ -103,7 +103,7 @@ class CustomUser(AbstractUser):
     user_type = models.CharField(
         max_length=20,
         choices=UserType.choices,
-        default=UserType.STUDENT
+        default=UserType.PARTICIPANT
     )
 
     USERNAME_FIELD = 'email'
@@ -114,3 +114,11 @@ class CustomUser(AbstractUser):
 
     def __str__(self):
         return self.email
+    
+class PasswordResetCode(models.Model):
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    code = models.CharField(max_length=6)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.user.email} - {self.code}"    

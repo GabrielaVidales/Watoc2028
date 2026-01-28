@@ -8,7 +8,7 @@ from .serializers import StudentSerializer
 class StudentProfileCreateView(generics.CreateAPIView):
     """ Crea el perfil de estudiante para el usuario logueado """
     serializer_class = StudentSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.AllowAny]
 
     def perform_create(self, serializer):
         # Verifica si ya tiene un perfil para evitar error 500

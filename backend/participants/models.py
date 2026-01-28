@@ -11,7 +11,6 @@ class Participant(models.Model):
     
     affiliation = models.CharField(max_length=255)
     affiliation_department = models.CharField(max_length=255)
-    position = models.CharField(max_length=100)
 
     def __str__(self):
         return f"Participant: {self.user.email}"    

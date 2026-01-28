@@ -27,19 +27,30 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.getenv('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.getenv('DEBUG')
 
 ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS').split(',')
-print("holaaaaaaaaaaaaaaaaaaaaaaaaaaaa",ALLOWED_HOSTS)
-SECURE_SSL_REDIRECT = os.getenv('SECURE_SSL_REDIRECT')
 
-SESSION_COOKIE_SECURE = os.getenv('SESSION_COOKIE_SECURE')
-CSRF_COOKIE_SECURE = os.getenv('CSRF_COOKIE_SECURE')
+SECURE_SSL_REDIRECT = os.getenv('SECURE_SSL_REDIRECT', 'False') == 'True'
+print("SECURE_SSL_REDIRECT: ",SECURE_SSL_REDIRECT)
 
-SECURE_PROXY_SSL_HEADER = os.getenv('SECURE_PROXY_SSL_HEADER').split(',')
+SESSION_COOKIE_SECURE = os.getenv('SESSION_COOKIE_SECURE', 'False') == 'True'
+print("SESSION_COOKIE_SECURE: ",SESSION_COOKIE_SECURE)
+CSRF_COOKIE_SECURE = os.getenv('CSRF_COOKIE_SECURE', 'False') == 'True'
+print("CSRF_COOKIE_SECURE: ",CSRF_COOKIE_SECURE)
+
+if not DEBUG:
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+else:
+    SECURE_PROXY_SSL_HEADER = None
+
+print("SECURE_PROXY_SSL_HEADER: ",SECURE_PROXY_SSL_HEADER)    
+
 
 
 CSRF_TRUSTED_ORIGINS = os.getenv('CSRF_TRUSTED_ORIGINS').split(',')
+
+print("CSRF_TRUSTED_ORIGINS: ",CSRF_TRUSTED_ORIGINS)
 
 AUTH_USER_MODEL = 'users.CustomUser'
 # Application definition
@@ -54,6 +65,7 @@ INSTALLED_APPS = [
     "corsheaders",
     'rest_framework',
     'rest_framework_simplejwt',
+    'rest_framework_simplejwt.token_blacklist',
     'users',
     'abstract',
     'contact_requests',
@@ -67,14 +79,17 @@ INSTALLED_APPS = [
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
+        'users.authentication.CustomJWTAuthentication',
     ),
     'DEFAULT_THROTTLE_CLASSES': [
         'rest_framework.throttling.AnonRateThrottle', # Para usuarios no logueados
-        'rest_framework.throttling.UserRateThrottle'  # Para usuarios logueados
+        'rest_framework.throttling.UserRateThrottle',  # Para usuarios logueados
+        'utils.throttles.DailyAnonThrottle',
     ],
     'DEFAULT_THROTTLE_RATES': {
         'anon': '10/minute',  # 10 peticiones por minuto para anónimos
-        'user': '1000/day'    # 1000 peticiones por día para usuarios
+        'anon_daily': '300/day',
+        'user': '1000/day',     # 1000 peticiones por día para usuarios  
     }
 }
 
@@ -96,8 +111,10 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
 CORS_ALLOW_ALL_ORIGINS = False
 CORS_ALLOWED_ORIGINS = os.getenv('CORS_ALLOWED_ORIGINS').split(',')
+print("CORS_ALLOWED_ORIGINS:", CORS_ALLOWED_ORIGINS)
 
 ROOT_URLCONF = 'watoc2028D.urls'
 

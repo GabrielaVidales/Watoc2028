@@ -7,10 +7,18 @@ from .models import ContactRequest
 @receiver(post_save, sender=ContactRequest)
 def send_contact_email(sender, instance, created, **kwargs):
     print(f"--- SIGNAL DISPARADO: Created={created} ---")
+    opciones = {
+        0: 'Posters',
+        1: 'Talks',
+        2: 'Visa Letters',
+        3: 'Payments',
+        4: 'Others'
+    }
+    subjectText = opciones.get(instance.subject,"Se envió un dato incorrecto")
 
     if created:
         # Enviar correo al admin avisando del nuevo mensaje
-        subject = f"Solicitud de Contacto: {instance.subject} - {instance.firstName} {instance.lastName}"
+        subject = f"Solicitud de Contacto: {subjectText} - {instance.firstName} {instance.lastName}"
 
         message = f"""
         Estimado administrador,
@@ -23,7 +31,7 @@ def send_contact_email(sender, instance, created, **kwargs):
         -------------------------------------------------------
         • Nombre:   {instance.firstName} {instance.lastName}
         • Correo:   {instance.email}
-        • Asunto:   {instance.subject}
+        • Asunto:   {subjectText}
         -------------------------------------------------------
 
         MENSAJE DEL USUARIO:
