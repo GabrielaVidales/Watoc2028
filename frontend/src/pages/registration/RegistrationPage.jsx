@@ -5,7 +5,7 @@ import Footer from '../../components/Footer'
 import { HeroSection } from '../../components/HeroSection'
 import { GenericHeroContent } from '../../components/GenericHeroContent'
 import GenericCTASection from '../../components/GenericCTASection'
-import WizardRegistration from '../../components/wizard registration/WizardRegistration'
+import RegistrationSteper from '../../components/wizard registration/RegistrationSteper'
 
 export default function RegistrationPage() {
     return (
@@ -16,7 +16,7 @@ export default function RegistrationPage() {
                     <GenericHeroContent />
                 </HeroSection>
                 <GenericCTASection maxWidth='xl'>
-                    <WizardRegistration/>
+                    <RegistrationSteper />
                 </GenericCTASection>
             </Box>
             <Footer />

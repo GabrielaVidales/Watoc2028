@@ -1,53 +1,8 @@
 import { Box, Container, Grid, Stack, Typography, Avatar, CardContent, Card, Collapse, ListItemButton, ListItemText } from '@mui/material'
 import { ExpandLess, ExpandMore, FormatQuote } from '@mui/icons-material';
 import { useState } from 'react';
-
-const CongressCard = ({ url, name, subtitle, text }) => (
-    <Card
-        elevation={8}
-        sx={{
-            position: 'relative',
-            borderRadius: 4,
-            overflow: 'hidden',
-            transition: 'all 0.4s ease',
-            // height: '100%',
-            '&:hover': {
-                transform: 'translateY(-8px)',
-                boxShadow: '0 12px 40px rgba(0,0,0,0.15)',
-            },
-        }}
-    >
-        <Box
-            sx={{
-                height: 320,
-                backgroundImage: `
-                            linear-gradient(
-                                to top,
-                                rgba(0,0,0,.3),
-                                rgba(0,0,0,.1)
-                            ),
-                            url(${url}) `,
-                backgroundSize: 'cover',
-                backgroundPosition: 'center',
-            }}
-        />
-        <CardContent sx={{
-            position: 'absolute',
-            bottom: 0,
-            color: 'white'
-        }}>
-            <Typography variant="subtitle1" fontWeight="bold" gutterBottom lineHeight={1.3}>
-                {name}
-            </Typography>
-            <Typography variant="subtitle2" fontWeight="600" gutterBottom lineHeight={1.3}>
-                {subtitle}
-            </Typography>
-            <Typography variant="caption" lineHeight={1}>
-                {text}
-            </Typography>
-        </CardContent>
-    </Card>
-);
+import mayaCalendar from '../../../assets/calendario_maya_rojo.png'
+import drMerino from '../../../assets/drmerino.jpg'
 
 const WelcomeMessage = ({ organizer, isReversed = false }) => {
     const [open, setOpen] = useState(false)
@@ -73,20 +28,17 @@ const WelcomeMessage = ({ organizer, isReversed = false }) => {
                         opacity: 0.2,
                     }}
                 />
-
                 <Typography variant="h6" fontWeight="bold" color="primary.main" gutterBottom marginLeft={2}>
                     Welcome to WATOC 2028
                 </Typography>
-
                 {organizer.paragraphs.length > 0 && (
                     <Typography
-                        variant="body1"
                         gutterBottom
                         marginBottom={3}
                         sx={{
-                            fontSize: '1.05rem',
+                            fontSize: '1rem',
                             lineHeight: 1.6,
-                            textAlign: open ? 'justify' : 'left',
+                            textAlign: 'justify',
                             wordSpacing: '6px',
                         }}
                     >
@@ -95,22 +47,17 @@ const WelcomeMessage = ({ organizer, isReversed = false }) => {
                 )}
 
                 {/* Caja colapsable para texto */}
-                <Box
-                    sx={{
-                        position: 'relative',
-                    }}
-                >
+                <Box position='relative'>
                     <Collapse in={open} timeout={1000} unmountOnExit>
                         {organizer.paragraphs.length > 1 && organizer.paragraphs.map((text, index) => {
                             if (index === 0) return null
                             return (
                                 <Typography
                                     key={index}
-                                    variant="body1"
                                     gutterBottom
                                     marginBottom={3}
                                     sx={{
-                                        fontSize: '1.05rem',
+                                        fontSize: '1rem',
                                         lineHeight: 1.6,
                                         textAlign: 'justify',
                                         wordSpacing: '6px'
@@ -128,8 +75,8 @@ const WelcomeMessage = ({ organizer, isReversed = false }) => {
                             mt: 1,
                         }}
                     >
-                        <ListItemButton onClick={() => setOpen(!open)}>
-                            <ListItemText secondary={open ? "Show less..." : "Show more..."} />
+                        <ListItemButton onClick={() => setOpen(!open)} sx={{ borderRadius: 3 }}>
+                            <ListItemText primary={open ? "Show less..." : "Show more..."} />
                             {open ? <ExpandLess /> : <ExpandMore />}
                         </ListItemButton>
                     </Box>
@@ -153,7 +100,7 @@ const WelcomeMessage = ({ organizer, isReversed = false }) => {
                             width: 120,
                             height: 120,
                             border: '3px solid',
-                            borderColor: 'primary.main',
+                            borderColor: 'primary.light',
                         }}
                     />
                     <Box>
@@ -179,7 +126,7 @@ const WelcomeMessage = ({ organizer, isReversed = false }) => {
 function WelcomeSection() {
     const organizers = [
         {
-            url: '/drmerino.jpg',
+            url: drMerino,
             name: 'Professor Gabriel Merino',
             subtitle: 'Physical & Theoretical Chemistry',
             text: 'Chair of WATOC 2028',
@@ -189,7 +136,6 @@ function WelcomeSection() {
                 "The scientific program will maintain a structure similar to that of recent WATOC congresses, combining plenary lectures, invited contributions, oral communications, and poster sessions. A broad range of thematic sessions will cover the full spectrum of contemporary theoretical and computational chemistry, from fundamental electronic-structure theory and molecular dynamics to catalysis, spectroscopy, materials science, medicinal chemistry, machine learning, and quantum computing. This format is designed to balance depth and breadth while encouraging interaction across subfields.",
                 "Following its very successful debut in Oslo, Young WATOC will remain a central component of the meeting. Taking place immediately prior to the main congress, this event will highlight the work of early-career researchers who have recently completed their PhD studies. While presentations will be delivered exclusively by young scientists, Young WATOC will be open to all congress participants, fostering dialogue between generations and reinforcing WATOC’s long-standing commitment to nurturing emerging leaders in the field.",
                 "WATOC 2028 will be hosted in Mérida, the cultural and scientific hub of southeastern Mexico. Often referred to as the “White City,” Mérida is renowned for its strong Mayan heritage, elegant colonial architecture, and vibrant contemporary cultural life. The city offers excellent infrastructure, a safe and welcoming environment, and convenient access to world-class archaeological sites such as Uxmal and Chichén Itzá, as well as to the Gulf of Mexico coastline. The congress venue, a modern convention center, will provide an ideal setting for scientific exchange, networking, and collaboration.",
-                "",
             ]
         },
     ];
@@ -204,13 +150,33 @@ function WelcomeSection() {
             }}
         >
             <Container maxWidth="lg">
-                <Box textAlign="center" mb={6}>
+                <Box sx={{
+                    textAlign: 'center',
+                    mb: 6,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'center',
+                    alignItems: 'center'
+                }}>
+                    <Box
+                        sx={{
+                            position: 'absolute',
+                            opacity: 0.25,
+                            height: '12rem',
+                            width: '12rem',
+                            backgroundImage: `url(${mayaCalendar})`,
+                            backgroundPosition: '50% 50%',
+                            backgroundAttachment: 'local',
+                            backgroundSize: 'contain',
+                            backgroundRepeat: 'no-repeat',
+                        }}
+                    />
 
                     <Typography
                         variant="overline"
                         color="primary"
                         fontWeight="bold"
-                        sx={{ fontSize: '1rem', letterSpacing: 2 }}
+                        sx={{ fontSize: '1rem', letterSpacing: 2, position: 'relative' }}
                     >
                         From the Organizer
                     </Typography>
@@ -220,13 +186,14 @@ function WelcomeSection() {
                         sx={{
                             mt: 1,
                             mb: 2,
-                            fontSize: { xs: '2rem', md: '2.5rem' },
+                            fontSize: { xs: '2rem', md: '2.5rem', position: 'relative' },
                         }}
                     >
                         Words of Welcome
                     </Typography>
                     <Box
                         sx={{
+                            position: 'relative',
                             width: 100,
                             height: 4,
                             bgcolor: 'primary.main',

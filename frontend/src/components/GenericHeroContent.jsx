@@ -114,10 +114,7 @@ export const GenericHeroContent = () => {
             <Box
                 onClick={scrollToContent}
                 sx={{
-                    position: 'absolute',
-                    bottom: 30,
-                    left: '50%',
-                    transform: 'translateX(-50%)',
+                    position: 'relative',
                     cursor: 'pointer',
                     animation: 'bounce 2s ease-in-out infinite',
                     '@keyframes bounce': {

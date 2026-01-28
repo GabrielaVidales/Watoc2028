@@ -14,6 +14,12 @@ const globalTheme = createTheme({
       dark: '#ba000d',
       contrastText: '#000',
     },
+    error: {
+      light: '#ff0011ff',
+      main: '#d2000eff',
+      dark: '#a1000bff',
+      contrastText: '#ffffffff',
+    },
   },
   components: {
     MuiTextField: {
@@ -24,7 +30,7 @@ const globalTheme = createTheme({
           },
           '& .MuiOutlinedInput-root': {
             borderRadius: 10,
-            backgroundColor: '#f8faffff', // azul muy suave
+            backgroundColor: '#fafcffff', // azul muy suave
           },
         },
       },

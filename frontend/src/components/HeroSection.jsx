@@ -4,6 +4,8 @@ import meridaWebp from './../assets/merida.webp'
 import meridaJpg from './../assets/merida.jpg'
 import hotel from './../assets/hotel.webp'
 import congresoEntrada from './../assets/congresoEntrada.webp'
+import mayaBackground from './../assets/maya_background.png'
+import { AnimatePresence, motion } from 'motion/react';
 
 const FloatingParticles = memo(({ count = 20, color = 'rgba(255,255,255,0.3)' }) => (
     <Box
@@ -45,48 +47,28 @@ const FloatingParticles = memo(({ count = 20, color = 'rgba(255,255,255,0.3)' })
 
 export const HeroSection = ({
     backgroundImgSrc = [meridaWebp, meridaJpg, hotel, congresoEntrada],
-    height = '70vh',
+    height = '75vh',
     disableLinearGradient = false,
     enableParticles = false,
     enableRadialGradient = true,
     gradientColors = 'rgba(13, 27, 42, 0.5) 0%, rgba(27, 38, 59, 0.25) 50%, rgba(13, 27, 42, 0.5) 100%',
     enableWave = true,
-    fadeTimeout = 1000,
-    transitionDuration = 1000,
-    slideshowInterval = 10000,
+    timeBetweenImages = 5000,
     offset = 0,
     children,
 }) => {
-    const [isVisible, setIsVisible] = useState(false);
     const [currentImageIndex, setCurrentImageIndex] = useState(offset)
-    const [isTransitioning, setIsTransitioning] = useState(false)
 
     useEffect(() => {
-        setIsVisible(true);
-    }, []);
-
-    useEffect(() => {
-        if (backgroundImgSrc.length <= 1) return;
-
-        const interval = setInterval(() => {
-            setIsTransitioning(true);
-
-            setTimeout(() => {
-                setCurrentImageIndex((prev) => (prev + 1) % backgroundImgSrc.length);
-                setTimeout(() => setIsTransitioning(false), 100);
-            }, transitionDuration / 2);
-        }, slideshowInterval);
-
-        return () => clearInterval(interval);
-    }, [backgroundImgSrc.length, slideshowInterval, transitionDuration]);
-
-
-    const getBackgroundStyle = (imageUrl) => ({
-        background: `${disableLinearGradient ? '' : `linear-gradient(135deg, ${gradientColors}),`} url("${imageUrl}")`,
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        backgroundAttachment: 'fixed',
-    })
+        const interval = setTimeout(() => {
+            setCurrentImageIndex(prev => {
+                if (++prev >= backgroundImgSrc.length)
+                    return 0;
+                return prev;
+            })
+        }, timeBetweenImages)
+        return () => clearTimeout(interval)
+    }, [currentImageIndex]);
 
     return (
         <>
@@ -117,7 +99,7 @@ export const HeroSection = ({
                     position: 'relative',
                     width: '100%',
                     minHeight: height,
-                    background: `url("/field.png")`,
+                    background: `url(${mayaBackground})`,
                     backgroundSize: 'cover',
                     backgroundPosition: 'center',
                     backgroundAttachment: 'fixed',
@@ -127,19 +109,25 @@ export const HeroSection = ({
                     overflow: 'hidden',
                 }}
             >
-                {backgroundImgSrc.map((img, index) => (
-                    <Box
-                        key={index}
-                        sx={{
+                <AnimatePresence mode='sync'>
+                    <motion.div
+                        key={backgroundImgSrc[currentImageIndex]}
+
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        transition={{ duration: 1 }}
+                        style={{
                             position: 'absolute',
                             inset: 0,
-                            ...getBackgroundStyle(img),
-                            opacity: index === currentImageIndex ? (isTransitioning ? 0 : 1) : 0,
-                            transition: `opacity ${transitionDuration}ms ease-in-out`,
-                            zIndex: index === currentImageIndex ? 1 : 0,
+                            zIndex: -1,
+                            background: `${disableLinearGradient ? '' : `linear-gradient(135deg, ${gradientColors}),`} url("${backgroundImgSrc[currentImageIndex]}")`,
+                            backgroundPosition: '50% 50%',
+                            backgroundSize: 'cover',
+                            backgroundAttachment: 'fixed',
                         }}
                     />
-                ))}
+                </AnimatePresence>
 
                 {enableParticles && <FloatingParticles />}
 
@@ -171,8 +159,13 @@ export const HeroSection = ({
                         py: { xs: 4, md: 6 },
                     }}
                 >
-                    <Fade in={isVisible} timeout={fadeTimeout}>
+                    <AnimatePresence>
                         <Box
+                            component={motion.div}
+                            initial={{ opacity: 0, y: -50 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: 50 }}
+                            transition={{ duration: 1, delay: 0.5 }}
                             sx={{
                                 display: 'flex',
                                 flexDirection: 'column',
@@ -183,7 +176,7 @@ export const HeroSection = ({
                         >
                             {children}
                         </Box>
-                    </Fade>
+                    </AnimatePresence>
                 </Container>
             </Box>
         </>

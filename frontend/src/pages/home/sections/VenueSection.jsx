@@ -3,14 +3,15 @@ import { Flight, Hotel, Room, ArrowForward, LocationOn } from '@mui/icons-materi
 import { useNavigate } from 'react-router';
 import CountUp from 'react-countup';
 import FeatureCard from '../../../components/FeatureCard';
+import venueImage from '../../../assets/centroconvenciones.webp'
 
 export default function VenueSection() {
     const navigate = useNavigate();
 
     const features = [
         { icon: Room, text: 'Downtown Mérida', color: '#1976d2' },
-        { icon: Flight, text: (<><CountUp end={20} separator="," duration={2} enableScrollSpy scrollSpyOnce style={{ fontSize: 'inherit', fontWeight: 'inherit' }}/> min from airport</>), color: '#2e7d32' },
-        { icon: Hotel, text: (<><CountUp end={2000} separator="," duration={2} enableScrollSpy scrollSpyOnce style={{ fontSize: 'inherit', fontWeight: 'inherit' }}/>+ hotel rooms</>), color: '#ed6c02' },
+        { icon: Flight, text: (<><CountUp end={20} separator="," duration={2} enableScrollSpy scrollSpyOnce style={{ fontSize: 'inherit', fontWeight: 'inherit' }} /> min from airport</>), color: '#2e7d32' },
+        { icon: Hotel, text: (<><CountUp end={2000} separator="," duration={2} enableScrollSpy scrollSpyOnce style={{ fontSize: 'inherit', fontWeight: 'inherit' }} />+ hotel rooms</>), color: '#ed6c02' },
     ];
 
     return (
@@ -60,7 +61,7 @@ export default function VenueSection() {
                 >
                     <Box
                         component="img"
-                        src="/centroconvenciones.webp"
+                        src={venueImage}
                         alt="Centro Internacional de Congresos de Yucatán"
                         sx={{
                             width: '100%',

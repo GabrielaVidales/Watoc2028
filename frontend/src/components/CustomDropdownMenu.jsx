@@ -11,11 +11,12 @@ const CustomDropdownMenu = ({ textBlack = false, children }) => {
                 alignItems: 'center',
                 gap: 0.5,
                 cursor: 'pointer',
-                transition: '0.3s ease',
                 color: (textBlack) ? 'black' : 'white',
             }} >
-                <Typography variant="h6" component="div" sx={{
-
+                <Typography component="div" sx={{
+                    fontSize: '1.2rem',
+                    fontWeight: 500,
+                    textAlign: 'center',
                 }} >
                     About
                 </Typography>

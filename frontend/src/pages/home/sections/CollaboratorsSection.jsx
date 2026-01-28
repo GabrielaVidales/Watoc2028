@@ -1,11 +1,14 @@
 import { Box, Container, Stack, Typography, Paper } from '@mui/material';
 import { Diversity3 } from '@mui/icons-material';
 import { Link } from 'react-router';
+import watocLogo from '../../../assets/watocLogo.png'
+import cinvestavLogo from '../../../assets/cinvestavlogo.png'
+import uamLogo from '../../../assets/uam.png'
 
 const collaborators = [
-    { name: 'WATOC', src: '/watocLogo.png', url: 'https://www.watoc.net/' },
-    { name: 'Cinvestav', src: '/cinvestavlogo.png', url: 'https://www.cinvestav.mx/' },
-    { name: 'UAM', src: '/uam.png', url: 'http://www.iztapalapa.uam.mx/' },
+    { name: 'WATOC', src: watocLogo, url: 'https://www.watoc.net/' },
+    { name: 'Cinvestav', src: cinvestavLogo, url: 'https://www.cinvestav.mx/' },
+    { name: 'UAM', src: uamLogo, url: 'http://www.iztapalapa.uam.mx/' },
 ];
 
 export default function CollaboratorsSection() {

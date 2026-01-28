@@ -6,6 +6,10 @@ import { VenueHeroContent } from './components/VenueHeroContent'
 import GenericCTASection from '../../components/GenericCTASection'
 import { HeroSection } from '../../components/HeroSection'
 import CountUp from 'react-countup';
+import centro1 from '../../assets/centro1.jpg'
+import centro2 from '../../assets/centro2.jpg'
+import centro3 from '../../assets/centro3.jpg'
+import centroConvenciones from '../../assets/centroconvenciones.webp'
 
 const FeatureCard = ({ icon, title, text }) => (
     <Paper elevation={5} sx={{
@@ -121,7 +125,7 @@ const ImageStatCard = ({ image, value, unit, label }) => (
                     duration={2}
                     separator=","
                     enableScrollSpy
-                    scrollSpyOnce
+                    scrollSpyOnce={false}
                     style={{ fontSize: 'inherit', fontWeight: 'inherit' }}
                 />
                 {unit && ` ${unit}`}
@@ -257,21 +261,21 @@ export default function VenuePage() {
                     <Grid container spacing={4}>
                         <Grid size={{ xs: 12, sm: 7 }}>
                             <ImageStatCard
-                                image="/centro1.jpg"
+                                image={centro1}
                                 value={26}
                                 label="Lounges"
                             />
                         </Grid>
                         <Grid size={{ xs: 12, sm: 5 }}>
                             <ImageStatCard
-                                image="/centro2.jpg"
+                                image={centro2}
                                 value={10000}
                                 label="Capacity of assistants"
                             />
                         </Grid>
                         <Grid size={{ xs: 12, sm: 4 }}>
                             <ImageStatCard
-                                image="/centro3.jpg"
+                                image={centro3}
                                 value={9430}
                                 unit="m²"
                                 label="Event area"
@@ -279,7 +283,7 @@ export default function VenuePage() {
                         </Grid>
                         <Grid size={{ xs: 12, sm: 8 }}>
                             <ImageStatCard
-                                image="/centroconvenciones.webp"
+                                image={centroConvenciones}
                                 value={50000}
                                 unit="m²"
                                 label="Total construction"
