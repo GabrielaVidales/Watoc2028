@@ -19,12 +19,6 @@ export default function Test() {
       <div className='row h-100 justify-content-center'>
         <div className='col-12 col-sm-10 col-lg-4 p-1 p-sm-3'>
 
-          <Button onClick={onProtected}>
-            Protected
-          </Button>
-          <Button onClick={makePayment}>
-            Pagar
-          </Button>
           <UserRegisterForm />
         </div>
         {/* 

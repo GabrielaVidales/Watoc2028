@@ -5,7 +5,7 @@ import FormSectionTitle from '../components/wizard registration/inputs/FormSecti
 import { AnimatePresence, Reorder } from "motion/react"
 import ReorderableItem from './ReorderableItem'
 import { ControlledTextField } from './components/ControlledInputs'
-import { useCallback } from 'react'
+import { useCallback, useMemo } from 'react'
 
 // Este closure es para que al eliminar un elemento se bloquee por 500 ms
 function createRemoveGuard(removeFn: (value: any) => void, delay = 500) {
@@ -72,7 +72,9 @@ export default function AbstractSubmissionForm() {
         }
     }
 
-    const onRemove = useCallback(() => createRemoveGuard((data) => {
+    const onRemove = useMemo(() => createRemoveGuard((data) => {
+        console.log(data);
+
         if (authorMethods.fields.length > 1) {
             authorMethods.remove(data)
         }
@@ -98,7 +100,7 @@ export default function AbstractSubmissionForm() {
         }
     }
 
-    const onRemoveReference = useCallback(() => createRemoveGuard((data) => {
+    const onRemoveReference = useMemo(() => createRemoveGuard((data) => {
         if (referencesArray.fields.length > 1) {
             referencesArray.remove(data)
         }
@@ -124,7 +126,7 @@ export default function AbstractSubmissionForm() {
                     }}
                 />
 
-                <Divider/>
+                <Divider />
 
                 <FormSectionTitle icon={<FormatQuote fontSize='small' />} text='Authors' />
 
@@ -176,7 +178,7 @@ export default function AbstractSubmissionForm() {
                     </AnimatePresence>
                 </Reorder.Group>
 
-                <Divider/>
+                <Divider />
 
                 <FormSectionTitle text='Abstract text' icon={<Article fontSize='small' />} />
 
@@ -194,11 +196,25 @@ export default function AbstractSubmissionForm() {
                     }}
                 />
 
-            
-                <Divider/>
+
+                <Divider />
 
                 <FormSectionTitle text='References' icon={<Article fontSize='small' />} />
 
+                <ControlledTextField
+                    id={`ref`} name={'ref'}
+                    maxLength={500}
+                    multiline minRows={2} maxRows={20}
+                    autoComplete='off' spellCheck={false}
+                    rules={{
+                        required: 'Required *',
+                        maxLength: {
+                            value: 2000,
+                            message: 'Too long',
+                        },
+                    }}
+                />
+                {/*
                 <Reorder.Group values={referencesArray.fields} onReorder={onReorderReference} style={{ padding: 0, }}>
                     <Box sx={{ pb: 2, display: 'flex', justifyContent: 'end', }}>
                         <Button variant='text' size='large' startIcon={<FormatQuote />} onClick={() => referencesArray.append({ text: '' })}>
@@ -231,6 +247,7 @@ export default function AbstractSubmissionForm() {
                         ))}
                     </AnimatePresence>
                 </Reorder.Group>
+                */}
             </Stack>
         </FormProvider>
     )

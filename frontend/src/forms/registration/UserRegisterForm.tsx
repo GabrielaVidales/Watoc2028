@@ -1,4 +1,4 @@
-import { Box, Button, InputAdornment, LinearProgress, Paper, Stack, Typography } from '@mui/material';
+import { Box, Button, Divider, InputAdornment, LinearProgress, List, ListItem, Paper, Stack, Typography } from '@mui/material';
 import { FormProvider, useForm, useFormContext, useWatch } from 'react-hook-form';
 import { Lock, Mail, Person } from '@mui/icons-material';
 import FormSectionTitle from '../../components/wizard registration/inputs/FormSectionTitle';
@@ -40,7 +40,9 @@ export default function UserRegisterForm({ }: IUserRegisterFormProps) {
             await axiosClient.post('register', data)
             navigate('/login')
         } catch (error) {
-            console.log("Registro falló");
+            if (import.meta.env.DEV){
+                console.log("Registro falló");
+            }
         }
     })
 
@@ -52,38 +54,49 @@ export default function UserRegisterForm({ }: IUserRegisterFormProps) {
                         <Button fullWidth onClick={handleDebugData}>Debug data</Button>
                     )}
                     <Box textAlign="center" mb={3} >
-                        <Typography
-                            variant="overline"
-                            color="primary"
-                            fontWeight="bold"
+                        <Typography variant="overline" color="primary" fontWeight="bold"
                             sx={{ fontSize: '1rem', letterSpacing: 2 }}
                         >
-                            Join WATOC 2028
+                            Join us in Mérida!
                         </Typography>
-                        <Typography
-                            variant="h3"
-                            fontWeight="bold"
+                        <Typography variant="h3" fontWeight="bold"
                             sx={{
                                 mt: 1,
                                 mb: 2,
                                 fontSize: { xs: '2rem', md: '2.5rem' },
                             }}
                         >
-                            Join WATOC 2028
+                            Express Your Interest for WATOC 2028
                         </Typography>
-                        <Box
-                            sx={{
-                                width: 100,
-                                height: 4,
-                                bgcolor: 'primary.main',
-                                mx: 'auto',
-                                borderRadius: 2,
-                            }}
-                        />
+                        <Box sx={{
+                            width: 100,
+                            height: 4,
+                            bgcolor: 'primary.main',
+                            mx: 'auto',
+                            borderRadius: 2,
+                        }} />
                     </Box>
-                    <Typography textAlign='center'>
-                        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+                    <Typography gutterBottom>
+                        We are thrilled to begin preparations for the 14th Triennial Congress of the WATOC 2028.
+                        While the full registration system is not yet open, we invite you to sign up below to stay informed. By registering your interest, you will be the first to receive:
                     </Typography>
+                    <Divider />
+                    <ul>
+                        <li>
+                            Important deadlines for abstract submission.
+                        </li>
+                        <li>
+                            Early-bird registration alerts.
+                        </li>
+                        <li>
+                            Updates on congress speakers and the scientific program.
+                        </li>
+                        <li>
+                            Travel and accommodation tips for visiting the Yucatán Peninsula.
+                        </li>
+                    </ul>
+
+
                     <hr />
                     <PersonalInfo />
                     <hr />
@@ -95,7 +108,7 @@ export default function UserRegisterForm({ }: IUserRegisterFormProps) {
                     <hr />
                     <Box display='flex' flex={1} justifyContent='flex-end'>
                         <Button variant='contained' onClick={onSubmit} loading={methods.formState.isSubmitting} size='large' >
-                            Create account
+                            Create Account & Express Interest
                         </Button>
                     </Box>
                 </Box>
@@ -107,19 +120,19 @@ export default function UserRegisterForm({ }: IUserRegisterFormProps) {
 
 const PersonalInfo = () => {
     const prefixOptions = [
-        { value: 'Mr.', label: 'Mr.' },       // Hombre (independiente de estado civil)
-        { value: 'Mrs.', label: 'Mrs.' },     // Mujer casada
-        { value: 'Ms.', label: 'Ms.' },       // Mujer (neutral/independiente de estado civil)
-        { value: 'Miss', label: 'Miss' },     // Mujer soltera
-        { value: 'Dr.', label: 'Doctor' },    // Profesional (neutral)
-        { value: 'Prof.', label: 'Professor' }, // Académico
-        { value: 'Mx.', label: 'Mx.' }        // Género neutro
+        { value: 'Mr.', label: 'Mr.' },     
+        { value: 'Mrs.', label: 'Mrs.' },     
+        { value: 'Ms.', label: 'Ms.' },     
+        { value: 'Miss', label: 'Miss' },    
+        { value: 'Dr.', label: 'Doctor' },   
+        { value: 'Prof.', label: 'Professor' },
+        { value: 'Mx.', label: 'Mx.' }       
     ];
 
     return <>
         <Stack spacing={2} py={2}>
             <FormSectionTitle
-                text='Información personal'
+                text='Personal Information'
                 icon={<Person />}
             />
             <ControlledSelect
@@ -127,6 +140,7 @@ const PersonalInfo = () => {
                 name='prefix'
                 label='Prefix *'
                 defaultValue=''
+                placeholder='Select your title'
                 options={prefixOptions}
                 rules={{ required: 'Required *' }}
                 getOptionLabel={option => (`${option.value} (${option.label})`)}
@@ -166,7 +180,7 @@ const ContactInfo = () => {
     return <>
         <Stack spacing={2} py={2}>
             <FormSectionTitle
-                text='Información de contacto'
+                text='Contact Information'
                 icon={<Person />}
             />
 
@@ -228,7 +242,7 @@ const AffiliationInfo = () => {
     return <>
         <Stack spacing={2} py={2}>
             <FormSectionTitle
-                text='Affiliation information'
+                text='Affiliation Information'
                 icon={<Lock />}
             />
             <ControlledTextField
@@ -249,15 +263,6 @@ const AffiliationInfo = () => {
                 maxLength={128}
                 hideLengthLabel
             />
-            <ControlledTextField
-                defaultValue=''
-                id='jobPosition'
-                name='jobPosition'
-                label='Job position *'
-                rules={{ required: 'Required *', }}
-                maxLength={128}
-                hideLengthLabel
-            />
 
         </Stack>
     </>
@@ -269,7 +274,7 @@ const PasswordInfo = () => {
     return <>
         <Stack spacing={2} py={2}>
             <FormSectionTitle
-                text='Choose a password'
+                text='Security'
                 icon={<Lock />}
             />
             <PasswordStrengthMeter control={control} />
@@ -320,7 +325,7 @@ const PasswordInfo = () => {
                     id='acceptTerms'
                     name='acceptTerms'
                     rules={{ required: 'Required *' }}
-                    label='Aceptar los términos y condiciones *'
+                    label='I accept the Terms and Conditions *'
                     small
                 />
             </Box>
@@ -343,11 +348,11 @@ const PasswordStrengthMeter = ({ control }: { control: any }) => {
     const score = getPasswordStrength(password);
 
     const config = [
-        { color: 'error', label: 'Muy débil', value: 20 },
-        { color: 'error', label: 'Débil', value: 40 },
-        { color: 'warning', label: 'Regular', value: 60 },
-        { color: 'info', label: 'Segura', value: 80 },
-        { color: 'success', label: '¡Excelente!', value: 100 },
+        { color: 'error', label: 'Very weak', value: 20 },
+        { color: 'error', label: 'Weak', value: 40 },
+        { color: 'warning', label: 'Medium', value: 60 },
+        { color: 'info', label: 'Strong', value: 80 },
+        { color: 'success', label: 'Very strong', value: 100 },
     ];
 
     const current = config[score - 1] || { color: 'inherit', label: '', value: 0 };
@@ -355,7 +360,7 @@ const PasswordStrengthMeter = ({ control }: { control: any }) => {
     return (
         <Box sx={{ mt: 1, mb: 2 }}>
             <Stack direction="row" justifyContent="space-between" mb={0.5}>
-                <Typography variant="caption">Fortaleza de contraseña</Typography>
+                <Typography variant="caption">Password Strength</Typography>
                 <Typography variant="caption" fontWeight="bold" color={`${current.color}.main`}>
                     {current.label}
                 </Typography>

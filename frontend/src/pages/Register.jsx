@@ -50,7 +50,6 @@ export default function Register() {
 
                 <Container maxWidth="md" sx={{ position: 'relative', py: 3, zIndex: 1 }}>
                     <Toolbar />
-                    <Toolbar />
 
                     {import.meta.env.DEV && (<UserRegisterForm/>)}
 

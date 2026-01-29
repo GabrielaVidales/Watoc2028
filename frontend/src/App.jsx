@@ -21,10 +21,10 @@ import Transportation from './pages/transportation/TransportationPage';
 import { useEffect } from 'react';
 import globalTheme from './themes/Themes';
 import Test from './pages/Test';
-import { MockAutenticatedPage } from './contexts/MockAutenticatedPage'
 import DashboardLayout from './pages/protected/dashboard/DashboardLayout'
 import UserProfile from './pages/protected/UserProfile'
 import AbstractSubmissionPortal from './pages/protected/AbstractSubmissionPortal'
+import { SuccessRegisterPage } from './pages/protected/SuccessRegisterPage'
 
 function App() {
 	const { pathname } = useLocation()
@@ -56,19 +56,19 @@ function App() {
 
 					{/* Rutas sólo para usuarios no loggeados */}
 					<Route element={<GuestRoute />}>
-						<Route path='/test' element={<Test />} />
 						<Route path='/login' element={<Login />} />
 						<Route path='/register' element={<Register />} />
 					</Route>
 
 					{/* Rutas protegidas van aquí */}
-					<Route element={<ProtectedRoute allowedRoutes={'admin'} />} >
-						<Route path='/protected' element={<MockAutenticatedPage />} />
-						<Route path='/user' element={<DashboardLayout />}>
-							<Route path='dashboard' element={<h1>HOLA MUNDO</h1>} />
-							<Route path='my-profile' element={<UserProfile />} />
-							<Route path='abstract' element={<AbstractSubmissionPortal />} />
-						</Route>
+					<Route element={<ProtectedRoute />} >
+						<Route path='/success' element={<SuccessRegisterPage />} />
+						{import.meta.env.DEV && (
+							<Route path='/user' element={<DashboardLayout />}>
+								<Route path='my-profile' element={<UserProfile />} />
+								<Route path='abstract' element={<AbstractSubmissionPortal />} />
+							</Route>
+						)}
 					</Route>
 				</Routes>
 			</ThemeProvider>

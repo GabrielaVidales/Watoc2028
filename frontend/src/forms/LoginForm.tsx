@@ -17,7 +17,7 @@ export default function LoginForm() {
             await handleLogin(data.email, data.password)
             navigate('/user/my-profile')
         } catch (error) {
-            console.error("Login fallido jajajjajaja");
+            console.error("...");
         }
     })
     

@@ -11,10 +11,10 @@ export function ProtectedRoute({ allowedRoles }: ProtectedRouteProps) {
 
     if (currentUser === undefined) {
         return <div>Loading...</div>
-    }
+    }    
 
     if (currentUser === null || (allowedRoles && !allowedRoles.includes(currentUser?.role))) {
-        return <Navigate to='login' />
+        return <Navigate to='/' replace />
     }
 
     if (!currentUser?.data?.emailConfirmed) {
@@ -28,7 +28,7 @@ export function GuestRoute() {
     const { currentUser } = useAuth()
 
     if (currentUser) {
-        return <Navigate to="/user/my-profile" replace />;
+        return <Navigate to="/success" replace />;
     }
 
     return <Outlet />;

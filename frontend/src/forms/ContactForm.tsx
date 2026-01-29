@@ -74,9 +74,11 @@ export default function ContactForm() {
     const { formState: { } } = useForm()
 
     useEffect(() => {
-        methods.register('captcha', {
-            required: 'Captcha required *'
-        })
+        if (!import.meta.env.DEV) {
+            methods.register('captcha', {
+                required: 'Captcha required *'
+            })
+        }
     }, [])
 
     const validateOption = (value: any) => (value !== -1 || 'Required *')
@@ -229,32 +231,34 @@ export default function ContactForm() {
                             maxLength={600}
                         />
 
-                        <Box display='flex' flexDirection='column' alignItems='center' >
-                            <FormControl >
-                                <HCaptcha
-                                    size={isMobile ? 'compact' : 'normal'}
-                                    // sitekey="ad963da0-1c32-45a2-a4ae-409600422f34"
-                                    sitekey="10000000-ffff-ffff-ffff-000000000001"
-                                    onVerify={(token) => {
-                                        methods.setValue('captcha', token, { shouldValidate: true })
-                                        methods.clearErrors('captcha')
-                                    }}
-                                    onExpire={() => {
-                                        if (!methods.formState.isSubmitSuccessful) {
-                                            methods.setError('captcha', {
-                                                type: 'manual',
-                                                message: 'Captcha expired, please verify again'
-                                            })
-                                        }
-                                    }}
-                                />
-                                {methods.formState.errors?.captcha && (
-                                    <Typography color="error" variant="caption">
-                                        <ErrorOutline fontSize='small' /> {methods.formState.errors?.captcha?.message?.toString()}
-                                    </Typography>
-                                )}
-                            </FormControl>
-                        </Box>
+                        {!import.meta.env.DEV && (
+                            <Box display='flex' flexDirection='column' alignItems='center' >
+                                <FormControl >
+                                    <HCaptcha
+                                        size={isMobile ? 'compact' : 'normal'}
+                                        // sitekey="ad963da0-1c32-45a2-a4ae-409600422f34"
+                                        sitekey="10000000-ffff-ffff-ffff-000000000001"
+                                        onVerify={(token) => {
+                                            methods.setValue('captcha', token, { shouldValidate: true })
+                                            methods.clearErrors('captcha')
+                                        }}
+                                        onExpire={() => {
+                                            if (!methods.formState.isSubmitSuccessful) {
+                                                methods.setError('captcha', {
+                                                    type: 'manual',
+                                                    message: 'Captcha expired, please verify again'
+                                                })
+                                            }
+                                        }}
+                                    />
+                                    {methods.formState.errors?.captcha && (
+                                        <Typography color="error" variant="caption">
+                                            <ErrorOutline fontSize='small' /> {methods.formState.errors?.captcha?.message?.toString()}
+                                        </Typography>
+                                    )}
+                                </FormControl>
+                            </Box>
+                        )}
 
                         <Button onClick={onSubmit} type='submit' variant='contained' loading={methods.formState.isSubmitting} disabled={methods.formState.isSubmitSuccessful} size='large' fullWidth endIcon={<Send />} >Submit</Button>
                     </Stack>

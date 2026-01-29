@@ -17,7 +17,7 @@ export const handlers = [
             return HttpResponse.json({ error: 'No credentials' }, { status: 400 })
         }
 
-        if (email === 'pendejo@email.com' && password === '1234') {
+        if (email === mockUser.email && password === '1234') {
             return new HttpResponse(
                 JSON.stringify(mockUser),
                 {
@@ -48,12 +48,7 @@ export const handlers = [
         const { session_id } = cookies
 
         if (session_id === 'abc-123') {
-            return HttpResponse.json({
-                id: 1,
-                email: 'pendejo@email.com',
-                role: 'admin',
-                data: userData
-            });
+            return HttpResponse.json(mockUser);
         }
 
         return new HttpResponse(null, { status: 401 });
@@ -76,7 +71,6 @@ const userData = {
     prefix: "Mr.",
     firstName: 'Eduardo',
     lastName: 'Escalante',
-    email: 'eduardo.escalante@example.com',
     phone: '+52 55 1234 5678',
     country: 'Mexico',
     city: 'Mexico City',
@@ -88,7 +82,7 @@ const userData = {
 
 const mockUser = {
     id: 1,
-    email: 'pendejo@email.com',
+    email: 'eduardo@email.com',
     role: 'admin',
     data: userData,
 }
