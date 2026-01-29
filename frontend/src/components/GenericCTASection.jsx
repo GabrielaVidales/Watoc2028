@@ -1,4 +1,5 @@
 import { Box, Container, Stack } from '@mui/material'
+import fieldPng from '../assets/field.png'
 
 const GenericCTASection = ({ maxWidth = "md", spacing=3, alignItems="center", textAlign="center", children }) => (
     <Box
@@ -6,7 +7,7 @@ const GenericCTASection = ({ maxWidth = "md", spacing=3, alignItems="center", te
         sx={{
             py: { xs: 6, md: 8 },
             px: { xs: 2, sm: 3, md: 10, lg: 15 },
-            background: 'linear-gradient(135deg, #1976d2 0%, #1565c0 100%)',
+            background: '#2a2a50',
             color: 'white',
             position: 'relative',
             overflow: 'hidden',
@@ -20,7 +21,7 @@ const GenericCTASection = ({ maxWidth = "md", spacing=3, alignItems="center", te
                 right: 0,
                 bottom: 0,
                 opacity: 0.5,
-                backgroundImage: 'url(/field.png)',
+                backgroundImage: `url(${fieldPng})`,
                 backgroundSize: 'cover',
                 backgroundPosition: 'center',
                 backgroundAttachment: 'fixed', 

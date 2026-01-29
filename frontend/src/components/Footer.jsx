@@ -1,29 +1,30 @@
 import { Box, Container, Grid, Stack, Typography, IconButton, Divider } from '@mui/material';
 import { Email, LocationOn, Facebook, Twitter, LinkedIn, Instagram } from '@mui/icons-material';
 import { Link } from 'react-router';
+import fieldPng from '../assets/field.png'
+
+const navigation = {
+    congress: [
+        { label: "What's WATOC?", href: '/watoc' },
+        { label: 'Abstract Submission', href: '/abstract-submission' },
+        { label: 'Visa Requirements', href: '/visa' },
+        { label: 'Registration', href: '/register' },
+    ],
+    venue: [
+        { label: 'Venue Information', href: '/venue' },
+        { label: 'Hotel Booking', href: '/hotel-booking' },
+        { label: 'Restaurants', href: '/restaurants' },
+        { label: 'Transportation', href: '/transportation' },
+        { label: 'Mérida City Guide', href: 'https://visitmerida.mx/' },
+    ],
+};
 
 export default function Footer() {
-    const navigation = {
-        congress: [
-            { label: "What's WATOC?", href: '/watoc' },
-            { label: 'Abstract Submission', href: '/abstract-submission' },
-            { label: 'Visa Requirements', href: '/visa' },
-            { label: 'Registration', href: '/register' },
-        ],
-        venue: [
-            { label: 'Venue Information', href: '/venue' },
-            { label: 'Hotel Booking', href: '/hotel-booking' },
-            { label: 'Restaurants', href: '/restaurants' },
-            { label: 'Transportation', href: '/transportation' },
-            { label: 'Mérida City Guide', href: 'https://visitmerida.mx/' },
-        ],
-    };
-
     return (
         <Box
             component="footer"
             sx={{
-                bgcolor: '#1a1a2e',
+                bgcolor: '#2a2a50',
                 color: 'white',
                 pt: 6,
                 pb: 3,
@@ -40,7 +41,7 @@ export default function Footer() {
                     right: 0,
                     bottom: 0,
                     opacity: 0.5,
-                    backgroundImage: 'url(/field.png)',
+                    backgroundImage: `url(${fieldPng})`,
                     backgroundSize: 'cover',
                     backgroundPosition: 'center',
                     backgroundAttachment: 'fixed',

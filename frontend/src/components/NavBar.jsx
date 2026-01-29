@@ -1,7 +1,7 @@
 import { ExpandLess, ExpandMore, Menu as MenuIcon } from '@mui/icons-material';
 import { AppBar, Box, Toolbar, Typography, useScrollTrigger, IconButton, Menu, MenuItem, ListItemText, MenuList, ListItemButton, Collapse, List } from '@mui/material';
 import { useMemo, useRef, useState } from 'react';
-import { Link } from 'react-router';
+import { Link, NavLink } from 'react-router';
 import { ScrollTop } from './ScrollTop';
 import CustomDropdownMenu from './CustomDropdownMenu';
 import logo from '../assets/WatocPNGLogo.png';
@@ -155,13 +155,26 @@ export default function NavBar({ invertImg = true }) {
     const HomeMenuLink = ({ path = '#', label = '' }) => {
         return (
             <Box>
-                <Link to={path} style={{ textDecoration: 'none' }} onClick={() => {
-                    scrollRef.current.click()
-                }}>
-                    <Typography component="div" sx={linkStyle} >
-                        {label}
-                    </Typography>
-                </Link>
+                <NavLink to={path} end style={{ textDecoration: 'none' }} >
+                    {({ isActive }) =>
+                        isActive ?
+                            (
+                                <Typography component="div" sx={{
+                                    fontSize: '1.2rem',
+                                    fontWeight: 500,
+                                    textAlign: 'center',
+                                    opacity: 0.5,
+                                    color: (trigger || !invertImg) ? 'black' : 'white',
+                                }}>
+                                    {label}
+                                </Typography>
+                            ) : (
+
+                                <Typography component="div" sx={linkStyle}>
+                                    {label}
+                                </Typography>
+                            )}
+                </NavLink>
             </Box>
         )
     }
@@ -176,7 +189,7 @@ export default function NavBar({ invertImg = true }) {
                     sx={{
                         display: 'flex',
                         justifyContent: { xs: 'end', md: 'space-between' },
-                        minHeight: { xs: 64, md: 100 }
+                        minHeight: { xs: 64, md: 85 }
                     }}
                 >
                     <Box
@@ -195,7 +208,7 @@ export default function NavBar({ invertImg = true }) {
                                 src={logo}
                                 sx={{
                                     filter: (trigger || !invertImg) ? 'none' : 'invert()',
-                                    maxHeight: { xs: 50, sm: 70, md: 80 },
+                                    maxHeight: { xs: 50, sm: 60, md: 70 },
                                     padding: { xs: 0, sm: 1, md: 0 },
                                     width: 'auto'
                                 }}

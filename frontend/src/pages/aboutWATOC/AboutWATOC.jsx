@@ -5,20 +5,14 @@ import { Box } from '@mui/material'
 import { GenericHeroContent } from '../../components/GenericHeroContent'
 import AboutWATOCSection from './sections/AboutWATOCSection'
 import { HeroSection } from '../../components/HeroSection'
+import { MainLayout } from '../../components/MainLayout'
 
 export default function AboutWATOC() {
     return (
         <>
-            <NavBar />
-            <Box component='main'>
-                <HeroSection
-                    offset={1}
-                >
-                    <GenericHeroContent />
-                </HeroSection>
+            <MainLayout heroContent={<GenericHeroContent />}>
                 <AboutWATOCSection />
-            </Box>
-            <Footer />
+            </MainLayout>
         </>
     )
 }

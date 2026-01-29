@@ -10,6 +10,7 @@ import { HomeHeroContent } from './components/HomeHeroContent'
 import GenericCTASection from '../../components/GenericCTASection'
 import { HeroSection } from '../../components/HeroSection'
 import { Link } from 'react-router'
+import { MainLayout } from '../../components/MainLayout'
 
 export const MainCTA = () => (
     <GenericCTASection>
@@ -151,35 +152,21 @@ const CounterCard = () => {
 
 export default function Home() {
     return (
-        <>
-            <NavBar />
-            <Box component='main'>
-                <HeroSection
-                    height="95vh"
-                    enableParticles={true}
-                    enableRadialGradient={true}
-                    disableLinearGradient={false}
-                    enableWave={true}
-                >
-                    <HomeHeroContent />
-                </HeroSection>
-
-                <WelcomeSection />
-                <MainCTA />
-                <Box component='section' justifyContent='center' textAlign='center' sx={{
-                    px: { xs: 1, sm: 3, md: 10, lg: 15 },
-                    py: { xs: 2, md: 3 },
-                }}>
-                    <Typography variant="h4" fontWeight="bold">
-                        Countdown to WATOC 2028
-                    </Typography>
-                    <CounterCard />
-                </Box>
-                <VenueSection />
-                {/* <NewsletterSection /> */}
-                <CollaboratorsSection />
+        <MainLayout  heroContent={<HomeHeroContent />}>
+            <WelcomeSection />
+            <MainCTA />
+            <Box component='section' justifyContent='center' textAlign='center' sx={{
+                px: { xs: 1, sm: 3, md: 10, lg: 15 },
+                py: { xs: 2, md: 3 },
+            }}>
+                <Typography variant="h4" fontWeight="bold">
+                    Countdown to WATOC 2028
+                </Typography>
+                <CounterCard />
             </Box>
-            <Footer />
-        </>
+            <VenueSection />
+            {/* <NewsletterSection /> */}
+            <CollaboratorsSection />
+        </MainLayout>
     )
 }

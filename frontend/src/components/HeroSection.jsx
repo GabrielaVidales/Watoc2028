@@ -116,7 +116,7 @@ export const HeroSection = ({
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
-                        transition={{ duration: 1 }}
+                        transition={{ delay: 3, duration: 1 }}
                         style={{
                             position: 'absolute',
                             inset: 0,

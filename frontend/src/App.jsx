@@ -1,8 +1,9 @@
 import './App.css'
-import { Routes, useLocation } from 'react-router'
+import { createBrowserRouter, Routes, useLocation } from 'react-router'
 import { Route } from 'react-router'
-import Login from './pages/Login'
+import { GuestRoute, ProtectedRoute } from './contexts/ProtectedRoute'
 
+import Login from './pages/Login'
 import { ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import Register from './pages/Register'
@@ -13,7 +14,6 @@ import AbstractSubmissionInfo from './pages/abstractSubmission/AbstractSubmissio
 import VisaRequirements from './pages/visa/VisaRequirements'
 import AboutWATOC from './pages/aboutWATOC/AboutWATOC'
 import Contact from './pages/contact/Contact';
-import RegistrationPage from './pages/registration/RegistrationPage';
 import NotFound from './pages/error/NotFound';
 import YoungWatoc from './pages/youngWATOC/YoungWatoc';
 import Restaurants from './pages/restaurants/RestaurantsPage';
@@ -21,6 +21,10 @@ import Transportation from './pages/transportation/TransportationPage';
 import { useEffect } from 'react';
 import globalTheme from './themes/Themes';
 import Test from './pages/Test';
+import DashboardLayout from './pages/protected/dashboard/DashboardLayout'
+import UserProfile from './pages/protected/UserProfile'
+import AbstractSubmissionPortal from './pages/protected/AbstractSubmissionPortal'
+import { SuccessRegisterPage } from './pages/protected/SuccessRegisterPage'
 
 function App() {
 	const { pathname } = useLocation()
@@ -49,12 +53,23 @@ function App() {
 					<Route path='/restaurants' element={<Restaurants />} />
 					<Route path='/transportation' element={<Transportation />} />
 					<Route path='/contact' element={<Contact />} />
-					<Route path='/register/account' element={<RegistrationPage />} />
-					{/* <Route path='/privacy-policy' element={<PrivacyPolicy />} /> */}
 
-					<Route path='/test' element={<Test />} />
-					<Route path='/login' element={<Login />} />
-					<Route path='/register' element={<Register />} />
+					{/* Rutas sólo para usuarios no loggeados */}
+					<Route element={<GuestRoute />}>
+						<Route path='/login' element={<Login />} />
+						<Route path='/register' element={<Register />} />
+					</Route>
+
+					{/* Rutas protegidas van aquí */}
+					<Route element={<ProtectedRoute />} >
+						<Route path='/success' element={<SuccessRegisterPage />} />
+						{import.meta.env.DEV && (
+							<Route path='/user' element={<DashboardLayout />}>
+								<Route path='my-profile' element={<UserProfile />} />
+								<Route path='abstract' element={<AbstractSubmissionPortal />} />
+							</Route>
+						)}
+					</Route>
 				</Routes>
 			</ThemeProvider>
 		</>

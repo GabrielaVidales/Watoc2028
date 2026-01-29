@@ -22,16 +22,24 @@ const globalTheme = createTheme({
     },
   },
   components: {
-    MuiTextField: {
+    MuiOutlinedInput: {
       styleOverrides: {
         root: {
+          borderRadius: 10,
+          backgroundColor: '#fafcffff',
           '& fieldset': {
             borderColor: '#a0a4aeff',
           },
-          '& .MuiOutlinedInput-root': {
-            borderRadius: 10,
-            backgroundColor: '#fafcffff', // azul muy suave
-          },
+        },
+      },
+    },
+    MuiDivider: {
+      styleOverrides: {
+        root: {
+          borderColor: 'rgba(0, 0, 0, 0.8)', 
+          borderBottomWidth: '1px', 
+          marginTop: '10px',
+          marginBottom: '10px',
         },
       },
     },
