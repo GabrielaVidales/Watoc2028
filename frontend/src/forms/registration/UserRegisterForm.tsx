@@ -2,7 +2,7 @@ import { Box, Button, Divider, InputAdornment, LinearProgress, Paper, Stack, Typ
 import { FormProvider, useForm, useFormContext, useWatch } from 'react-hook-form';
 import { Lock, Mail, Person } from '@mui/icons-material';
 import FormSectionTitle from '../../components/wizard registration/inputs/FormSectionTitle';
-import { REGEX_EMAIL } from '../../utils/formRegex';
+import { REGEX_EMAIL, REGEX_NAME } from '../../utils/formRegex';
 import { countries } from '../../utils/countriesInfo';
 import axiosClient from '../../clients/axiosClient';
 import { ControlledCheckBox, ControlledSelect, ControlledTextField } from '../components/ControlledInputs';
@@ -20,30 +20,44 @@ export default function UserRegisterForm({ }: IUserRegisterFormProps) {
     })
 
     const debugData = {
-        "prefix": "Prof.",
-        "firstName": "José",
-        "middleName": "Gabriel",
-        "lastName": "Merino",
-        "email": "gabrielmerino@gmail.com",
-        "country": "MX",
-        "city": "Mérida",
-        "affiliation": "Cinvestav",
-        "department": "Física aplicada",
-        "jobPosition": "Investigador",
-        "password": "Admin123#",
-        "acceptTerms": true,
-        "confirmPassword": "Admin123#",
-        "newsletter": false
+        prefix: "Prof.",
+        first_name: "José",
+        middle_name: "Gabriel",
+        last_name: "Merino",
+        email: "gabrielmerino@gmail.com",
+        nationality: "MX",
+        city: "Mérida",
+        affiliation: "Cinvestav",
+        affiliation_department: "Física aplicada",
+        password: "Admin123#",
+        accept_terms: true,
+        confirm_password: "Admin123#",
     }
+
     const handleDebugData = () => {
         methods.reset(debugData)
     }
 
     const onSubmit = methods.handleSubmit(async (data) => {
+        const affiliation = data['affiliation']
+        const affiliation_department = data['affiliation_department']
+        const preparedData = {
+            ...data,
+            participant_profile: {
+                affiliation,
+                affiliation_department,
+            }
+        }
+        if (import.meta.env.DEV) {
+            console.log(preparedData);
+        }
         try {
-            await axiosClient.post('register/', data)
+            const res = await axiosClient.post('register/', preparedData)
+            console.log(res);
+            
             await handleLogin(data.email, data.password)
-            navigate('/success', { replace: true, })
+
+            // navigate('/success', { replace: true, })
         } catch (error) {
             const axiosErr = error as AxiosError
             const backendErrors: any = axiosErr?.response?.data
@@ -174,42 +188,39 @@ const PersonalInfo = () => {
             />
             <Box display='flex' gap={2}>
                 <ControlledTextField
-                    defaultValue=''
-                    id='firstName'
+                    id='first_name'
+                    name='first_name'
                     label='First Name *'
-                    name='firstName'
                     rules={{
                         required: 'Required *',
-                        maxLength: {
-                            value: 50,
-                            message: 'Too long'
-                        }
+                        pattern: { value: REGEX_NAME, message: 'Invalid name', },
+                        maxLength: { value: 50, message: 'Too long' }
                     }}
                     maxLength={50}
                     hideLengthLabel
                 />
 
                 <ControlledTextField
-                    defaultValue=''
-                    id='middleName'
+                    id='middle_name'
+                    name='middle_name'
                     label='Middle Name'
-                    name='middleName'
                     rules={{
-                        maxLength: {
-                            value: 50,
-                            message: 'Too long'
-                        }
+                        pattern: { value: REGEX_NAME, message: 'Invalid name', },
+                        maxLength: { value: 50, message: 'Too long' }
                     }}
                     maxLength={50}
                     hideLengthLabel
                 />
             </Box>
             <ControlledTextField
-                defaultValue=''
-                id='lastName'
+                id='last_name'
+                name='last_name'
                 label='Last Name *'
-                name='lastName'
-                rules={{ required: 'Required *' }}
+                rules={{
+                    required: 'Required *',
+                    pattern: { value: REGEX_NAME, message: 'Invalid name', },
+                    maxLength: { value: 50, message: 'Too long' }
+                }}
                 maxLength={50}
                 hideLengthLabel
             />
@@ -250,8 +261,8 @@ const ContactInfo = () => {
                 maxLength={50}
             />
             <ControlledSelect
-                id='country'
-                name='country'
+                id='nationality'
+                name='nationality'
                 label='Select your country *'
                 options={countries}
                 rules={{ required: 'Required *' }}
@@ -280,8 +291,6 @@ const ContactInfo = () => {
 }
 
 const AffiliationInfo = () => {
-    ['affiliation', 'department', 'jobPosition']
-
     return <>
         <Stack spacing={2} py={2}>
             <FormSectionTitle
@@ -289,7 +298,6 @@ const AffiliationInfo = () => {
                 icon={<Lock />}
             />
             <ControlledTextField
-                defaultValue=''
                 id='affiliation'
                 name='affiliation'
                 label='Affiliation *'
@@ -298,9 +306,8 @@ const AffiliationInfo = () => {
                 hideLengthLabel
             />
             <ControlledTextField
-                defaultValue=''
-                id='department'
-                name='department'
+                id='affiliation_department'
+                name='affiliation_department'
                 label='Department *'
                 rules={{ required: 'Required *', }}
                 maxLength={128}
@@ -322,10 +329,9 @@ const PasswordInfo = () => {
             />
             <PasswordStrengthMeter control={control} />
             <ControlledTextField
-                defaultValue=''
                 id='password'
-                label='Password *'
                 name='password'
+                label='Password *'
                 placeholder='Create password'
                 rules={{
                     required: 'Required *',
@@ -343,10 +349,9 @@ const PasswordInfo = () => {
                 }}
             />
             <ControlledTextField
-                defaultValue=''
-                id='confirmPassword'
+                id='confirm_password'
+                name='confirm_password'
                 label='Confirm password *'
-                name='confirmPassword'
                 placeholder='Confirm password'
                 rules={{
                     required: 'Required *',
