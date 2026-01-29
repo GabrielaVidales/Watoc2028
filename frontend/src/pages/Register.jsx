@@ -48,7 +48,7 @@ export default function Register() {
                     pointerEvents: 'none',
                 }} />
 
-                <Container maxWidth="md" sx={{ position: 'relative', py: 3, zIndex: 1 }}>
+                <Container maxWidth="md" sx={{ position: 'relative', py: 6, zIndex: 1 }}>
                     <Toolbar />
 
                     {import.meta.env.DEV && (<UserRegisterForm/>)}

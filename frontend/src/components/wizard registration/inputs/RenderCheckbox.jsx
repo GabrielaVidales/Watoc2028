@@ -13,10 +13,6 @@ export default function RenderCheckbox({
     boxProps = { flex: 1 },
     ...props
 }) {
-    useEffect(() => {
-        console.log(helperText);
-        console.log(error);
-    }, [helperText, error])
     return (
         <Box {...boxProps}>
             {label && <InputLabel>­</InputLabel>}

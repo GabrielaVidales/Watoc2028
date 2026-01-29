@@ -76,11 +76,11 @@ export default function ReorderableItem({ field, index, children, onRemove, disa
                     <Box display={'flex'} alignSelf={'center'}>
                         <Tooltip title={disableRemove && "At least one author is required"} disableInteractive>
                             {disableRemove ? (<span>
-                                <IconButton size='large' onClick={() => { onRemove(index); console.log('000') }} color='black' disabled={disableRemove}>
+                                <IconButton size='large' onClick={() => onRemove(index)} color='black' disabled={disableRemove}>
                                     <DeleteOutline fontSize='medium' />
                                 </IconButton>
                             </span>) : (
-                                <IconButton size='large' onClick={() => { onRemove(index); console.log('010') }} color='black' disabled={disableRemove}>
+                                <IconButton size='large' onClick={() => onRemove(index)} color='black' disabled={disableRemove}>
                                     <DeleteOutline fontSize='medium' />
                                 </IconButton>
                             )}

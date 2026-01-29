@@ -7,7 +7,7 @@ import './index.css'
 
 // Esto solo se ejecuta si está en modo development 
 // no se ejecuta cuando se hace el build de React
-if (import.meta.env.MODE === 'development') {
+if (false && import.meta.env.MODE === 'development') {
   console.groupCollapsed(
     "%c[WATOC 2028: Frontend]",
     `color:#00ff88;

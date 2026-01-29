@@ -6,12 +6,12 @@ import CustomTextField from '../components/CustomTextField'
 import { REGEX_EMAIL, REGEX_NAME } from '../utils/formRegex'
 import { useNavigate } from 'react-router'
 
+// DEPRECADO
 export default function RegisterForm() {
     const navigate = useNavigate()
     const { control, formState: { errors }, handleSubmit } = useForm()
 
     const onValidatedData = (data) => {
-        console.log(data);
         navigate('/register/account', {
             state: {
                 data

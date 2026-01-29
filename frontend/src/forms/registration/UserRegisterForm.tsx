@@ -1,4 +1,4 @@
-import { Box, Button, Divider, InputAdornment, LinearProgress, List, ListItem, Paper, Stack, Typography } from '@mui/material';
+import { Box, Button, Divider, InputAdornment, LinearProgress, Paper, Stack, Typography } from '@mui/material';
 import { FormProvider, useForm, useFormContext, useWatch } from 'react-hook-form';
 import { Lock, Mail, Person } from '@mui/icons-material';
 import FormSectionTitle from '../../components/wizard registration/inputs/FormSectionTitle';
@@ -7,10 +7,13 @@ import { countries } from '../../utils/countriesInfo';
 import axiosClient from '../../clients/axiosClient';
 import { ControlledCheckBox, ControlledSelect, ControlledTextField } from '../components/ControlledInputs';
 import { useNavigate } from 'react-router';
+import { useAuth } from '../../contexts/AuthContext';
+import { AxiosError } from 'axios';
 
 export interface IUserRegisterFormProps { }
 
 export default function UserRegisterForm({ }: IUserRegisterFormProps) {
+    const { handleLogin } = useAuth()
     const navigate = useNavigate()
     const methods = useForm({
         mode: 'onChange'
@@ -18,7 +21,8 @@ export default function UserRegisterForm({ }: IUserRegisterFormProps) {
 
     const debugData = {
         "prefix": "Prof.",
-        "firstName": "Gabriel",
+        "firstName": "José",
+        "middleName": "Gabriel",
         "lastName": "Merino",
         "email": "gabrielmerino@gmail.com",
         "country": "MX",
@@ -37,11 +41,28 @@ export default function UserRegisterForm({ }: IUserRegisterFormProps) {
 
     const onSubmit = methods.handleSubmit(async (data) => {
         try {
-            await axiosClient.post('register', data)
-            navigate('/login')
+            await axiosClient.post('register/', data)
+            await handleLogin(data.email, data.password)
+            navigate('/success', { replace: true, })
         } catch (error) {
-            if (import.meta.env.DEV){
-                console.log("Registro falló");
+            const axiosErr = error as AxiosError
+            const backendErrors: any = axiosErr?.response?.data
+
+            Object.keys(backendErrors).forEach((field, index) => {
+                methods.setError(field, {
+                    type: "server",
+                    message: backendErrors[field][0],
+                });
+
+                if (index === 0) {
+                    setTimeout(() => {
+                        methods.setFocus(field);
+                    }, 10);
+                }
+            });
+
+            if (import.meta.env.DEV) {
+                console.error(error);
             }
         }
     })
@@ -50,53 +71,12 @@ export default function UserRegisterForm({ }: IUserRegisterFormProps) {
         <FormProvider {...methods}>
             <Paper elevation={5} sx={{ py: 6, px: { xs: 3, sm: 6, md: 9 }, borderTop: 12, borderColor: 'primary.main', }}>
                 <Box component='fieldset' disabled={methods.formState.isSubmitting}>
+
                     {import.meta.env.DEV && (
                         <Button fullWidth onClick={handleDebugData}>Debug data</Button>
                     )}
-                    <Box textAlign="center" mb={3} >
-                        <Typography variant="overline" color="primary" fontWeight="bold"
-                            sx={{ fontSize: '1rem', letterSpacing: 2 }}
-                        >
-                            Join us in Mérida!
-                        </Typography>
-                        <Typography variant="h3" fontWeight="bold"
-                            sx={{
-                                mt: 1,
-                                mb: 2,
-                                fontSize: { xs: '2rem', md: '2.5rem' },
-                            }}
-                        >
-                            Express Your Interest for WATOC 2028
-                        </Typography>
-                        <Box sx={{
-                            width: 100,
-                            height: 4,
-                            bgcolor: 'primary.main',
-                            mx: 'auto',
-                            borderRadius: 2,
-                        }} />
-                    </Box>
-                    <Typography gutterBottom>
-                        We are thrilled to begin preparations for the 14th Triennial Congress of the WATOC 2028.
-                        While the full registration system is not yet open, we invite you to sign up below to stay informed. By registering your interest, you will be the first to receive:
-                    </Typography>
-                    <Divider />
-                    <ul>
-                        <li>
-                            Important deadlines for abstract submission.
-                        </li>
-                        <li>
-                            Early-bird registration alerts.
-                        </li>
-                        <li>
-                            Updates on congress speakers and the scientific program.
-                        </li>
-                        <li>
-                            Travel and accommodation tips for visiting the Yucatán Peninsula.
-                        </li>
-                    </ul>
 
-
+                    <TitleSection />
                     <hr />
                     <PersonalInfo />
                     <hr />
@@ -117,16 +97,62 @@ export default function UserRegisterForm({ }: IUserRegisterFormProps) {
     );
 }
 
+const TitleSection = () => {
+    return (<>
+        <Box textAlign="center" mb={3} >
+            <Typography variant="overline" color="primary" fontWeight="bold"
+                sx={{ fontSize: '1rem', letterSpacing: 2 }}
+            >
+                Join us in Mérida!
+            </Typography>
+            <Typography variant="h3" fontWeight="bold"
+                sx={{
+                    mt: 1,
+                    mb: 2,
+                    fontSize: { xs: '1.7rem', md: '2.5rem' },
+                }}
+            >
+                Express Your Interest for WATOC 2028
+            </Typography>
+            <Box sx={{
+                width: 100,
+                height: 4,
+                bgcolor: 'primary.main',
+                mx: 'auto',
+                borderRadius: 2,
+            }} />
+        </Box>
+        <Typography gutterBottom>
+            We are thrilled to begin preparations for the <b>14th Triennial Congress of the WATOC 2028</b>.
+            While the full registration system is not yet open, we invite you to sign up below to stay informed. By registering your interest, you will be the first to receive:
+        </Typography>
+        <Divider />
+        <ul>
+            <li>
+                Important deadlines for abstract submission.
+            </li>
+            <li>
+                Early-bird registration alerts.
+            </li>
+            <li>
+                Updates on congress speakers and the scientific program.
+            </li>
+            <li>
+                Travel and accommodation tips for visiting the Yucatán Peninsula.
+            </li>
+        </ul>
+    </>)
+}
 
 const PersonalInfo = () => {
     const prefixOptions = [
-        { value: 'Mr.', label: 'Mr.' },     
-        { value: 'Mrs.', label: 'Mrs.' },     
-        { value: 'Ms.', label: 'Ms.' },     
-        { value: 'Miss', label: 'Miss' },    
-        { value: 'Dr.', label: 'Doctor' },   
+        { value: 'Mr.', label: 'Mr.' },
+        { value: 'Mrs.', label: 'Mrs.' },
+        { value: 'Ms.', label: 'Ms.' },
+        { value: 'Miss', label: 'Miss' },
+        { value: 'Dr.', label: 'Doctor' },
         { value: 'Prof.', label: 'Professor' },
-        { value: 'Mx.', label: 'Mx.' }       
+        { value: 'Mx.', label: 'Mx.' }
     ];
 
     return <>
@@ -146,21 +172,38 @@ const PersonalInfo = () => {
                 getOptionLabel={option => (`${option.value} (${option.label})`)}
                 optionRender={option => (`${option.value} (${option.label})`)}
             />
-            <ControlledTextField
-                defaultValue=''
-                id='firstName'
-                label='First Name *'
-                name='firstName'
-                rules={{
-                    required: 'Required *',
-                    maxLength: {
-                        value: 50,
-                        message: 'Too long'
-                    }
-                }}
-                maxLength={50}
-                hideLengthLabel
-            />
+            <Box display='flex' gap={2}>
+                <ControlledTextField
+                    defaultValue=''
+                    id='firstName'
+                    label='First Name *'
+                    name='firstName'
+                    rules={{
+                        required: 'Required *',
+                        maxLength: {
+                            value: 50,
+                            message: 'Too long'
+                        }
+                    }}
+                    maxLength={50}
+                    hideLengthLabel
+                />
+
+                <ControlledTextField
+                    defaultValue=''
+                    id='middleName'
+                    label='Middle Name'
+                    name='middleName'
+                    rules={{
+                        maxLength: {
+                            value: 50,
+                            message: 'Too long'
+                        }
+                    }}
+                    maxLength={50}
+                    hideLengthLabel
+                />
+            </Box>
             <ControlledTextField
                 defaultValue=''
                 id='lastName'

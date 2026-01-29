@@ -1,7 +1,7 @@
 from rest_framework import generics, permissions, status
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework.parsers import MultiPartParser, FormParser
+from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
 from .serializers import CustomUserSerializer, CustomUserUpdateSerializer,ChangePasswordSerializer, RequestResetCodeSerializer, VerifyCodeSerializer, SetNewPasswordSerializer
 from django.contrib.auth import get_user_model
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
@@ -23,7 +23,7 @@ class UserRegistrationView(generics.CreateAPIView):
     queryset = User.objects.all()
     serializer_class = CustomUserSerializer
     permission_classes = [permissions.AllowAny]
-    parser_classes = (MultiPartParser, FormParser)
+    parser_classes = (MultiPartParser, FormParser, JSONParser)
 
 # Ver y Editar mi propio perfil (Privada)
 class UserProfileView(generics.RetrieveUpdateAPIView):
@@ -65,8 +65,6 @@ COOKIE_SECURE = False
 class CustomTokenObtainPairView(TokenObtainPairView):
     def post(self, request, *args, **kwargs):
         response = super().post(request, *args, **kwargs)
-        print("response: ",response)
-        print(request.data)
 
         if response.status_code == 200:
             email = request.data.get('email') 
@@ -81,7 +79,8 @@ class CustomTokenObtainPairView(TokenObtainPairView):
                 refresh_token,
                 httponly= True,
                 secure= COOKIE_SECURE,
-                samesite='Lax'
+                samesite='Lax',
+                max_age=86400
             )  
 
             response.set_cookie(
@@ -89,7 +88,8 @@ class CustomTokenObtainPairView(TokenObtainPairView):
                 access_token,
                 httponly= True,
                 secure= COOKIE_SECURE,
-                samesite='Lax'
+                samesite='Lax',
+                max_age=900
             )
               
         return response 

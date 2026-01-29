@@ -11,7 +11,6 @@ export default function Test() {
       username: 'eduar',
       password: 'password'
     })
-    console.log(response)
   }
 
   return (

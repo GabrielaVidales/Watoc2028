@@ -2,9 +2,7 @@ import { ErrorOutline } from '@mui/icons-material'
 import { Box, TextField, Typography } from '@mui/material'
 import { useRef } from 'react'
 
-export default function CustomTextField({ value, onChange, maxLength = 64, hideLengthLabel = false, multiline = false, error = false, helperText, ...props }) {
-    const textFieldRef = useRef()
-
+export default function CustomTextField({ value, onChange, maxLength = 64, hideLengthLabel = false, multiline = false, error = false, helperText, ref, ...props }) {
     const handleOnChange = (evt) => {
         if (evt.target.value.length <= maxLength) {
             onChange?.(evt)
@@ -21,7 +19,7 @@ export default function CustomTextField({ value, onChange, maxLength = 64, hideL
 
     return (
         <TextField
-            ref={textFieldRef}
+            inputRef={ref}
             value={value}
             onChange={handleOnChange}
             fullWidth

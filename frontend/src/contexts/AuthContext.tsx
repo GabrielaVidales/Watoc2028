@@ -51,7 +51,7 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
 
     async function fetchUser() {
         try {
-            const res = await axiosClient.get('/whoami');
+            const res = await axiosClient.get('/profile/');
             setCurrentUser({
                 id: res.data.id,
                 email: res.data.email,
@@ -64,12 +64,12 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
     }
 
     async function handleLogin(email: string, password: string) {
-        const res = await axiosClient.post('/login', { email, password })
-        setCurrentUser(res.data)
+        await axiosClient.post('/login/', { email, password })
+        await fetchUser()
     }
-    
+
     async function handleLogout() {
-        await axiosClient.post('/logout')
+        await axiosClient.post('/logout/')
         setCurrentUser(null)
     }
 

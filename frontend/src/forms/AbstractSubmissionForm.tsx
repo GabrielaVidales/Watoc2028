@@ -48,7 +48,9 @@ export default function AbstractSubmissionForm() {
     })
 
     const handleOnSubmit = methods.handleSubmit(async (data) => {
-        console.log(data)
+        if (import.meta.env.DEV) {
+            console.log(data)
+        }
     })
 
     //#region useArrayField para los autores
@@ -73,7 +75,9 @@ export default function AbstractSubmissionForm() {
     }
 
     const onRemove = useMemo(() => createRemoveGuard((data) => {
-        console.log(data);
+        if (import.meta.env.DEV) {
+            console.log(data);
+        }
 
         if (authorMethods.fields.length > 1) {
             authorMethods.remove(data)

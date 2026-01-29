@@ -21,7 +21,7 @@ type IControlledTextFieldProps = BaseControlledProps & TextFieldProps & {
     hideLengthLabel?: boolean;
 };
 
-export const ControlledTextField = ({ label, name, id, defaultValue='', placeholder, rules, inputAdornment, maxLength, hideLengthLabel, ...props }: IControlledTextFieldProps) => {
+export const ControlledTextField = ({ label, name, id, defaultValue = '', placeholder, rules, inputAdornment, maxLength, hideLengthLabel, ...props }: IControlledTextFieldProps) => {
     const { control } = useFormContext()
 
     return <Box flex={1}>
@@ -37,14 +37,15 @@ export const ControlledTextField = ({ label, name, id, defaultValue='', placehol
                 <CustomTextField
                     {...field}
                     id={id}
+                    ref={field.ref}
                     fullWidth
                     maxLength={maxLength}
                     hideLengthLabel={hideLengthLabel}
                     placeholder={placeholder}
                     error={!!error}
                     helperText={error ? (<Grow in={!!error} timeout={500}><span>{error.message}</span></Grow>) : null}
-                    onBlur={(event: any) => {
-                        field.onChange(event.target.value.trim())
+                    onBlur={() => {
+                        // field.onChange(event.target.value.trim())
                         field.onBlur()
                     }}
                     slotProps={{
@@ -138,7 +139,7 @@ export const ControlledSelect = <T extends BaseOption>({ label, name, id, defaul
     );
 }
 
-export const ControlledDropdown = <T extends BaseOption>({ label, name, id, defaultValue='', placeholder, rules, options, optionRender, boxProps }: IControlledAutocompleteProps<T>) => {
+export const ControlledDropdown = <T extends BaseOption>({ label, name, id, defaultValue = '', placeholder, rules, options, optionRender, boxProps }: IControlledAutocompleteProps<T>) => {
     const { control } = useFormContext();
 
     return (
