@@ -1,13 +1,13 @@
-import { Box, Container, Fade, Toolbar } from '@mui/material';
-import { useState, useEffect, memo } from 'react';
-import meridaWebp from './../assets/merida.webp'
+import { Box, Container, Toolbar } from '@mui/material';
+import { useState, useEffect, memo, type ReactNode } from 'react';
+import meridaWebp from '@/assets/merida.webp'
 import meridaJpg from './../assets/merida.jpg'
 import hotel from './../assets/hotel.webp'
 import congresoEntrada from './../assets/congresoEntrada.webp'
 import mayaBackground from './../assets/maya_background.png'
 import { AnimatePresence, motion } from 'motion/react';
 
-const FloatingParticles = memo(({ count = 20, color = 'rgba(255,255,255,0.3)' }) => (
+const FloatingParticles = memo(({ count = 20, color = 'rgba(255,255,255,0.3)' }: { count?: number, color?: string }) => (
     <Box
         sx={{
             position: 'absolute',
@@ -45,6 +45,19 @@ const FloatingParticles = memo(({ count = 20, color = 'rgba(255,255,255,0.3)' })
     </Box>
 ))
 
+export interface HeroSectionProps {
+  backgroundImgSrc?: string[]
+  height?: string
+  disableLinearGradient?: boolean
+  enableParticles?: boolean
+  enableRadialGradient?: boolean
+  gradientColors?: string
+  enableWave?: boolean
+  timeBetweenImages?: number
+  offset?: number
+  children?: ReactNode
+}
+
 export const HeroSection = ({
     backgroundImgSrc = [meridaWebp, meridaJpg, hotel, congresoEntrada],
     height = '75vh',
@@ -56,7 +69,7 @@ export const HeroSection = ({
     timeBetweenImages = 5000,
     offset = 0,
     children,
-}) => {
+}: HeroSectionProps) => {
     const [currentImageIndex, setCurrentImageIndex] = useState(offset)
 
     useEffect(() => {
@@ -98,7 +111,7 @@ export const HeroSection = ({
                 sx={{
                     position: 'relative',
                     width: '100%',
-                    minHeight: height,
+                    height: height,
                     background: `url(${mayaBackground})`,
                     backgroundSize: 'cover',
                     backgroundPosition: 'center',

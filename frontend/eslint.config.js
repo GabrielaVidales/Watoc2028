@@ -8,11 +8,6 @@ import { defineConfig, globalIgnores } from 'eslint/config'
 export default defineConfig([
   globalIgnores(['dist']),
   {
-    settings: {
-      react: {
-        version: 'detect',
-      },
-    },
     files: ['**/*.{js,jsx,ts,tsx}'],
     extends: [
       js.configs.recommended,
@@ -23,13 +18,13 @@ export default defineConfig([
     languageOptions: {
       ecmaVersion: 2020,
       globals: globals.browser,
-      parserOptions: {
-        ecmaVersion: 'latest',
-        ecmaFeatures: { jsx: true },
-        sourceType: 'module',
-      },
     },
     rules: {
+      '@typescript-eslint/no-unused-vars': 'warn',
+      "@typescript-eslint/no-explicit-any": ["off"],
+      "react-hooks/exhaustive-deps": "off",
+      'react-refresh/only-export-components': 'off',
+      "react-hooks/set-state-in-effect": "off",
       'react/jsx-uses-vars': 'error',
       'react/react-in-jsx-scope': 'off',
       'react/prop-types': 'off',
@@ -41,6 +36,16 @@ export default defineConfig([
           ignoreRestSiblings: false,
         },
       ],
+    },
+    settings: {
+      react: {
+        version: 'detect',
+      },
+      "import/resolver": {
+        typescript: {
+          project: "./tsconfig.json",
+        },
+      },
     },
   },
 ])

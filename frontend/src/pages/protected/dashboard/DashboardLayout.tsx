@@ -1,5 +1,5 @@
 import { CardTravel, Description, Help, Logout, Menu, MenuOpen, Payment, Person, Person2 } from '@mui/icons-material';
-import { AppBar, Avatar, Box, Button, Divider, Drawer, IconButton, List, ListItem, ListItemButton, ListItemIcon, ListItemText, SxProps, Theme, Toolbar } from '@mui/material';
+import { AppBar, Avatar, Box, Button, Divider, Drawer, IconButton, List, ListItem, ListItemButton, ListItemIcon, ListItemText, type SxProps, type Theme, Toolbar } from '@mui/material';
 import { Link, Outlet, useNavigate } from 'react-router';
 import logo from '../../../assets/WatocPNGLogo.png';
 import { useState } from 'react';
