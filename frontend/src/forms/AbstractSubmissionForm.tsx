@@ -1,11 +1,11 @@
 import { Box, Button, Divider, Stack, Typography } from '@mui/material'
-import { FieldArrayWithId, FormProvider, useFieldArray, useForm } from 'react-hook-form'
+import { type FieldArrayWithId, FormProvider, useFieldArray, useForm } from 'react-hook-form'
 import { AddBox, Article, FormatQuote } from '@mui/icons-material'
 import FormSectionTitle from '../components/wizard registration/inputs/FormSectionTitle'
 import { AnimatePresence, Reorder } from "motion/react"
 import ReorderableItem from './ReorderableItem'
 import { ControlledTextField } from './components/ControlledInputs'
-import { useCallback, useMemo } from 'react'
+import { useMemo } from 'react'
 
 // Este closure es para que al eliminar un elemento se bloquee por 500 ms
 function createRemoveGuard(removeFn: (value: any) => void, delay = 500) {

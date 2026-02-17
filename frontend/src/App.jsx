@@ -1,5 +1,5 @@
 import './App.css'
-import { createBrowserRouter, Routes, useLocation } from 'react-router'
+import {  Routes, useLocation } from 'react-router'
 import { Route } from 'react-router'
 import { GuestRoute, ProtectedRoute } from './contexts/ProtectedRoute'
 
@@ -20,11 +20,12 @@ import Restaurants from './pages/restaurants/RestaurantsPage';
 import Transportation from './pages/transportation/TransportationPage';
 import { useEffect } from 'react';
 import globalTheme from './themes/Themes';
-import Test from './pages/Test';
 import DashboardLayout from './pages/protected/dashboard/DashboardLayout'
 import UserProfile from './pages/protected/UserProfile'
 import AbstractSubmissionPortal from './pages/protected/AbstractSubmissionPortal'
 import { SuccessRegisterPage } from './pages/protected/SuccessRegisterPage'
+import HomeLayout from './layouts/HomeLayout'
+import Test from './pages/Test'
 
 function App() {
 	const { pathname } = useLocation()
@@ -43,7 +44,6 @@ function App() {
 				<CssBaseline />
 				<Routes>
 					<Route path='' element={<Home />} />
-					<Route path='*' element={<NotFound />} />
 					<Route path='/venue' element={<VenuePage />} />
 					<Route path='/hotel-booking' element={<HotelBooking />} />
 					<Route path='/abstract-submission' element={<AbstractSubmissionInfo />} />
@@ -70,6 +70,13 @@ function App() {
 							</Route>
 						)}
 					</Route>
+
+					<Route element={<HomeLayout />}>
+						<Route path='/test' element={<Test/>} />
+					</Route>
+
+					{/* Para rutas diferentes */}
+					<Route path='*' element={<NotFound />} />
 				</Routes>
 			</ThemeProvider>
 		</>

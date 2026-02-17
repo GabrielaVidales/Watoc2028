@@ -1,6 +1,6 @@
 import * as React from 'react';
-import { Autocomplete, Box, Checkbox, CheckboxProps, FormControl, FormControlLabel, FormGroup, FormHelperText, Grow, InputLabel, MenuItem, Select, TextField, TextFieldProps, Typography } from '@mui/material';
-import { Controller, FieldValues, Path, RegisterOptions, useFormContext } from 'react-hook-form';
+import { Autocomplete, Box, Checkbox, type CheckboxProps, FormControl, FormControlLabel, FormGroup, FormHelperText, Grow, InputLabel, MenuItem, Select, TextField, type TextFieldProps, Typography } from '@mui/material';
+import { Controller, type FieldValues, type Path, type RegisterOptions, useFormContext } from 'react-hook-form';
 import CustomTextField from '../../components/CustomTextField';
 
 //#region Controlled Inputs
@@ -144,7 +144,7 @@ export const ControlledDropdown = <T extends BaseOption>({ label, name, id, defa
 
     return (
         <Box {...boxProps}>
-            {label && <InputLabel htmlFor={id}>{label}</InputLabel>}
+            {label && <InputLabel component='span'>{label}</InputLabel>}
             <Controller
                 name={name}
                 control={control}

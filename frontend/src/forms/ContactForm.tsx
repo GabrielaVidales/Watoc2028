@@ -5,7 +5,7 @@ import { REGEX_EMAIL, REGEX_NAME } from '../utils/formRegex'
 import HCaptcha from '@hcaptcha/react-hcaptcha'
 import { useEffect, useState } from 'react'
 import axiosClient from '../clients/axiosClient'
-import { BaseOption, ControlledDropdown, ControlledTextField } from './components/ControlledInputs'
+import { type BaseOption, ControlledDropdown, ControlledTextField } from './components/ControlledInputs'
 
 interface ContactType extends BaseOption {
     label: string

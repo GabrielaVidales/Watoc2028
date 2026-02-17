@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { useAuth, User } from './AuthContext';
+import { useAuth, type User } from './AuthContext';
 import { Navigate, Outlet } from 'react-router';
 import LoadingPage from './LoadingPage';
 

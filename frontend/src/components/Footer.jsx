@@ -1,4 +1,4 @@
-import { Box, Container, Grid, Stack, Typography, IconButton, Divider } from '@mui/material';
+import { Box, Container, Grid, Stack, Typography, IconButton } from '@mui/material';
 import { Email, LocationOn, Facebook, Twitter, LinkedIn, Instagram } from '@mui/icons-material';
 import { Link } from 'react-router';
 import fieldPng from '../assets/field.png'
@@ -19,10 +19,16 @@ const navigation = {
     ],
 };
 
+const webmasters = [
+    { name: 'Brishel Acosta', },
+    { name: 'Eduardo Bojórquez', },
+    { name: 'Eduardo Escalante', },
+    { name: 'Gabriela Vidales', },
+]
+
 export default function Footer() {
     return (
-        <Box
-            component="footer"
+        <Box component="footer"
             sx={{
                 bgcolor: '#2a2a50',
                 color: 'white',
@@ -33,22 +39,20 @@ export default function Footer() {
                 zIndex: -1,
             }}
         >
-            <Box
-                sx={{
-                    position: 'absolute',
-                    top: 0,
-                    left: 0,
-                    right: 0,
-                    bottom: 0,
-                    opacity: 0.5,
-                    backgroundImage: `url(${fieldPng})`,
-                    backgroundSize: 'cover',
-                    backgroundPosition: 'center',
-                    backgroundAttachment: 'fixed',
-                    pointerEvents: 'none',
-                    zIndex: -1,
-                }}
-            />
+            <Box sx={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                opacity: 0.5,
+                backgroundImage: `url(${fieldPng})`,
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+                backgroundAttachment: 'fixed',
+                pointerEvents: 'none',
+                zIndex: -1,
+            }} />
             <Container maxWidth="lg">
                 <Grid container spacing={4}>
                     <Grid size={{ xs: 12, md: 5 }}>
@@ -64,31 +68,6 @@ export default function Footer() {
                                 January 9-14, 2028<br />
                                 Mérida, Yucatán, México
                             </Typography>
-
-                            {/* <Stack direction="row" spacing={1} sx={{ pt: 2 }}>
-                                {[
-                                    { icon: <Facebook />, href: '#' },
-                                    { icon: <Twitter />, href: '#' },
-                                    { icon: <LinkedIn />, href: '#' },
-                                    { icon: <Instagram />, href: '#' },
-                                ].map((social, index) => (
-                                    <IconButton
-                                        key={index}
-                                        size="small"
-                                        sx={{
-                                            color: 'white',
-                                            bgcolor: 'rgba(255,255,255,0.1)',
-                                            '&:hover': {
-                                                bgcolor: 'primary.main',
-                                                transform: 'translateY(-2px)',
-                                            },
-                                            transition: 'all 0.3s',
-                                        }}
-                                    >
-                                        {social.icon}
-                                    </IconButton>
-                                ))}
-                            </Stack> */}
                         </Stack>
                     </Grid>
 
@@ -98,22 +77,20 @@ export default function Footer() {
                         </Typography>
                         <Stack spacing={1} width={{ xs: '50%', md: '100%' }}>
                             {navigation.congress.map((item, index) => (
-                                <Link to={item.href}
-                                    key={index}
+                                <Link key={index}
+                                    to={item.href}
                                     target={item.href.startsWith('http') ? "_blank" : undefined}
                                     rel={item.href.startsWith('http') ? "noopener noreferrer" : undefined}
                                 >
-                                    <Typography
-                                        sx={{
-                                            color: 'rgba(255,255,255,0.8)',
-                                            fontSize: '0.875rem',
-                                            transition: 'all 0.2s',
-                                            '&:hover': {
-                                                color: 'primary.light',
-                                                pl: 1,
-                                            },
-                                        }}
-                                    >
+                                    <Typography sx={{
+                                        color: 'rgba(255,255,255,0.8)',
+                                        fontSize: '0.875rem',
+                                        transition: 'all 0.2s',
+                                        '&:hover': {
+                                            color: 'primary.light',
+                                            pl: 1,
+                                        },
+                                    }}>
                                         {item.label}
                                     </Typography>
                                 </Link>
@@ -127,23 +104,20 @@ export default function Footer() {
                         </Typography>
                         <Stack spacing={1} width={{ xs: '50%', md: '100%' }}>
                             {navigation.venue.map((item, index) => (
-                                <Link to={item.href}
-                                    key={index}
+                                <Link key={index}
+                                    to={item.href}
                                     target={item.href.startsWith('http') ? "_blank" : undefined}
                                     rel={item.href.startsWith('http') ? "noopener noreferrer" : undefined}
                                 >
-                                    <Typography
-                                        key={index}
-                                        sx={{
-                                            color: 'rgba(255,255,255,0.8)',
-                                            fontSize: '0.875rem',
-                                            transition: 'all 0.2s',
-                                            '&:hover': {
-                                                color: 'primary.light',
-                                                pl: 1,
-                                            },
-                                        }}
-                                    >
+                                    <Typography sx={{
+                                        color: 'rgba(255,255,255,0.8)',
+                                        fontSize: '0.875rem',
+                                        transition: 'all 0.2s',
+                                        '&:hover': {
+                                            color: 'primary.light',
+                                            pl: 1,
+                                        },
+                                    }}>
                                         {item.label}
                                     </Typography>
                                 </Link>
@@ -162,12 +136,6 @@ export default function Footer() {
                                     info@watoc2028.org
                                 </Typography>
                             </Box>
-                            {/* <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                <Phone sx={{ fontSize: 18, opacity: 0.7 }} />
-                                <Typography variant="body2" sx={{ fontSize: '0.875rem', opacity: 0.8 }}>
-                                    +52 999 xxx xxxx
-                                </Typography>
-                            </Box> */}
                             <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1 }}>
                                 <LocationOn sx={{ fontSize: 18, opacity: 0.7, mt: 0.3 }} />
                                 <Typography variant="body2" sx={{ fontSize: '0.875rem', opacity: 0.8 }}>
@@ -185,16 +153,8 @@ export default function Footer() {
                         </Typography>
 
                         <Stack spacing={{ xs: 1, sm: 3 }} width={{ xs: '50%', sm: '100%' }} direction={{ xs: 'column', sm: 'row' }}>
-                            {[
-                                { name: 'Brishel Acosta', },
-                                { name: 'Eduardo Bojórquez', },
-                                { name: 'Eduardo Escalante', },
-                                { name: 'Gabriela Vidales', },
-                            ].map((item, index) => (
-                                <Link to={item.href}
-                                    key={index}
-                                >
-                              
+                            {webmasters.map((item, index) => (
+                                <Link key={index} to={item.href}>
                                     <Typography sx={{
                                         color: 'rgba(255,255,255,0.8)',
                                         fontSize: '0.875rem',
@@ -206,7 +166,6 @@ export default function Footer() {
                                     }}>
                                         {item.name}
                                     </Typography>
-
                                 </Link>
                             ))}
                         </Stack>
@@ -260,6 +219,6 @@ export default function Footer() {
                     </Typography>
                 </Stack>
             </Container>
-        </Box>
+        </Box >
     );
 }
