@@ -46,16 +46,16 @@ const FloatingParticles = memo(({ count = 20, color = 'rgba(255,255,255,0.3)' }:
 ))
 
 export interface HeroSectionProps {
-  backgroundImgSrc?: string[]
-  height?: string
-  disableLinearGradient?: boolean
-  enableParticles?: boolean
-  enableRadialGradient?: boolean
-  gradientColors?: string
-  enableWave?: boolean
-  timeBetweenImages?: number
-  offset?: number
-  children?: ReactNode
+    backgroundImgSrc?: string[]
+    height?: string
+    disableLinearGradient?: boolean
+    enableParticles?: boolean
+    enableRadialGradient?: boolean
+    gradientColors?: string
+    enableWave?: boolean
+    timeBetweenImages?: number
+    offset?: number
+    children?: ReactNode
 }
 
 export const HeroSection = ({
@@ -95,9 +95,9 @@ export const HeroSection = ({
                                     dur="8s"
                                     repeatCount="indefinite"
                                     values="
-                                        M0 0 H1 V0.96 C0.9 1.0 0.8 0.92 0.65 0.96 C0.5 1.0 0.35 0.92 0.2 0.96 C0.1 0.99 0.05 0.97 0 0.98 Z;
-                                        M0 0 H1 V0.97 C0.9 0.92 0.8 1.0 0.65 0.97 C0.5 0.92 0.35 1.0 0.2 0.97 C0.1 0.95 0.05 0.96 0 0.97 Z;
-                                        M0 0 H1 V0.96 C0.9 1.0 0.8 0.92 0.65 0.96 C0.5 1.0 0.35 0.92 0.2 0.96 C0.1 0.99 0.05 0.97 0 0.98 Z
+                                        M0 0 H1 V0.95 C0.80 1.00 0.65 0.90 0.50 0.95 C0.35 1.00 0.20 0.90 0 0.95 Z;
+                                        M0 0 H1 V0.95 C0.80 0.90 0.65 1.00 0.50 0.95 C0.35 0.90 0.20 1.00 0 0.95 Z;
+                                        M0 0 H1 V0.95 C0.80 1.00 0.65 0.90 0.50 0.95 C0.35 1.00 0.20 0.90 0 0.95 Z
                                     "
                                 />
                             </path>

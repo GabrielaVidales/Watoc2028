@@ -1,5 +1,5 @@
 import './App.css'
-import {  Routes, useLocation } from 'react-router'
+import { Routes, useLocation } from 'react-router'
 import { Route } from 'react-router'
 import { GuestRoute, ProtectedRoute } from './contexts/ProtectedRoute'
 
@@ -40,7 +40,10 @@ function App() {
 			<ThemeProvider theme={globalTheme}>
 				<CssBaseline />
 				<Routes>
-					<Route path='' element={<Home />} />
+					<Route path='/' element={<HomeLayout />}>
+						<Route index element={<Home />} />
+					</Route>
+
 					<Route path='/venue' element={<VenuePage />} />
 					<Route path='/hotel-booking' element={<HotelBooking />} />
 					<Route path='/abstract-submission' element={<AbstractSubmissionInfo />} />
@@ -63,7 +66,7 @@ function App() {
 					</Route>
 
 					<Route element={<HomeLayout />}>
-						<Route path='/test' element={<Test/>} />
+						<Route path='/test' element={<Test />} />
 					</Route>
 
 					{/* Para rutas diferentes */}

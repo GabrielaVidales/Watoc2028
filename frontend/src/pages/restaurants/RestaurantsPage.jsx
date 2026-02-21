@@ -1,7 +1,6 @@
 import NavBar from '../../components/NavBar'
 import Footer from '../../components/Footer'
-import { Box, Card, CardContent, Container, Grid2 as Grid, Paper, Typography } from '@mui/material'
-// Cambio a Lucide React
+import { Box, Card, CardContent, Container, Grid, Paper, Typography } from '@mui/material'
 import { Utensils, MapPin, ChevronRight, Map as MapIcon } from 'lucide-react' 
 import { RestaurantHeroContent } from './components/RestaurantsHeroContent'
 import { HeroSection } from '../../components/HeroSection'
@@ -42,7 +41,7 @@ const RestaurantCard = ({ restaurant }) => (
 
         <CardContent sx={{ flexGrow: 1 }}>
             <Box display="flex" alignItems="center" gap={1} mb={1}>
-                <Utensils size={16} color="#1976d2" />
+                <Utensils size={16} color="#" />
                 <Typography variant="h6" fontWeight="bold" sx={{ fontSize: '1.1rem', lineHeight: 1.2 }}>
                     {restaurant.name}
                 </Typography>

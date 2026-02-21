@@ -1,4 +1,4 @@
-import { Box, Container, Grid, Stack, Typography, IconButton } from '@mui/material';
+import { Box, Stack, Typography, IconButton } from '@mui/material';
 import { Link } from 'react-router';
 import fieldPng from '../assets/field.png'
 import { Facebook, Instagram, Linkedin, Mail, MapPin, X } from 'lucide-react';
@@ -28,51 +28,30 @@ const webmasters = [
 
 export default function Footer() {
     return (
-        <Box component="footer"
-            sx={{
-                bgcolor: '#2a2a50',
-                color: 'white',
-                pt: 6,
-                pb: 3,
-                backgroundPositionY: 'bottom',
-                position: 'relative',
-                zIndex: -1,
-            }}
-        >
-            <Box sx={{
-                position: 'absolute',
-                top: 0,
-                left: 0,
-                right: 0,
-                bottom: 0,
-                opacity: 0.5,
-                backgroundImage: `url(${fieldPng})`,
-                backgroundSize: 'cover',
-                backgroundPosition: 'center',
-                backgroundAttachment: 'fixed',
-                pointerEvents: 'none',
-                zIndex: -1,
-            }} />
-            <Container maxWidth="lg">
-                <Grid container spacing={4}>
-                    <Grid size={{ xs: 12, md: 5 }}>
-                        <Stack spacing={2}>
-                            <Typography variant="h5" fontWeight="bold" color="primary.light">
-                                WATOC 2028
-                            </Typography>
-                            <Typography variant="body2" sx={{ opacity: 0.9, lineHeight: 1.7 }}>
-                                14th Triennial Congress of the World Association of Theoretical
-                                and Computational Chemists
-                            </Typography>
-                            <Typography variant="body2" sx={{ opacity: 0.8 }}>
-                                January 9-14, 2028<br />
-                                Mérida, Yucatán, México
-                            </Typography>
-                        </Stack>
-                    </Grid>
-
-                    <Grid size={{ xs: 12, md: 2 }}>
-                        <Typography variant="subtitle1" fontWeight="bold" mb={2} color="primary.light">
+        <footer className='pt-12 pb-6 text-white bg-bottom relative bg-[#2a2a50] -z-10'>
+            <div
+                className="absolute inset-0 opacity-50 bg-cover bg-center bg-fixed pointer-events-none -z-10"
+                style={{ backgroundImage: `url(${fieldPng})` }}
+            />
+            <div className='max-w-6xl justify-self-center px-6'>
+                <div className="grid grid-cols-1 lg:grid-cols-12 md:grid-cols-12 gap-5 text-white mb-3">
+                    <div className="lg:col-span-5 md:col-span-12 flex flex-col gap-3">
+                        <Typography variant="h5" fontWeight="bold" color="primary.light">
+                            WATOC 2028
+                        </Typography>
+                        <Typography variant="subtitle1" sx={{ opacity: 0.9, lineHeight: 1.25 }}>
+                            14th Triennial Congress of the World Association of Theoretical
+                            and Computational Chemists
+                        </Typography>
+                        <Typography variant="body2" sx={{ opacity: 0.8 }}>
+                            January 9-14, 2028
+                        </Typography>
+                        <Typography variant="body2" sx={{ opacity: 0.8 }}>
+                            Mérida, Yucatán, México
+                        </Typography>
+                    </div>
+                    <div className="lg:col-span-2 md:col-span-4 flex flex-col gap-1">
+                        <Typography variant="subtitle1" fontWeight="bold" color="primary.light">
                             Congress
                         </Typography>
                         <Stack spacing={1} width={{ xs: '50%', md: '100%' }}>
@@ -96,10 +75,9 @@ export default function Footer() {
                                 </Link>
                             ))}
                         </Stack>
-                    </Grid>
-
-                    <Grid size={{ xs: 12, md: 2 }}>
-                        <Typography variant="subtitle1" fontWeight="bold" mb={2} color="primary.light">
+                    </div>
+                    <div className="lg:col-span-2 md:col-span-4 flex flex-col gap-1">
+                        <Typography variant="subtitle1" fontWeight="bold" color="primary.light">
                             Venue & City
                         </Typography>
                         <Stack spacing={1} width={{ xs: '50%', md: '100%' }}>
@@ -123,21 +101,23 @@ export default function Footer() {
                                 </Link>
                             ))}
                         </Stack>
-                    </Grid>
-
-                    <Grid size={{ xs: 12, md: 3 }}>
-                        <Typography variant="subtitle1" fontWeight="bold" mb={2} color="primary.light">
+                    </div>
+                    <div className="lg:col-span-3 md:col-span-4 flex flex-col gap-1">
+                        <Typography variant="subtitle1" fontWeight="bold" color="primary.light">
                             Contact
                         </Typography>
                         <Stack spacing={1.5}>
                             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                <Mail className='size-5' />
-                                <Typography variant="body2" sx={{ fontSize: '0.875rem', opacity: 0.8 }}>
-                                    info@watoc2028.org
-                                </Typography>
+                                <Mail className='size-5 shrink-0' />
+                                <a href="mailto:contact@watoc2028.org">
+                                    <Typography variant="body2" sx={{ fontSize: '0.875rem', opacity: 0.8 }}>
+                                        contact@watoc2028.org
+
+                                    </Typography>
+                                </a>
                             </Box>
                             <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1 }}>
-                                <MapPin />
+                                <MapPin className='size-5 shrink-0' />
                                 <Typography variant="body2" sx={{ fontSize: '0.875rem', opacity: 0.8 }}>
                                     Centro de Investigación y de Estudios Avanzados<br />
                                     Instituto Politécnico Nacional<br />
@@ -145,13 +125,11 @@ export default function Footer() {
                                 </Typography>
                             </Box>
                         </Stack>
-                    </Grid>
-
-                    <Grid size={{ xs: 12, md: 6 }}>
-                        <Typography variant="subtitle1" fontWeight="bold" mb={2} color="primary.light">
+                    </div>
+                    <div className="lg:col-span-12 md:col-span-12 flex flex-col gap-1">
+                        <Typography variant="subtitle1" fontWeight="bold" color="primary.light">
                             Webmasters
                         </Typography>
-
                         <Stack spacing={{ xs: 1, sm: 3 }} width={{ xs: '50%', sm: '100%' }} direction={{ xs: 'column', sm: 'row' }}>
                             {webmasters.map((item, index) => (
                                 <Link key={index} to={(item as any).href}>
@@ -169,16 +147,9 @@ export default function Footer() {
                                 </Link>
                             ))}
                         </Stack>
-                    </Grid>
-                </Grid>
-
-                <Stack
-                    direction={{ xs: 'column', sm: 'row' }}
-                    justifyContent="space-between"
-                    alignItems="center"
-                    spacing={2}
-                    sx={{ opacity: 0.7 }}
-                >
+                    </div>
+                </div>
+                <div className='flex flex-col md:flex-row items-center justify-between gap-3'>
                     <Stack direction="row" spacing={1} sx={{ pt: 2 }}>
                         {[
                             { icon: <Facebook />, href: '#' },
@@ -217,8 +188,9 @@ export default function Footer() {
                         </Link>
                         ©
                     </Typography>
-                </Stack>
-            </Container>
-        </Box >
+                </div>
+            </div>
+        </footer>
+
     );
 }

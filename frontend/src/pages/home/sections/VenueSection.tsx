@@ -5,14 +5,14 @@ import CountUp from 'react-countup';
 import FeatureCard from '../../../components/FeatureCard';
 import venueImage from '../../../assets/centroconvenciones.webp'
 
+const features = [
+    { icon: MapPin, text: 'Downtown Mérida', color: '#1976d2' },
+    { icon: Plane, text: (<><CountUp end={20} separator="," duration={2} enableScrollSpy scrollSpyOnce style={{ fontSize: 'inherit', fontWeight: 'inherit' }} /> min from airport</>), color: '#2e7d32' },
+    { icon: Hotel, text: (<><CountUp end={2000} separator="," duration={2} enableScrollSpy scrollSpyOnce style={{ fontSize: 'inherit', fontWeight: 'inherit' }} />+ hotel rooms</>), color: '#ed6c02' },
+];
+
 export default function VenueSection() {
     const navigate = useNavigate();
-
-    const features = [
-        { icon: MapPin, text: 'Downtown Mérida', color: '#1976d2' },
-        { icon: Plane, text: (<><CountUp end={20} separator="," duration={2} enableScrollSpy scrollSpyOnce style={{ fontSize: 'inherit', fontWeight: 'inherit' }} /> min from airport</>), color: '#2e7d32' },
-        { icon: Hotel, text: (<><CountUp end={2000} separator="," duration={2} enableScrollSpy scrollSpyOnce style={{ fontSize: 'inherit', fontWeight: 'inherit' }} />+ hotel rooms</>), color: '#ed6c02' },
-    ];
 
     return (
         <Box
@@ -101,7 +101,7 @@ export default function VenueSection() {
 
                 <Grid container spacing={3} justifyContent='center' sx={{ maxWidth: 900, mx: 'auto', mb: 4 }} >
                     {features.map((feature, index) => (
-                        <Grid item xs={12} sm={4} key={index}>
+                        <Grid size={{ xs: 12, sm: 4 }} key={index}>
                             <FeatureCard {...feature} />
                         </Grid>
                     ))}

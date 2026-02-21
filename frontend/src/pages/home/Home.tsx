@@ -1,14 +1,13 @@
-import { Box, Button, Card, CardContent, Container, Stack, Typography } from '@mui/material'
+import { Box, Button, Card, CardContent, Stack, Typography } from '@mui/material'
 import { useEffect, useState } from 'react'
-import WelcomeSection from '@/pages/home/sections/WelcomeSection'
-import VenueSection from './sections/VenueSection'
 import CollaboratorsSection from './sections/CollaboratorsSection'
-import { HomeHeroContent } from './components/HomeHeroContent'
 import GenericCTASection from '../../components/GenericCTASection'
-import { HeroSection } from '../../components/HeroSection'
 import { Link } from 'react-router'
-import { MainLayout } from '../../components/MainLayout'
 import { ArrowRight } from 'lucide-react'
+import { HeroSection } from '@/components/HeroSection'
+import VenueSection from './sections/VenueSection'
+import WelcomeSection from './sections/WelcomeSection'
+import { HomeHeroContent } from './components/HomeHeroContent'
 
 export const MainCTA = () => (
     <GenericCTASection>
@@ -92,7 +91,6 @@ const CounterCard = () => {
             const totalDays = Math.floor(diff / (1000 * 60 * 60 * 24));
             setTimeRemaining({
                 weeks: Math.floor(totalDays / 7),
-                // days: totalDays % 7,
                 days: totalDays,
                 hours: Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)),
                 minutes: Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60)),
@@ -104,7 +102,7 @@ const CounterCard = () => {
         return () => clearInterval(interval);
     }, []);
 
-    const counterItem = (value, label) => (
+    const counterItem = (value: string | number, label: string) => (
         <Card
             elevation={6}
             sx={{
@@ -150,9 +148,12 @@ const CounterCard = () => {
 
 export default function Home() {
     return (
-        <MainLayout  heroContent={<HomeHeroContent />}>
+        <>
+            <HeroSection >
+                <HomeHeroContent />
+            </HeroSection>
             <WelcomeSection />
-            <MainCTA />
+
             <Box component='section' justifyContent='center' textAlign='center' sx={{
                 px: { xs: 1, sm: 3, md: 10, lg: 15 },
                 py: { xs: 2, md: 3 },
@@ -162,9 +163,8 @@ export default function Home() {
                 </Typography>
                 <CounterCard />
             </Box>
-            <VenueSection />
-            {/* <NewsletterSection /> */}
+            {/* <VenueSection /> */}
             <CollaboratorsSection />
-        </MainLayout>
+        </>
     )
 }

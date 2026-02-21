@@ -13,16 +13,22 @@
 }
 
 
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
 
-  &:hover {
-    color: #585dc8;
-  }
-  &:active {
-    color: #404491;
-  }
+@theme {
+  --color-primary-light: #757ce8;
+  --color-primary: #3f50b5;
+  --color-primary-dark: #002884;
+  --color-primary-contrast: #fff;
+
+  --color-secondary-light: #ff7961;
+  --color-secondary: #f44336;
+  --color-secondary-dark: #ba000d;
+  --color-secondary-contrast: #000;
+
+  --color-error-light: #ff0011;
+  --color-error: #d2000e;
+  --color-error-dark: #a1000b;
+  --color-error-contrast: #ffffff;
+
+  --muted: oklch(0.967 0.001 286.375);
 }
-
