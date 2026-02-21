@@ -1,5 +1,5 @@
 import { Box, Container, Stack, Typography, Paper } from '@mui/material';
-import { Diversity3 } from '@mui/icons-material';
+import { UsersRound } from 'lucide-react';
 import { Link } from 'react-router';
 import watocLogo from '../../../assets/watocLogo.png'
 import cinvestavLogo from '../../../assets/cinvestavlogo.png'
@@ -38,7 +38,7 @@ export default function CollaboratorsSection() {
                             mb: 1,
                         }}
                     >
-                        <Diversity3 sx={{ fontSize: 32, color: 'white' }} />
+                        <UsersRound size={32} color="white" />
                     </Box>
 
                     <Typography

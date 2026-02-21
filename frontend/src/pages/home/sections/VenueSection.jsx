@@ -1,5 +1,5 @@
 import { Box, Button, Card, CardContent, Container, Grid, Paper, Stack, Typography, Chip } from '@mui/material';
-import { Flight, Hotel, Room, ArrowForward, LocationOn } from '@mui/icons-material';
+import { Plane, Hotel, MapPin, ArrowRight, Info } from 'lucide-react';
 import { useNavigate } from 'react-router';
 import CountUp from 'react-countup';
 import FeatureCard from '../../../components/FeatureCard';
@@ -9,8 +9,8 @@ export default function VenueSection() {
     const navigate = useNavigate();
 
     const features = [
-        { icon: Room, text: 'Downtown Mérida', color: '#1976d2' },
-        { icon: Flight, text: (<><CountUp end={20} separator="," duration={2} enableScrollSpy scrollSpyOnce style={{ fontSize: 'inherit', fontWeight: 'inherit' }} /> min from airport</>), color: '#2e7d32' },
+        { icon: MapPin, text: 'Downtown Mérida', color: '#1976d2' },
+        { icon: Plane, text: (<><CountUp end={20} separator="," duration={2} enableScrollSpy scrollSpyOnce style={{ fontSize: 'inherit', fontWeight: 'inherit' }} /> min from airport</>), color: '#2e7d32' },
         { icon: Hotel, text: (<><CountUp end={2000} separator="," duration={2} enableScrollSpy scrollSpyOnce style={{ fontSize: 'inherit', fontWeight: 'inherit' }} />+ hotel rooms</>), color: '#ed6c02' },
     ];
 
@@ -26,11 +26,11 @@ export default function VenueSection() {
             <Container maxWidth="lg">
                 <Stack alignItems="center" spacing={1} mb={5} textAlign="center">
                     <Chip
-                        icon={<LocationOn />}
+                        icon={<Info size={18} />}
                         label="Event Location"
                         color="primary"
                         variant="outlined"
-                        sx={{ fontWeight: 600, mb: 1 }}
+                        sx={{ fontWeight: 600, mb: 1, '& .MuiChip-icon': { color: 'inherit' } }}
                     />
                     <Typography
                         variant="h3"
@@ -101,7 +101,7 @@ export default function VenueSection() {
 
                 <Grid container spacing={3} justifyContent='center' sx={{ maxWidth: 900, mx: 'auto', mb: 4 }} >
                     {features.map((feature, index) => (
-                        <Grid size={{ sx: 12, sm: 3 }} key={index}>
+                        <Grid item xs={12} sm={4} key={index}>
                             <FeatureCard {...feature} />
                         </Grid>
                     ))}
@@ -129,7 +129,7 @@ export default function VenueSection() {
                         }}
                         variant="contained"
                         size="large"
-                        endIcon={<ArrowForward />}
+                        endIcon={<ArrowRight size={20} />}
                         sx={{
                             px: 5,
                             py: 1.5,

@@ -1,11 +1,10 @@
 import NavBar from '../../components/NavBar'
 import Footer from '../../components/Footer'
-import { Box, Card, CardContent, Container, Grid, Paper, Stack, Typography } from '@mui/material'
-import { EnergySavingsLeaf, Flight, Groups2, Hotel, Room, WifiTethering } from '@mui/icons-material'
+import { Box, Card, CardContent, Container, Grid2 as Grid, Paper, Typography } from '@mui/material'
+// Cambio a Lucide React
+import { Utensils, MapPin, ChevronRight, Map as MapIcon } from 'lucide-react' 
 import { RestaurantHeroContent } from './components/RestaurantsHeroContent'
-import GenericCTASection from '../../components/GenericCTASection'
 import { HeroSection } from '../../components/HeroSection'
-import CountUp from 'react-countup';
 import apapacho from '../../assets/apapacho.jpg';
 import avelino from '../../assets/avelino.jpg';
 import katun from '../../assets/katun.jpg';
@@ -42,33 +41,41 @@ const RestaurantCard = ({ restaurant }) => (
         />
 
         <CardContent sx={{ flexGrow: 1 }}>
-            <Typography variant="h6" fontWeight="bold" gutterBottom>
-                {restaurant.name}
-            </Typography>
+            <Box display="flex" alignItems="center" gap={1} mb={1}>
+                <Utensils size={16} color="#1976d2" />
+                <Typography variant="h6" fontWeight="bold" sx={{ fontSize: '1.1rem', lineHeight: 1.2 }}>
+                    {restaurant.name}
+                </Typography>
+            </Box>
 
             <Typography
                 variant="body2"
-                sx={{ color: 'primary.main', fontWeight: 600 }}
+                sx={{ color: 'primary.main', fontWeight: 600, mb: 1, display: 'block' }}
             >
                 {restaurant.type}
             </Typography>
 
-            <Typography
-                variant="caption"
-                color="text.secondary"
-                sx={{ display: 'block', mt: 1 }}
-            >
-                {restaurant.distance}
-            </Typography>
+            <Box display="flex" alignItems="center" gap={0.5}>
+                <MapPin size={14} style={{ opacity: 0.6 }} />
+                <Typography
+                    variant="caption"
+                    color="text.secondary"
+                >
+                    {restaurant.distance}
+                </Typography>
+            </Box>
         </CardContent>
 
         <Box sx={{ px: 2, pb: 2 }}>
-            <Typography
+            <Box
                 component="a"
                 href={restaurant.maps}
                 target="_blank"
                 rel="noopener noreferrer"
                 sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 0.5,
                     fontSize: '0.85rem',
                     fontWeight: 600,
                     color: 'primary.main',
@@ -76,83 +83,23 @@ const RestaurantCard = ({ restaurant }) => (
                     '&:hover': { textDecoration: 'underline' }
                 }}
             >
-                View on Google Maps →
-            </Typography>
+                View on Google Maps <ChevronRight size={14} />
+            </Box>
         </Box>
     </Card>
 );
 
 const restaurants = [
-    {
-        name: 'La Terraza Amarilla',
-        type: 'Traditional Yucatecan Cuisine',
-        distance: '2 min walk',
-        image: terraza,
-        maps: 'https://maps.app.goo.gl/7tq7MdeYH9mb4Sv97'
-    },
-    {
-        name: 'La Pigua',
-        type: 'Seafood & Contemporary Mexican',
-        distance: '2 min walk',
-        image: pigua,
-        maps: 'https://maps.app.goo.gl/ExLgZq9eYkYdEHjt9'
-    },
-    {
-        name: 'Katún Cocina Yucateca',
-        type: 'Traditional Yucatecan Cuisine',
-        distance: '3 min walk',
-        image: katun,
-        maps: 'https://maps.app.goo.gl/rgEJuSquaT1qK7dj6'
-    },
-    {
-        name: 'Peregrina Bistro',
-        type: 'Mexican & International Bistro',
-        distance: '4 min walk',
-        image: peregrina,
-        maps: 'https://maps.app.goo.gl/nHwVgpyKBfS4rEaX9'
-    },
-    {
-        name: 'Avelino & María',
-        type: 'Mexican Contemporary Cuisine',
-        distance: '9 min walk',
-        image: avelino,
-        maps: 'https://maps.app.goo.gl/H8DbHsSuqEXqzkxJ8'
-    },
-    {
-        name: 'La Tradición',
-        type: 'Yucatecan & Southern Mexican Specialties',
-        distance: '6 min walk',
-        image: tradicion,
-        maps: 'https://maps.app.goo.gl/EyztEpL1Z15uBZbY8'
-    },
-    {
-        name: 'Los Platos Rotos',
-        type: 'Traditional Mexican Cuisine',
-        distance: '7 min walk',
-        image: platosrotos,
-        maps: 'https://maps.app.goo.gl/tJ5mhAnhr17Lgeqy5'
-    },
-    {
-        name: 'El Tío Ricardo',
-        type: 'Traditional Mexican Cuisine',
-        distance: '9 min walk',
-        image: tioricardo,
-        maps: 'https://maps.app.goo.gl/DytLwDcCHpoS6a2MA'
-    },
-    {
-        name: 'Siqueff',
-        type: 'Yucatecan & Lebanese Fusion',
-        distance: '8 min walk',
-        image: siqueff,
-        maps: 'https://maps.app.goo.gl/GNBgTTYw1twhjyyZ6'
-    },
-    {
-        name: 'El Apapacho',
-        type: 'Traditional Mexican Cuisine',
-        distance: '11 min walk',
-        image: apapacho,
-        maps: 'https://maps.app.goo.gl/vG9MYqvDSoGxtvxB7'
-    }
+    { name: 'La Terraza Amarilla', type: 'Traditional Yucatecan Cuisine', distance: '2 min walk', image: terraza, maps: '#' },
+    { name: 'La Pigua', type: 'Seafood & Contemporary Mexican', distance: '2 min walk', image: pigua, maps: '#' },
+    { name: 'Katún Cocina Yucateca', type: 'Traditional Yucatecan Cuisine', distance: '3 min walk', image: katun, maps: '#' },
+    { name: 'Peregrina Bistro', type: 'Mexican & International Bistro', distance: '4 min walk', image: peregrina, maps: '#' },
+    { name: 'Avelino & María', type: 'Mexican Contemporary Cuisine', distance: '9 min walk', image: avelino, maps: '#' },
+    { name: 'La Tradición', type: 'Yucatecan & Southern Mexican Specialties', distance: '6 min walk', image: tradicion, maps: '#' },
+    { name: 'Los Platos Rotos', type: 'Traditional Mexican Cuisine', distance: '7 min walk', image: platosrotos, maps: '#' },
+    { name: 'El Tío Ricardo', type: 'Traditional Mexican Cuisine', distance: '9 min walk', image: tioricardo, maps: '#' },
+    { name: 'Siqueff', type: 'Yucatecan & Lebanese Fusion', distance: '8 min walk', image: siqueff, maps: '#' },
+    { name: 'El Apapacho', type: 'Traditional Mexican Cuisine', distance: '11 min walk', image: apapacho, maps: '#' }
 ];
 
 export default function RestaurantPage() {
@@ -183,9 +130,9 @@ export default function RestaurantPage() {
                                 variant="overline"
                                 color="primary"
                                 fontWeight="bold"
-                                sx={{ fontSize: '1rem', letterSpacing: 2 }}
+                                sx={{ fontSize: '1rem', letterSpacing: 2, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1 }}
                             >
-                                Gastronomic Guide
+                                <Utensils size={20} /> Gastronomic Guide
                             </Typography>
 
                             <Typography
@@ -225,6 +172,7 @@ export default function RestaurantPage() {
                                 attendees seeking authentic local experiences.
                             </Typography>
                         </Box>
+
                         <Grid container spacing={4}>
                             {restaurants.map((restaurant, index) => (
                                 <Grid key={index} size={{ xs: 12, sm: 6, md: 2.4 }}>
@@ -232,15 +180,16 @@ export default function RestaurantPage() {
                                 </Grid>
                             ))}
                         </Grid>
+
                         <Box sx={{ mt: 10 }}>
                             <Box textAlign="center" mb={5}>
                                 <Typography
                                     variant="overline"
                                     color="primary"
                                     fontWeight="bold"
-                                    sx={{ fontSize: '1rem', letterSpacing: 2 }}
+                                    sx={{ fontSize: '1rem', letterSpacing: 2, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1 }}
                                 >
-                                    Interactive Map
+                                    <MapIcon size={20} /> Interactive Map
                                 </Typography>
 
                                 <Typography
@@ -278,11 +227,12 @@ export default function RestaurantPage() {
                                 }}
                             >
                                 <iframe
-                                    src="https://www.google.com/maps/d/embed?mid=1L_QkGpsWbW7tqOrGilCYYmtsLr_vvco&ehbc=2E312F"
+                                    src="about:blank" // Reemplazar con URL real
                                     width="100%"
                                     height="100%"
                                     style={{ border: 0 }}
                                     loading="lazy"
+                                    title="Google Maps"
                                 />
                             </Paper>
                         </Box>
@@ -292,4 +242,4 @@ export default function RestaurantPage() {
             <Footer />
         </>
     );
-}
+}   

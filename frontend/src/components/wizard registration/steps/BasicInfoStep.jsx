@@ -1,7 +1,7 @@
 import { Box, Button, Divider, InputAdornment } from '@mui/material'
 import { useForm } from 'react-hook-form'
 import { REGEX_EMAIL, REGEX_NAME } from '../../../utils/formRegex'
-import { DriveFileRenameOutline, LocationCity, MailOutline, Person, Phone, Public } from '@mui/icons-material'
+import { User, PenLine, Mail, Phone, Globe, City } from 'lucide-react'
 import { useEffect } from 'react'
 import { countries } from '../../../utils/countriesInfo'
 import CustomTextField from '../../CustomTextField'
@@ -34,7 +34,7 @@ export default function BasicInfoStep({ data = {}, stepName = '_', onNext = null
             </>
         )}>
             <FormSectionTitle
-                icon={<Person fontSize='small' />}
+                icon={<User size={18} />}
                 text='Personal data'
             />
             <Box display='flex' flexDirection={{ xs: 'column', sm: 'row' }} justifyContent='space-between' gap={3}>
@@ -78,7 +78,7 @@ export default function BasicInfoStep({ data = {}, stepName = '_', onNext = null
                     maxLenght={100}
                     inputAdornment={(
                         <InputAdornment position="start">
-                            <DriveFileRenameOutline />
+                            <PenLine size={20} />
                         </InputAdornment>
                     )}
                 />
@@ -90,7 +90,7 @@ export default function BasicInfoStep({ data = {}, stepName = '_', onNext = null
                         required: 'Please provide your first name',
                         maxLength: {
                             value: 100,
-                            message: 'No seas puta',
+                            message: 'Max length exceeded',
                         },
                         pattern: {
                             value: REGEX_NAME,
@@ -106,7 +106,7 @@ export default function BasicInfoStep({ data = {}, stepName = '_', onNext = null
                     maxLenght={100}
                     inputAdornment={(
                         <InputAdornment position="start">
-                            <DriveFileRenameOutline />
+                            <PenLine size={20} />
                         </InputAdornment>
                     )}
                 />
@@ -115,7 +115,7 @@ export default function BasicInfoStep({ data = {}, stepName = '_', onNext = null
             <Divider />
 
             <FormSectionTitle
-                icon={<Public fontSize='small' />}
+                icon={<Globe size={18} />}
                 text='Contact Information'
             />
             <Box display='flex' flexDirection={{ xs: 'column', sm: 'row' }} justifyContent='space-between' gap={2}>
@@ -137,7 +137,7 @@ export default function BasicInfoStep({ data = {}, stepName = '_', onNext = null
                     helperText={errors?.email?.message}
                     inputAdornment={(
                         <InputAdornment position="start">
-                            <MailOutline />
+                            <Mail size={20} />
                         </InputAdornment>
                     )}
                 />
@@ -155,7 +155,7 @@ export default function BasicInfoStep({ data = {}, stepName = '_', onNext = null
                     helperText={errors?.phone?.message}
                     inputAdornment={(
                         <InputAdornment position="start">
-                            <Phone />
+                            <Phone size={20} />
                         </InputAdornment>
                     )}
                 />
@@ -198,7 +198,7 @@ export default function BasicInfoStep({ data = {}, stepName = '_', onNext = null
                     helperText={errors?.city?.message}
                     inputAdornment={(
                         <InputAdornment position="start">
-                            <LocationCity />
+                            <City size={20} />
                         </InputAdornment>
                     )}
                 />
@@ -206,4 +206,3 @@ export default function BasicInfoStep({ data = {}, stepName = '_', onNext = null
         </StepTemplate>
     )
 }
-

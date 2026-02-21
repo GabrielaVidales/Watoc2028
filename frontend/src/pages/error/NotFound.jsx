@@ -1,5 +1,5 @@
 import { Box, Button, Container, Stack, Typography } from '@mui/material';
-import { Home, ArrowBack, Explore } from '@mui/icons-material';
+import { Home, Undo2, Compass } from 'lucide-react';
 import { useNavigate } from 'react-router';
 
 export default function NotFound() {
@@ -71,6 +71,17 @@ export default function NotFound() {
                         >
                             404
                         </Typography>
+                        <Box 
+                            sx={{ 
+                                position: 'absolute', 
+                                top: '50%', 
+                                left: '50%', 
+                                transform: 'translate(-50%, -50%)',
+                                opacity: 0.1
+                            }}
+                        >
+                            <Compass size={120} color="white" />
+                        </Box>
                     </Box>
 
                     <Stack spacing={2}>
@@ -107,7 +118,7 @@ export default function NotFound() {
                         <Button
                             variant="contained"
                             size="large"
-                            startIcon={<Home />}
+                            startIcon={<Home size={20} />}
                             onClick={() => navigate('/')}
                             sx={{
                                 px: 4,
@@ -130,7 +141,7 @@ export default function NotFound() {
                         <Button
                             variant="outlined"
                             size="large"
-                            startIcon={<ArrowBack />}
+                            startIcon={<Undo2 size={20} />}
                             onClick={() => navigate(-1)}
                             sx={{
                                 px: 4,

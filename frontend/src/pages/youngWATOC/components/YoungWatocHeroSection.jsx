@@ -1,5 +1,5 @@
-import { ArrowDownward, LocationOn } from '@mui/icons-material'
 import { Box, Chip, Stack, Typography } from '@mui/material'
+import { ArrowDown, MapPin } from 'lucide-react';
 
 export default function YoungWatocHeroSection() {
     const scrollToContent = () => {
@@ -13,7 +13,7 @@ export default function YoungWatocHeroSection() {
         <>
             <Stack spacing={{ xs: 3, md: 4 }} alignItems="center">
                 <Chip
-                    icon={<LocationOn color='white' fontSize='0.8rem' />}
+                    icon={<MapPin color='white' />}
                     label="Mérida, México"
                     sx={{
                         bgcolor: 'rgba(255,255,255,0.1)',
@@ -85,14 +85,7 @@ export default function YoungWatocHeroSection() {
                     },
                 }}
             >
-                <ArrowDownward
-                    sx={{
-                        color: 'white',
-                        fontSize: 40,
-                        opacity: 0.7,
-                        '&:hover': { opacity: 1 },
-                    }}
-                />
+                <ArrowDown />
             </Box>
         </>
     )

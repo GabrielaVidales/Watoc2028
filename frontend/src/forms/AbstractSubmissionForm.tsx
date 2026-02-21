@@ -1,11 +1,11 @@
 import { Box, Button, Divider, Stack, Typography } from '@mui/material'
 import { type FieldArrayWithId, FormProvider, useFieldArray, useForm } from 'react-hook-form'
-import { AddBox, Article, FormatQuote } from '@mui/icons-material'
 import FormSectionTitle from '../components/wizard registration/inputs/FormSectionTitle'
 import { AnimatePresence, Reorder } from "motion/react"
 import ReorderableItem from './ReorderableItem'
 import { ControlledTextField } from './components/ControlledInputs'
 import { useMemo } from 'react'
+import { Plus, Quote, Text } from 'lucide-react'
 
 // Este closure es para que al eliminar un elemento se bloquee por 500 ms
 function createRemoveGuard(removeFn: (value: any) => void, delay = 500) {
@@ -116,7 +116,7 @@ export default function AbstractSubmissionForm() {
             <Stack spacing={2} component='form' onSubmit={handleOnSubmit}>
                 <Button type='submit' > botón para testear funcioamiento</Button>
 
-                <FormSectionTitle icon={<FormatQuote fontSize='small' />} text='Title' />
+                <FormSectionTitle icon={<Quote fontSize='small' />} text='Title' />
 
                 <ControlledTextField
                     id='title' name='title'
@@ -132,7 +132,7 @@ export default function AbstractSubmissionForm() {
 
                 <Divider />
 
-                <FormSectionTitle icon={<FormatQuote fontSize='small' />} text='Authors' />
+                <FormSectionTitle icon={<Quote fontSize='small' />} text='Authors' />
 
                 <Typography align='left'>
                     List all authors, including yourself. You can add multiple authors and reorder them as needed.
@@ -140,7 +140,7 @@ export default function AbstractSubmissionForm() {
 
                 <Reorder.Group values={authorMethods.fields} onReorder={onReorder} style={{ padding: 0, }}>
                     <Box sx={{ pb: 2, display: 'flex', justifyContent: 'end', }}>
-                        <Button variant='text' size='large' startIcon={<AddBox />} onClick={() => authorMethods.append({ name: '', affiliation: '' })}>
+                        <Button variant='text' size='large' startIcon={<Plus />} onClick={() => authorMethods.append({ name: '', affiliation: '' })}>
                             Add author
                         </Button>
                     </Box>
@@ -184,7 +184,7 @@ export default function AbstractSubmissionForm() {
 
                 <Divider />
 
-                <FormSectionTitle text='Abstract text' icon={<Article fontSize='small' />} />
+                <FormSectionTitle text='Abstract text' icon={< Text />} />
 
                 <ControlledTextField
                     id={`text`} name={'text'}
@@ -203,7 +203,7 @@ export default function AbstractSubmissionForm() {
 
                 <Divider />
 
-                <FormSectionTitle text='References' icon={<Article fontSize='small' />} />
+                <FormSectionTitle text='References' icon={<Text  />} />
 
                 <ControlledTextField
                     id={`ref`} name={'ref'}

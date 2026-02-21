@@ -8,10 +8,10 @@ import { defineConfig, globalIgnores } from 'eslint/config'
 export default defineConfig([
   globalIgnores(['dist']),
   {
-    files: ['**/*.{js,jsx,ts,tsx}'],
+    files: ['**/*.{ts,tsx}'],
     extends: [
       js.configs.recommended,
-      react.configs.flat.recommended,
+      tseslint.configs.recommended,
       reactHooks.configs.flat.recommended,
       reactRefresh.configs.vite,
     ],
@@ -22,30 +22,11 @@ export default defineConfig([
     rules: {
       '@typescript-eslint/no-unused-vars': 'warn',
       "@typescript-eslint/no-explicit-any": ["off"],
-      "react-hooks/exhaustive-deps": "off",
       'react-refresh/only-export-components': 'off',
+      "react-hooks/exhaustive-deps": "off",
       "react-hooks/set-state-in-effect": "off",
+      'react/jsx-no-undef': 'error',
       'react/jsx-uses-vars': 'error',
-      'react/react-in-jsx-scope': 'off',
-      'react/prop-types': 'off',
-      'no-unused-vars': [
-        'error',
-        {
-          vars: 'all',
-          args: 'after-used',
-          ignoreRestSiblings: false,
-        },
-      ],
-    },
-    settings: {
-      react: {
-        version: 'detect',
-      },
-      "import/resolver": {
-        typescript: {
-          project: "./tsconfig.json",
-        },
-      },
     },
   },
 ])

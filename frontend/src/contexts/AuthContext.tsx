@@ -52,6 +52,8 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
     async function fetchUser() {
         try {
             const res = await axiosClient.get('/profile/');
+            console.log(res);
+            
             setCurrentUser({
                 id: res.data.id,
                 email: res.data.email,

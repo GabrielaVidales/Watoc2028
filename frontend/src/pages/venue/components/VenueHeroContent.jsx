@@ -1,6 +1,6 @@
 import { Box, Typography, Stack, Chip, Button } from '@mui/material';
-import { LocationOn, ArrowDownward } from '@mui/icons-material';
 import { Link } from 'react-router';
+import { ArrowDown, MapPin } from 'lucide-react';
 
 export const VenueHeroContent = () => {
     const scrollToContent = () => {
@@ -14,7 +14,7 @@ export const VenueHeroContent = () => {
         <>
             <Stack spacing={{ xs: 3, md: 4 }} alignItems="center" sx={{ width: '100%' }}>
                 <Chip
-                    icon={<LocationOn />}
+                    icon={<MapPin />}
                     label="MÉRIDA, YUCATÁN"
                     sx={{
                         bgcolor: 'rgba(255,255,255,0.15)',
@@ -138,16 +138,7 @@ export const VenueHeroContent = () => {
                     },
                 }}
             >
-                <ArrowDownward
-                    sx={{
-                        color: 'white',
-                        fontSize: 40,
-                        opacity: 0.8,
-                        filter: 'drop-shadow(0 2px 8px rgba(0,0,0,0.5))',
-                        transition: 'opacity 0.3s',
-                        '&:hover': { opacity: 1 },
-                    }}
-                />
+                <ArrowDown />
             </Box>
         </>
     );

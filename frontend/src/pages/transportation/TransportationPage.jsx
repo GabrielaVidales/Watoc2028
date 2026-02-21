@@ -1,11 +1,11 @@
 import NavBar from '../../components/NavBar'
 import Footer from '../../components/Footer'
 import { Box, Card, CardContent, Container, Grid, Stack, Typography } from '@mui/material'
-import { DirectionsBus, ElectricBolt, LocalTaxi, DirectionsWalk } from '@mui/icons-material'
 import { TransportationHeroContent } from './components/TransportationHeroContent'
 import { HeroSection } from '../../components/HeroSection'
 import vayvenImg from '../../assets/vayven.png'
 import ietranImg from '../../assets/ietram.jpg'
+import { Bus, Car, Footprints, Zap } from 'lucide-react'
 
 const TransportCard = ({ icon, title, text, image }) => (
     <Card
@@ -202,12 +202,12 @@ export default function TransportationPage() {
                         </Box>
                         <Stack spacing={4} mb={8} maxWidth={900} mx="auto">
                             <TransportHighlight
-                                icon={<LocalTaxi />}
+                                icon={<Car />}
                                 title="Taxis & Ride-Sharing"
                                 text="Uber, Didi, and local taxis are widely available for convenient travel throughout the city."
                             />
                             <TransportHighlight
-                                icon={<DirectionsWalk />}
+                                icon={<Footprints />}
                                 title="Walking"
                                 text="The congress center is within comfortable walking distance of numerous hotels, restaurants, and attractions along Paseo de Montejo."
                             />
@@ -246,7 +246,7 @@ export default function TransportationPage() {
                         <Grid container spacing={4}>
                             <Grid item size={{ xs: 12, sm: 6}}>
                                 <TransportCard
-                                    icon={<DirectionsBus />}
+                                    icon={<Bus />}
                                     title="Va-y-Ven System"
                                     image={vayvenImg}
                                     text='The main public transport system with modern, air-conditioned buses.
@@ -258,7 +258,7 @@ export default function TransportationPage() {
 
                             <Grid item size={{ xs: 12, sm: 6}}>
                                 <TransportCard
-                                    icon={<ElectricBolt />}
+                                    icon={<Zap />}
                                     title="IE-TRAM Yucatán"
                                     image={ietranImg}
                                     text='A 100% electric, tram-like bus system connecting Mérida with nearby

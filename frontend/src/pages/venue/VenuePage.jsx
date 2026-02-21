@@ -1,16 +1,13 @@
-import NavBar from '../../components/NavBar'
-import Footer from '../../components/Footer'
 import { Box, Card, CardContent, Container, Grid, Paper, Stack, Typography } from '@mui/material'
-import { EnergySavingsLeaf, Flight, Groups2, Hotel, Room, WifiTethering } from '@mui/icons-material'
 import { VenueHeroContent } from './components/VenueHeroContent'
 import GenericCTASection from '../../components/GenericCTASection'
-import { HeroSection } from '../../components/HeroSection'
 import CountUp from 'react-countup';
 import centro1 from '../../assets/centro1.jpg'
 import centro2 from '../../assets/centro2.jpg'
 import centro3 from '../../assets/centro3.jpg'
 import centroConvenciones from '../../assets/centroconvenciones.webp'
 import { MainLayout } from '../../components/MainLayout'
+import { Bed, Leaf, MapPin, Plane, UsersRound, Wifi } from 'lucide-react'
 
 const FeatureCard = ({ icon, title, text }) => (
     <Paper elevation={5} sx={{
@@ -85,7 +82,7 @@ const LocationItem = ({ icon, title, text }) => (
     </Box>
 )
 
-const ImageStatCard = ({ image, value, unit, label }) => (
+const ImageStatCard = ({ image, value, unit=null, label }) => (
     <Card
         sx={{
             height: '100%',
@@ -174,21 +171,21 @@ export default function VenuePage() {
                             }}>
                                 <Grid size={{ xs: 12, sm: 6, md: 4 }}>
                                     <FeatureCard
-                                        icon={<Groups2 />}
+                                        icon={<UsersRound />}
                                         title='High Capacity'
                                         text='With a total event area of 10,000 m² and 26 meeting rooms, the venue can accommodate up to 10,000 attendees.'
                                     />
                                 </Grid>
                                 <Grid size={{ xs: 12, sm: 6, md: 4 }}>
                                     <FeatureCard
-                                        icon={<EnergySavingsLeaf />}
+                                        icon={<Leaf />}
                                         title='LEED Certification'
                                         text='The first building in Mexico to receive LEED Platinum certification in its category, prioritizing energy efficiency and sustainable design.'
                                     />
                                 </Grid>
                                 <Grid size={{ xs: 12, sm: 6, md: 4 }}>
                                     <FeatureCard
-                                        icon={<WifiTethering />}
+                                        icon={<Wifi />}
                                         title='Advanced Connectivity'
                                         text='State-of-the-art fiber-optic infrastructure and high-quality Wi-Fi designed to support thousands of simultaneous attendees.'
                                     />
@@ -215,17 +212,17 @@ export default function VenuePage() {
                                 </Typography>
 
                                 <LocationItem
-                                    icon={<Room />}
+                                    icon={<MapPin />}
                                     title='Address'
                                     text='62 No. 294, between Av. Cupules and Av. Colón, Centro, Mérida, Yucatán, Mexico.'
                                 />
                                 <LocationItem
-                                    icon={<Hotel />}
+                                    icon={<Bed />}
                                     title='Accommodation'
                                     text='More than 2,000 hotel rooms available within walking distance'
                                 />
                                 <LocationItem
-                                    icon={<Flight />}
+                                    icon={<Plane />}
                                     title='Transportation'
                                     text='Approximately 20 minutes from Mérida International Airport (MID).'
                                 />

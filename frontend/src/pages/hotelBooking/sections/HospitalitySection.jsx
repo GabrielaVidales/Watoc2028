@@ -1,5 +1,5 @@
 import { Box, Button, Container, Stack, Typography } from '@mui/material'
-import { ArrowForward, Hotel, LocationOn, Star } from '@mui/icons-material'
+import { ArrowRight, Hotel, MapPin, Star } from 'lucide-react'
 import FeatureCard from '../../../components/FeatureCard'
 import { Link } from 'react-router'
 import CountUp from 'react-countup';
@@ -23,7 +23,7 @@ const stats = [
         title: (<><CountUp end={6000} separator="," duration={2} enableScrollSpy scrollSpyOnce style={{ fontSize: 'inherit', fontWeight: 'inherit' }}/>+</>),
         label: 'Rooms in Mérida',
         text: 'City-wide capacity',
-        icon: LocationOn,
+        icon: MapPin,
         color: '#ed6c02',
     },
 ]
@@ -130,7 +130,7 @@ export default function HospitalitySection() {
                             <Button
                                 variant="contained"
                                 size="large"
-                                endIcon={<ArrowForward />}
+                                endIcon={<ArrowRight size={20} />}
                                 sx={{
                                     px: 5,
                                     py: 1.5,

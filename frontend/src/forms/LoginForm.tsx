@@ -1,8 +1,7 @@
 import { Button, Stack, InputAdornment, Paper, Box, IconButton, Typography } from '@mui/material'
 import { FormProvider, useForm } from 'react-hook-form'
-import MailOutlineIcon from '@mui/icons-material/MailOutline';
+import { Mail, Lock, Eye, EyeOff } from 'lucide-react'; // Íconos de Lucide
 import { ControlledTextField } from './components/ControlledInputs';
-import { LockOutline, Visibility, VisibilityOff } from '@mui/icons-material';
 import React from 'react';
 import { Link, useNavigate } from 'react-router';
 import { REGEX_EMAIL } from '../utils/formRegex';
@@ -27,7 +26,7 @@ export default function LoginForm() {
     return (
         <FormProvider {...methods}>
             <Paper component='form' onSubmit={onSubmit} elevation={5} sx={{ py: 6, px: { xs: 3, sm: 6, md: 9 }, borderTop: 12, borderColor: 'primary.main', }}>
-                <Box component='fieldset' disabled={methods.formState.isSubmitting}>
+                <Box component='fieldset' disabled={methods.formState.isSubmitting} sx={{ border: 'none', p: 0, m: 0 }}>
                     <Stack spacing={2} py={2}>
                         <Typography variant='h4' fontWeight={500} textAlign='center'>
                             Welcome back
@@ -52,7 +51,7 @@ export default function LoginForm() {
                             inputAdornment={{
                                 startAdornment: (
                                     <InputAdornment position='start'>
-                                        <MailOutlineIcon />
+                                        <Mail size={20} />
                                     </InputAdornment>
                                 )
                             }}
@@ -64,7 +63,7 @@ export default function LoginForm() {
                             defaultValue=''
                             placeholder='**********'
                             rules={{
-                                required: 'Please provide your email',
+                                required: 'Please provide your password',
                                 maxLength: { value: 128, message: 'Max length is 64 characters' },
                             }}
                             type={showPassword ? 'text' : 'password'}
@@ -73,7 +72,7 @@ export default function LoginForm() {
                             inputAdornment={{
                                 startAdornment: (
                                     <InputAdornment position='start'>
-                                        <LockOutline />
+                                        <Lock size={20} />
                                     </InputAdornment>
                                 ),
                                 endAdornment: (
@@ -81,8 +80,9 @@ export default function LoginForm() {
                                         <IconButton
                                             aria-label={showPassword ? 'hide the password' : 'display the password'}
                                             onClick={handleClickShowPassword}
+                                            edge="end"
                                         >
-                                            {showPassword ? <VisibilityOff /> : <Visibility />}
+                                            {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                                         </IconButton>
                                     </InputAdornment>
                                 )

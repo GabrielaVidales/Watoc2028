@@ -1,10 +1,10 @@
-import { ExpandLess, ExpandMore, Menu as MenuIcon } from '@mui/icons-material';
 import { AppBar, Box, Toolbar, Typography, useScrollTrigger, IconButton, Menu, MenuItem, ListItemText, MenuList, ListItemButton, Collapse, List } from '@mui/material';
 import { useMemo, useRef, useState } from 'react';
 import { Link, NavLink } from 'react-router';
 import { ScrollTop } from './ScrollTop';
 import CustomDropdownMenu from './CustomDropdownMenu';
 import logo from '../assets/WatocPNGLogo.png';
+import { ChevronDown, ChevronUp, MenuIcon } from 'lucide-react';
 
 const MobileNavMenu = ({ open, anchorEl, handleClose, aboutSubmenus }) => {
     const [submenuOpen, setSubmenuOpen] = useState(false)
@@ -45,7 +45,7 @@ const MobileNavMenu = ({ open, anchorEl, handleClose, aboutSubmenus }) => {
             </Link>
             <ListItemButton onClick={handleClick}>
                 <ListItemText primary='About' />
-                {submenuOpen ? <ExpandLess /> : <ExpandMore />}
+                {submenuOpen ? <ChevronDown /> : <ChevronUp />}
             </ListItemButton>
             <Collapse in={submenuOpen} timeout={400} unmountOnExit>
                 <List dense component="div" disablePadding>

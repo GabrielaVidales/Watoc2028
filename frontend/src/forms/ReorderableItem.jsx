@@ -1,9 +1,7 @@
-import { BorderStyle, Dehaze, DeleteOutline, DragHandle, DragIndicator, PersonOutline } from '@mui/icons-material'
-import { Box, IconButton, InputAdornment, Paper, Stack, Tooltip } from '@mui/material'
-import { Reorder, transform, useDragControls } from 'motion/react'
+import { GripVertical, Trash2 } from 'lucide-react'
+import { Box, IconButton, Paper, Tooltip } from '@mui/material'
+import { Reorder, useDragControls } from 'motion/react'
 import React, { useState } from 'react'
-import RenderInput from '../components/wizard registration/inputs/RenderInput'
-import CustomTextField from '../components/CustomTextField'
 
 export default function ReorderableItem({ field, index, children, onRemove, disableRemove = false }) {
     const dragControls = useDragControls()
@@ -63,27 +61,32 @@ export default function ReorderableItem({ field, index, children, onRemove, disa
                     pt: 2, pb: 1,
                 }}>
 
-                    <IconButton size='large' onPointerDown={handlePointerDown} sx={{
-                        cursor: 'grab',
-                        touchAction: 'none',
-                    }}>
-                        <DragIndicator fontSize='medium' />
+                    <IconButton 
+                        size='large' 
+                        onPointerDown={handlePointerDown} 
+                        sx={{
+                            cursor: 'grab',
+                            touchAction: 'none',
+                        }}
+                    >
+                        <GripVertical size={24} />
                     </IconButton>
 
                     <Box display={'flex'} alignItems={'center'} flex={1} gap={{ xs: 0, sm: 1 }} flexDirection={{ xs: 'column', sm: 'row' }}>
                         {children}
                     </Box>
                     <Box display={'flex'} alignSelf={'center'}>
-                        <Tooltip title={disableRemove && "At least one author is required"} disableInteractive>
-                            {disableRemove ? (<span>
-                                <IconButton size='large' onClick={() => onRemove(index)} color='black' disabled={disableRemove}>
-                                    <DeleteOutline fontSize='medium' />
+                        <Tooltip title={disableRemove ? "At least one author is required" : ""} disableInteractive>
+                            <span>
+                                <IconButton 
+                                    size='large' 
+                                    onClick={() => onRemove(index)} 
+                                    sx={{ color: 'black' }} 
+                                    disabled={disableRemove}
+                                >
+                                    <Trash2 size={22} />
                                 </IconButton>
-                            </span>) : (
-                                <IconButton size='large' onClick={() => onRemove(index)} color='black' disabled={disableRemove}>
-                                    <DeleteOutline fontSize='medium' />
-                                </IconButton>
-                            )}
+                            </span>
                         </Tooltip>
                     </Box>
 

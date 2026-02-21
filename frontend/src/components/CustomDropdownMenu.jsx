@@ -1,6 +1,6 @@
 import { Box, Typography } from "@mui/material";
-import { KeyboardArrowDown } from "@mui/icons-material";
 import './CustomDropdownMenu.css'
+import { ChevronDown } from "lucide-react";
 
 const CustomDropdownMenu = ({ textBlack = false, children }) => {
 
@@ -20,7 +20,7 @@ const CustomDropdownMenu = ({ textBlack = false, children }) => {
                 }} >
                     About
                 </Typography>
-                <KeyboardArrowDown />
+                <ChevronDown />
             </Box>
             {/* NO USAR OTRO COMPONENTE, SINO SE ROMPE */}
             <div className="dropdown-content">

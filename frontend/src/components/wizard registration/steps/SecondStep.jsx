@@ -1,10 +1,10 @@
 import { Box } from '@mui/material'
 import { useForm } from 'react-hook-form'
-import { School } from '@mui/icons-material'
 import StepTemplate from './StepTemplate'
 import RenderInput from '../inputs/RenderInput'
 import FormSectionTitle from '../inputs/FormSectionTitle'
 import RenderCheckbox from '../inputs/RenderCheckbox'
+import { School } from 'lucide-react'
 
 export default function SecondStep({ data = {}, stepName = '_', onNext = null, onBack = null }) {
     const { handleSubmit, formState: { errors }, control, getValues } = useForm()
@@ -22,7 +22,7 @@ export default function SecondStep({ data = {}, stepName = '_', onNext = null, o
     return (
         <StepTemplate onBack={onCurrentData} onSubmit={handleSubmit(onValidData)}>
             <FormSectionTitle
-                icon={<School fontSize='small' />}
+                icon={<School />}
                 text='Proffesional Information'
             />
             <Box display='flex' flexDirection={{ xs: 'column', sm: 'row' }} justifyContent='space-between' gap={3}>

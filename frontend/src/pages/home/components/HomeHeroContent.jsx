@@ -1,7 +1,6 @@
-import { Typography, Button, Stack, Chip, Box } from '@mui/material';
-import { CalendarToday, LocationOn, ArrowDownward } from '@mui/icons-material';
+import { Typography, Stack, Chip, Box } from '@mui/material';
+import { CalendarDays, MapPin, ChevronDown } from 'lucide-react';
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router';
 
 const QuickCountdown = () => {
     const [days, setDays] = useState(0);
@@ -20,7 +19,7 @@ const QuickCountdown = () => {
 
     return (
         <Chip
-            icon={<CalendarToday color='white' fontSize='0.8rem' />}
+            icon={<CalendarDays size={16} color='white' />}
             label={`${days} days until WATOC 2028`}
             sx={{
                 bgcolor: 'rgba(255,255,255,0.15)',
@@ -53,7 +52,7 @@ export const HomeHeroContent = () => {
         <>
             <Stack spacing={{ xs: 3, md: 4 }} alignItems="center">
                 <QuickCountdown />
-                <Box>
+                <Box textAlign="center">
                     <Typography
                         variant="h1"
                         sx={{
@@ -64,6 +63,8 @@ export const HomeHeroContent = () => {
                             textShadow: '0 4px 20px rgba(0,0,0,0.5)',
                             background: 'linear-gradient(to right, #ffffff, #90caf9)',
                             backgroundClip: 'text',
+                            WebkitBackgroundClip: 'text',
+                            WebkitTextFillColor: 'transparent',
                             mb: 2,
                         }}
                     >
@@ -78,7 +79,7 @@ export const HomeHeroContent = () => {
                         sx={{ mb: 1 }}
                     >
                         <Chip
-                            icon={<LocationOn color='white' fontSize='0.8rem' />}
+                            icon={<MapPin size={16} color='white' />}
                             label="Mérida, México"
                             sx={{
                                 bgcolor: 'rgba(255,255,255,0.1)',
@@ -86,7 +87,7 @@ export const HomeHeroContent = () => {
                                 backdropFilter: 'blur(5px)',
                                 border: '1px solid rgba(255,255,255,0.2)',
                                 fontSize: { xs: '0.9rem', md: '1.1rem' },
-                                '&>span': {
+                                '& .MuiChip-label': {
                                     fontSize: { xs: '0.8rem', md: '0.9rem' },
                                 }
                             }}
@@ -101,7 +102,7 @@ export const HomeHeroContent = () => {
                             •
                         </Typography>
                         <Chip
-                            icon={<CalendarToday color='white' fontSize='0.8rem' />}
+                            icon={<CalendarDays size={16} color='white' />}
                             label="January 9-14, 2028"
                             sx={{
                                 bgcolor: 'rgba(255,255,255,0.1)',
@@ -109,86 +110,68 @@ export const HomeHeroContent = () => {
                                 backdropFilter: 'blur(5px)',
                                 border: '1px solid rgba(255,255,255,0.2)',
                                 fontSize: { xs: '0.9rem', md: '1.1rem' },
-                                '&>span': {
+                                '& .MuiChip-label': {
                                     fontSize: { xs: '0.8rem', md: '0.9rem' },
                                 }
-                            }}
-                        />
-                        <Typography
-                            sx={{
-                                color: 'rgba(255,255,255,0.8)',
-                                fontSize: { xs: '0.9rem', md: '1.1rem' },
-                                display: { xs: 'none', sm: 'block' },
-                            }}
-                        >
-                            •
-                        </Typography>
-                        <Chip
-                            icon={<CalendarToday color='white' fontSize='0.8rem' />}
-                            label="Young WATOC January 9th, 2028"
-                            sx={{
-                                bgcolor: 'rgba(255,255,255,0.1)',
-                                color: 'white',
-                                backdropFilter: 'blur(5px)',
-                                border: '1px solid rgba(255,255,255,0.2)',
-                                fontSize: { xs: '0.9rem', md: '1.1rem' },
-                                '&>span': {
-                                    fontSize: { xs: '0.8rem', md: '0.9rem' },
-                                },
                             }}
                         />
                     </Stack>
                 </Box>
 
-                <Typography
-                    sx={{
-                        color: 'rgba(255,255,255,0.95)',
-                        fontSize: { xs: '1rem', sm: '1.2rem', md: '1.4rem' },
-                        maxWidth: 700,
-                        lineHeight: 1.6,
-                        fontWeight: 700,
-                        letterSpacing: '0.4px',
-                        textShadow: '0 2px 10px rgba(0,0,0,0.6)',
-                    }}
-                >
-                    14th Triennial Congress of the World Association of Theoretical and
-                    Computational Chemists
-                </Typography>
-                <Typography
-                    sx={{
-                        color: 'rgba(255,255,255,0.95)',
-                        fontSize: { xs: '1rem', sm: '1.2rem', md: '1.3rem' },
-                        maxWidth: 700,
-                        lineHeight: 1.6,
-                        fontWeight: 700,
-                        letterSpacing: '0.4px',
-                        textShadow: '0 2px 10px rgba(0,0,0,0.3)',
-                    }}
-                >
-                    Preceded by Young WATOC on January 8th
-                </Typography>
-
+                <Stack spacing={1} textAlign="center">
+                    <Typography
+                        sx={{
+                            color: 'rgba(255,255,255,0.95)',
+                            fontSize: { xs: '1rem', sm: '1.2rem', md: '1.4rem' },
+                            maxWidth: 700,
+                            lineHeight: 1.6,
+                            fontWeight: 700,
+                            letterSpacing: '0.4px',
+                            textShadow: '0 2px 10px rgba(0,0,0,0.6)',
+                        }}
+                    >
+                        14th Triennial Congress of the World Association of Theoretical and
+                        Computational Chemists
+                    </Typography>
+                    <Typography
+                        sx={{
+                            color: 'rgba(255,255,255,0.85)',
+                            fontSize: { xs: '0.9rem', sm: '1.1rem', md: '1.2rem' },
+                            maxWidth: 700,
+                            lineHeight: 1.6,
+                            fontWeight: 500,
+                            letterSpacing: '0.4px',
+                            textShadow: '0 2px 10px rgba(0,0,0,0.3)',
+                        }}
+                    >
+                        Preceded by Young WATOC on January 8th
+                    </Typography>
+                </Stack>
             </Stack>
 
             <Box
                 onClick={scrollToContent}
                 sx={{
-                    position: 'relative',
+                    mt: 8,
                     cursor: 'pointer',
                     animation: 'bounce 2s ease-in-out infinite',
+                    display: 'flex',
+                    justifyContent: 'center',
                     '@keyframes bounce': {
-                        '0%, 100%': { transform: 'translateX(-50%) translateY(0)' },
-                        '50%': { transform: 'translateX(-50%) translateY(-10px)' },
+                        '0%, 100%': { transform: 'translateY(0)' },
+                        '50%': { transform: 'translateY(-10px)' },
                     },
                 }}
             >
-                <ArrowDownward
-                    sx={{
-                        color: 'white',
-                        fontSize: 40,
+                <ChevronDown
+                    size={40}
+                    color="white"
+                    style={{
                         opacity: 0.7,
-                        '&:hover': { opacity: 1 },
+                        transition: 'opacity 0.3s ease',
                     }}
+                    onMouseEnter={(e) => (e.currentTarget.style.opacity = '1')}
+                    onMouseLeave={(e) => (e.currentTarget.style.opacity = '0.7')}
                 />
             </Box>
         </>

@@ -1,5 +1,5 @@
-import { Box, Container, Grid, Stack, Typography, Avatar, CardContent, CardMedia, Card, List, ListItem, ListItemIcon } from '@mui/material'
-import { FormatQuote, ScatterPlot } from '@mui/icons-material';
+import { Box, Container, Grid, Stack, Typography, Avatar, List, ListItem, ListItemIcon } from '@mui/material'
+import { Microscope } from 'lucide-react';
 import React from 'react'
 import { Link } from 'react-router';
 
@@ -13,7 +13,7 @@ const Text = ({ isReversed = false }) => (
             flexDirection: { xs: 'column', md: isReversed ? 'row-reverse' : 'row' },
         }}
     >
-        <Grid size={{ xs: 12, md: 10 }}>
+        <Grid item xs={12} md={10}>
             <Box sx={{ position: 'relative', pl: { xs: 2, md: 4 }, pr: { xs: 2, md: 3 } }}>
                 <Typography variant="h6" fontWeight="bold" color="primary.main" gutterBottom>
                     Welcome to WATOC 2028
@@ -38,7 +38,7 @@ const Text = ({ isReversed = false }) => (
                         <ListItem key={index}>
                             <ListItemIcon>
                                 <Avatar sx={{ color: 'white', backgroundColor: 'primary.main' }}>
-                                    <ScatterPlot />
+                                    <Microscope size={24} />
                                 </Avatar>
                             </ListItemIcon>
                             {item.text}

@@ -1,5 +1,5 @@
-import { Typography, Button, Stack, Chip, Box } from '@mui/material';
-import { CalendarToday, LocationOn, ArrowDownward } from '@mui/icons-material';
+import { Typography, Stack, Chip, Box } from '@mui/material';
+import { CalendarDays, MapPin, ChevronDown } from 'lucide-react';
 import { useState, useEffect } from 'react';
 
 const QuickCountdown = () => {
@@ -19,7 +19,7 @@ const QuickCountdown = () => {
 
     return (
         <Chip
-            icon={<CalendarToday />}
+            icon={<CalendarDays size={20} color='white' />}
             label={`${days} days until WATOC 2028`}
             sx={{
                 bgcolor: 'rgba(255,255,255,0.15)',
@@ -64,6 +64,8 @@ export const AbstractSubmissionHeroContent = () => {
                             mb: 2,
                             background: 'linear-gradient(to right, #ffffff, #90caf9)',
                             backgroundClip: 'text',
+                            WebkitBackgroundClip: 'text',
+                            WebkitTextFillColor: 'transparent',
                         }}
                     >
                         WATOC 2028
@@ -77,7 +79,7 @@ export const AbstractSubmissionHeroContent = () => {
                         sx={{ mb: 2 }}
                     >
                         <Chip
-                            icon={<LocationOn />}
+                            icon={<MapPin size={18} color='white' />}
                             label="Mérida, México"
                             sx={{
                                 bgcolor: 'rgba(255,255,255,0.1)',
@@ -97,7 +99,7 @@ export const AbstractSubmissionHeroContent = () => {
                             •
                         </Typography>
                         <Chip
-                            icon={<CalendarToday />}
+                            icon={<CalendarDays size={18} color='white' />}
                             label="January 9-14, 2028"
                             sx={{
                                 bgcolor: 'rgba(255,255,255,0.1)',
@@ -126,12 +128,11 @@ export const AbstractSubmissionHeroContent = () => {
                     },
                 }}
             >
-                <ArrowDownward
-                    sx={{
+                <ChevronDown
+                    size={40}
+                    style={{
                         color: 'white',
-                        fontSize: 40,
                         opacity: 0.7,
-                        '&:hover': { opacity: 1 },
                     }}
                 />
             </Box>

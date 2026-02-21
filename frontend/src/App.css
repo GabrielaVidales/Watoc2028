@@ -11,7 +11,7 @@
 
 
 /* Estilo por defecto para pantallas grandes */
-h1 {
+/* h1 {
   font-size: 4rem;
 }
 
@@ -43,10 +43,10 @@ span {
 
 small {
   font-size: 0.8rem;
-}
+} */
 
 /* Estilos para pantallas medianas (por ejemplo, tabletas) */
-@media (max-width: 1024px) {
+/* @media (max-width: 1024px) {
   h1 {
     font-size: 3rem;
   }
@@ -80,10 +80,10 @@ small {
   small {
     font-size: 0.7rem;
   }
-}
+} */
 
 /* Estilos para pantallas pequeñas (por ejemplo, teléfonos móviles) */
-@media (max-width: 600px) {
+/* @media (max-width: 600px) {
   h1 {
     font-size: 2rem;
   }
@@ -112,10 +112,9 @@ small {
   p,
   span {
     font-size: 0.875rem;
-    /* Reducir un poco el tamaño del texto en móviles */
   }
 
   small {
     font-size: 0.7rem;
   }
-}
+} */

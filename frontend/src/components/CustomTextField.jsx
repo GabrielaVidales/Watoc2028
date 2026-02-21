@@ -1,8 +1,7 @@
-import { ErrorOutline } from '@mui/icons-material'
-import { Box, TextField, Typography } from '@mui/material'
-import { useRef } from 'react'
+import { Box, Grow, TextField, Typography } from '@mui/material'
+import { AlertCircle } from 'lucide-react'
 
-export default function CustomTextField({ value, onChange, maxLength = 64, hideLengthLabel = false, multiline = false, error = false, helperText, ref, ...props }) {
+export default function CustomTextField({ value, label, onChange, maxLength = 64, hideLengthLabel = false, multiline = false, error = false, helperText, ref, ...props }) {
     const handleOnChange = (evt) => {
         if (evt.target.value.length <= maxLength) {
             onChange?.(evt)
@@ -10,11 +9,9 @@ export default function CustomTextField({ value, onChange, maxLength = 64, hideL
     }
 
     const setValueColor = () => (
-        value.length === maxLength
-            ? 'error.main'
-            : value.length >= Math.floor(maxLength * 0.75)
-                ? '#ff8800ff'
-                : 'text.secondary'
+        error ? 'error.main' : value.length === maxLength
+            ? 'error.main' : value.length >= Math.floor(maxLength * 0.75)
+                ? '#ff8800ff' : 'text.secondary'
     )
 
     return (
@@ -23,6 +20,9 @@ export default function CustomTextField({ value, onChange, maxLength = 64, hideL
             value={value}
             onChange={handleOnChange}
             fullWidth
+            label={label}
+            hiddenLabel={!label}
+            size='small'
             multiline={multiline}
             error={error}
             helperText={
@@ -36,11 +36,13 @@ export default function CustomTextField({ value, onChange, maxLength = 64, hideL
                     }}
                 >
                     <Typography component="small" sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                        {helperText && (
-                            <>
-                                <ErrorOutline sx={{ fontSize: 'inherit' }} />
-                                {helperText}
-                            </>
+                        {helperText && error && (
+                            <Grow in={error} timeout={500}>
+                                <small style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                                    <AlertCircle sx={{ fontSize: '1rem' }} />
+                                    {helperText}
+                                </small>
+                            </Grow>
                         )}
                     </Typography>
 

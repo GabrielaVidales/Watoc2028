@@ -1,124 +1,129 @@
-import { Box, Container, Grid, Stack, Typography, Avatar, CardContent, Card, Collapse, ListItemButton, ListItemText } from '@mui/material'
-import { ExpandLess, ExpandMore, FormatQuote } from '@mui/icons-material';
+import { Box, Container, Grid, Stack, Typography, Avatar, Collapse, ListItemButton, ListItemText } from '@mui/material';
+import { Quote, ChevronUp, ChevronDown } from 'lucide-react';
 import { useState } from 'react';
-import mayaCalendar from '../../../assets/calendario_maya_rojo.png'
-import drMerino from '../../../assets/drmerino.jpg'
+import mayaCalendar from '../../../assets/calendario_maya_rojo.png';
+import drMerino from '../../../assets/drmerino.jpg';
 
 const WelcomeMessage = ({ organizer, isReversed = false }) => {
-    const [open, setOpen] = useState(false)
+    const [open, setOpen] = useState(false);
 
-    return <Grid
-        container
-        spacing={4}
-        justifyContent="center"
-        alignItems="center"
-        sx={{
-            flexDirection: { xs: 'column', md: isReversed ? 'row-reverse' : 'row' },
-        }}
-    >
-        <Grid size={{ xs: 12, md: 10 }}>
-            <Box sx={{ position: 'relative', px: { xs: 2, md: 4 } }}>
-                <FormatQuote
-                    sx={{
-                        position: 'absolute',
-                        top: -20,
-                        left: { xs: 0, md: 10 },
-                        fontSize: 64,
-                        color: 'primary.main',
-                        opacity: 0.2,
-                    }}
-                />
-                <Typography variant="h6" fontWeight="bold" color="primary.main" gutterBottom marginLeft={2}>
-                    Welcome to WATOC 2028
-                </Typography>
-                {organizer.paragraphs.length > 0 && (
-                    <Typography
-                        gutterBottom
-                        marginBottom={3}
-                        sx={{
-                            fontSize: '1rem',
-                            lineHeight: 1.6,
-                            textAlign: 'justify',
-                            wordSpacing: '6px',
-                        }}
-                    >
-                        {organizer.paragraphs[0]}
-                    </Typography>
-                )}
-
-                {/* Caja colapsable para texto */}
-                <Box position='relative'>
-                    <Collapse in={open} timeout={1000} unmountOnExit>
-                        {organizer.paragraphs.length > 1 && organizer.paragraphs.map((text, index) => {
-                            if (index === 0) return null
-                            return (
-                                <Typography
-                                    key={index}
-                                    gutterBottom
-                                    marginBottom={3}
-                                    sx={{
-                                        fontSize: '1rem',
-                                        lineHeight: 1.6,
-                                        textAlign: 'justify',
-                                        wordSpacing: '6px'
-                                    }}
-                                >
-                                    {text}
-                                </Typography>
-                            )
-                        })}
-                    </Collapse>
-                    <Box
-                        sx={{
-                            display: 'flex',
-                            justifyContent: 'flex-end',
-                            mt: 1,
-                        }}
-                    >
-                        <ListItemButton onClick={() => setOpen(!open)} sx={{ borderRadius: 3 }}>
-                            <ListItemText primary={open ? "Show less..." : "Show more..."} />
-                            {open ? <ExpandLess /> : <ExpandMore />}
-                        </ListItemButton>
-                    </Box>
-                </Box>
-
-                <Box
-                    sx={{
-                        mt: 3,
-                        pt: 2,
-                        borderTop: '3px solid',
-                        borderColor: 'primary.main',
-                        opacity: 0.3,
-                    }}
-                />
-
-                <Box sx={{ mt: 2, display: 'flex', alignItems: 'center', gap: 2 }}>
-                    <Avatar
-                        src={organizer.url}
-                        alt={organizer.name}
-                        sx={{
-                            width: 120,
-                            height: 120,
-                            border: '3px solid',
-                            borderColor: 'primary.light',
+    return (
+        <Grid
+            container
+            spacing={4}
+            justifyContent="center"
+            alignItems="center"
+            sx={{
+                flexDirection: { xs: 'column', md: isReversed ? 'row-reverse' : 'row' },
+            }}
+        >
+            <Grid item xs={12} md={10}>
+                <Box sx={{ position: 'relative', px: { xs: 2, md: 4 } }}>
+                    <Quote
+                        size={64}
+                        style={{
+                            position: 'absolute',
+                            top: -20,
+                            left: 10,
+                            color: 'var(--mui-palette-primary-main)',
+                            opacity: 0.1,
+                            transform: 'rotate(180deg)'
                         }}
                     />
-                    <Box>
-                        <Typography variant="subtitle1" fontWeight="bold">
-                            {organizer.name}
+                    <Typography variant="h6" fontWeight="bold" color="primary.main" gutterBottom sx={{ ml: 2 }}>
+                        Welcome to WATOC 2028
+                    </Typography>
+                    
+                    {organizer.paragraphs.length > 0 && (
+                        <Typography
+                            gutterBottom
+                            sx={{
+                                fontSize: '1.05rem',
+                                lineHeight: 1.7,
+                                textAlign: 'justify',
+                                mb: 3,
+                                color: 'text.primary'
+                            }}
+                        >
+                            {organizer.paragraphs[0]}
                         </Typography>
-                        <Typography variant="subtitle2" color="text.secondary" gutterBottom>
-                            {organizer.subtitle}
-                        </Typography>
-                        <Typography variant="body2" color="text.secondary">
-                            {organizer.text}
-                        </Typography>
+                    )}
+
+                    <Collapse in={open} timeout={800} unmountOnExit>
+                        {organizer.paragraphs.slice(1).map((text, index) => (
+                            <Typography
+                                key={index}
+                                gutterBottom
+                                sx={{
+                                    fontSize: '1.05rem',
+                                    lineHeight: 1.7,
+                                    textAlign: 'justify',
+                                    mb: 3,
+                                    color: 'text.primary'
+                                }}
+                            >
+                                {text}
+                            </Typography>
+                        ))}
+                    </Collapse>
+
+                    <Box sx={{ display: 'flex', justifyContent: 'flex-start', mt: -1, mb: 3 }}>
+                        <ListItemButton 
+                            onClick={() => setOpen(!open)} 
+                            sx={{ 
+                                borderRadius: 2, 
+                                width: 'fit-content',
+                                color: 'primary.main',
+                                '&:hover': { bgcolor: 'primary.light', opacity: 0.9 }
+                            }}
+                        >
+                            <ListItemText 
+                                primary={open ? "Read less" : "Read the full invitation"} 
+                                primaryTypographyProps={{ fontWeight: 600 }}
+                            />
+                            {open ? <ChevronUp size={20} style={{ marginLeft: 8 }} /> : <ChevronDown size={20} style={{ marginLeft: 8 }} />}
+                        </ListItemButton>
+                    </Box>
+
+                    <Box
+                        sx={{
+                            mt: 4,
+                            pt: 3,
+                            borderTop: '1px solid',
+                            borderColor: 'divider',
+                            display: 'flex',
+                            flexDirection: { xs: 'column', sm: 'row' },
+                            alignItems: 'center',
+                            gap: 3
+                        }}
+                    >
+                        <Avatar
+                            src={organizer.url}
+                            alt={organizer.name}
+                            sx={{
+                                width: 100,
+                                height: 100,
+                                border: '4px solid white',
+                                boxShadow: '0 4px 14px rgba(0,0,0,0.1)',
+                            }}
+                        />
+                        <Box sx={{ textAlign: { xs: 'center', sm: 'left' } }}>
+                            <Typography variant="subtitle1" fontWeight="800" sx={{ color: 'text.primary' }}>
+                                {organizer.name}
+                            </Typography>
+                            <Typography variant="subtitle2" color="primary.main" fontWeight="600">
+                                {organizer.subtitle}
+                            </Typography>
+                            <Typography variant="body2" color="text.secondary">
+                                {organizer.text}
+                            </Typography>
+                        </Box>
                     </Box>
                 </Box>
-            </Box>
+            </Grid>
         </Grid>
-    </Grid>
-}
+    );
+};
 
 function WelcomeSection() {
     const organizers = [
@@ -130,9 +135,9 @@ function WelcomeSection() {
             paragraphs: [
                 "On behalf of the local scientific and organizing committees, it is a great pleasure to invite you to the 14th Triennial Congress of the World Association of Theoretical and Computational Chemists (WATOC 2028), which will be held in January 2028 in Mérida.",
                 "WATOC 2028 will once again bring together the global theoretical and computational chemistry community in what will be one of the major international scientific events of the year. The congress is expected to attract participants from all regions of the world, providing a forum for presenting frontier research, exchanging ideas, and strengthening collaborations across disciplines and career stages.",
-                "The scientific program will maintain a structure similar to that of recent WATOC congresses, combining plenary lectures, invited contributions, oral communications, and poster sessions. A broad range of thematic sessions will cover the full spectrum of contemporary theoretical and computational chemistry, from fundamental electronic-structure theory and molecular dynamics to catalysis, spectroscopy, materials science, medicinal chemistry, machine learning, and quantum computing. This format is designed to balance depth and breadth while encouraging interaction across subfields.",
-                "Following its very successful debut in Oslo, Young WATOC will remain a central component of the meeting. Taking place immediately prior to the main congress, this event will highlight the work of early-career researchers who have recently completed their PhD studies. While presentations will be delivered exclusively by young scientists, Young WATOC will be open to all congress participants, fostering dialogue between generations and reinforcing WATOC’s long-standing commitment to nurturing emerging leaders in the field.",
-                "WATOC 2028 will be hosted in Mérida, the cultural and scientific hub of southeastern Mexico. Often referred to as the “White City,” Mérida is renowned for its strong Mayan heritage, elegant colonial architecture, and vibrant contemporary cultural life. The city offers excellent infrastructure, a safe and welcoming environment, and convenient access to world-class archaeological sites such as Uxmal and Chichén Itzá, as well as to the Gulf of Mexico coastline. The congress venue, a modern convention center, will provide an ideal setting for scientific exchange, networking, and collaboration.",
+                "The scientific program will maintain a structure similar to that of recent WATOC congresses, combining plenary lectures, invited contributions, oral communications, and poster sessions. A broad range of thematic sessions will cover the full spectrum of contemporary theoretical and computational chemistry, from fundamental electronic-structure theory and molecular dynamics to catalysis, spectroscopy, materials science, medicinal chemistry, machine learning, and quantum computing.",
+                "Following its very successful debut in Oslo, Young WATOC will remain a central component of the meeting. Taking place immediately prior to the main congress, this event will highlight the work of early-career researchers who have recently completed their PhD studies. While presentations will be delivered exclusively by young scientists, Young WATOC will be open to all congress participants, fostering dialogue between generations.",
+                "WATOC 2028 will be hosted in Mérida, the cultural and scientific hub of southeastern Mexico. Often referred to as the “White City,” Mérida is renowned for its strong Mayan heritage, elegant colonial architecture, and vibrant contemporary cultural life. The city offers excellent infrastructure, a safe and welcoming environment, and convenient access to world-class archaeological sites such as Uxmal and Chichén Itzá."
             ]
         },
     ];
@@ -141,49 +146,55 @@ function WelcomeSection() {
         <Box
             component="section"
             sx={{
-                py: { xs: 6, md: 8 },
-                px: { xs: 2, sm: 3, md: 4 },
-                background: 'white',
+                py: { xs: 8, md: 12 },
+                background: 'linear-gradient(to bottom, #ffffff 0%, #f8f9fa 100%)',
+                overflow: 'hidden'
             }}
         >
             <Container maxWidth="lg">
                 <Box sx={{
                     textAlign: 'center',
-                    mb: 6,
+                    mb: 8,
+                    position: 'relative',
                     display: 'flex',
                     flexDirection: 'column',
-                    justifyContent: 'center',
                     alignItems: 'center'
                 }}>
                     <Box
                         sx={{
                             position: 'absolute',
-                            opacity: 0.25,
-                            height: '12rem',
-                            width: '12rem',
+                            opacity: 0.08,
+                            height: { xs: '15rem', md: '20rem' },
+                            width: { xs: '15rem', md: '20rem' },
                             backgroundImage: `url(${mayaCalendar})`,
-                            backgroundPosition: '50% 50%',
-                            backgroundAttachment: 'local',
                             backgroundSize: 'contain',
                             backgroundRepeat: 'no-repeat',
+                            backgroundPosition: 'center',
+                            top: '50%',
+                            left: '50%',
+                            transform: 'translate(-50%, -50%)',
+                            zIndex: 0
                         }}
                     />
 
                     <Typography
                         variant="overline"
                         color="primary"
-                        fontWeight="bold"
-                        sx={{ fontSize: '1rem', letterSpacing: 2, position: 'relative' }}
+                        fontWeight="800"
+                        sx={{ fontSize: '1rem', letterSpacing: 3, position: 'relative', zIndex: 1 }}
                     >
                         From the Organizer
                     </Typography>
                     <Typography
                         variant="h3"
-                        fontWeight="bold"
+                        fontWeight="900"
                         sx={{
                             mt: 1,
                             mb: 2,
-                            fontSize: { xs: '2rem', md: '2.5rem', position: 'relative' },
+                            fontSize: { xs: '2.25rem', md: '3rem' },
+                            position: 'relative',
+                            zIndex: 1,
+                            color: 'text.primary'
                         }}
                     >
                         Words of Welcome
@@ -191,19 +202,19 @@ function WelcomeSection() {
                     <Box
                         sx={{
                             position: 'relative',
-                            width: 100,
-                            height: 4,
+                            width: 80,
+                            height: 6,
                             bgcolor: 'primary.main',
-                            mx: 'auto',
-                            borderRadius: 2,
+                            borderRadius: 4,
+                            zIndex: 1
                         }}
                     />
                 </Box>
 
-                <Stack spacing={8}>
+                <Stack spacing={10}>
                     {organizers.map((organizer, index) => (
                         <WelcomeMessage
-                            key={organizer.url}
+                            key={organizer.name}
                             organizer={organizer}
                             isReversed={index % 2 !== 0}
                         />
@@ -212,16 +223,25 @@ function WelcomeSection() {
 
                 <Box
                     sx={{
-                        mt: 4,
+                        mt: 10,
+                        p: 4,
                         textAlign: 'center',
-                        borderTop: '1px solid',
-                        borderColor: 'divider',
+                        backgroundColor: 'rgba(25, 118, 210, 0.03)',
+                        borderRadius: 4,
+                        border: '1px dashed',
+                        borderColor: 'primary.light'
                     }}
                 >
                     <Typography
-                        variant="body1"
-                        color="text.secondary"
-                        sx={{ fontStyle: 'italic', maxWidth: 700, mx: 'auto' }}
+                        variant="h6"
+                        color="text.primary"
+                        sx={{ 
+                            fontStyle: 'italic', 
+                            maxWidth: 800, 
+                            mx: 'auto',
+                            lineHeight: 1.6,
+                            fontWeight: 500
+                        }}
                     >
                         "We look forward to welcoming you to Mérida for what promises to be a scientifically stimulating, intellectually enriching, and culturally memorable WATOC congress."
                     </Typography>
@@ -231,4 +251,4 @@ function WelcomeSection() {
     );
 }
 
-export default WelcomeSection
+export default WelcomeSection;
