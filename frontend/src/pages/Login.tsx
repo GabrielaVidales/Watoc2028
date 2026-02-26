@@ -6,7 +6,6 @@ import Footer from '../components/Footer'
 export default function Login() {
 	return (
 		<>
-			<NavBar invertImg={true} />
 			<Box
 				component='main'
 				sx={{
@@ -29,7 +28,6 @@ export default function Login() {
 					<LoginForm />
 				</Container>
 			</Box>
-			<Footer />
 		</>
 	)
 }

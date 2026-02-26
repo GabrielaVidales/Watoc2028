@@ -1,4 +1,5 @@
-from rest_framework import generics, permissions, status
+from rest_framework import permissions, status
+from rest_framework.decorators import action
 from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.response import Response
@@ -9,8 +10,8 @@ from rest_framework_simplejwt.exceptions import TokenError, InvalidToken
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth.models import update_last_login
 from django.conf import settings
-from .serializers import UserSerializer, AbstractSerializer
-from .models import Abstract
+from .serializers import UserSerializer, AbstractSerializer, ParticipantSerializer
+from .models import Abstract, Participant
 
 
 User = get_user_model()
@@ -26,6 +27,69 @@ class UserView(ModelViewSet):
             return [permissions.AllowAny()]
         return [permissions.IsAuthenticated()]
 
+    @action(detail=False, methods=["get"], url_path="session")
+    def whoami(self, request):
+        user = request.user
+        data = {}
+        data['anonymous'] = user.is_anonymous
+        if user.is_authenticated:
+            data["user"] = self.get_serializer(user).data
+
+        return Response(data)
+
+    @action(detail=False, methods=["get"], url_path="profile")
+    def profiles(self, request):
+        profiles = {}
+        user_is_participant = request.user.groups.filter(name="participant").exists()
+        if user_is_participant and hasattr(request.user, "participant"):
+            profiles["participant"] = ParticipantSerializer(request.user.participant).data
+        return Response(profiles, status=200)
+
+    @action(detail=False, methods=["post"], url_path="change-profile-pic")
+    def change_profile_pic(self, request):
+        user = self.request.user
+        file = request.data.get("photo", None)
+        if file is not None and user.is_authenticated:
+            if user.photo:
+                user.photo.delete()
+            user.photo = file
+            user.save()
+            return Response(status=status.HTTP_200_OK)
+
+        return Response(status=status.HTTP_400_BAD_REQUEST)
+
+    @action(detail=False, methods=["post"], url_path="change-password")
+    def change_password(self, request):
+        user = self.request.user
+
+        old_password = request.data.get("oldPassword")
+        if not old_password:
+            return Response(
+                {"oldPassword": ["This field is required."]},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        new_password = request.data.get("newPassword", None)
+        if not new_password:
+            return Response(
+                {"newPassword": ["This field is required."]},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+            
+        is_old_pwd_ok = user.check_password(old_password)
+        if not is_old_pwd_ok:
+            return Response(
+                {"oldPassword": ["Current password is incorrect."]},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        user.set_password(new_password)
+        user.save()
+        return Response(
+            {"detail": "Password changed successfully."},
+            status=status.HTTP_200_OK,
+        )
+
 
 class CustomTokenObtainPairView(TokenObtainPairView):
     def post(self, request, *args, **kwargs):
@@ -38,10 +102,9 @@ class CustomTokenObtainPairView(TokenObtainPairView):
 
             access_token = response.data.get("access")
             refresh_token = response.data.get("refresh")
-
             response.set_cookie(
-                "refresh_token",
-                refresh_token,
+                "access_token",
+                access_token,
                 httponly=True,
                 secure=settings.COOKIE_SECURE,
                 samesite="Lax",
@@ -49,59 +112,55 @@ class CustomTokenObtainPairView(TokenObtainPairView):
             )
 
             response.set_cookie(
-                "access_token",
-                access_token,
+                "refresh_token",
+                refresh_token,
                 httponly=True,
                 secure=settings.COOKIE_SECURE,
                 samesite="Lax",
-                max_age=900,
+                max_age=2592000,
             )
 
         return response
 
 
 class CustomTokenRefreshView(TokenRefreshView):
-    def post(self, request, *args, **kwargs):
-        refresh_token = request.COOKIES.get("refresh_token")
+    authentication_classes = []
+    permission_classes = [permissions.AllowAny]
 
-        if refresh_token:
-            data = {"refresh": refresh_token}
+    def post(self, request, *args, **kwargs):
+        token = request.COOKIES.get("refresh_token")
+        if token:
+            data = {"refresh": token}
         else:
             data = request.data
 
         serializer = self.get_serializer(data=data)
-
         try:
             serializer.is_valid(raise_exception=True)
         except TokenError as e:
             raise InvalidToken(e.args[0])
-
-        # Obtenemos los nuevos datos (el nuevo access token)
         token_data = serializer.validated_data
-        response = Response(token_data, status=200)
 
         access_token = token_data.get("access")
+        refresh_roken = token_data.get("refresh")
+        response = Response(token_data, status=200)
+        response.set_cookie(
+            "access_token",
+            access_token,
+            httponly=True,
+            secure=settings.COOKIE_SECURE,
+            samesite="Lax",
+            max_age=86400,
+        )
 
-        if response.status_code == 200:
-            # access_token = response.data.get('access')
-
-            # Actualiza la cookie de acceso
-            response.set_cookie(
-                "access_token",
-                access_token,
-                httponly=True,
-                secure=COOKIE_SECURE,
-                samesite="Lax",
-            )
-
-        if "refresh" in token_data:
-            response.set_cookie(
-                "refresh_token",
-                token_data["refresh"],
-                httponly=True,
-                secure=COOKIE_SECURE,
-                samesite="Lax",
-            )
+        response.set_cookie(
+            "refresh_token",
+            refresh_roken,
+            httponly=True,
+            secure=settings.COOKIE_SECURE,
+            samesite="Lax",
+            max_age=2592000,
+        )
 
         return response
 
@@ -127,9 +186,6 @@ class LogoutView(APIView):
 
 
 class AbstractView(ModelViewSet):
+    queryset = Abstract.objects.all()
     serializer_class = AbstractSerializer
     permission_classes = [permissions.IsAuthenticated]
-
-    def get_queryset(self):
-        user = self.request.user
-        return user.abstracts.all()

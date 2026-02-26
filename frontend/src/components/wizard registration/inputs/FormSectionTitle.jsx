@@ -3,7 +3,7 @@ import React from 'react'
 
 export default function FormSectionTitle({ icon, text }) {
     return (
-        <Box display='flex' alignItems='center' gap={1.5} >
+        <Box display='flex' alignItems='center' gap={1.5} sx={{borderBottom: 4, pb:1, borderColor: 'primary.main'}}>
             <Avatar sx={{ bgcolor: 'primary.main', height: 'auto', width: 35, aspectRatio: '1 / 1' }}>
                 {icon}
             </Avatar>

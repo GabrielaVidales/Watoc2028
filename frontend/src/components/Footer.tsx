@@ -2,6 +2,7 @@ import { Box, Stack, Typography, IconButton } from '@mui/material';
 import { Link } from 'react-router';
 import fieldPng from '../assets/field.png'
 import { Facebook, Instagram, Linkedin, Mail, MapPin, X } from 'lucide-react';
+import { urls } from '@/routes/routes';
 
 const navigation = {
     congress: [
@@ -36,9 +37,11 @@ export default function Footer() {
             <div className='max-w-6xl justify-self-center px-6'>
                 <div className="grid grid-cols-1 lg:grid-cols-12 md:grid-cols-12 gap-5 text-white mb-3">
                     <div className="lg:col-span-5 md:col-span-12 flex flex-col gap-3">
-                        <Typography variant="h5" fontWeight="bold" color="primary.light">
-                            WATOC 2028
-                        </Typography>
+                        <Link to={urls.home.index}>
+                            <Typography variant="h5" fontWeight="bold" color="primary.light">
+                                WATOC 2028
+                            </Typography>
+                        </Link>
                         <Typography variant="subtitle1" sx={{ opacity: 0.9, lineHeight: 1.25 }}>
                             14th Triennial Congress of the World Association of Theoretical
                             and Computational Chemists

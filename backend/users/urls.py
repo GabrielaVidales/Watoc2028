@@ -7,7 +7,7 @@ router.register(r"abstracts", views.AbstractView, "abstracts")
 router.register(r"users", views.UserView, "users")
 
 urlpatterns = [
-    path("login/", views.CustomTokenObtainPairView.as_view(), name="token_obtain_pair"),
+    path("login/", views.CustomTokenObtainPairView.as_view(), name="login"),
     path("token/refresh/", views.CustomTokenRefreshView.as_view(), name="token_refresh"),
     path("logout/", views.LogoutView.as_view(), name="logout"),
 ] + router.urls

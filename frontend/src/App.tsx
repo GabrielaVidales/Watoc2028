@@ -1,7 +1,8 @@
 import './App.css'
 import { Routes, useLocation } from 'react-router'
 import { Route } from 'react-router'
-import { GuestRoute, ProtectedRoute } from './contexts/ProtectedRoute'
+import { ProtectedRoute } from './contexts/ProtectedRoute'
+import { GuestRoute } from './contexts/GuestRoute'
 
 import Login from './pages/Login'
 import { ThemeProvider } from '@mui/material/styles';
@@ -23,11 +24,18 @@ import { SuccessRegisterPage } from './pages/protected/SuccessRegisterPage'
 import HomeLayout from './layouts/HomeLayout'
 import Test from './pages/Test'
 import VisaRequirements from '@/pages/visa/VisaRequirements'
+import AuthLayout from './layouts/AuthLayout'
+import DashboardLayout from './layouts/DashboardLayout'
+import CreateAbstractPage from './pages/protected/CreateAbstractPage'
+import { urls } from './routes/routes'
+import UserProfile from './pages/protected/UserProfile'
 
 function App() {
 	const { pathname } = useLocation()
 
 	useEffect(() => {
+		console.log(pathname);
+
 		window.scrollTo({
 			top: 0,
 			left: 0,
@@ -56,18 +64,23 @@ function App() {
 
 					{/* Rutas sólo para usuarios no loggeados */}
 					<Route element={<GuestRoute />}>
-						<Route path='/login' element={<Login />} />
-						<Route path='/register' element={<Register />} />
+						<Route element={<AuthLayout />}>
+							<Route path='/login' element={<Login />} />
+							<Route path='/register' element={<Register />} />
+						</Route>
 					</Route>
 
 					{/* Rutas protegidas van aquí */}
-					<Route element={<ProtectedRoute />} >
+					<Route element={<ProtectedRoute allowedRoles={['admin', 'participant']} />} >
 						<Route path='/success' element={<SuccessRegisterPage />} />
+						<Route element={<DashboardLayout />}>
+							<Route path='/test' element={<Test />} />
+
+							<Route path={urls.users.profile} element={<UserProfile />} />
+							<Route path={urls.users.submitAbstract} element={<CreateAbstractPage />} />
+						</Route>
 					</Route>
 
-					<Route element={<HomeLayout />}>
-						<Route path='/test' element={<Test />} />
-					</Route>
 
 					{/* Para rutas diferentes */}
 					<Route path='*' element={<NotFound />} />

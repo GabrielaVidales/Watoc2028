@@ -1,6 +1,5 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
-from django.conf import settings
 from .managers import CustomUserManager
 from .text_choices import Nationality, PrefixType, AbstractPresentation, AbstactStatus
 
@@ -8,13 +7,13 @@ from .text_choices import Nationality, PrefixType, AbstractPresentation, Abstact
 class User(AbstractUser):
     username = None
     email = models.EmailField(unique=True)
-    middle_name = models.CharField(max_length=100, blank=True, null=True)
+    middle_name = models.CharField(max_length=100, blank=True, default='')
 
-    prefix = models.CharField(max_length=10, choices=PrefixType.choices, null=False, default=PrefixType.PROF)
-    pronouns = models.CharField(max_length=50, blank=True, null=True)
+    prefix = models.CharField(max_length=10, choices=PrefixType.choices, default=PrefixType.PROF)
+    pronouns = models.CharField(max_length=50, blank=True, default='')
 
     nationality = models.CharField(max_length=5, choices=Nationality.choices, default=Nationality.MEXICO)
-    city = models.CharField(max_length=30, blank=False, null=False)
+    city = models.CharField(max_length=30, blank=False)
 
     photo = models.ImageField(upload_to="users/photos/", blank=True, null=True)
 
@@ -22,6 +21,15 @@ class User(AbstractUser):
     REQUIRED_FIELDS = []
 
     objects = CustomUserManager()
+    
+    @property
+    def full_name(self):
+        return f"{self.first_name} {self.last_name}".strip() or self.email
+
+    @property
+    def roles(self):
+        roles = [role.name for role in self.groups.all()]
+        return roles
 
     def __str__(self):
         return self.email
@@ -36,6 +44,11 @@ class Participant(models.Model):
     affiliation = models.CharField(max_length=100, blank=True)
     job_title = models.CharField(max_length=100, blank=True)
     field_of_study = models.CharField(max_length=100, blank=True)
+    
+    needs_visa = models.BooleanField(default=False)
+    invitation_letter = models.FileField(upload_to="users/photos/", blank=True, null=True, default=None)
+    
+    going_to_dinner = models.BooleanField(default=False)
 
     def __str__(self):
         return f"Participant({self.user.email}) [{self.affiliation}|{self.job_title}] — {self.field_of_study}"
@@ -102,5 +115,11 @@ class Author(models.Model):
         return self.name
 
 
-
+class Dinner(models.Model):
+    participant = models.OneToOneField(
+        Participant,
+        primary_key=True,
+        on_delete=models.CASCADE,
+        default=None
+    )
 

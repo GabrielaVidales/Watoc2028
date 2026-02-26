@@ -1,17 +1,93 @@
 from django.contrib.auth import get_user_model
 from django.db import transaction
 from rest_framework import serializers
-from utils.mixins import EmptyStringToNoneMixin
+from utils.validators import valid_email, valid_name
+from datetime import datetime
 from . import models
 
 User = get_user_model()
 
 
+class ParticipantSerializer(serializers.ModelSerializer):
+    # abstracts = serializers.SerializerMethodField()
+
+    class Meta:
+        model = models.Participant
+        fields = (
+            "affiliation",
+            "job_title",
+            "field_of_study",
+        )
+
+    # def get_abstracts(self, obj: models.Participant):
+    #     from users.serializers import AbstractSerializer
+
+    #     return AbstractSerializer(obj.user.abstracts.exclude(status="deleted"), many=True).data
+
+
 class UserSerializer(serializers.ModelSerializer):
+    participant = ParticipantSerializer(required=False, write_only=True)
+    photo = serializers.SerializerMethodField()
+
     class Meta:
         model = models.User
-        fields = "__all__"
-        extra_kwargs = {"order": {"required": False}, "name": {"required": False}}
+        fields = ["id", "email", "first_name", "middle_name", "last_name", "prefix", "pronouns", "nationality", "city", "photo", "full_name", "roles", "last_login", "date_joined", "participant"]
+        extra_kwargs = {
+            "first_name": {
+                "validators": [valid_name],
+                "allow_blank": False,
+            },
+            "last_name": {
+                "validators": [valid_name],
+                "allow_blank": False,
+            },
+            "email": {
+                "validators": [valid_email],
+                "allow_blank": False,
+            },
+            "city": {
+                "allow_blank": False,
+            },
+            "password": {"write_only": True},
+            "photo": {"required": False},
+        }
+
+    def validate_participant(self, value):
+        print(value)
+        return value
+
+    def get_photo(self, obj):
+        if not obj.photo:
+            return None
+
+        try:
+            photo_url = obj.photo.url
+            timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
+            request = self.context.get("request")
+
+            if request is not None:
+                photo_url = request.build_absolute_uri(photo_url)
+
+            return f"{photo_url}?t={timestamp}"
+        except Exception:
+            return None
+
+    @transaction.atomic
+    def create(self, validated_data):
+        print(validated_data)
+        participant_data = validated_data.pop("participant", None)
+        # TODO: Crear la información de participantes
+
+        response = super().create(validated_data)
+        return response
+    
+    @transaction.atomic
+    def update(self, instance, validated_data):
+        participant_data = validated_data.pop("participant", None)
+        # TODO: actualizar la información de participantes
+        
+        response =  super().update(instance, validated_data)        
+        return response
 
 
 class AuthorSerializer(serializers.ModelSerializer):
