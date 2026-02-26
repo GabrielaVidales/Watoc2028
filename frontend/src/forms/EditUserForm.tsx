@@ -214,9 +214,9 @@ function EditUserForm({ defaultValues }: P) {
                     />
                 </div>
 
-
-                <div className='grid grid-cols-1 sm:grid-cols-2 gap-3 pt-5'>
-                    <h2 className='text-xl font-semibold pt-5'>Professional Affiliation</h2>
+                
+                <div className='grid grid-cols-1 sm:grid-cols-2 gap-3 py-5'>
+                    <h2 className='text-xl font-semibold pt-5'>Change your email</h2>
                     <InfoAlert
                         className='col-span-full'
                         title="IMPORTANT"

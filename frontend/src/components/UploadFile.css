@@ -41,7 +41,7 @@
 .soft-translation {
     display: inline-block;
     will-change: transform; 
-    animation: translation 1s ease infinite;
+    animation: translation 2s ease infinite;
 }
 
 @keyframes translation {

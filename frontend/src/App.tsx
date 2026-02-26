@@ -74,8 +74,8 @@ function App() {
 					<Route element={<ProtectedRoute allowedRoles={['admin', 'participant']} />} >
 						<Route path='/success' element={<SuccessRegisterPage />} />
 						<Route element={<DashboardLayout />}>
-							<Route path='/test' element={<Test />} />
 
+							<Route path='/test' element={<Test />} />
 							<Route path={urls.users.profile} element={<UserProfile />} />
 							<Route path={urls.users.submitAbstract} element={<CreateAbstractPage />} />
 						</Route>
