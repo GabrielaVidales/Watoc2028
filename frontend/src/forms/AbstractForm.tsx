@@ -7,22 +7,22 @@ import { Spinner } from '@/components/ui/spinner'
 import { Textarea } from '@/components/ui/textarea'
 import { abstractSchema, presentationTypes, submitAbstractDefaults, submitAbstractSchema, type AbstractSchema } from '@/schemas/abstract-schemas'
 import { zodResolver } from '@hookform/resolvers/zod'
-import {  GripVertical, Save, Send, Trash2, UserPlus } from 'lucide-react'
+import { GripVertical, Save, Trash2, UserPlus } from 'lucide-react'
 import { AnimatePresence, Reorder } from 'motion/react'
-import React, { useEffect } from 'react'
+import React from 'react'
 import { Controller, useFieldArray, useForm, useWatch } from 'react-hook-form'
 import { InfoAlert } from '@/pages/protected/CreateAbstractPage'
 
-type Props = {
+
+type AbstractFormProps = {
     abstract?: AbstractSchema
 }
 
-function AbstractForm({ abstract }: Props) {
-    const { handleSubmit, reset, control, formState: { isValid, isSubmitting, errors } } = useForm({
+function AbstractForm({ abstract }: AbstractFormProps) {
+    const { handleSubmit, control, formState: { isValid, isSubmitting, errors } } = useForm({
         resolver: zodResolver(submitAbstractSchema),
         defaultValues: submitAbstractDefaults.parse(abstract || {}),
         mode: 'onSubmit',
-        reValidateMode: 'onChange'
     })
 
     const onSubmit = handleSubmit(async (data) => {
@@ -60,28 +60,8 @@ function AbstractForm({ abstract }: Props) {
         }
     }
 
-    const onDebugData = () => {
-        reset(DEBUG_DATA)
-    }
-    const DEBUG_DATA = {
-        id: null,
-        title: "Impact of Neural Network Architectures on Real-Time Data Processing",
-        presentationType: "oral",
-        text: "This study investigates the efficiency of various neural network architectures in the context of real-time data streaming. By comparing convolutional and recurrent models, we demonstrate that optimized lightweight layers can reduce latency by 40% without compromising predictive accuracy. Our findings provide a framework for deploying complex AI models on edge computing devices with limited hardware resources, ensuring high-speed performance for critical applications in autonomous systems and smart infrastructure. This study investigates the efficiency of various neural network architectures in the context of real-time data streaming. By comparing convolutional and recurrent models, we demonstrate that optimized lightweight layers can reduce latency by 40% without compromising predictive accuracy. Our findings provide a framework for deploying complex AI models on edge computing devices with limited hardware resources, ensuring high-speed performance for critical applications in autonomous systems and smart infrastructure. This study investigates the efficiency of various neural network architectures in the context of real-time data streaming. By comparing convolutional and recurrent models, we demonstrate that optimized lightweight layers can reduce latency by 40% without compromising predictive accuracy. Our findings provide a framework for deploying complex AI models on edge computing devices with limited hardware resources, ensuring high-speed performance for critical applications in autonomous systems and smart infrastructure.",
-        authors: [
-            {
-                firstName: "John",
-                lastName: "Doe",
-                email: "j.doe@research-inst.org",
-                order: 1,
-                is_corresponding: true
-            }
-        ],
-        references: "Smith, A. (2024). Advanced Neural Systems; Johnson, L. (2023). Edge Computing Efficiency."
-    };
-
     return (
-        <form onSubmit={onSubmit}>
+        <form onSubmit={onSubmit} id='abstract-submission-form'>
             <fieldset disabled={isSubmitting}>
                 <div className='space-y-7'>
                     <Controller
@@ -97,8 +77,7 @@ function AbstractForm({ abstract }: Props) {
                                     placeholder="Your awesome title..."
                                     maxLength={128}
                                     autoComplete="off"
-                                    variant='inline'
-                                    className='pb-1 h-10 text-xl! font-semibold placeholder:font-normal '
+                                    className='h-12 text-xl! tracking-wide placeholder:font-normal'
                                 />
                                 <FieldDescription>The abstract title must have a maximum of 10 words.</FieldDescription>
                                 {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
@@ -377,8 +356,12 @@ function AbstractForm({ abstract }: Props) {
                             )}
                             Save abstract
                         </Button>
-                        <Button onClick={onDebugData}>
-                            Debug Data
+                        <Button type='button' onClick={()=> {
+                            if (fields.length === 2){
+                                swap(0, 1)
+                            }
+                        }}>
+                            Puta
                         </Button>
                     </div>
                 </div>
@@ -403,3 +386,4 @@ const WordCounter = ({ control, name, limit }: { control: any, name: string, lim
         </span>
     )
 }
+

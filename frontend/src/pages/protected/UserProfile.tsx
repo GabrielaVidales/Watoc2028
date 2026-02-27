@@ -8,10 +8,12 @@ import { formatDate } from '@/utils/formatDate';
 import 'react-image-crop/dist/ReactCrop.css';
 import { InfoAlert } from './CreateAbstractPage';
 import { UserPictureForm } from '@/forms/UserPictureForm';
-import { Link } from 'react-router';
+import { Link, NavLink } from 'react-router';
 import ChangePasswordForm from '@/forms/ChangePasswordForm';
 import EditUserForm from '@/forms/EditUserForm';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import DinnerForm from '@/forms/DinnerForm';
+import { urls } from '@/routes/routes';
 
 
 export default function UserProfile() {
@@ -28,7 +30,8 @@ export default function UserProfile() {
 	}, [])
 
 	return (
-		<div className='w-full grid grid-cols-1 sm:grid-cols-3 gap-5'>
+		<div className='w-full max-w-5xl grid grid-cols-3 gap-3 p-3 mx-auto'>
+
 			<div className='col-span-1 w-full'>
 				<Card>
 					<CardContent>
@@ -77,46 +80,64 @@ export default function UserProfile() {
 					</CardContent>
 				</Card>
 			</div>
-			<div className='flex flex-col col-span-2 gap-5'>
-				<Tabs defaultValue="home">
-					<TabsList variant='line'>
-						<TabsTrigger value="home">
-							<House/>
-							Profile
-						</TabsTrigger>
-						<TabsTrigger value="account">
-							<UserRoundPen />
-							Edit Account
-						</TabsTrigger>
-						<TabsTrigger value="picture">
-							<Image/>
-							Change Photo
-						</TabsTrigger>
-						<TabsTrigger value="password">
-							<LockKeyhole/>
-							Change Password
-						</TabsTrigger>
-					</TabsList>
-					<TabsContent value='home'>
-						<div className='w-full bg-background py-9 space-y-5 border-2 px-5 sm:px-9 rounded-lg shadow-md'>
+
+			<div className='col-span-2 min-h-50 w-full flex gap-3 justify-center'>
+				<div className='w-full bg-background border-2 p-3 rounded-lg shadow-lg flex flex-col gap-5'>
+					<Tabs defaultValue="home">
+						<TabsList variant='line' className='w-full'>
+							<TabsTrigger value="home">
+								<House />
+								Profile
+							</TabsTrigger>
+							<TabsTrigger value="account">
+								<UserRoundPen />
+								Edit Account
+							</TabsTrigger>
+							<TabsTrigger value="picture">
+								<Image />
+								Change Photo
+							</TabsTrigger>
+							<TabsTrigger value="password">
+								<LockKeyhole />
+								Change Password
+							</TabsTrigger>
+						</TabsList>
+						<TabsContent value='home' className='w-full py-9 pt-4 space-y-5 px-5 sm:px-9'>
 							<h2 className='text-2xl font-semibold'>Abstract submission</h2>
 							<InfoAlert
 								title="Abstract submission deadline: June 10, 2026"
 								messages={[
 									'Read our Abstract Submission Guideline here',
-									<span className='font-semibold text-slate-950'>Ver detalles</span>,
+									<NavLink to={urls.users.viewAbstracts}>
+										<span className='font-semibold text-slate-950'>Ver detalles</span>,
+									</NavLink>
 								]}
 							/>
-						</div>
-					</TabsContent>
-					<TabsContent value="account">
-						<div className='w-full bg-background py-9 space-y-5 border-2 px-5 sm:px-9 rounded-lg shadow-md'>
-							<h2 className='text-2xl font-semibold'>Edit your profile data</h2>
+							<br />
+							<br />
+
+							<h2 className='text-2xl font-semibold text-primary-main'>Dietary Survey</h2>
+							<InfoAlert
+								variant='warning'
+								title="Attendance to Congress Dinner"
+								messages={[
+									<span className='text-slate-950'>
+										<b>Time: </b>19:00 - 22:00.
+									</span>,
+									<span className='text-slate-950'>
+										<b>Location: </b>Centro Internacional de Congresos, Mérida
+									</span>,
+								]}
+							/>
+							<DinnerForm />
+						</TabsContent>
+						<TabsContent value="account" className='w-full py-9 pt-4 space-y-5 px-5 sm:px-9'>
+							<h2 className='text-2xl font-semibold text-primary-main'>Edit your profile data</h2>
 							{profile?.participant && (
 								<EditUserForm defaultValues={{
 									...currentUser,
 									email: {
-										value: currentUser.email,
+										value: '',
 										confirm: ''
 									},
 									participant: {
@@ -126,11 +147,9 @@ export default function UserProfile() {
 									}
 								}} />
 							)}
-						</div>
-					</TabsContent>
-					<TabsContent value="picture">
-						<div className='w-full bg-background py-9 space-y-5 border-2 px-5 sm:px-9 rounded-lg shadow-md'>
-							<h2 className='text-2xl font-semibold'>Edit Profile Picture</h2>
+						</TabsContent>
+						<TabsContent value="picture" className='w-full py-9 pt-4 space-y-5 px-5 sm:px-9'>
+							<h2 className='text-2xl font-semibold text-primary-main'>Edit Profile Picture</h2>
 							<InfoAlert
 								title="Profile Picture Guidelines"
 								messages={[
@@ -140,11 +159,9 @@ export default function UserProfile() {
 								]}
 							/>
 							<UserPictureForm />
-						</div>
-					</TabsContent>
-					<TabsContent value="password">
-						<div className='w-full bg-background py-9 space-y-5 border-2 px-5 sm:px-9 rounded-lg shadow-md'>
-							<h2 className='text-2xl font-semibold'>Change password</h2>
+						</TabsContent>
+						<TabsContent value="password" className='w-full py-9 pt-4 space-y-5 px-5 sm:px-9'>
+							<h2 className='text-2xl font-semibold text-primary-main'>Change password</h2>
 							<InfoAlert
 								title="Password Requirements"
 								messages={[
@@ -152,51 +169,13 @@ export default function UserProfile() {
 									'Include at least one uppercase letter.',
 									'Include at least one number.',
 									'Include at least one special character (e.g., !@#$%).',
-									'Make sure your new password is different from the previous one.',
 								]}
 							/>
 							<ChangePasswordForm />
-						</div>
-
-					</TabsContent>
-				</Tabs>
+						</TabsContent>
+					</Tabs>
+				</div>
 			</div>
 		</div>
 	)
-}
-
-export function ParticipantTasks({ title, points, link }: { title: string, points: string[], link: string }) {
-	return (
-		<div className="w-full col-span-2 bg-background/95 backdrop-blur-sm p-8 space-y-6 border rounded-xl shadow-xl">
-			<div className="space-y-1">
-				<h2 className="text-2xl font-bold tracking-tight">Participant Tasks</h2>
-				<p className="text-muted-foreground text-sm">Please complete the following actions to finalize your attendance.</p>
-			</div>
-
-			<div className="group border rounded-xl overflow-hidden shadow-md transition-all hover:shadow-lg border-primary/10">
-				<div className="flex items-center gap-3 bg-primary px-6 py-4 text-primary-foreground font-semibold">
-					<UtensilsCrossed className="w-5 h-5" />
-					<span className="text-lg">{title}</span>
-				</div>
-
-				<div className="px-6 py-3 bg-card space-y-3">
-					<ul className="space-y-2">
-						{points.map(p => (
-							<li className="flex items-start gap-3 text-sm text-foreground/80">
-								<CheckCircle2 className="w-4 h-4 mt-0.5 text-muted-foreground" />
-								<span>{p}</span>
-							</li>
-						))}
-					</ul>
-
-					<hr className="my-2 border-muted" />
-
-					<Link to={'/'} className="flex items-center gap-2 text-sm font-semibold text-primary hover:underline group-hover:pl-3 transition-all">
-						{link}
-						<ChevronRight className="w-4 h-4" />
-					</Link>
-				</div>
-			</div>
-		</div>
-	);
 }

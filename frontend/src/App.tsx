@@ -29,6 +29,7 @@ import DashboardLayout from './layouts/DashboardLayout'
 import CreateAbstractPage from './pages/protected/CreateAbstractPage'
 import { urls } from './routes/routes'
 import UserProfile from './pages/protected/UserProfile'
+import ViewAbstracts from './pages/protected/ViewAbstracts'
 
 function App() {
 	const { pathname } = useLocation()
@@ -77,6 +78,7 @@ function App() {
 
 							<Route path='/test' element={<Test />} />
 							<Route path={urls.users.profile} element={<UserProfile />} />
+							<Route path={urls.users.viewAbstracts} element={<ViewAbstracts />} />
 							<Route path={urls.users.submitAbstract} element={<CreateAbstractPage />} />
 						</Route>
 					</Route>

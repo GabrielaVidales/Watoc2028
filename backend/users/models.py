@@ -1,16 +1,16 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from .managers import CustomUserManager
-from .text_choices import Nationality, PrefixType, AbstractPresentation, AbstactStatus
+from .text_choices import Nationality, PrefixType, AbstractPresentation, AbstactStatus, DietaryRestrictionsList, FoodAllergiesList
 
 
 class User(AbstractUser):
     username = None
     email = models.EmailField(unique=True)
-    middle_name = models.CharField(max_length=100, blank=True, default='')
+    middle_name = models.CharField(max_length=100, blank=True, default="")
 
     prefix = models.CharField(max_length=10, choices=PrefixType.choices, default=PrefixType.PROF)
-    pronouns = models.CharField(max_length=50, blank=True, default='')
+    pronouns = models.CharField(max_length=50, blank=True, default="")
 
     nationality = models.CharField(max_length=5, choices=Nationality.choices, default=Nationality.MEXICO)
     city = models.CharField(max_length=30, blank=False)
@@ -21,7 +21,7 @@ class User(AbstractUser):
     REQUIRED_FIELDS = []
 
     objects = CustomUserManager()
-    
+
     @property
     def full_name(self):
         return f"{self.first_name} {self.last_name}".strip() or self.email
@@ -44,11 +44,12 @@ class Participant(models.Model):
     affiliation = models.CharField(max_length=100, blank=True)
     job_title = models.CharField(max_length=100, blank=True)
     field_of_study = models.CharField(max_length=100, blank=True)
-    
+
     needs_visa = models.BooleanField(default=False)
-    invitation_letter = models.FileField(upload_to="users/photos/", blank=True, null=True, default=None)
+    invitation_letter = models.FileField(upload_to="users/invitation_letter/", blank=True, null=True, default=None)
     
-    going_to_dinner = models.BooleanField(default=False)
+    
+    student_proof=models.FileField(upload_to="users/student_proof/", blank=True, null=True, default=None)
 
     def __str__(self):
         return f"Participant({self.user.email}) [{self.affiliation}|{self.job_title}] — {self.field_of_study}"
@@ -96,7 +97,11 @@ class Abstract(models.Model):
 
 
 class Author(models.Model):
-    name = models.CharField(db_column="name", null=False, blank=False)
+    #datos principales del usuario
+    first_name = models.CharField(null=False, blank=True)
+    last_name = models.CharField(null=False, blank=True)
+    email = models.EmailField(unique=True, blank=True)
+
     order = models.PositiveSmallIntegerField(db_column="order", null=False, blank=False)
     is_corresponding = models.BooleanField(db_column="is_corresponding", default=False)
     abstract = models.ForeignKey(
@@ -107,6 +112,12 @@ class Author(models.Model):
         null=False,
         blank=False,
     )
+    
+    # datos de afiliación del autor
+    affiliation = models.CharField(max_length=100, blank=True)
+    job_title = models.CharField(max_length=100, blank=True)
+    nationality = models.CharField(max_length=5, choices=Nationality.choices, default=Nationality.MEXICO)
+    city = models.CharField(max_length=30, blank=False, default='')
 
     class Meta:
         ordering = ["order"]
@@ -115,11 +126,29 @@ class Author(models.Model):
         return self.name
 
 
-class Dinner(models.Model):
-    participant = models.OneToOneField(
-        Participant,
-        primary_key=True,
-        on_delete=models.CASCADE,
-        default=None
-    )
+class AbstractDeclarations(models.Model):
+    needs_visa = models.BooleanField(default=False, help_text='1. I confirm that the abstract and all entered information is correct.*\nI confirm that I have reviewed this abstract and that all information is correct. I acknowledge that the content of this abstract cannot be edited after final submission, and I am aware that it will be published exactly as submitted.')
 
+
+
+class Dinner(models.Model):
+    participant = models.OneToOneField(Participant, primary_key=True, on_delete=models.CASCADE)
+    will_assist_dinner = models.BooleanField(default=False)
+
+    has_dietary_restriction = models.BooleanField(default=False)
+    dietary_needs = models.CharField(
+        max_length=10,
+        blank=False,
+        choices=DietaryRestrictionsList.choices,
+        default=DietaryRestrictionsList.DEFAULT,
+    )
+    other_dietary_needs = models.CharField(max_length=75, blank=True)
+
+    has_food_allergy = models.BooleanField(default=False)
+    food_allergies = models.CharField(
+        max_length=10,
+        blank=False,
+        choices=FoodAllergiesList.choices,
+        default=FoodAllergiesList.DEFAULT,
+    )
+    other_allergies = models.CharField(max_length=100, blank=True)

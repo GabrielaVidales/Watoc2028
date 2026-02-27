@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { ChevronDown, SquareUserRound } from "lucide-react"
+import { ChevronDown, LogOut, SquareUserRound } from "lucide-react"
 import React from 'react'
 import { Link, NavLink, Outlet, useNavigate } from "react-router"
 import logo from '@/assets/WatocPNGLogo.png';
@@ -9,7 +9,15 @@ import { urls } from "@/routes/routes"
 import { useAuth } from "@/contexts/AuthContext"
 import background from '@/assets/background.png'
 import { cn } from "@/lib/utils"
-
+import {
+    NavigationMenu,
+    NavigationMenuContent,
+    NavigationMenuItem,
+    NavigationMenuLink,
+    NavigationMenuList,
+    NavigationMenuTrigger,
+    navigationMenuTriggerStyle,
+} from "@/components/ui/navigation-menu"
 
 
 function DashboardLayout() {
@@ -35,9 +43,8 @@ function DashboardLayout() {
     }
 
     return (<>
-        <header className="flex flex-col shadow-lg">
-            <div className="max-w-4xl w-full mx-auto flex flex-col items-center">
-
+        <header className="flex flex-col shadow-xl border-b-2">
+            <div className="max-w-4xl w-full mx-auto flex justify-center sm:justify-between items-center">
                 <div className="h-full py-2">
                     <Link to={'/'}>
                         <img
@@ -47,42 +54,27 @@ function DashboardLayout() {
                         />
                     </Link>
                 </div>
-            </div>
-            <div className="border-b-10 border-primary-dark w-full shadow-lg">
-            </div>
-        </header>
-        <main className=" bg-cover bg-center bg-fixed" style={{ backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url(${background})` }}>
-            <div className='min-h-50 w-full py-9 flex gap-3 justify-center'>
-                <div className='max-w-5xl w-full bg-background border-2 p-5 rounded-lg shadow-lg flex flex-col gap-5'>
-                    <div className="flex gap-3 ">
-                        <div onClick={onLogout}
-                            className={
-                                cn("cursor-pointer inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
-                                    "bg-background hover:bg-background/50 hover:text-foreground border-2")
-                            }
-                        >
-                            Logout
-                        </div>
-                        {links.map((item) => (
-                            <NavLink
-                                key={item.url}
-                                to={item.url}
-                                className={({ isActive }) =>
-                                    cn(
-                                        "inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
-                                        isActive
-                                            ? "bg-background/50 text-foreground shadow-md border-2 border-primary-light"
-                                            : "bg-background hover:bg-background/50 hover:text-foreground border-2"
-                                    )
-                                }
-                            >
-                                {item.label}
-                            </NavLink>
-                        ))}
-                    </div>
-                    <Outlet />
+                <div className="max-sm:hidden">
+                    <NavigationMenu>
+                        <NavigationMenuList>
+                            <NavigationMenuItem className="p-0 w-full">
+                                <NavigationMenuLink asChild className={navigationMenuTriggerStyle()}>
+                                    <Link to={'puta'} className="p-0 w-full">
+                                        <Button variant="ghost" className="p-0 w-full text-lg">
+                                            Logout
+                                            <LogOut className="text-foreground" />
+                                        </Button>
+                                    </Link>
+                                </NavigationMenuLink>
+                            </NavigationMenuItem>
+                        </NavigationMenuList>
+                    </NavigationMenu>
                 </div>
             </div>
+        </header>
+
+        <main className="bg-gray-100">
+            <Outlet />
         </main>
         <Footer />
     </>)

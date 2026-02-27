@@ -13,6 +13,7 @@ export const urls = {
             url: 'user/:id',
             build: (id: number | string) => `user/${id}`
         },
+        viewAbstracts: '/user/abstracts',
         submitAbstract: '/user/abstract',
         profile: '/user/profile/',
     }

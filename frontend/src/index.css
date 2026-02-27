@@ -5,8 +5,7 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.2;
+  font-family: 'DM Sans', sans-serif !important;  line-height: 1.2;
   font-weight: 400;
   color-scheme: light dark;
   color: rgba(255, 255, 255, 0.87);
@@ -48,7 +47,6 @@
   --sidebar-ring: oklch(0.708 0 0);
 }
 
-
 @theme inline {
   --color-primary-light: #757ce8;
   --color-primary-main: #3f50b5;
@@ -66,7 +64,6 @@
   --color-error-contrast: #ffffff;
 
   --muted: oklch(0.967 0.001 286.375);
-
 
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);

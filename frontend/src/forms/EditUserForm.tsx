@@ -4,12 +4,14 @@ import { Field, FieldContent, FieldDescription, FieldError, FieldLabel, FieldTit
 import { Input } from '@/components/ui/input'
 import { InputGroup, InputGroupAddon, InputGroupInput } from '@/components/ui/input-group'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Separator } from '@/components/ui/separator'
 import { Spinner } from '@/components/ui/spinner'
 import { useAuth } from '@/contexts/AuthContext'
 import { InfoAlert } from '@/pages/protected/CreateAbstractPage'
 import { editUserFormSchema, prefixes, type EditUserFormValues } from '@/schemas/user-schemas'
 import { countries } from '@/utils/countriesInfo'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { isAxiosError } from 'axios'
 import { Save } from 'lucide-react'
 import React from 'react'
 import { Controller, useForm } from 'react-hook-form'
@@ -25,21 +27,21 @@ function EditUserForm({ defaultValues }: P) {
         mode: 'onChange',
     })
 
-    const { isSubmitting, isValid, isSubmitSuccessful, isDirty } = formState
+    const { isSubmitting, isValid, isDirty } = formState
 
 
     const onFormSubmit = handleSubmit(async (data) => {
-        console.log(data);
-
         try {
-            console.log(data);
-            const res = await axiosClient.patch(`/users/${data.id}/`, data)
-            console.log(res.data);
-
+            await axiosClient.patch(`/users/${data.id}/`, {
+                ...data,
+                email: data.email.value || undefined
+            })
         } catch (error) {
-            console.log(error);
-
-
+            if (import.meta.env.DEV) {
+                if (isAxiosError(error)) {
+                    console.log(error.response.data);
+                }
+            }
         }
     })
 
@@ -214,22 +216,25 @@ function EditUserForm({ defaultValues }: P) {
                     />
                 </div>
 
-                
-                <div className='grid grid-cols-1 sm:grid-cols-2 gap-3 py-5'>
-                    <h2 className='text-xl font-semibold pt-5'>Change your email</h2>
-                    <InfoAlert
-                        className='col-span-full'
-                        title="IMPORTANT"
-                        messages={[
-                            'Updating your email address will require you to use the new address for all future logins. Please ensure you have access to the new email before saving your changes.',
-                        ]}
-                    />
+                <Separator/>
+
+                <h2 className='text-xl font-semibold'>Change your email</h2>
+                <InfoAlert
+                    className='col-span-full'
+                    title="IMPORTANT"
+                    messages={[
+                        'Updating your email address will require you to use the new address for all future logins. Please ensure you have access to the new email before saving your changes.',
+                        "Leave it blank if you don't want to change it",
+                    ]}
+                />
+
+                <div className='grid grid-cols-1 sm:grid-cols-2 gap-3'>
                     <Controller
                         name="email.value"
                         control={control}
                         render={({ field, fieldState }) => (
                             <Field data-invalid={fieldState.invalid}>
-                                <FieldLabel htmlFor={field.name}>Email <address></address></FieldLabel>
+                                <FieldLabel htmlFor={field.name}>New Email <address></address></FieldLabel>
                                 <FieldDescription>This will be your login email</FieldDescription>
                                 <Input
                                     {...field}
@@ -248,7 +253,7 @@ function EditUserForm({ defaultValues }: P) {
                         control={control}
                         render={({ field, fieldState }) => (
                             <Field data-invalid={fieldState.invalid}>
-                                <FieldLabel htmlFor={field.name}>Confirm email</FieldLabel>
+                                <FieldLabel htmlFor={field.name}>Confirm New email</FieldLabel>
                                 <FieldDescription>Please re-enter your email</FieldDescription>
                                 <Input
                                     {...field}
@@ -263,7 +268,9 @@ function EditUserForm({ defaultValues }: P) {
                     />
                 </div>
 
-                <h2 className='text-xl font-semibold pt-5'>Professional Affiliation</h2>
+                <Separator/>
+
+                <h2 className='text-xl font-semibold'>Professional Affiliation</h2>
                 <Controller
                     name="participant.affiliation"
                     control={control}
@@ -276,7 +283,7 @@ function EditUserForm({ defaultValues }: P) {
                                 aria-invalid={fieldState.invalid}
                                 autoComplete="off"
                             />
-                            <FieldDescription>For example: name of institution, company, etc.</FieldDescription>
+                            <FieldDescription>Name of institution, company, etc.</FieldDescription>
                             {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                         </Field>
                     )}

@@ -83,6 +83,9 @@ export default function RegisterForm() {
                 console.log(error.response);
             }
         }
+    }, async (invalid) => {
+        console.log(invalid);
+        
     })
 
     return (
@@ -417,25 +420,6 @@ export default function RegisterForm() {
                     </div>
                 </div>
 
-                <div className='flex flex-col gap-5 pb-5'>
-                    <div className='flex justify-center gap-5'>
-                        <HCaptcha
-                            sitekey={
-                                import.meta.env.DEV
-                                    ? "10000000-ffff-ffff-ffff-000000000001"
-                                    : "ad963da0-1c32-45a2-a4ae-409600422f34"
-                            }
-                            onVerify={(token) => {
-                                setValue("captcha", token, { shouldValidate: true });
-                                clearErrors("captcha");
-                            }}
-                            onExpire={() => {
-                                setValue("captcha", "");
-                                setError("captcha", { type: "manual", message: "El captcha expiró" });
-                            }}
-                        />
-                    </div>
-                </div>
 
                 <div className='flex flex-col items-center gap-3 w-full'>
                     <Button type='submit' className='p-5 text-xl' disabled={!isValid}>
@@ -445,6 +429,9 @@ export default function RegisterForm() {
                             <Send data-icon="inline-start" />
                         )}
                         Create account
+                    </Button>
+                    <Button>
+                        adasd
                     </Button>
                 </div>
             </fieldset>

@@ -146,10 +146,11 @@ export const registrationSchema = userSchema
                 error: "Passwords do not match",
                 path: ["confirm"]
             }),
-        captcha: z.string()
-            .min(1, "Field required *")
-            .max(100, 'Input too long')
-            .default('')
+        // captcha: z.string()
+        //     .min(1, "Field required *")
+        //     .max(100, 'Input too long')
+        //     .default('')
+        //     .optional()
     })
 
 
@@ -179,20 +180,30 @@ export const changePasswordSchema = registrationSchema.pick({
 })
 
 export const editUserFormSchema = userSchema
-    .extend(registrationSchema.pick({ email: true }).shape)
     .extend({
         participant: participantSchema.omit({
             abstracts: true
+        }),
+        email: z.object({
+            value: z.email("Invalid email address")
+                .max(100, 'Input too long')
+                .or(z.literal(''))
+                .optional(),
+            confirm: z.string()
+                .max(100, 'Input too long'),
         })
+            .default({ value: '', confirm: '' })
+            .refine(data => !data.confirm || data.value === data.confirm, {
+                error: 'Email does not match',
+                path: ['confirm']
+            }),
     })
     .omit({
-        // email: true,
         last_login: true,
         date_joined: true,
         photo: true,
         roles: true,
         full_name: true,
-        // abstracts: true,
     })
 
 export type EditUserFormValues = z.infer<typeof editUserFormSchema>

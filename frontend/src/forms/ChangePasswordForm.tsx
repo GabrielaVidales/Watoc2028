@@ -84,7 +84,6 @@ function ChangePasswordForm() {
                                     {isValid ? <Lock /> : <LockOpen />}
                                 </InputGroupAddon>
                             </InputGroup>
-                            <FieldDescription>Please enter your current password</FieldDescription>
                             {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                         </Field>
                     )}

@@ -53,7 +53,7 @@ class UserSerializer(serializers.ModelSerializer):
         }
 
     def validate_participant(self, value):
-        print(value)
+        print('queee')
         return value
 
     def get_photo(self, obj):
@@ -72,22 +72,42 @@ class UserSerializer(serializers.ModelSerializer):
         except Exception:
             return None
 
-    @transaction.atomic
-    def create(self, validated_data):
-        print(validated_data)
-        participant_data = validated_data.pop("participant", None)
-        # TODO: Crear la información de participantes
+    def validate_email(self, email):
+        print('puta madreee')
+        user_id = self.instance.id if self.instance else None
 
-        response = super().create(validated_data)
-        return response
-    
+        if User.objects.filter(email__iexact=email).exclude(id=user_id).exists():
+            raise serializers.ValidationError("This email is already registered.")
+        
+        return email
+
+    @transaction.atomic
+    def create(self, validated_data):        
+        participant_data = validated_data.pop("participant", None)
+
+        user = super().create(validated_data)
+
+        participant_serializer = ParticipantSerializer(data=participant_data)
+        if participant_serializer.is_valid(raise_exception=True):
+            p_instance = participant_serializer.save(user=user)
+            models.Dinner.objects.create(participant=p_instance)
+
+        return user
+
     @transaction.atomic
     def update(self, instance, validated_data):
         participant_data = validated_data.pop("participant", None)
-        # TODO: actualizar la información de participantes
+        print('PUTA')
         
-        response =  super().update(instance, validated_data)        
-        return response
+        
+        user = super().update(instance, validated_data)
+
+        p_instance = user.participant
+        participant_serializer = ParticipantSerializer(p_instance, data=participant_data, partial=True)
+        if participant_serializer.is_valid(raise_exception=True):
+            p_instance = participant_serializer.save(user=user)
+
+        return user
 
 
 class AuthorSerializer(serializers.ModelSerializer):
