@@ -4,6 +4,8 @@ from . import views
 
 router = DefaultRouter()
 router.register(r"abstracts", views.AbstractView, "abstracts")
+router.register(r"affiliations", views.AuthorAffiliationsView, "affiliations")
+router.register(r"authors", views.AuthorsView, "authors")
 router.register(r"users", views.UserView, "users")
 
 urlpatterns = [

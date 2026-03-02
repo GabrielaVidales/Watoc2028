@@ -22,8 +22,8 @@ import { Badge } from '@/components/ui/badge'
 
 function CreateAbstractPage() {
     return (
-        <div className='w-full max-w-5xl grid grid-cols-3 gap-3 p-3 mx-auto'>
-            <div className='col-span-2 w-full'>
+        <div className='w-full max-w-5xl grid grid-cols-1 md:grid-cols-3 gap-3 p-3 mx-auto'>
+            <div className='md:col-span-2 w-full'>
                 <div className='w-full bg-background border-2 p-7 rounded-lg shadow-lg flex flex-col gap-5'>
                     <div className='w-full space-y-5'>
                         <h2 className='text-2xl font-semibold'>Abstract Submission</h2>

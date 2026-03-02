@@ -3,6 +3,7 @@ from django.utils.translation import gettext_lazy as _
 
 
 class AbstractPresentation(TextChoices):
+    NOT_SET = '', _('Not set')
     ORAL = "oral", "Oral Presentation Preferred"
     POSTER = "poster", "Poster Presentation Preferred"
 

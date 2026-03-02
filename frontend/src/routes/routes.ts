@@ -1,4 +1,3 @@
-
 export const urls = {
     home: {
         index: '/'
@@ -10,11 +9,15 @@ export const urls = {
     },
     users: {
         root: {
-            url: 'user/:id',
-            build: (id: number | string) => `user/${id}`
+            url: '/user/:id',
+            build: (id: number | string) => `/user/${id}`
         },
-        viewAbstracts: '/user/abstracts',
+        viewAbstracts: '/user/my-abstracts',
+        editAbstract: {
+            url: '/user/abstract/:id/edit',
+            build: (id: number | string) => `/user/abstract/${id}/edit`
+        },
         submitAbstract: '/user/abstract',
-        profile: '/user/profile/',
+        profile: '/user/profile',
     }
 }

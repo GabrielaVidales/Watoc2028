@@ -14,6 +14,7 @@ import EditUserForm from '@/forms/EditUserForm';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import DinnerForm from '@/forms/DinnerForm';
 import { urls } from '@/routes/routes';
+import AuthorForm from '@/forms/AuthorForm';
 
 
 export default function UserProfile() {
@@ -103,6 +104,7 @@ export default function UserProfile() {
 							</TabsTrigger>
 						</TabsList>
 						<TabsContent value='home' className='w-full py-9 pt-4 space-y-5 px-5 sm:px-9'>
+					
 							<h2 className='text-2xl font-semibold'>Abstract submission</h2>
 							<InfoAlert
 								title="Abstract submission deadline: June 10, 2026"

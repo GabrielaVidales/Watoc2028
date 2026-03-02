@@ -10,7 +10,7 @@ type ProtectedRouteProps = React.PropsWithChildren & {
 
 export function ProtectedRoute({ allowedRoles }: ProtectedRouteProps) {
     const { currentUser } = useAuth()
-
+    
     if (currentUser === undefined) {
         return <LoadingPage/>
     }
@@ -18,7 +18,7 @@ export function ProtectedRoute({ allowedRoles }: ProtectedRouteProps) {
     if (!currentUser) {
         return <Navigate to='/login' replace />
     }
-    
+        
     const authorized = currentUser?.roles.some(
         role => allowedRoles?.includes(role)
     )

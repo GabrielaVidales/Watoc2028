@@ -23,21 +23,6 @@ import {
 function DashboardLayout() {
     const { handleLogout } = useAuth()
 
-    const links = [
-        {
-            label: 'Logout',
-            url: urls.auth.logout
-        },
-        {
-            label: 'My profile',
-            url: urls.users.profile
-        },
-        {
-            label: 'Abstract',
-            url: urls.users.submitAbstract
-        },
-    ]
-
     const onLogout = async () => {
         await handleLogout()
     }
@@ -57,16 +42,26 @@ function DashboardLayout() {
                 <div className="max-sm:hidden">
                     <NavigationMenu>
                         <NavigationMenuList>
+
                             <NavigationMenuItem className="p-0 w-full">
                                 <NavigationMenuLink asChild className={navigationMenuTriggerStyle()}>
-                                    <Link to={'puta'} className="p-0 w-full">
-                                        <Button variant="ghost" className="p-0 w-full text-lg">
-                                            Logout
-                                            <LogOut className="text-foreground" />
+                                    <Link to={urls.users.profile}>
+                                        <Button variant="ghost" className="p-0 flex flex-row gap-2 w-full text-lg">
+                                            Profile
                                         </Button>
                                     </Link>
                                 </NavigationMenuLink>
                             </NavigationMenuItem>
+
+                            <NavigationMenuItem className="p-0 w-full">
+                                <NavigationMenuLink asChild className={navigationMenuTriggerStyle()}>
+                                    <Button variant="ghost" onClick={onLogout} className="p-0 flex flex-row gap-2 w-full text-lg">
+                                        Logout
+                                        <LogOut className="text-foreground" />
+                                    </Button>
+                                </NavigationMenuLink>
+                            </NavigationMenuItem>
+
                         </NavigationMenuList>
                     </NavigationMenu>
                 </div>

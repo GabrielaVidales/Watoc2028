@@ -1,4 +1,8 @@
 import z from "zod";
+import countries from '@/data/countries-list.json'
+
+
+const countriesArray = countries.map(country => country.code)
 
 export const presentationTypes = [
     {
@@ -12,7 +16,28 @@ export const presentationTypes = [
 ]
 
 
+export const authorAffiliationSchema = z.object({
+    id: z.number()
+        .optional(),
+    institute: z.string().trim()
+        .min(1, 'Required')
+        .max(100, 'Input too long')
+        .default(''),
+    department: z.string().trim()
+        .min(1, 'Required')
+        .max(100, 'Input too long')
+        .default(''),
+    nationality: z.enum(countriesArray, 'Choose a valid option')
+        .default(''),
+    city: z.string().trim()
+        .min(1, "Please enter your city")
+        .max(30, 'Input too long')
+        .default(''),
+})
+
 export const authorSchema = z.object({
+    id: z.number()
+        .optional(),
     firstName: z.string()
         .min(1, "Name required")
         .max(100, 'Input too long')
@@ -24,13 +49,18 @@ export const authorSchema = z.object({
     email: z.email('Please provide a valid email address')
         .max(100, 'Input too long')
         .default(''),
+
     order: z.number()
         .default(1)
         .optional(),
     is_corresponding: z.boolean()
-        .default(false)
+        .default(false),
+
+    affiliation: authorAffiliationSchema
+        .optional()
 })
 
+// FORMS
 
 export const abstractSchema = z.object({
     id: z.number().nullable().optional().default(null),
@@ -49,8 +79,11 @@ export const abstractSchema = z.object({
         .default(''),
 
     authors: z.array(authorSchema)
-        .min(1, "At least one author is required")
+        // .min(1, "At least one author is required")
         .superRefine((authors, ctx) => {
+            if (authors.length === 0) {
+                return
+            }
             const correspondingCount = authors.filter(a => a.is_corresponding).length;
             console.log(correspondingCount);
 
@@ -62,6 +95,7 @@ export const abstractSchema = z.object({
                 });
             }
         })
+        .optional()
         .default([]),
 
     references: z.string()
@@ -87,16 +121,18 @@ export const submitAbstractSchema = abstractSchema.extend({
         .refine((v) => v === true, {
             message: "You must accept the ethical statement.",
         }),
-}).refine((data) => {
-    if (data.authors.length > 0 && !data.authorsConsent) {
-        return false;
-    }
-    return true;
-}, {
-    message: "Debes confirmar que los co-autores otorgan su consentimiento",
-    path: ["authorsConsent"],
 })
+    .refine((data) => {
+        if (data.authors.length > 0 && !data.authorsConsent) {
+            return false;
+        }
+        return true;
+    }, {
+        message: "Debes confirmar que los co-autores otorgan su consentimiento",
+        path: ["authorsConsent"],
+    })
 
+// Default values
 export const submitAbstractDefaults = abstractSchema.extend({
     authorsConsent: z.boolean().default(false)
 })
@@ -106,6 +142,7 @@ export type AbstractSchema = z.infer<typeof abstractSchema>
 
 export type AbstractFormValues = z.infer<typeof submitAbstractSchema>
 
+export type AuthorAffiliationSchema = z.infer<typeof authorAffiliationSchema>
 
 const countWords = (input: string, limit: number) => {
     if (!input)

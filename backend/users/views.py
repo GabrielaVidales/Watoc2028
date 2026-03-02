@@ -1,3 +1,4 @@
+from django.db import transaction
 from rest_framework import permissions, status
 from rest_framework.decorators import action
 from rest_framework.views import APIView
@@ -10,8 +11,8 @@ from rest_framework_simplejwt.exceptions import TokenError, InvalidToken
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth.models import update_last_login
 from django.conf import settings
-from .serializers import UserSerializer, AbstractSerializer, ParticipantSerializer
-from .models import Abstract, Participant
+from .serializers import UserSerializer, AbstractSerializer, ParticipantSerializer, AuthorSerializer, AuthorAffiliationSerializer
+from .models import Abstract, Participant, Author, AuthorAffiliation
 
 
 User = get_user_model()
@@ -31,7 +32,7 @@ class UserView(ModelViewSet):
     def whoami(self, request):
         user = request.user
         data = {}
-        data['anonymous'] = user.is_anonymous
+        data["anonymous"] = user.is_anonymous
         if user.is_authenticated:
             data["user"] = self.get_serializer(user).data
 
@@ -75,7 +76,7 @@ class UserView(ModelViewSet):
                 {"newPassword": ["This field is required."]},
                 status=status.HTTP_400_BAD_REQUEST,
             )
-            
+
         is_old_pwd_ok = user.check_password(old_password)
         if not is_old_pwd_ok:
             return Response(
@@ -189,3 +190,29 @@ class AbstractView(ModelViewSet):
     queryset = Abstract.objects.all()
     serializer_class = AbstractSerializer
     permission_classes = [permissions.IsAuthenticated]
+    
+    @action(detail=True, methods=["get"], url_path="affiliations")
+    def get_affiliations(self, request, pk=None):
+        abstract = self.get_object()
+        data = AuthorAffiliationSerializer(abstract.affiliations.all(), many=True)
+        return Response(data.data)
+    
+    
+    
+
+class AuthorsView(ModelViewSet):
+    queryset = Author.objects.all()
+    serializer_class = AuthorSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+
+class AuthorAffiliationsView(ModelViewSet):
+    queryset = AuthorAffiliation.objects.all()
+    serializer_class=AuthorAffiliationSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    @transaction.atomic
+    def create(self, request, *args, **kwargs):
+        instance = super().create(request, *args, **kwargs)
+        transaction.set_rollback(True)
+        return instance

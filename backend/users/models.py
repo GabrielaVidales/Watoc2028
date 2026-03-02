@@ -47,12 +47,34 @@ class Participant(models.Model):
 
     needs_visa = models.BooleanField(default=False)
     invitation_letter = models.FileField(upload_to="users/invitation_letter/", blank=True, null=True, default=None)
-    
-    
-    student_proof=models.FileField(upload_to="users/student_proof/", blank=True, null=True, default=None)
+
+    student_proof = models.FileField(upload_to="users/student_proof/", blank=True, null=True, default=None)
 
     def __str__(self):
         return f"Participant({self.user.email}) [{self.affiliation}|{self.job_title}] — {self.field_of_study}"
+
+
+class Dinner(models.Model):
+    participant = models.OneToOneField(Participant, primary_key=True, on_delete=models.CASCADE)
+    will_assist_dinner = models.BooleanField(default=False)
+
+    has_dietary_restriction = models.BooleanField(default=False)
+    dietary_needs = models.CharField(
+        max_length=10,
+        blank=True,
+        choices=DietaryRestrictionsList.choices,
+        default=DietaryRestrictionsList.DEFAULT,
+    )
+    other_dietary_needs = models.CharField(max_length=75, blank=True)
+
+    has_food_allergy = models.BooleanField(default=False)
+    food_allergies = models.CharField(
+        max_length=10,
+        blank=True,
+        choices=FoodAllergiesList.choices,
+        default=FoodAllergiesList.DEFAULT,
+    )
+    other_allergies = models.CharField(max_length=100, blank=True)
 
 
 class Abstract(models.Model):
@@ -62,11 +84,16 @@ class Abstract(models.Model):
         ordering = ["-created_at"]
         get_latest_by = "last_update"
 
-    title = models.CharField(db_column="title", verbose_name="Título", max_length=128)
-    text = models.TextField(db_column="text", verbose_name="Texto")
-    references = models.TextField(db_column="references", verbose_name="Referencias")
+    title = models.CharField(db_column="title", verbose_name="Título", max_length=128, blank=True)
+    text = models.TextField(db_column="text", verbose_name="Texto", blank=True)
+    references = models.TextField(db_column="references", verbose_name="Referencias", blank=True)
     user = models.ForeignKey(User, on_delete=models.SET_NULL, related_name="abstracts", null=True)
-    presentation_type = models.CharField(db_column="presentation", verbose_name="Tipo de presentación", choices=AbstractPresentation.choices, default=AbstractPresentation.POSTER)
+    presentation_type = models.CharField(
+        db_column="presentation",
+        verbose_name="Tipo de presentación",
+        choices=AbstractPresentation.choices,
+        default=AbstractPresentation.NOT_SET,
+    )
     status = models.CharField(
         db_column="status",
         verbose_name="Estado del abstract",
@@ -96,8 +123,22 @@ class Abstract(models.Model):
         return f"{truncated_title} | {username}"
 
 
+class AuthorAffiliation(models.Model):
+    institute = models.CharField(max_length=100, blank=True)
+    department = models.CharField(max_length=100, blank=True)
+    nationality = models.CharField(max_length=5, choices=Nationality.choices, default=Nationality.MEXICO)
+    city = models.CharField(max_length=30, blank=False, default="")
+    
+    abstract = models.ForeignKey(
+        Abstract,
+        on_delete=models.CASCADE,
+        related_name="affiliations",
+        db_column="abstract",
+        null=True,
+    )
+    
+
 class Author(models.Model):
-    #datos principales del usuario
     first_name = models.CharField(null=False, blank=True)
     last_name = models.CharField(null=False, blank=True)
     email = models.EmailField(unique=True, blank=True)
@@ -112,12 +153,8 @@ class Author(models.Model):
         null=False,
         blank=False,
     )
-    
-    # datos de afiliación del autor
-    affiliation = models.CharField(max_length=100, blank=True)
-    job_title = models.CharField(max_length=100, blank=True)
-    nationality = models.CharField(max_length=5, choices=Nationality.choices, default=Nationality.MEXICO)
-    city = models.CharField(max_length=30, blank=False, default='')
+
+    affiliation = models.ForeignKey(AuthorAffiliation, on_delete=models.SET_NULL, related_name="authors", null=True)
 
     class Meta:
         ordering = ["order"]
@@ -127,28 +164,34 @@ class Author(models.Model):
 
 
 class AbstractDeclarations(models.Model):
-    needs_visa = models.BooleanField(default=False, help_text='1. I confirm that the abstract and all entered information is correct.*\nI confirm that I have reviewed this abstract and that all information is correct. I acknowledge that the content of this abstract cannot be edited after final submission, and I am aware that it will be published exactly as submitted.')
-
-
-
-class Dinner(models.Model):
-    participant = models.OneToOneField(Participant, primary_key=True, on_delete=models.CASCADE)
-    will_assist_dinner = models.BooleanField(default=False)
-
-    has_dietary_restriction = models.BooleanField(default=False)
-    dietary_needs = models.CharField(
-        max_length=10,
-        blank=False,
-        choices=DietaryRestrictionsList.choices,
-        default=DietaryRestrictionsList.DEFAULT,
+    abstract = models.OneToOneField(Abstract, primary_key=True, on_delete=models.CASCADE, default=None)
+    confirm_accuracy = models.BooleanField(
+        default=False,
+        verbose_name="Information Correctness",
+        help_text="I confirm that I have reviewed this abstract and that all information is correct. I acknowledge that the content cannot be edited after final submission and will be published exactly as submitted.",
     )
-    other_dietary_needs = models.CharField(max_length=75, blank=True)
-
-    has_food_allergy = models.BooleanField(default=False)
-    food_allergies = models.CharField(
-        max_length=10,
-        blank=False,
-        choices=FoodAllergiesList.choices,
-        default=FoodAllergiesList.DEFAULT,
+    consent_publication = models.BooleanField(
+        default=False,
+        verbose_name="Consent to Publication",
+        help_text="The submission of an abstract constitutes your consent to publication (e.g. congress website, programme, other promotions, etc.).",
     )
-    other_allergies = models.CharField(max_length=100, blank=True)
+    submit_on_behalf = models.BooleanField(
+        default=False,
+        verbose_name="Submit on behalf of all authors",
+        help_text="I confirm that I submit this abstract on behalf of all authors. The contact details saved are those of the first author, who is responsible for informing the others.",
+    )
+    commitment_attendance = models.BooleanField(
+        default=False,
+        verbose_name="Commitment to Attend",
+        help_text="The abstract submission constitutes a formal commitment by the first author to physically attend the ECP and present the abstract in the assigned session.",
+    )
+    not_previously_published = models.BooleanField(
+        default=False,
+        verbose_name="Not Previously Published",
+        help_text="I herewith confirm that the abstract has not been previously published.",
+    )
+    no_ai_used = models.BooleanField(
+        default=False,
+        verbose_name="No AI Tools Used",
+        help_text="I herewith confirm that the abstract was prepared without using the aid of AI tools (such as, but not limited to, ChatGPT).",
+    )

@@ -9,7 +9,7 @@ User = get_user_model()
 
 
 class ParticipantSerializer(serializers.ModelSerializer):
-    # abstracts = serializers.SerializerMethodField()
+    abstracts = serializers.SerializerMethodField()
 
     class Meta:
         model = models.Participant
@@ -17,12 +17,12 @@ class ParticipantSerializer(serializers.ModelSerializer):
             "affiliation",
             "job_title",
             "field_of_study",
+            "abstracts",
         )
-
-    # def get_abstracts(self, obj: models.Participant):
-    #     from users.serializers import AbstractSerializer
-
-    #     return AbstractSerializer(obj.user.abstracts.exclude(status="deleted"), many=True).data
+        
+    def get_abstracts(self, obj:models.Participant):
+        serializer = AbstractSerializer(obj.user.abstracts, many=True)
+        return serializer.data
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -52,10 +52,6 @@ class UserSerializer(serializers.ModelSerializer):
             "photo": {"required": False},
         }
 
-    def validate_participant(self, value):
-        print('queee')
-        return value
-
     def get_photo(self, obj):
         if not obj.photo:
             return None
@@ -73,16 +69,15 @@ class UserSerializer(serializers.ModelSerializer):
             return None
 
     def validate_email(self, email):
-        print('puta madreee')
         user_id = self.instance.id if self.instance else None
 
         if User.objects.filter(email__iexact=email).exclude(id=user_id).exists():
             raise serializers.ValidationError("This email is already registered.")
-        
+
         return email
 
     @transaction.atomic
-    def create(self, validated_data):        
+    def create(self, validated_data):
         participant_data = validated_data.pop("participant", None)
 
         user = super().create(validated_data)
@@ -97,9 +92,7 @@ class UserSerializer(serializers.ModelSerializer):
     @transaction.atomic
     def update(self, instance, validated_data):
         participant_data = validated_data.pop("participant", None)
-        print('PUTA')
-        
-        
+
         user = super().update(instance, validated_data)
 
         p_instance = user.participant
@@ -110,8 +103,17 @@ class UserSerializer(serializers.ModelSerializer):
         return user
 
 
+""""""
+
+class AuthorAffiliationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.AuthorAffiliation
+        fields = "__all__"
+
+
 class AuthorSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField(required=False)
+    affiliation = AuthorAffiliationSerializer()
 
     class Meta:
         model = models.Author
@@ -120,7 +122,7 @@ class AuthorSerializer(serializers.ModelSerializer):
 
 
 class AbstractSerializer(serializers.ModelSerializer):
-    authors = AuthorSerializer(many=True)
+    # authors = AuthorSerializer(many=True)
 
     class Meta:
         model = models.Abstract
@@ -129,41 +131,21 @@ class AbstractSerializer(serializers.ModelSerializer):
 
     @transaction.atomic
     def create(self, validated_data):
-        authors = validated_data.pop("authors")
-        instance = models.Abstract(**validated_data)
+        instance = models.Abstract()
         request = self.context.get("request", None)
         instance.user = request.user
         instance.save()
-
-        for index, author in enumerate(authors):
-            models.Author.objects.create(name=author.get("name"), order=index, is_corresponding=author.get("is_corresponding", False), abstract=instance)
 
         # transaction.on_commit(lambda: signals.on_abstract_created(instance))
         return instance
 
     @transaction.atomic
     def update(self, instance: models.Abstract, validated_data):
-        authors_data = validated_data.pop("authors")
-        keywords_data = validated_data.pop("keywords")
-
-        instance.authors.all().delete()
-        instance.keywords.all().delete()
-
+        # authors_data = validated_data.pop("authors")
         extra_kwargs = {"previous_status": instance.status}
         for attr, value in validated_data.items():
             setattr(instance, attr, value)
-
-        # se hace esto porque si los _data traen id's produce un
-        # django.db.utils.IntegrityError: UNIQUE constraint failed: users_author.id
-        for a in authors_data:
-            a.pop("id", None)
-        for k in keywords_data:
-            k.pop("id", None)
-
-        models.Author.objects.bulk_create([models.Author(abstract=instance, **a) for a in authors_data])
-
         instance.extra_kwargs = extra_kwargs
         instance.save()
-
         # transaction.on_commit(lambda: signals.on_abstract_updated(instance))
         return instance
