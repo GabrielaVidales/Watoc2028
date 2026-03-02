@@ -38,11 +38,11 @@ export const authorAffiliationSchema = z.object({
 export const authorSchema = z.object({
     id: z.number()
         .optional(),
-    firstName: z.string()
+    first_name: z.string()
         .min(1, "Name required")
         .max(100, 'Input too long')
         .default(''),
-    lastName: z.string()
+    last_name: z.string()
         .min(1, "Name required")
         .max(100, 'Input too long')
         .default(''),
@@ -139,6 +139,9 @@ export const submitAbstractDefaults = abstractSchema.extend({
 
 
 export type AbstractSchema = z.infer<typeof abstractSchema>
+
+export type AuthorSchema = z.infer<typeof authorSchema>
+
 
 export type AbstractFormValues = z.infer<typeof submitAbstractSchema>
 

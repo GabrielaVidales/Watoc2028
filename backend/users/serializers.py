@@ -112,13 +112,36 @@ class AuthorAffiliationSerializer(serializers.ModelSerializer):
 
 
 class AuthorSerializer(serializers.ModelSerializer):
-    id = serializers.IntegerField(required=False)
     affiliation = AuthorAffiliationSerializer()
+
+    abstract_id = serializers.PrimaryKeyRelatedField(
+        queryset=models.Abstract.objects.all(),
+        source="abstract",
+        write_only=True
+    )
 
     class Meta:
         model = models.Author
-        exclude = ["abstract"]
-        extra_kwargs = {"order": {"required": False}, "name": {"required": False}}
+        exclude = ['abstract']
+        extra_kwargs = {"order": {"required": False},}
+        
+    
+    @transaction.atomic
+    def create(self, validated_data):
+        print(validated_data)
+        affiliation_data = validated_data.pop('affiliation')
+        
+        affiliation, created = models.AuthorAffiliation.objects.get_or_create(
+            institute = affiliation_data.get('institute', None),
+            department = affiliation_data.get('department', None),
+            nationality = affiliation_data.get('nationality', None),
+            city = affiliation_data.get('city', None),
+        )
+        validated_data['affiliation'] = affiliation
+        
+        instance = super().create(validated_data)
+        transaction.set_rollback(True)
+        return instance
 
 
 class AbstractSerializer(serializers.ModelSerializer):

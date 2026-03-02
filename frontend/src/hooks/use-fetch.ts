@@ -1,16 +1,22 @@
 import axiosClient from "@/clients/axiosClient"
 import { isAxiosError } from "axios"
-import { useEffect, useState } from "react"
+import { useCallback, useEffect, useState } from "react"
 
-export const useFetch = <T>(url: string) => {
+export const useFetch = <T>(url?: string | null) => {
     const [data, setData] = useState<T>(null)
-    const [fetching, setFetching] = useState(true)
+    const [fetching, setFetching] = useState(false)
     const [error, setError] = useState(null)
 
-    const fetchData = async () => {
+    const fetchData = useCallback(async () => {
+        if (!url) {
+            return
+        }
+
+        setFetching(true)
         try {
             const res = await axiosClient.get<T>(url)
             setData(res.data)
+            setError(null)
         } catch (error) {
             if (import.meta.env.DEV) {
                 if (isAxiosError(error)) {
@@ -21,9 +27,9 @@ export const useFetch = <T>(url: string) => {
         } finally {
             setFetching(false)
         }
-    }
+    }, [url])
 
-    useEffect(() => { fetchData() }, [url])
+    useEffect(() => { fetchData() }, [url, fetchData])
 
     return { data, fetching, error, fetchData }
 }

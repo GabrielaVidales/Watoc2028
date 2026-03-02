@@ -16,10 +16,11 @@ import axiosClient from '@/clients/axiosClient'
 
 
 type AbstractFormProps = {
-    abstract?: AbstractSchema
+    abstract?: AbstractSchema,
+    onSubmit?: () => Promise<void> | void
 }
 
-function AbstractForm({ abstract }: AbstractFormProps) {
+function AbstractForm({ abstract, onSubmit }: AbstractFormProps) {
     const { handleSubmit, reset, control, formState: { isValid, isSubmitting } } = useForm({
         resolver: zodResolver(abstractSchema),
         defaultValues: submitAbstractDefaults.parse({}),
@@ -30,8 +31,12 @@ function AbstractForm({ abstract }: AbstractFormProps) {
         reset(abstract || {})
     }, [abstract])
 
-    const onSubmit = handleSubmit(async (data) => {
+    const onFormSubmit = handleSubmit(async (data) => {
         await new Promise(r => setTimeout(r, 1000))
+
+        console.log(data);
+        console.log(abstract);
+
         if (!data.id || data.id === -1) {
             console.log('Invalid ID');
             return
@@ -40,6 +45,7 @@ function AbstractForm({ abstract }: AbstractFormProps) {
         const res = await axiosClient.patch<AbstractSchema>(`/abstracts/${abstract.id}/`, data)
         console.log(res);
 
+        onSubmit?.()
 
     }, invalid => {
         console.log(invalid);
@@ -47,7 +53,7 @@ function AbstractForm({ abstract }: AbstractFormProps) {
 
 
     return (
-        <form onSubmit={onSubmit} id='abstract-submission-form'>
+        <form onSubmit={onFormSubmit} id='abstract-submission-form'>
             <fieldset disabled={isSubmitting}>
                 <div className='space-y-7'>
                     <Controller
@@ -109,12 +115,12 @@ function AbstractForm({ abstract }: AbstractFormProps) {
                         render={({ field, fieldState }) => (
                             <Field data-invalid={fieldState.invalid}>
                                 <FieldLabel htmlFor={field.name}>Abstract text</FieldLabel>
+                                <FieldDescription>Enter the abstract content below.</FieldDescription>
                                 <InfoAlert
                                     title='IMPORTANT'
                                     messages={'Total character count is 2,600 and includes spaces. Tables and images are not included, as only text is allowed. You will be able to see your character count below the text boxes.'}
                                     className='mx-auto'
                                 />
-                                <FieldDescription>Enter the abstract content below.</FieldDescription>
                                 <Textarea
                                     {...field}
                                     id={field.name}

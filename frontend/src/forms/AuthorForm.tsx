@@ -1,7 +1,7 @@
 import { Field, FieldContent, FieldDescription, FieldError, FieldLabel } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { authorAffiliationSchema, authorSchema, type AuthorAffiliationSchema } from '@/schemas/abstract-schemas'
+import { authorAffiliationSchema, authorSchema, type AbstractSchema, type AuthorAffiliationSchema } from '@/schemas/abstract-schemas'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Controller, useFieldArray, useForm } from 'react-hook-form'
 import { countries } from '@/utils/countriesInfo'
@@ -13,17 +13,27 @@ import { Separator } from '@/components/ui/separator'
 import axiosClient from '@/clients/axiosClient'
 import { Spinner } from '@/components/ui/spinner'
 import { cn } from '@/lib/utils'
+import { isAxiosError } from 'axios'
 
-function AuthorForm() {
-    const abstractId = 1
-    const { control, handleSubmit, reset, formState: { isValid, isSubmitting } } = useForm({
-        resolver: zodResolver(authorAffiliationSchema),
+type AbstractFormProps = {
+    abstractId?: number,
+    onSubmit?: () => Promise<void> | void
+}
+
+function AuthorForm({ abstractId }: AbstractFormProps) {
+    const { control, handleSubmit, setValue, formState: { isValid, isSubmitting } } = useForm({
+        resolver: zodResolver(authorSchema),
         mode: 'onChange',
         defaultValues: {
-            city: '',
-            department: '',
-            institute: '',
-            nationality: '',
+            first_name: '',
+            last_name: '',
+            email: '',
+            affiliation: {
+                city: '',
+                department: '',
+                institute: '',
+                nationality: '',
+            }
         }
     })
 
@@ -31,26 +41,35 @@ function AuthorForm() {
 
 
     const onFormSubmit = handleSubmit(async (data) => {
-        console.log(data);
+        try {
+            const payload = {
+                ...data,
+                abstract_id: abstractId || null
+            }
+            console.log(payload);
 
-        const res = await axiosClient.post('/affiliations/', data)
-        console.log(res.data);
+            const res = await axiosClient.post('/authors/', payload)
+            console.log(res.data);
 
-
+        } catch (error) {
+            if (import.meta.env.DEV){
+                if (isAxiosError(error)){
+                    console.log(error.response.data);
+                    
+                }
+            }
+        }
 
     })
 
 
     const handleSelectAffiliation = (data: AuthorAffiliationSchema) => {
-        reset({ ...data })
+        setValue('affiliation', { ...data })
     }
-
 
     const fetchPreviousAffilliations = async () => {
         const aff = await axiosClient.get<AuthorAffiliationSchema[]>(`/abstracts/${abstractId}/affiliations/`)
         setPreviousAffiliations(aff.data)
-
-        console.log(aff.data);
     }
     useEffect(() => {
         fetchPreviousAffilliations()
@@ -60,10 +79,64 @@ function AuthorForm() {
         <form onSubmit={onFormSubmit}>
             <fieldset disabled={isSubmitting}>
                 <div className='grid grid-cols-1 md:grid-cols-2 items-start gap-5'>
+                    <div className='space-y-5 col-span-full'>
+                        <h2 className='text-lg font-semibold text-primary-main'>Author affiliation</h2>
+                        <Controller
+                            name={`first_name`}
+                            control={control}
+                            render={({ field, fieldState }) => (
+                                <Field data-invalid={fieldState.invalid}>
+                                    <FieldLabel htmlFor={field.name}>First Name</FieldLabel>
+                                    <Input
+                                        {...field}
+                                        id={field.name}
+                                        aria-invalid={fieldState.invalid}
+                                        autoComplete="off"
+                                        maxLength={100}
+                                    />
+                                    {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                                </Field>
+                            )}
+                        />
+                        <Controller
+                            name={`last_name`}
+                            control={control}
+                            render={({ field, fieldState }) => (
+                                <Field data-invalid={fieldState.invalid}>
+                                    <FieldLabel htmlFor={field.name}>Last Name</FieldLabel>
+                                    <Input
+                                        {...field}
+                                        id={field.name}
+                                        aria-invalid={fieldState.invalid}
+                                        autoComplete="off"
+                                        maxLength={100}
+                                    />
+                                    {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                                </Field>
+                            )}
+                        />
+                        <Controller
+                            name={`email`}
+                            control={control}
+                            render={({ field, fieldState }) => (
+                                <Field data-invalid={fieldState.invalid}>
+                                    <FieldLabel htmlFor={field.name}>Email</FieldLabel>
+                                    <Input
+                                        {...field}
+                                        id={field.name}
+                                        aria-invalid={fieldState.invalid}
+                                        autoComplete="off"
+                                        maxLength={100}
+                                    />
+                                    {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                                </Field>
+                            )}
+                        />
+                    </div>
                     <div className='space-y-5'>
                         <h2 className='text-lg font-semibold text-primary-main'>Author affiliation</h2>
                         <Controller
-                            name={`institute`}
+                            name={`affiliation.institute`}
                             control={control}
                             render={({ field, fieldState }) => (
                                 <Field data-invalid={fieldState.invalid}>
@@ -80,7 +153,7 @@ function AuthorForm() {
                             )}
                         />
                         <Controller
-                            name={`department`}
+                            name={`affiliation.department`}
                             control={control}
                             render={({ field, fieldState }) => (
                                 <Field data-invalid={fieldState.invalid}>
@@ -97,7 +170,7 @@ function AuthorForm() {
                             )}
                         />
                         <Controller
-                            name={`nationality`}
+                            name={`affiliation.nationality`}
                             control={control}
                             render={({ field, fieldState }) => (
                                 <Field orientation="responsive" data-invalid={fieldState.invalid}>
@@ -138,7 +211,7 @@ function AuthorForm() {
                             )}
                         />
                         <Controller
-                            name={`city`}
+                            name={`affiliation.city`}
                             control={control}
                             render={({ field, fieldState }) => (
                                 <Field data-invalid={fieldState.invalid}>
@@ -208,6 +281,9 @@ function AuthorForm() {
                                 <Save data-icon="inline-start" />
                             )}
                             Save changes
+                        </Button>
+                        <Button>
+                            asdad
                         </Button>
                     </div>
                 </div>

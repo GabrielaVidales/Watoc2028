@@ -3,6 +3,7 @@ from rest_framework import permissions, status
 from rest_framework.decorators import action
 from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet
+from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
 from django.contrib.auth import get_user_model
@@ -197,6 +198,14 @@ class AbstractView(ModelViewSet):
         data = AuthorAffiliationSerializer(abstract.affiliations.all(), many=True)
         return Response(data.data)
     
+    @action(detail=True, methods=["get"], url_path="authors")
+    def get_authors(self, request, pk=None):
+        abstract = self.get_object()
+        serializer = AuthorSerializer(abstract.authors, many=True)
+        print(serializer.data)
+        return Response(serializer.data)
+        
+    
     
     
 
@@ -210,9 +219,3 @@ class AuthorAffiliationsView(ModelViewSet):
     queryset = AuthorAffiliation.objects.all()
     serializer_class=AuthorAffiliationSerializer
     permission_classes = [permissions.IsAuthenticated]
-
-    @transaction.atomic
-    def create(self, request, *args, **kwargs):
-        instance = super().create(request, *args, **kwargs)
-        transaction.set_rollback(True)
-        return instance

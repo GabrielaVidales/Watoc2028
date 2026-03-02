@@ -1,5 +1,5 @@
 import { useFetch } from '@/hooks/use-fetch'
-import type { AbstractSchema } from '@/schemas/abstract-schemas'
+import type { AbstractSchema, AuthorSchema } from '@/schemas/abstract-schemas'
 import React, { useCallback, useEffect, useState } from 'react'
 import { useParams } from 'react-router'
 import { Card, CardAction, CardContent, CardDescription, CardFooter, CardHeader, CardTitle, } from "@/components/ui/card"
@@ -10,11 +10,19 @@ import { InfoAlert } from './CreateAbstractPage'
 import AbstractForm from '@/forms/AbstractForm'
 import { ChevronsLeft, ChevronsRight } from 'lucide-react'
 import AuthorForm from '@/forms/AuthorForm'
+import { DataTable } from '@/components/ui/data-table'
+import { authorColumns } from '@/data/authors-columns'
 
 
 function EditAbstractPage() {
     const { id } = useParams()
-    const { data } = useFetch<AbstractSchema>(`/abstracts/${id}/`)
+    const { data, fetchData } = useFetch<AbstractSchema>(`/abstracts/${id}/`)
+    const { data: authors } = useFetch<AuthorSchema[]>(`/abstracts/${id}/authors/`)
+
+    useEffect(()=>{
+        console.log(authors);
+        
+    }, [authors])
 
     const [currStep, setCurrState] = useState(0)
     const nextStep = () => {
@@ -34,20 +42,23 @@ function EditAbstractPage() {
                 return (
                     <div className='w-full space-y-5 p-5'>
                         <h2 className='text-2xl font-semibold'>Abstract Submission</h2>
-                        <AbstractForm abstract={data} />
+                        <AbstractForm abstract={data} onSubmit={async () => { await fetchData() }} />
                     </div>
                 )
             case 1:
                 return (
                     <div className='w-full space-y-5 p-5'>
                         <h2 className='text-2xl font-semibold'>Abstract Submission</h2>
-                        <AuthorForm />
+
+                        <DataTable columns={authorColumns} data={authors ? authors : []} />
+
+                        <AuthorForm abstractId={data.id} />
                     </div>
                 )
             default:
                 return null
         }
-    }, [data])
+    }, [data, authors])
 
     return (
         <div className='w-full max-w-5xl grid grid-cols-1 md:grid-cols-3 gap-3 p-3 mx-auto'>
