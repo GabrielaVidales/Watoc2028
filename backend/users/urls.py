@@ -7,6 +7,7 @@ router.register(r"abstracts", views.AbstractView, "abstracts")
 router.register(r"affiliations", views.AuthorAffiliationsView, "affiliations")
 router.register(r"authors", views.AuthorsView, "authors")
 router.register(r"users", views.UserView, "users")
+router.register(r"abstract-declarations", views.AuthorDeclarationsView, "abstract_declarations")
 
 urlpatterns = [
     path("login/", views.CustomTokenObtainPairView.as_view(), name="login"),

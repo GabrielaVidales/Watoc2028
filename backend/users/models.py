@@ -46,7 +46,7 @@ class Participant(models.Model):
     field_of_study = models.CharField(max_length=100, blank=True)
 
     needs_visa = models.BooleanField(default=False)
-    invitation_letter = models.FileField(upload_to="users/invitation_letter/", blank=True, null=True, default=None)
+    invitation_letter = models.FileField(upload_to="users/invitation_letter/", blank=True, default=None)
 
     student_proof = models.FileField(upload_to="users/student_proof/", blank=True, null=True, default=None)
 
@@ -137,6 +137,7 @@ class AuthorAffiliation(models.Model):
         null=True,
     )
     
+
 
 class Author(models.Model):
     first_name = models.CharField(null=False, blank=True)

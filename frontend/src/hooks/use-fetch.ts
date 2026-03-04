@@ -31,6 +31,6 @@ export const useFetch = <T>(url?: string | null) => {
 
     useEffect(() => { fetchData() }, [url, fetchData])
 
-    return { data, fetching, error, fetchData }
+    return { data, fetching, error, fetchData, setData }
 }
 

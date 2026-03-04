@@ -1,0 +1,73 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{% static 'css/abstract_styles.css' %}">
+    <title>{{ abstract.title }}</title>
+</head>
+
+<body>
+    <header id="cabecera">
+        <div class="header-container">
+            <img src="img/WatocPNGLogo.png" class="header-logo">
+
+            <div style="display: flex; flex-flow: column; text-align: right; font-weight: bold;">
+                <span>Mérida, Mexico</span>
+                <span>WATOC 2025</span>
+            </div>
+        </div>
+        <hr>
+    </header>
+
+    <footer id="foot">
+        <div class="footer-container">
+            <hr>
+            <div class="flex-between">
+                <div>
+                    World Association of Theoretical and Computational Chemists
+                </div>
+
+            </div>
+        </div>
+        <div style="text-align: center;">
+            <span class="page-number"></span>
+        </div>
+    </footer>
+
+    <h1 class="title">{{ abstract.title }}</h1>
+
+    <div style="font-weight: bold; text-align: center;">
+        {% for author in authors_list %}
+        <span>
+            {{ author.full_name }}
+            <sup>
+                {{author.aff_index}}
+            </sup>
+            {% if not forloop.last %}, {% endif %}
+        </span>
+        {% endfor %}
+    </div>
+
+    <div style="text-align: center; font-style: italic;">
+        {% for aff in affiliations_list %}
+        <span>
+            <sup>
+                {{aff.index}}
+            </sup>
+            {{ aff.text }}{% if not forloop.last %}; {% endif %}
+        </span>
+        {% endfor %}
+    </div>
+
+    <h2 class="subtitle">Abstract</h2>
+    <p class="text">{{ abstract.text }}</p>
+
+    <h2 class="subtitle">References</h2>
+    <p class="text">{{ abstract.references | linebreaks }}</p>
+</body>
+
+</html>

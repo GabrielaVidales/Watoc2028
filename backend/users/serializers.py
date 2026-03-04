@@ -19,8 +19,8 @@ class ParticipantSerializer(serializers.ModelSerializer):
             "field_of_study",
             "abstracts",
         )
-        
-    def get_abstracts(self, obj:models.Participant):
+
+    def get_abstracts(self, obj: models.Participant):
         serializer = AbstractSerializer(obj.user.abstracts, many=True)
         return serializer.data
 
@@ -105,48 +105,61 @@ class UserSerializer(serializers.ModelSerializer):
 
 """"""
 
+
 class AuthorAffiliationSerializer(serializers.ModelSerializer):
+    id = serializers.IntegerField(required=False)
+
     class Meta:
         model = models.AuthorAffiliation
         fields = "__all__"
 
 
 class AuthorSerializer(serializers.ModelSerializer):
-    affiliation = AuthorAffiliationSerializer()
+    affiliation = AuthorAffiliationSerializer(allow_null=True, required=False)
 
-    abstract_id = serializers.PrimaryKeyRelatedField(
-        queryset=models.Abstract.objects.all(),
-        source="abstract",
-        write_only=True
-    )
+    abstract_id = serializers.PrimaryKeyRelatedField(queryset=models.Abstract.objects.all(), source="abstract", write_only=True)
 
     class Meta:
         model = models.Author
-        exclude = ['abstract']
-        extra_kwargs = {"order": {"required": False},}
-        
-    
+        exclude = ["abstract"]
+        extra_kwargs = {"order": {"required": False}, }
+
     @transaction.atomic
     def create(self, validated_data):
-        print(validated_data)
-        affiliation_data = validated_data.pop('affiliation')
-        
-        affiliation, created = models.AuthorAffiliation.objects.get_or_create(
-            institute = affiliation_data.get('institute', None),
-            department = affiliation_data.get('department', None),
-            nationality = affiliation_data.get('nationality', None),
-            city = affiliation_data.get('city', None),
-        )
-        validated_data['affiliation'] = affiliation
-        
+        affiliation_data = validated_data.pop("affiliation")
+        if affiliation_data is not None:
+            affiliation, created = models.AuthorAffiliation.objects.get_or_create(
+                institute=affiliation_data.get("institute", None),
+                department=affiliation_data.get("department", None),
+                nationality=affiliation_data.get("nationality", None),
+                city=affiliation_data.get("city", None),
+            )
+            validated_data["affiliation"] = affiliation
+
         instance = super().create(validated_data)
-        transaction.set_rollback(True)
+        # transaction.set_rollback(True)
+        return instance
+
+    @transaction.atomic
+    def update(self, instance, validated_data):
+        affiliation_data = validated_data.pop("affiliation")
+        if affiliation_data is not None:
+            affiliation, created = models.AuthorAffiliation.objects.update_or_create(
+                institute=affiliation_data.get("institute", None),
+                department=affiliation_data.get("department", None),
+                nationality=affiliation_data.get("nationality", None),
+                city=affiliation_data.get("city", None),
+                abstract=instance.abstract,
+            )
+            validated_data["affiliation"] = affiliation
+
+        instance = super().update(instance, validated_data)
+
+        # transaction.set_rollback(True)
         return instance
 
 
 class AbstractSerializer(serializers.ModelSerializer):
-    # authors = AuthorSerializer(many=True)
-
     class Meta:
         model = models.Abstract
         fields = "__all__"
@@ -164,7 +177,6 @@ class AbstractSerializer(serializers.ModelSerializer):
 
     @transaction.atomic
     def update(self, instance: models.Abstract, validated_data):
-        # authors_data = validated_data.pop("authors")
         extra_kwargs = {"previous_status": instance.status}
         for attr, value in validated_data.items():
             setattr(instance, attr, value)
@@ -172,3 +184,12 @@ class AbstractSerializer(serializers.ModelSerializer):
         instance.save()
         # transaction.on_commit(lambda: signals.on_abstract_updated(instance))
         return instance
+
+
+class AbstractDeclarationsSerializer(serializers.ModelSerializer):
+    abstract_id = serializers.PrimaryKeyRelatedField(queryset=models.Abstract.objects.all(), source="abstract", write_only=True)
+
+    class Meta:
+        model = models.AbstractDeclarations
+        exclude = ["abstract"]
+

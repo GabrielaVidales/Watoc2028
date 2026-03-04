@@ -12,8 +12,13 @@ from rest_framework_simplejwt.exceptions import TokenError, InvalidToken
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth.models import update_last_login
 from django.conf import settings
-from .serializers import UserSerializer, AbstractSerializer, ParticipantSerializer, AuthorSerializer, AuthorAffiliationSerializer
-from .models import Abstract, Participant, Author, AuthorAffiliation
+from .serializers import UserSerializer, AbstractSerializer, ParticipantSerializer, AuthorSerializer, AuthorAffiliationSerializer, AbstractDeclarationsSerializer
+from .models import Abstract, Author, AuthorAffiliation, AbstractDeclarations
+from django.http import HttpResponse
+from django.template.loader import render_to_string
+from weasyprint import HTML, CSS
+import os
+
 
 
 User = get_user_model()
@@ -191,31 +196,127 @@ class AbstractView(ModelViewSet):
     queryset = Abstract.objects.all()
     serializer_class = AbstractSerializer
     permission_classes = [permissions.IsAuthenticated]
-    
+
     @action(detail=True, methods=["get"], url_path="affiliations")
     def get_affiliations(self, request, pk=None):
         abstract = self.get_object()
         data = AuthorAffiliationSerializer(abstract.affiliations.all(), many=True)
         return Response(data.data)
-    
-    @action(detail=True, methods=["get"], url_path="authors")
+
+    @action(detail=True, methods=["get", "patch"], url_path="authors")
     def get_authors(self, request, pk=None):
         abstract = self.get_object()
+        if request.method == "PATCH":
+            author_data = request.data.get("authors")
+            for author in author_data:
+                instance = Author.objects.get(id=author.get('id'))
+                instance.order = author.get('order')
+                instance.save()
+                
+            serializer = AuthorSerializer(abstract.authors, data=author_data, many=True)
+            if serializer.is_valid(raise_exception=True):
+                return Response(serializer.data)
+
         serializer = AuthorSerializer(abstract.authors, many=True)
-        print(serializer.data)
         return Response(serializer.data)
-        
+
+    @transaction.atomic
+    @action(detail=True, methods=["get", "patch"], url_path="declarations")
+    def update_declarations(self, request, pk=None):
+        instance = self.get_object()
+        if request.method == "GET":
+            declarations, created = AbstractDeclarations.objects.get_or_create(abstract=instance)
+            serializer = AbstractDeclarationsSerializer(declarations)
+            return Response(serializer.data)
+
+        if request.method == "PATCH":
+            declarations, created = AbstractDeclarations.objects.update_or_create(
+                abstract=instance,
+                defaults={
+                    "confirm_accuracy": request.data.get("confirm_accuracy", False),
+                    "consent_publication": request.data.get("consent_publication", False),
+                    "submit_on_behalf": request.data.get("submit_on_behalf", False),
+                    "commitment_attendance": request.data.get("commitment_attendance", False),
+                    "not_previously_published": request.data.get("not_previously_published", False),
+                    "no_ai_used": request.data.get("no_ai_used", False),
+                },
+            )
+            declarations.save()
+            serializer = AbstractDeclarationsSerializer(declarations)
+            # transaction.set_rollback(True)
+            return Response(serializer.data)
+
+        return Response(status=status.HTTP_400_BAD_REQUEST)
+
+    @action(detail=True, methods=["get"], url_path="preview")
+    def generate_pdf(self, request: Request, pk=None):
+        abstract = Abstract.objects.prefetch_related("authors__affiliation").get(id=pk)
+        context = self.get_abstract_context(abstract)
+
+        html_string = render_to_string("abstract_template.html", context)
+        path_to_css = os.path.join(settings.BASE_DIR, "static", "css", "abstract_styles.css")
+        path_to_static = os.path.join(settings.BASE_DIR, "static")
+        html = HTML(string=html_string, base_url=path_to_static)
+
+        pdf_file = html.write_pdf(
+            stylesheets=[CSS(filename=path_to_css)],
+        )
+
+        response = HttpResponse(pdf_file, content_type="application/pdf")
+        response["Content-Disposition"] = f'attachment; filename="{abstract.title or f'abstract_{abstract}'}.pdf"'
+        return response
+
     
-    
-    
+    def get_abstract_context(self, abstract):
+        authors_data = []
+        affiliations_set = {}
+        unique_affiliations = []
+
+        counter = 1
+
+        for author in abstract.authors.all():
+            aff = author.affiliation
+            aff_id = aff.id if aff else None
+            if aff_id and aff_id not in affiliations_set:
+                affiliations_set[aff_id] = counter
+                unique_affiliations.append(
+                    {
+                        "index": counter,
+                        "text": f"{aff.institute}, {aff.department}, {aff.city}, {aff.get_nationality_display()}",
+                    }
+                )
+                counter += 1
+            
+            authors_data.append({
+                'full_name': f"{author.first_name[0]}. {author.last_name}",            
+                'aff_index': affiliations_set.get(aff_id), 
+                # 'is_corresponding': author.is_corresponding
+            })
+            
+        return {
+            'abstract': abstract,
+            'authors_list': authors_data,
+            'affiliations_list': unique_affiliations
+        }
+
 
 class AuthorsView(ModelViewSet):
     queryset = Author.objects.all()
     serializer_class = AuthorSerializer
     permission_classes = [permissions.IsAuthenticated]
 
+    def update(self, request, *args, **kwargs):
+        print(request.data)
+        return super().update(request, *args, **kwargs)
+
 
 class AuthorAffiliationsView(ModelViewSet):
     queryset = AuthorAffiliation.objects.all()
-    serializer_class=AuthorAffiliationSerializer
+    serializer_class = AuthorAffiliationSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+
+class AuthorDeclarationsView(ModelViewSet):
+    queryset = AbstractDeclarations.objects.all()
+    serializer_class = AbstractDeclarationsSerializer
     permission_classes = [permissions.IsAuthenticated]

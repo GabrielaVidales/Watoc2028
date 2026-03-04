@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/dialog"
 import { useAuth, type UserProfile } from '@/contexts/AuthContext'
 import { formatDate } from '@/utils/formatDate'
-import { Calendar, Camera, LockOpen, Mail, MapPin } from 'lucide-react'
+import { Calendar, Camera, CircleAlert, LockOpen, Mail, MailWarning, MapPin, Pencil, Search, Send, Trash2 } from 'lucide-react'
 import React, { useEffect, useState } from 'react'
 import { InfoAlert } from './CreateAbstractPage'
 import { Link, NavLink, useNavigate } from 'react-router'
@@ -22,22 +22,43 @@ import { urls } from '@/routes/routes'
 import { useFetch } from '@/hooks/use-fetch'
 import { useProfiles } from '@/hooks/use-profiles'
 import axiosClient from '@/clients/axiosClient'
-import type { AbstractSchema } from '@/schemas/abstract-schemas'
+import { presentationTypes, type AbstractSchema } from '@/schemas/abstract-schemas'
 import { isAxiosError } from 'axios'
+import { cn } from '@/lib/utils'
+import { Badge } from '@/components/ui/badge'
 
 
 function ViewAbstracts() {
     const navigate = useNavigate()
-    const { currentUser, getProfile } = useAuth()
     const { profile } = useProfiles()
 
     const handleCreate = async () => {
         try {
             const response = await axiosClient.post<AbstractSchema>('abstracts/')
-            navigate(urls.users.editAbstract.build(response.data.id))            
+            navigate(urls.users.editAbstract.build(response.data.id))
         } catch (error) {
-            if (import.meta.env.DEV){
-                if (isAxiosError(error)){
+            if (import.meta.env.DEV) {
+                if (isAxiosError(error)) {
+                    console.log(error.response.data);
+                }
+            }
+        }
+    }
+
+    const handlePreview = async (id: number | string, name: string = 'abstract') => {
+        try {
+            const response = await axiosClient.get<Blob>(`/abstracts/${id}/preview`, {
+                responseType: 'blob',
+            })
+            console.log(response);
+            const href = URL.createObjectURL(response.data);
+            const link = document.createElement('a');
+            link.href = href;
+            link.setAttribute('download', `${name.replaceAll(" ", "_")}_preview.pdf`);
+            link.click();
+        } catch (error) {
+            if (import.meta.env.DEV) {
+                if (isAxiosError(error)) {
                     console.log(error.response.data);
                 }
             }
@@ -61,10 +82,68 @@ function ViewAbstracts() {
                         />
 
                         {profile?.participant?.abstracts.map(a => (
-                            <div key={a.id}>
-                                {a.title}
+                            <div key={a.id} className='border rounded-md shadow p-3'>
+                                <div className='flex gap-5'>
+                                    <div className='size-20 flex flex-col items-center justify-center border-3 gap-1 p-3 rounded-md border-primary/20 bg-primary/5'>
+                                        <MailWarning className='size-5' />
+                                        <span className='uppercase text-xs font-semibold'>
+                                            {a.status}
+                                        </span>
+                                    </div>
+
+                                    <div className='w-full flex flex-col md:flex-row md:justify-between'>
+                                        <div className='w-full'>
+                                            <Badge variant='outline' className='uppercase text-muted-foreground'>
+                                                Folio: {a.id}
+                                            </Badge>
+                                            <p className='text-lg tracking-wide mb-2'>
+                                                {a.title || (
+                                                    <span className='flex items-center gap-1 text-destructive'>
+                                                        <CircleAlert className='size-5 shrink-0' />
+                                                        No title set
+                                                    </span>
+                                                )}
+                                            </p>
+                                            <p className='mb-2 text-sm text-muted-foreground flex flex-col sm:flex-row sm:items-center sm:gap-2'>
+                                                Presentation type:
+                                                <span>
+                                                    {presentationTypes?.find(p => p.value === a.presentation_type)?.label || (
+                                                        <span className='inline-flex items-center gap-1 text-destructive'>
+                                                            <CircleAlert className='size-3 shrink-0' />
+                                                            Not set
+                                                        </span>
+                                                    )}
+                                                </span>
+                                            </p>
+                                        </div>
+
+                                        <div className="flex items-center gap-1 bg-muted/30 p-1 rounded-lg">
+                                            <Button variant='outline' className="shadow-sm" title="Preview" onClick={() => {
+                                                handlePreview(a.id, a.title)
+                                            }}>
+                                                <Search className="size-4" />
+                                                <span className='max-sm:hidden'>Preview</span>
+                                            </Button>
+                                            <Button variant="outline" className="shadow-sm" title="Edit" onClick={() => {
+                                                navigate(urls.users.editAbstract.build(a.id))
+                                            }}>
+                                                <Pencil className="size-4" />
+                                                <span className='max-sm:hidden'>Edit</span>
+                                            </Button>
+                                            <Button variant="outline" title="Submit">
+                                                <Send className="size-4" />
+                                                <span className='max-sm:hidden'>Submit</span>
+                                            </Button>
+                                            <div className="w-px h-4 bg-border mx-1" />
+                                            <Button variant="destructive" size="icon" title="Delete">
+                                                <Trash2 className="size-4" />
+                                            </Button>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         ))}
+
 
                         <Dialog>
                             <DialogTrigger asChild>
