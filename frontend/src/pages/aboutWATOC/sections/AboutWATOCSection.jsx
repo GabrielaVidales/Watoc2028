@@ -3,74 +3,6 @@ import { Microscope } from 'lucide-react';
 import React from 'react'
 import { Link } from 'react-router';
 
-const Text = ({ isReversed = false }) => (
-    <Grid
-        container
-        spacing={4}
-        justifyContent="center"
-        alignItems="center"
-        sx={{
-            flexDirection: { xs: 'column', md: isReversed ? 'row-reverse' : 'row' },
-        }}
-    >
-        <Grid item xs={12} md={10}>
-            <Box sx={{ position: 'relative', pl: { xs: 2, md: 4 }, pr: { xs: 2, md: 3 } }}>
-                <Typography variant="h6" fontWeight="bold" color="primary.main" gutterBottom>
-                    Welcome to WATOC 2028
-                </Typography>
-
-                <Typography
-                    variant="body1"
-                    gutterBottom
-                    sx={{
-                        fontSize: '1.05rem',
-                        lineHeight: 1.8,
-                        textAlign: 'justify',
-                    }}
-                >
-                    WATOC aims to:
-                </Typography>
-                <List>
-                    {[{ text: 'Promote excellence in theoretical and computational chemistry.', },
-                    { text: 'Encourage interaction and collaboration among scientists worldwide.', },
-                    { text: 'Support both method development and practical applications across all chemical disciplines.', },
-                    ].map((item, index) =>
-                        <ListItem key={index}>
-                            <ListItemIcon>
-                                <Avatar sx={{ color: 'white', backgroundColor: 'primary.main' }}>
-                                    <Microscope size={24} />
-                                </Avatar>
-                            </ListItemIcon>
-                            {item.text}
-                        </ListItem>
-                    )}
-                </List>
-                <Typography
-                    variant="body1"
-                    gutterBottom
-                    sx={{
-                        fontSize: '1.05rem',
-                        lineHeight: 1.8,
-                        textAlign: 'justify',
-                    }}
-                >
-                    One of WATOC’s central activities is the organization of Triennial WATOC Congresses, which rank among the largest international meetings in the field of theoretical and computational chemistry. The congress in Mérida is the 14th in the WATOC series.
-                    Although originally founded with a focus on theoretical organic chemistry, WATOC has continuously expanded its scope and now represents all areas of chemistry where theory and computation play a fundamental role.
-                </Typography>
-                <Box
-                    sx={{
-                        mt: 3,
-                        pt: 2,
-                        borderTop: '3px solid',
-                        borderColor: 'primary.main',
-                        opacity: 0.3,
-                    }}
-                />
-            </Box>
-        </Grid>
-
-    </Grid>
-)
 
 export default function AboutWATOCSection() {
     return (
@@ -83,22 +15,23 @@ export default function AboutWATOCSection() {
         >
             <Container maxWidth={'md'}>
                 <Box textAlign="center" mb={6}>
-
-                    <Typography
-                        variant="overline"
-                        color="primary"
-                        fontWeight="bold"
-                        sx={{ fontSize: '1rem', letterSpacing: 2 }}
-                    >
-                        About WATOC
-                    </Typography>
+                    <Container maxWidth='sm'>
+                        <Typography
+                            variant="overline"
+                            color="primary"
+                            fontWeight="bold"
+                            sx={{ fontSize: '1rem', letterSpacing: 2, lineHeight: 0 }}
+                        >
+                            About
+                        </Typography>
+                    </Container>
                     <Typography
                         variant="h3"
                         fontWeight="bold"
                         sx={{
                             mt: 1,
                             mb: 2,
-                            fontSize: { xs: '2rem', md: '2.5rem' },
+                            fontSize: { xs: '2rem', md: '2.5rem', },
                         }}
                     >
                         World Association of Theoretical and Computational Chemists
@@ -115,27 +48,16 @@ export default function AboutWATOCSection() {
                 </Box>
 
                 <Stack spacing={4} textAlign="left" alignItems="center">
-                    <Typography
-                        sx={{
-                            maxWidth: 1000,
-                            fontSize: { xs: '1rem', md: '1.15rem' },
-                            opacity: 0.95,
-                            lineHeight: 1.7,
-                        }}
-                    >
-                        The World Association of Theoretical and Computational Chemists (<Link to='https://www.watoc.net/index.html'>WATOC</Link>) is an international scientific organization dedicated to the promotion and advancement of theoretical and computational chemistry worldwide.
-                    </Typography>
-                    <Typography
-                        sx={{
-                            maxWidth: 1000,
-                            fontSize: { xs: '1rem', md: '1.15rem' },
-                            opacity: 0.95,
-                            lineHeight: 1.7,
-                        }}
-                    >
+                    <p className='mb-6 leading-6 text-justify text-sm md:text-lg md:leading-7'>
+                        The World Association of Theoretical and Computational Chemists (<Link to='https://www.watoc.net/index.html' className='text-primary-light'>WATOC</Link>) is an international scientific organization dedicated to the promotion and advancement of theoretical and computational chemistry worldwide.
+                    </p>
+                    <p className='mb-6 leading-6 text-justify text-sm md:text-lg md:leading-7'>
                         WATOC fosters global collaboration, scientific exchange, and the development of theoretical methods and computational tools that support research across all areas of chemistry.
-                    </Typography>
-                    <Text></Text>
+                    </p>
+                    <p className='mb-6 leading-6 text-justify text-sm md:text-lg md:leading-7'>
+                        One of WATOC's central activities is the organization of Triennial WATOC Congresses, which rank among the largest international meetings in the field of theoretical and computational chemistry. The congress in Mérida is the 14th in the WATOC series.
+                        Although originally founded with a focus on theoretical organic chemistry, WATOC has continuously expanded its scope and now represents all areas of chemistry where theory and computation play a fundamental role.
+                    </p>
                 </Stack>
             </Container>
         </Box>

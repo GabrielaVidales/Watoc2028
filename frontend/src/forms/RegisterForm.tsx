@@ -122,7 +122,7 @@ export default function RegisterForm() {
                                         </SelectTrigger>
                                         <SelectContent position="item-aligned">
                                             {prefixes.map(p => (
-                                                <SelectItem value={p} key={p}>{p}</SelectItem>
+                                                <SelectItem value={p.value} key={p.value}>{p.label}</SelectItem>
                                             ))}
                                         </SelectContent>
                                     </Select>
@@ -435,31 +435,6 @@ export default function RegisterForm() {
                     </Button>
                 </div>
             </fieldset>
-
-            <Button type='button' variant='ghost' onClick={() => reset(debugData)} className='w-full'>Debug data</Button>
         </form>
     )
-}
-
-
-const debugData = {
-    first_name: "Carlos",
-    middle_name: "Antonio",
-    last_name: "Sánchez",
-    prefix: "Prof.",
-    pronouns: "he/him",
-    nationality: "MX",
-    city: "Mérida",
-    affiliation: "Autonomous University of Yucatan",
-    job_title: "Senior Research Fellow",
-    field_of_study: "Artificial Intelligence",
-    email: {
-        value: "c.sanchez@example.com",
-        confirm: "c.sanchez@example.com"
-    },
-    password: {
-        value: "PutaMadre123#",
-        confirm: "PutaMadre123#"
-    },
-    captcha: '',
 }

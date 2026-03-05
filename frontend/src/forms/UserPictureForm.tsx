@@ -81,7 +81,7 @@ export function UserPictureForm() {
                                         <ImagePreview file={field.value as File} className='w-40' />
                                         <Button variant='link' type='button' onClick={() => field.onChange(null)} className='text-destructive'>
                                             <Trash2 data-icon='inline-start' />
-                                            Eliminar
+                                            Remove
                                         </Button>
                                     </div>
                                 </FieldContent>

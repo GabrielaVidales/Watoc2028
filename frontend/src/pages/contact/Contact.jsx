@@ -11,7 +11,20 @@ import { MainLayout } from '../../components/MainLayout'
 
 export default function Contact() {
     return (
-        <MainLayout heroContent={<GenericHeroContent />} heroProps={{ height: "75vh" }}>
+        <>
+            <HeroSection>
+                <div className='flex flex-col items-center gap-4 text-center'>
+                    <h1 className='max-w-4xl text-gray-200 text-4xl md:text-[72pt] text-shadow-2xl tracking-wide font-bold'>
+                        Contact Us
+                    </h1>
+                    {/* <h2 className='max-w-xl text-gray-200 text-xl md:text-2xl text-shadow-2xl tracking-wide font-semibold'>
+                    Promoting Theoretical and Computational Chemistry since 1982
+                </h2> */}
+                    <h3 className='max-w-xl text-gray-200 text-xl md:text-2xl text-shadow-2xl tracking-wide font-medium'>
+                        For inquiries regarding registration, abstract submission, or logistics, please contact the secretariat at contact@watoc2028.org.
+                    </h3>
+                </div>
+            </HeroSection>
             <Box
                 component="section"
                 sx={{
@@ -37,6 +50,6 @@ export default function Contact() {
                     </Grow>
                 </Container>
             </Box>
-        </MainLayout>
+        </>
     )
 }

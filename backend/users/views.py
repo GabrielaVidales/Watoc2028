@@ -20,7 +20,6 @@ from weasyprint import HTML, CSS
 import os
 
 
-
 User = get_user_model()
 
 
@@ -208,11 +207,14 @@ class AbstractView(ModelViewSet):
         abstract = self.get_object()
         if request.method == "PATCH":
             author_data = request.data.get("authors")
-            for author in author_data:
-                instance = Author.objects.get(id=author.get('id'))
-                instance.order = author.get('order')
+            for index, author in enumerate(author_data, start=1):
+                instance = Author.objects.get(
+                    id=author.get("id"),
+                    abstract=abstract,
+                )
+                instance.order = index
                 instance.save()
-                
+
             serializer = AuthorSerializer(abstract.authors, data=author_data, many=True)
             if serializer.is_valid(raise_exception=True):
                 return Response(serializer.data)
@@ -266,7 +268,6 @@ class AbstractView(ModelViewSet):
         response["Content-Disposition"] = f'attachment; filename="{abstract.title or f'abstract_{abstract}'}.pdf"'
         return response
 
-    
     def get_abstract_context(self, abstract):
         authors_data = []
         affiliations_set = {}
@@ -286,28 +287,22 @@ class AbstractView(ModelViewSet):
                     }
                 )
                 counter += 1
-            
-            authors_data.append({
-                'full_name': f"{author.first_name[0]}. {author.last_name}",            
-                'aff_index': affiliations_set.get(aff_id), 
-                # 'is_corresponding': author.is_corresponding
-            })
-            
-        return {
-            'abstract': abstract,
-            'authors_list': authors_data,
-            'affiliations_list': unique_affiliations
-        }
+
+            authors_data.append(
+                {
+                    "full_name": f"{author.first_name[0]}. {author.last_name}",
+                    "aff_index": affiliations_set.get(aff_id),
+                    # 'is_corresponding': author.is_corresponding
+                }
+            )
+
+        return {"abstract": abstract, "authors_list": authors_data, "affiliations_list": unique_affiliations}
 
 
 class AuthorsView(ModelViewSet):
     queryset = Author.objects.all()
     serializer_class = AuthorSerializer
     permission_classes = [permissions.IsAuthenticated]
-
-    def update(self, request, *args, **kwargs):
-        print(request.data)
-        return super().update(request, *args, **kwargs)
 
 
 class AuthorAffiliationsView(ModelViewSet):

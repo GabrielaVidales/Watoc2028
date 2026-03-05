@@ -10,9 +10,11 @@ export default function Register() {
 
     return (
         <>
-            <div className='max-w-2xl mx-auto p-9'>
+            <div className='max-w-4xl mx-auto p-9'>
                 {import.meta.env.DEV && (
-                    <RegisterForm />
+                    <div className='bg-background p-9 rounded-md'>
+                        <RegisterForm />
+                    </div>
                 )}
             </div>
             <Container maxWidth="md" sx={{ position: 'relative', py: 6 }}>

@@ -24,7 +24,7 @@ class User(AbstractUser):
 
     @property
     def full_name(self):
-        return f"{self.first_name} {self.last_name}".strip() or self.email
+        return f"{self.prefix} {self.first_name} {self.middle_name} {self.last_name}".strip() or self.email
 
     @property
     def roles(self):
@@ -144,7 +144,7 @@ class Author(models.Model):
     last_name = models.CharField(null=False, blank=True)
     email = models.EmailField(blank=True)
 
-    order = models.PositiveSmallIntegerField(db_column="order", null=False, blank=False)
+    order = models.PositiveSmallIntegerField(db_column="order", null=False)
     is_corresponding = models.BooleanField(db_column="is_corresponding", default=False)
     abstract = models.ForeignKey(
         Abstract,
@@ -159,6 +159,7 @@ class Author(models.Model):
 
     class Meta:
         ordering = ["order"]
+        unique_together = ("abstract", "order")
 
     def __str__(self):
         return f'{self.first_name} {self.last_name} ({self.email})'

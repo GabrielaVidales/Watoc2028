@@ -44,67 +44,56 @@ const LocationItem = ({ icon, title, text }) => (
 export default function HotelBooking() {
     return (
         <>
-            <NavBar />
-            <Box component='main'>
-                <HeroSection
-                    enableRadialGradient
-                    height='70dvh'
-                    enableParticles={true}
-                    enableWave={true}
-                >
-                    <HotelBookingHeroContent />
+            <HeroSection>
+                <HotelBookingHeroContent />
+            </HeroSection>
+            <HospitalitySection />
 
-                </HeroSection>
+            <GenericCTASection maxWidth='lg' textAlign='left'>
+                <Paper elevation={5} sx={{
+                    backgroundColor: '#fff',
+                    borderRadius: 10,
+                    padding: { xs: 4, sm: 5, md: 6 },
+                    height: '100%'
+                }}>
+                    <Grid container spacing={3}>
+                        <Grid size={{ xs: 12, sm: 5, md: 5 }}>
+                            <Typography variant="h4" fontWeight="bold" gutterBottom>
+                                Strategic Location
+                            </Typography>
+                            <Typography variant="body1" color="text.secondary" mb={4}>
+                                Located in the heart of Yucatán's Convention District, surrounded by hotels, restaurants, and cultural venues.
+                            </Typography>
 
-                <HospitalitySection />
-
-                <GenericCTASection maxWidth='lg' textAlign='left'>
-                    <Paper elevation={5} sx={{
-                        backgroundColor: '#fff',
-                        borderRadius: 10,
-                        padding: { xs: 4, sm: 5, md: 6 },
-                        height: '100%'
-                    }}>
-                        <Grid container spacing={3}>
-                            <Grid size={{ xs: 12, sm: 5, md: 5 }}>
-                                <Typography variant="h4" fontWeight="bold" gutterBottom>
-                                    Strategic Location
-                                </Typography>
-                                <Typography variant="body1" color="text.secondary" mb={4}>
-                                    Located in the heart of Yucatán's Convention District, surrounded by hotels, restaurants, and cultural venues.
-                                </Typography>
-
-                                <LocationItem
-                                    icon={<MapPin size={20} />}
-                                    title='Address'
-                                    text='62 No. 294, between Av. Cupules and Av. Colón, Centro, Mérida, Yucatán, Mexico.'
-                                />
-                                <LocationItem
-                                    icon={<Hotel size={20} />}
-                                    title='Accommodation'
-                                    text='More than 2,000 hotel rooms available within walking distance'
-                                />
-                                <LocationItem
-                                    icon={<Plane size={20} />}
-                                    title='Transportation'
-                                    text='Approximately 20 minutes from Mérida International Airport (MID).'
-                                />
-                            </Grid>
-                            <Grid size={{ xs: 12, sm: 7, md: 7 }}>
-                                <Paper elevation={3} sx={{
-                                    width: '100%',
-                                    height: { xs: 350, sm: '300' },
-                                    borderRadius: 2,
-                                    overflow: 'hidden',
-                                }}>
-                                    <iframe src="https://www.google.com/maps/d/u/0/embed?mid=1Nq4NPtYNPWUUEkhnz3JnCANa6bv83MM&ehbc=2E312F" width="100%" height="100%"></iframe>
-                                </Paper>
-                            </Grid>
+                            <LocationItem
+                                icon={<MapPin size={20} />}
+                                title='Address'
+                                text='62 No. 294, between Av. Cupules and Av. Colón, Centro, Mérida, Yucatán, Mexico.'
+                            />
+                            <LocationItem
+                                icon={<Hotel size={20} />}
+                                title='Accommodation'
+                                text='More than 2,000 hotel rooms available within walking distance'
+                            />
+                            <LocationItem
+                                icon={<Plane size={20} />}
+                                title='Transportation'
+                                text='Approximately 20 minutes from Mérida International Airport (MID).'
+                            />
                         </Grid>
-                    </Paper>
-                </GenericCTASection>
-            </Box>
-            <Footer />
+                        <Grid size={{ xs: 12, sm: 7, md: 7 }}>
+                            <Paper elevation={3} sx={{
+                                width: '100%',
+                                height: { xs: 350, sm: '300' },
+                                borderRadius: 2,
+                                overflow: 'hidden',
+                            }}>
+                                <iframe src="https://www.google.com/maps/d/u/0/embed?mid=1Nq4NPtYNPWUUEkhnz3JnCANa6bv83MM&ehbc=2E312F" width="100%" height="100%"></iframe>
+                            </Paper>
+                        </Grid>
+                    </Grid>
+                </Paper>
+            </GenericCTASection>
         </>
     )
 }

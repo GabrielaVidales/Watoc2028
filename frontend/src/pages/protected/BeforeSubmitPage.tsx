@@ -4,7 +4,7 @@ import { Switch } from '@/components/ui/switch'
 import { useFetch } from '@/hooks/use-fetch'
 import { cn } from '@/lib/utils'
 import { abstractDeclaration, declarationsLabels, type AbstractDeclarationValues } from '@/schemas/abstract-declaration-schema'
-import { abstractSchema, presentationTypes, type AbstractSchema, type AuthorAffiliationSchema, type AuthorSchema } from '@/schemas/abstract-schemas'
+import { abstractSchema, authorSchema, presentationTypes, type AbstractSchema, type AuthorAffiliationSchema, type AuthorSchema } from '@/schemas/abstract-schemas'
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { useParams } from 'react-router'
 import z from 'zod'
@@ -45,6 +45,18 @@ function BeforeSubmitPage() {
         setDeclarationsErrors(null)
     }, [declarations])
 
+    const [authorErrors, setAuthorErrors] = useState(null)
+    useEffect(() => {
+        if (authors) {
+            const declAuthor = abstractSchema.shape.authors.safeParse(authors)
+            if (!declAuthor.success) {
+                const treifiedError = z.treeifyError(declAuthor.error)?.errors
+                setAuthorErrors(treifiedError)
+            }
+            return
+        }
+        setAuthorErrors(null)
+    }, [authors])
 
     const { loading, action } = useAsyncAction(async () => {
         const payload = {
@@ -57,7 +69,7 @@ function BeforeSubmitPage() {
     })
 
     return (
-        <div className=''>
+        <div className='space-y-2'>
             <h2 className='font-semibold pb-1 border-b-2 border-b-input'>Abstract Content</h2>
 
             <>
@@ -76,14 +88,10 @@ function BeforeSubmitPage() {
                 />
 
                 <ShowField
-                    hasError={Boolean(abstractErrors?.references)}
-                    errors={abstractErrors?.references?.errors}
+                    hasError={Boolean(authorErrors)}
+                    errors={authorErrors}
                     name='Authors'
-                    value={(
-                        <AuthorsPreview
-                            authors={authors}
-                        />
-                    )}
+                    value={(authors?.length > 0 ? <AuthorsPreview authors={authors} /> : null)}
                 />
 
                 <ShowField
@@ -120,7 +128,9 @@ function BeforeSubmitPage() {
                     </FieldContent>
 
                     <Field orientation="horizontal" data-invalid={Boolean(declarationsErrors?.[field])}>
-                        {declarations?.[field] ? ('Yes') : ('No')}
+                        <span className='text-center w-full'>
+                            {declarations?.[field] ? ('Yes') : ('No')}
+                        </span>
                     </Field>
                 </div>
             ))}
@@ -158,7 +168,7 @@ const ShowField = ({ hasError, errors, name, value }: ShowFieldProps) => {
                     "text-sm leading-snug",
                     hasError ? "text-destructive italic" : "text-foreground"
                 )}>
-                    {value || "Missing data"}
+                    {value || "Not set"}
                 </div>
 
                 {errors?.map((e, i) => (

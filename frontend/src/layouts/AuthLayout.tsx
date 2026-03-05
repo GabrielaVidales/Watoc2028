@@ -18,13 +18,15 @@ function AuthLayout() {
                     />
 
                     <Button className='flex items-center gap-3'>
-                        <ChevronsLeft/>
+                        <ChevronsLeft />
                         Return to homepage
                     </Button>
 
                 </div>
             </header>
-            <main>
+            <main className='bg-[rgb(10,14,39)]' style={{
+                background: 'radial-gradient(circle at 50% 50%, rgba(30,30,150,1), rgb(10,14,39) 60%)',
+            }}>
                 <Outlet />
             </main>
             <Footer />

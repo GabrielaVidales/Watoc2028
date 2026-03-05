@@ -156,8 +156,6 @@ export const HeroSection = ({
                     />
                 )}
 
-                <Toolbar />
-
                 <Container
                     maxWidth="lg"
                     sx={{

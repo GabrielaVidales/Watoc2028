@@ -68,7 +68,7 @@ function DashboardLayout() {
             </div>
         </header>
 
-        <main className="bg-gray-100">
+        <main className="bg-gray-100" >
             <Outlet />
         </main>
         <Footer />

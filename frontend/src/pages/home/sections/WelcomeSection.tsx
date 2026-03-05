@@ -44,7 +44,7 @@ function WelcomeSection() {
                         fontWeight="bold"
                         sx={{ fontSize: '1rem', letterSpacing: 2, position: 'relative' }}
                     >
-                        From the Organizer
+                        From the Congress Chair
                     </Typography>
                     <Typography
                         variant="h3"

@@ -1,7 +1,7 @@
 import NavBar from '../../components/NavBar'
 import Footer from '../../components/Footer'
 import { Box, Card, CardContent, Container, Grid, Paper, Typography } from '@mui/material'
-import { Utensils, MapPin, ChevronRight, Map as MapIcon } from 'lucide-react' 
+import { Utensils, MapPin, ChevronRight, Map as MapIcon } from 'lucide-react'
 import { RestaurantHeroContent } from './components/RestaurantsHeroContent'
 import { HeroSection } from '../../components/HeroSection'
 import apapacho from '../../assets/apapacho.jpg';
@@ -104,34 +104,88 @@ const restaurants = [
 export default function RestaurantPage() {
     return (
         <>
-            <NavBar />
+            <HeroSection
+                height="70dvh"
+                enableParticles={true}
+                enableRadialGradient={true}
+            >
+                <RestaurantHeroContent />
+            </HeroSection>
 
-            <Box component="main">
-                <HeroSection
-                    height="70dvh"
-                    enableParticles={true}
-                    enableRadialGradient={true}
-                >
-                    <RestaurantHeroContent />
-                </HeroSection>
+            <Box
+                component="section"
+                sx={{
+                    py: { xs: 6, md: 8 },
+                    px: { xs: 2, sm: 3, md: 4 },
+                    bgcolor: 'background.default',
+                }}
+            >
+                <Container maxWidth="lg">
+                    <Box textAlign="center" mb={6}>
+                        <Typography
+                            variant="overline"
+                            color="primary"
+                            fontWeight="bold"
+                            sx={{ fontSize: '1rem', letterSpacing: 2, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1 }}
+                        >
+                            <Utensils size={20} /> Gastronomic Guide
+                        </Typography>
 
-                <Box
-                    component="section"
-                    sx={{
-                        py: { xs: 6, md: 8 },
-                        px: { xs: 2, sm: 3, md: 4 },
-                        bgcolor: 'background.default',
-                    }}
-                >
-                    <Container maxWidth="lg">
-                        <Box textAlign="center" mb={6}>
+                        <Typography
+                            variant="h3"
+                            fontWeight="bold"
+                            sx={{
+                                mt: 1,
+                                mb: 2,
+                                fontSize: { xs: '2rem', md: '2.5rem' },
+                            }}
+                        >
+                            Restaurants Near the Venue
+                        </Typography>
+
+                        <Box
+                            sx={{
+                                width: 100,
+                                height: 4,
+                                bgcolor: 'primary.main',
+                                mx: 'auto',
+                                borderRadius: 2,
+                                mb: 6,
+                            }}
+                        />
+
+                        <Typography
+                            sx={{
+                                maxWidth: 760,
+                                mx: 'auto',
+                                fontSize: { xs: '1rem', md: '1.15rem' },
+                                opacity: 0.95,
+                                lineHeight: 1.7,
+                            }}
+                        >
+                            Discover traditional Yucatecan cuisine and international flavors just
+                            steps away from the conference location, carefully selected for
+                            attendees seeking authentic local experiences.
+                        </Typography>
+                    </Box>
+
+                    <Grid container spacing={4}>
+                        {restaurants.map((restaurant, index) => (
+                            <Grid key={index} size={{ xs: 12, sm: 6, md: 2.4 }}>
+                                <RestaurantCard restaurant={restaurant} />
+                            </Grid>
+                        ))}
+                    </Grid>
+
+                    <Box sx={{ mt: 10 }}>
+                        <Box textAlign="center" mb={5}>
                             <Typography
                                 variant="overline"
                                 color="primary"
                                 fontWeight="bold"
                                 sx={{ fontSize: '1rem', letterSpacing: 2, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1 }}
                             >
-                                <Utensils size={20} /> Gastronomic Guide
+                                <MapIcon size={20} /> Interactive Map
                             </Typography>
 
                             <Typography
@@ -140,105 +194,46 @@ export default function RestaurantPage() {
                                 sx={{
                                     mt: 1,
                                     mb: 2,
-                                    fontSize: { xs: '2rem', md: '2.5rem' },
+                                    fontSize: { xs: '1.8rem', md: '2.3rem' },
                                 }}
                             >
-                                Restaurants Near the Venue
+                                Explore Dining Options Around the Venue
                             </Typography>
 
                             <Box
                                 sx={{
-                                    width: 100,
+                                    width: 80,
                                     height: 4,
                                     bgcolor: 'primary.main',
                                     mx: 'auto',
                                     borderRadius: 2,
-                                    mb: 6,
                                 }}
                             />
-
-                            <Typography
-                                sx={{
-                                    maxWidth: 760,
-                                    mx: 'auto',
-                                    fontSize: { xs: '1rem', md: '1.15rem' },
-                                    opacity: 0.95,
-                                    lineHeight: 1.7,
-                                }}
-                            >
-                                Discover traditional Yucatecan cuisine and international flavors just
-                                steps away from the conference location, carefully selected for
-                                attendees seeking authentic local experiences.
-                            </Typography>
                         </Box>
 
-                        <Grid container spacing={4}>
-                            {restaurants.map((restaurant, index) => (
-                                <Grid key={index} size={{ xs: 12, sm: 6, md: 2.4 }}>
-                                    <RestaurantCard restaurant={restaurant} />
-                                </Grid>
-                            ))}
-                        </Grid>
-
-                        <Box sx={{ mt: 10 }}>
-                            <Box textAlign="center" mb={5}>
-                                <Typography
-                                    variant="overline"
-                                    color="primary"
-                                    fontWeight="bold"
-                                    sx={{ fontSize: '1rem', letterSpacing: 2, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1 }}
-                                >
-                                    <MapIcon size={20} /> Interactive Map
-                                </Typography>
-
-                                <Typography
-                                    variant="h3"
-                                    fontWeight="bold"
-                                    sx={{
-                                        mt: 1,
-                                        mb: 2,
-                                        fontSize: { xs: '1.8rem', md: '2.3rem' },
-                                    }}
-                                >
-                                    Explore Dining Options Around the Venue
-                                </Typography>
-
-                                <Box
-                                    sx={{
-                                        width: 80,
-                                        height: 4,
-                                        bgcolor: 'primary.main',
-                                        mx: 'auto',
-                                        borderRadius: 2,
-                                    }}
-                                />
-                            </Box>
-
-                            <Paper
-                                elevation={0}
-                                sx={{
-                                    borderRadius: 6,
-                                    overflow: 'hidden',
-                                    height: { xs: 360, md: 480 },
-                                    position: 'relative',
-                                    border: '1px solid rgba(0,0,0,0.08)',
-                                    boxShadow: '0 20px 60px rgba(0,0,0,0.15)',
-                                }}
-                            >
-                                <iframe
-                                    src="about:blank" // Reemplazar con URL real
-                                    width="100%"
-                                    height="100%"
-                                    style={{ border: 0 }}
-                                    loading="lazy"
-                                    title="Google Maps"
-                                />
-                            </Paper>
-                        </Box>
-                    </Container>
-                </Box>
+                        <Paper
+                            elevation={0}
+                            sx={{
+                                borderRadius: 6,
+                                overflow: 'hidden',
+                                height: { xs: 360, md: 480 },
+                                position: 'relative',
+                                border: '1px solid rgba(0,0,0,0.08)',
+                                boxShadow: '0 20px 60px rgba(0,0,0,0.15)',
+                            }}
+                        >
+                            <iframe
+                                src="about:blank" // Reemplazar con URL real
+                                width="100%"
+                                height="100%"
+                                style={{ border: 0 }}
+                                loading="lazy"
+                                title="Google Maps"
+                            />
+                        </Paper>
+                    </Box>
+                </Container>
             </Box>
-            <Footer />
         </>
     );
 }   

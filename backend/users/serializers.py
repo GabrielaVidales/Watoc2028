@@ -116,16 +116,23 @@ class AuthorAffiliationSerializer(serializers.ModelSerializer):
 
 class AuthorSerializer(serializers.ModelSerializer):
     affiliation = AuthorAffiliationSerializer(allow_null=True, required=False)
-
     abstract_id = serializers.PrimaryKeyRelatedField(queryset=models.Abstract.objects.all(), source="abstract", write_only=True)
 
     class Meta:
         model = models.Author
         exclude = ["abstract"]
-        extra_kwargs = {"order": {"required": False}, }
+        extra_kwargs = {
+            "order": {
+                "required": False,
+                "read_only": True,
+            },
+        }
 
     @transaction.atomic
     def create(self, validated_data):
+        abstract = validated_data.get("abstract")
+        validated_data["order"] = abstract.authors.count()
+
         affiliation_data = validated_data.pop("affiliation")
         if affiliation_data is not None:
             affiliation, created = models.AuthorAffiliation.objects.get_or_create(
@@ -137,6 +144,7 @@ class AuthorSerializer(serializers.ModelSerializer):
             validated_data["affiliation"] = affiliation
 
         instance = super().create(validated_data)
+        normalize_author_order(instance.abstract)
         # transaction.set_rollback(True)
         return instance
 
@@ -154,9 +162,20 @@ class AuthorSerializer(serializers.ModelSerializer):
             validated_data["affiliation"] = affiliation
 
         instance = super().update(instance, validated_data)
-
+        normalize_author_order(instance.abstract)
         # transaction.set_rollback(True)
         return instance
+
+
+def normalize_author_order(abstract):
+    if abstract is None:
+        return
+
+    authors = abstract.authors.order_by("order")
+    for index, author in enumerate(authors, start=1):
+        if author.order != index:
+            author.order = index
+            author.save(update_fields=["order"])
 
 
 class AbstractSerializer(serializers.ModelSerializer):
@@ -192,4 +211,3 @@ class AbstractDeclarationsSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.AbstractDeclarations
         exclude = ["abstract"]
-

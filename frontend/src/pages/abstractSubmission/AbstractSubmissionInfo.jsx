@@ -11,21 +11,17 @@ import { HeroSection } from '../../components/HeroSection'
 export default function AbstractSubmissionInfo() {
     return (
         <>
-            <NavBar />
-            <Box component='main'>
-                <HeroSection
-                    height="70vh"
-                    enableParticles={true}
-                    enableRadialGradient={true}
-                    disableLinearGradient={false}
-                    enableWave={true}
-                >
-                    <GenericHeroContent />
-                </HeroSection>
-                <AbstractsSection />
-                <ExampleSection />
-            </Box>
-            <Footer />
+            <HeroSection
+                height="70vh"
+                enableParticles={true}
+                enableRadialGradient={true}
+                disableLinearGradient={false}
+                enableWave={true}
+            >
+                <GenericHeroContent />
+            </HeroSection>
+            <AbstractsSection />
+            <ExampleSection />
         </>
     )
 }

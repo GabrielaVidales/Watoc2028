@@ -34,9 +34,7 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
 
     async function fetchUser() {
         try {
-            const res = await axiosClient.get('/users/session/');
-            console.log(res.data);
-            
+            const res = await axiosClient.get('/users/session/');            
             if (res.data.anonymous) {
                 setCurrentUser(null);
             } else setCurrentUser(res.data.user)

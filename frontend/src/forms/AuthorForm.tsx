@@ -12,12 +12,7 @@ import axiosClient from '@/clients/axiosClient'
 import { Spinner } from '@/components/ui/spinner'
 import { cn } from '@/lib/utils'
 import { isAxiosError } from 'axios'
-import {
-    Accordion,
-    AccordionContent,
-    AccordionItem,
-    AccordionTrigger,
-} from "@/components/ui/accordion"
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger, } from "@/components/ui/accordion"
 
 
 type AbstractFormProps = {
@@ -46,6 +41,8 @@ function AuthorForm({ abstractId, author, onSubmit }: AbstractFormProps) {
 
     const onFormSubmit = handleSubmit(async (data) => {
         try {
+            console.log(data);
+
             if (data.id) {
                 await axiosClient.patch(`/authors/${data.id}/`, {
                     ...data,
@@ -90,7 +87,7 @@ function AuthorForm({ abstractId, author, onSubmit }: AbstractFormProps) {
             <fieldset disabled={isSubmitting}>
                 <div className='grid grid-cols-1 md:grid-cols-2 items-start gap-5 py-5'>
                     <div className='space-y-8 col-span-3'>
-                      
+
                         <div className='space-y-3 grid grid-cols-1 sm:grid-cols-7 gap-x-0 sm:gap-x-5 gap-y-0'>
                             <Controller
                                 name={`first_name`}
@@ -246,47 +243,47 @@ function AuthorForm({ abstractId, author, onSubmit }: AbstractFormProps) {
                                 <AccordionTrigger className='px-4'>Previously Used Affiliations</AccordionTrigger>
                                 <AccordionContent className='space-y-5 p-4'>
                                     {/* <div className='space-y-5 col-span-2'> */}
-                                        {previousAffiliations?.map(p => (
-                                            <div key={p.id}>
-                                                <div onClick={() => handleSelectAffiliation(p)} className={cn(
-                                                    "cursor-pointer rounded-xl border-2 p-4 transition-all",
-                                                    "hover:border-primary hover:bg-primary/10",
-                                                    "border-input bg-background"
-                                                )}>
-                                                    <div className="flex flex-col w-full gap-1">
-                                                        <div className='justify-self-end'>
-                                                            <h3 className="font-medium leading-none">{p.institute}</h3>
+                                    {previousAffiliations?.map(p => (
+                                        <div key={p.id}>
+                                            <div onClick={() => handleSelectAffiliation(p)} className={cn(
+                                                "cursor-pointer rounded-xl border-2 p-4 transition-all",
+                                                "hover:border-primary hover:bg-primary/10",
+                                                "border-input bg-background"
+                                            )}>
+                                                <div className="flex flex-col w-full gap-1">
+                                                    <div className='justify-self-end'>
+                                                        <h3 className="font-medium leading-none">{p.institute}</h3>
+                                                    </div>
+                                                    <div className="grid grid-cols-2 gap-5 w-full">
+                                                        <div className='flex flex-col'>
+                                                            <span className="text-sm text-muted-foreground truncate">
+                                                                {p.department}
+                                                            </span>
+                                                            <span className="text-xs text-muted-foreground whitespace-nowrap">
+                                                                {p.city}, {p.nationality}
+                                                            </span>
                                                         </div>
-                                                        <div className="grid grid-cols-2 gap-5 w-full">
-                                                            <div className='flex flex-col'>
-                                                                <span className="text-sm text-muted-foreground truncate">
-                                                                    {p.department}
-                                                                </span>
-                                                                <span className="text-xs text-muted-foreground whitespace-nowrap">
-                                                                    {p.city}, {p.nationality}
-                                                                </span>
-                                                            </div>
-                                                            <div className='justify-self-end'>
-                                                                <Button type='button' onClick={() => handleSelectAffiliation(p)}>
-                                                                    Select this
-                                                                </Button>
-                                                            </div>
+                                                        <div className='justify-self-end'>
+                                                            <Button type='button' onClick={() => handleSelectAffiliation(p)}>
+                                                                Select this
+                                                            </Button>
                                                         </div>
                                                     </div>
                                                 </div>
                                             </div>
-                                        ))}
-                                        {previousAffiliations?.length === 0 && (
-                                            <div className="flex flex-col items-center justify-center rounded-xl border-2 border-dashed p-8 text-center">
-                                                <div className="rounded-full bg-muted p-3 mb-3">
-                                                    <SearchX className="size-6 text-muted-foreground" /> {/* O cualquier icono que uses */}
-                                                </div>
-                                                <h4 className="font-medium text-muted-foreground">No previous affiliations found</h4>
-                                                <p className="text-sm text-muted-foreground/60">
-                                                    Start by adding a new affiliation in the form.
-                                                </p>
+                                        </div>
+                                    ))}
+                                    {previousAffiliations?.length === 0 && (
+                                        <div className="flex flex-col items-center justify-center rounded-xl border-2 border-dashed p-8 text-center">
+                                            <div className="rounded-full bg-muted p-3 mb-3">
+                                                <SearchX className="size-6 text-muted-foreground" /> {/* O cualquier icono que uses */}
                                             </div>
-                                        )}
+                                            <h4 className="font-medium text-muted-foreground">No previous affiliations found</h4>
+                                            <p className="text-sm text-muted-foreground/60">
+                                                Start by adding a new affiliation in the form.
+                                            </p>
+                                        </div>
+                                    )}
 
                                     {/* </div> */}
                                 </AccordionContent>

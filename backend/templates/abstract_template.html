@@ -17,7 +17,7 @@
 
             <div style="display: flex; flex-flow: column; text-align: right; font-weight: bold;">
                 <span>Mérida, Mexico</span>
-                <span>WATOC 2025</span>
+                <span>WATOC 2028</span>
             </div>
         </div>
         <hr>
@@ -38,36 +38,33 @@
         </div>
     </footer>
 
-    <h1 class="title">{{ abstract.title }}</h1>
+    <h1 class="title">{{ abstract.title|default:'Not set' }}</h1>
 
     <div style="font-weight: bold; text-align: center;">
         {% for author in authors_list %}
         <span>
-            {{ author.full_name }}
-            <sup>
-                {{author.aff_index}}
-            </sup>
-            {% if not forloop.last %}, {% endif %}
+            {{ author.full_name }}<sup>{{author.aff_index}}</sup>{% if not forloop.last %}, {% endif %}
         </span>
+        {% empty %}
+        <span><i>No authors</i></span>
         {% endfor %}
     </div>
 
     <div style="text-align: center; font-style: italic;">
         {% for aff in affiliations_list %}
         <span>
-            <sup>
-                {{aff.index}}
-            </sup>
-            {{ aff.text }}{% if not forloop.last %}; {% endif %}
+            <sup>{{aff.index}}</sup>{{ aff.text }}{% if not forloop.last %}; {% endif %}
         </span>
+        {% empty %}
+        <span><i>No affiliations</i></span>
         {% endfor %}
     </div>
 
     <h2 class="subtitle">Abstract</h2>
-    <p class="text">{{ abstract.text }}</p>
+    <p class="text">{{ abstract.text|default:'Not set' }}</p>
 
     <h2 class="subtitle">References</h2>
-    <p class="text">{{ abstract.references | linebreaks }}</p>
+    <p class="text">{{ abstract.references|default:'Not set'|linebreaks }}</p>
 </body>
 
 </html>

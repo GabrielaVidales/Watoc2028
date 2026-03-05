@@ -51,7 +51,6 @@ export const authorSchema = z.object({
         .default(''),
 
     order: z.number()
-        .default(1)
         .optional(),
     is_corresponding: z.boolean()
         .default(false),
@@ -59,8 +58,6 @@ export const authorSchema = z.object({
     affiliation: authorAffiliationSchema
         .optional()
 })
-
-// FORMS
 
 export const abstractSchema = z.object({
     id: z.number().nullable().optional().default(null),
@@ -82,18 +79,22 @@ export const abstractSchema = z.object({
         // .min(1, "At least one author is required")
         .superRefine((authors, ctx) => {
             if (authors.length === 0) {
-                return
-            }
-            const correspondingCount = authors.filter(a => a.is_corresponding).length;
-            console.log(correspondingCount);
-
-            if (correspondingCount !== 1) {
                 ctx.addIssue({
                     code: 'custom',
-                    message: "Exactly one (1) corresponding author must be designated",
+                    message: "No authors",
                     path: [],
                 });
             }
+            // const correspondingCount = authors.filter(a => a.is_corresponding).length;
+            // console.log(correspondingCount);
+
+            // if (correspondingCount !== 1) {
+            //     ctx.addIssue({
+            //         code: 'custom',
+            //         message: "Exactly one (1) corresponding author must be designated",
+            //         path: [],
+            //     });
+            // }
         })
         .optional()
         .default([]),

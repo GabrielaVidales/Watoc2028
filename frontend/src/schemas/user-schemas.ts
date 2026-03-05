@@ -6,16 +6,14 @@ import { abstractSchema } from "./abstract-schemas";
 const countriesArray = countries.map(country => country.code)
 
 export const prefixes = [
-    "Sr.",
-    "Sra.",
-    "Srta.",
-    "Dr.",
-    "Dra.",
-    "Mtro.",
-    "Mtra.",
-    "Prof.",
-]
-
+  { value: "Miss", label: "Miss" },
+  { value: "Ms.", label: "Ms." },
+  { value: "Mrs.", label: "Mrs." },
+  { value: "Mr.", label: "Mr." },
+  { value: "Dr.", label: "Dr." },
+  { value: "Prof.", label: "Prof." },
+  { value: "Mx.", label: "Mx." },
+] as const;
 
 export const UserRole = {
     Admin: 'admin',
@@ -50,7 +48,7 @@ export const userSchema = z.object({
     email: z.email('Please provide a valid email address')
         .max(100, 'Input too long')
         .default(''),
-    prefix: z.enum(prefixes, 'Choose a valid option')
+    prefix: z.enum(prefixes.map(p => p.value), 'Choose a valid option')
         .default('Prof.'),
     pronouns: z.string().trim()
         .max(50, 'Too long')

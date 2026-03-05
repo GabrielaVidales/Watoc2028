@@ -8,7 +8,7 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { InfoAlert } from './CreateAbstractPage'
 import AbstractForm from '@/forms/AbstractForm'
-import { ChevronsLeft, ChevronsRight, CircleX, GripVertical, Hand, Menu, Pen, PencilLine, Plus, Space, SquarePen, Trash } from 'lucide-react'
+import { ChevronsLeft, ChevronsRight, CircleX, GripVertical, Hand, Menu, Pen, PencilLine, Plus, Space, SquarePen, Trash, User2 } from 'lucide-react'
 import AuthorForm from '@/forms/AuthorForm'
 import { DataTable } from '@/components/ui/data-table'
 import { authorColumns } from '@/data/authors-columns'
@@ -59,12 +59,12 @@ function EditAbstractPage() {
 
     const onSaveAuthors = async () => {
         try {
-            console.log(authors.map(item => ({ ...item, abstract_id: parseInt(id) })));
-
             const res = await axiosClient.patch(`/abstracts/${id}/authors/`, {
                 authors: authors.map(item => ({ ...item, abstract_id: parseInt(id) }))
             })
-            console.log(res);
+            if (import.meta.env.DEV) {
+                console.log(res);
+            }
         } catch (error) {
             if (import.meta.env.DEV) {
                 if (isAxiosError(error)) {
@@ -117,8 +117,6 @@ function EditAbstractPage() {
 
         return affiliationsJSX
     }, [authors, affiliations])
-
-
 
     const renderAuthorsAndAffiliations = useCallback(() => {
         if (!authors || authors.length === 0) return null;
@@ -191,7 +189,7 @@ function EditAbstractPage() {
                             <Reorder.Group axis="y" values={authors} onReorder={onReorder}>
                                 {authors.map((item, index) => (
                                     <Reorder.Item key={item.id} value={item}>
-                                        <div className='border-2 bg-background rounded-sm flex justify-between items-start p-3 mb-2 gap-3'>
+                                        <div className='cursor-grab border-2 bg-background rounded-sm flex justify-between items-start p-3 mb-2 gap-3'>
                                             <div className=' flex justify-center items-center'>
                                                 <Menu className='stroke-3 size-5' />
                                             </div>
@@ -244,6 +242,18 @@ function EditAbstractPage() {
                                 ))}
                             </Reorder.Group>
 
+                            {authors.length === 0 && (
+                                <div className="flex flex-col items-center justify-center rounded-xl border-2 border-dashed p-8 text-center">
+                                    <div className="rounded-full bg-muted p-3 mb-3">
+                                        <User2 className="size-6 text-muted-foreground" /> {/* O cualquier icono que uses */}
+                                    </div>
+                                    <h4 className="font-medium text-muted-foreground">No authors added</h4>
+                                    <p className="text-sm text-muted-foreground/60">
+                                        Start by adding a new affiliation in the form.
+                                    </p>
+                                </div>
+                            )}
+
                             <div>
                                 <Button type='button' onClick={() => {
                                     setOpen(true)
@@ -269,8 +279,8 @@ function EditAbstractPage() {
             case 3:
                 return (<>
                     <div>
-                        <BeforeSubmitPage/>
-                     
+                        <BeforeSubmitPage />
+
                     </div>
                 </>)
             default:
@@ -355,6 +365,7 @@ function EditAbstractPage() {
                     </div>
                 </div>
             </div>
+
             <div className='col-span-2 min-h-50 w-full flex gap-3 justify-center'>
                 <div className='w-full bg-background border-2 p-3 rounded-lg shadow-lg flex flex-col'>
                     {renderStep(currStep)}

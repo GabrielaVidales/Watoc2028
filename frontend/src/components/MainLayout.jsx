@@ -7,7 +7,7 @@ export function MainLayout({ heroContent = null, heroProps = {}, children }) {
     return <>
         <NavBar />
         <Box component='main'>
-            <HeroSection height="95vh" enableParticles={true} enableRadialGradient={true} disableLinearGradient={false} enableWave={true} {...heroProps} >
+            <HeroSection enableParticles={true} enableRadialGradient={true} disableLinearGradient={false} enableWave={true} {...heroProps} >
                 {heroContent}
             </HeroSection>
             {children}

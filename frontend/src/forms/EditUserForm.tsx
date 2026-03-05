@@ -7,13 +7,14 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Separator } from '@/components/ui/separator'
 import { Spinner } from '@/components/ui/spinner'
 import { useAuth } from '@/contexts/AuthContext'
+import { useProfiles } from '@/hooks/use-profiles'
 import { InfoAlert } from '@/pages/protected/CreateAbstractPage'
 import { editUserFormSchema, prefixes, type EditUserFormValues } from '@/schemas/user-schemas'
 import { countries } from '@/utils/countriesInfo'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { isAxiosError } from 'axios'
 import { Save } from 'lucide-react'
-import React from 'react'
+import React, { useEffect } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 
 type P = {
@@ -21,14 +22,44 @@ type P = {
 }
 
 function EditUserForm({ defaultValues }: P) {
-    const { handleSubmit, control, formState } = useForm({
+    const { currentUser, fetchUser } = useAuth()
+    const { profile, fetchProfile } = useProfiles()
+
+    const { handleSubmit, reset, control, formState } = useForm({
         resolver: zodResolver(editUserFormSchema),
-        defaultValues: defaultValues,
+        defaultValues: {
+            ...currentUser,
+            email: {
+                value: '',
+                confirm: ''
+            },
+            participant: {
+                affiliation: '',
+                job_title: '',
+                field_of_study: ''
+            }
+        },
         mode: 'onChange',
     })
 
     const { isSubmitting, isValid, isDirty } = formState
 
+    useEffect(() => {
+        if (currentUser) {
+            reset({
+                ...currentUser,
+                email: {
+                    value: '',
+                    confirm: ''
+                },
+                participant: {
+                    affiliation: profile?.participant?.affiliation,
+                    job_title: profile?.participant?.job_title,
+                    field_of_study: profile?.participant?.field_of_study
+                }
+            })
+        }
+    }, [currentUser, profile])
 
     const onFormSubmit = handleSubmit(async (data) => {
         try {
@@ -36,6 +67,8 @@ function EditUserForm({ defaultValues }: P) {
                 ...data,
                 email: data.email.value || undefined
             })
+            await fetchUser()
+            await fetchProfile()
         } catch (error) {
             if (import.meta.env.DEV) {
                 if (isAxiosError(error)) {
@@ -74,7 +107,7 @@ function EditUserForm({ defaultValues }: P) {
                                     </SelectTrigger>
                                     <SelectContent position="item-aligned">
                                         {prefixes.map(p => (
-                                            <SelectItem value={p} key={p}>{p}</SelectItem>
+                                            <SelectItem value={p.value} key={p.value}>{p.label}</SelectItem>
                                         ))}
                                     </SelectContent>
                                 </Select>
@@ -216,7 +249,7 @@ function EditUserForm({ defaultValues }: P) {
                     />
                 </div>
 
-                <Separator/>
+                <Separator />
 
                 <h2 className='text-xl font-semibold'>Change your email</h2>
                 <InfoAlert
@@ -268,7 +301,7 @@ function EditUserForm({ defaultValues }: P) {
                     />
                 </div>
 
-                <Separator/>
+                <Separator />
 
                 <h2 className='text-xl font-semibold'>Professional Affiliation</h2>
                 <Controller

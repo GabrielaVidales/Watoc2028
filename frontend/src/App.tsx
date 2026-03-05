@@ -36,8 +36,6 @@ function App() {
 	const { pathname } = useLocation()
 
 	useEffect(() => {
-		console.log(pathname);
-
 		window.scrollTo({
 			top: 0,
 			left: 0,
@@ -52,17 +50,17 @@ function App() {
 				<Routes>
 					<Route path='/' element={<HomeLayout />}>
 						<Route index element={<Home />} />
+						<Route path='/watoc' element={<AboutWATOC />} />
+						<Route path='/venue' element={<VenuePage />} />
+						<Route path='/hotel-booking' element={<HotelBooking />} />
+						<Route path='/abstract-submission' element={<AbstractSubmissionInfo />} />
+						<Route path='/young-watoc' element={<YoungWatoc />} />
+						<Route path='/visa' element={<VisaRequirements />} />
+						<Route path='/restaurants' element={<Restaurants />} />
+						<Route path='/transportation' element={<Transportation />} />
+						<Route path='/contact' element={<Contact />} />
 					</Route>
 
-					<Route path='/venue' element={<VenuePage />} />
-					<Route path='/hotel-booking' element={<HotelBooking />} />
-					<Route path='/abstract-submission' element={<AbstractSubmissionInfo />} />
-					<Route path='/watoc' element={<AboutWATOC />} />
-					<Route path='/young-watoc' element={<YoungWatoc />} />
-					<Route path='/visa' element={<VisaRequirements />} />
-					<Route path='/restaurants' element={<Restaurants />} />
-					<Route path='/transportation' element={<Transportation />} />
-					<Route path='/contact' element={<Contact />} />
 
 					{/* Rutas sólo para usuarios no loggeados */}
 					<Route element={<GuestRoute />}>
