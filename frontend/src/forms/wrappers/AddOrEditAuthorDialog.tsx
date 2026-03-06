@@ -22,7 +22,7 @@ type AddOrEditAuthorProps = {
     onSubmit?: () => void | Promise<void>
 }
 
-function AddOrEditAuthorDialog({ open, setOpen, onSubmit, author }: AddOrEditAuthorProps) {
+function AddOrEditAuthorDialog({ author, open, setOpen, onSubmit, }: AddOrEditAuthorProps) {
     const { id } = useParams()
     const form = useForm<z.input<typeof authorSchema>>({
         resolver: zodResolver(authorSchema),
@@ -84,9 +84,11 @@ function AddOrEditAuthorDialog({ open, setOpen, onSubmit, author }: AddOrEditAut
         }}>
             <AlertDialogContent className="sm:max-w-2xl!">
                 <AlertDialogHeader>
-                    <AlertDialogTitle>Add New Author</AlertDialogTitle>
+                    <AlertDialogTitle>
+                        {author ? 'Edit Author' : 'Add New Author'}
+                    </AlertDialogTitle>
                     <AlertDialogDescription>
-                        Escribe los datos de contacto y de afiliación del autor.
+                        {author ? 'Update the contact information and institutional affiliation for this author.' : 'Please provide the contact information and institutional affiliation for the author.'}
                     </AlertDialogDescription>
                 </AlertDialogHeader>
                 <section className="-mx-4 no-scrollbar max-h-[50vh] overflow-y-auto px-4 border-y-2">

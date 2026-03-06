@@ -1,9 +1,9 @@
 import { useFetch } from '@/hooks/use-fetch'
 import { type AuthorSchema } from '@/schemas/abstract-schemas'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useParams } from 'react-router'
 import { Button } from '@/components/ui/button'
-import { Hand, Menu, PencilLine, Save, Trash, User2 } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Hand, Menu, PencilLine, Plus, Save, Trash, TriangleAlert, User2 } from 'lucide-react'
 import { Reorder } from 'motion/react'
 import { AlertDialog, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, } from "@/components/ui/alert-dialog"
 import { isAxiosError } from 'axios'
@@ -11,9 +11,11 @@ import { Spinner } from '@/components/ui/spinner'
 import AddOrEditAuthorDialog from '@/forms/wrappers/AddOrEditAuthorDialog'
 import { useMutation } from '@/hooks/use-mutation'
 import { InfoAlert } from '@/components/InfoAlert'
+import type { EditAbstractCallbacks } from './EditAbstractPage'
+import { Separator } from '@/components/ui/separator'
 
 
-function EditAuthorsPage() {
+function EditAuthorsPage({ onStepBack, onStepForward }: EditAbstractCallbacks) {
     const { id } = useParams()
     const { loading, mutate, } = useMutation()
     const {
@@ -25,6 +27,16 @@ function EditAuthorsPage() {
     const onReorder = (data: AuthorSchema[]) => {
         setAuthors(data.map((item, i) => ({ ...item, order: i + 1 })))
     }
+
+    const [originalAuthors, setOriginalAuthors] = useState<AuthorSchema[] | null>(null);
+
+    useEffect(() => {
+        if (authors && !originalAuthors) {
+            setOriginalAuthors(authors);
+        }
+    }, [authors]);
+
+    const isDirty = JSON.stringify(authors) !== JSON.stringify(originalAuthors);
 
     //#region DELETE AUTHOR
     const [openDeleteAuthor, setOpenDeleteAuthor] = useState(false)
@@ -56,6 +68,7 @@ function EditAuthorsPage() {
                 authors: authors.map(item => ({ ...item, abstract_id: parseInt(id) }))
             })
             await fetchAuthors()
+            setOriginalAuthors(authors)
         } catch (error) {
             if (import.meta.env.DEV) {
                 if (isAxiosError(error)) {
@@ -70,7 +83,7 @@ function EditAuthorsPage() {
         <div className='w-full space-y-5 p-5'>
             <h2 className='text-2xl font-semibold'>Abstract Submission</h2>
 
-            <div className='flex flex-col gap-3'>
+            <div className='space-y-5'>
                 <InfoAlert
                     title={<span><b>Drag to reorder</b> the list of authors.</span>}
                     messages={[]}
@@ -146,25 +159,13 @@ function EditAuthorsPage() {
                     </div>
                 </Reorder.Group>
 
-                <fieldset disabled={loading} className='flex items-center justify-between'>
+                <fieldset disabled={loading} className='flex items-center justify-center'>
                     <Button type='button' onClick={() => {
                         setOpen(true)
                         setAuthorIdToEdit(null)
                     }}>
-                        {loading ? (
-                            <Spinner data-icon="inline-start" />
-                        ) : (
-                            <Save data-icon="inline-start" />
-                        )}
+                        <Plus data-icon="inline-start" />
                         Add Author
-                    </Button>
-                    <Button type='button' onClick={onSaveAuthors} disabled={!authors || authors.length === 0}>
-                        {loading ? (
-                            <Spinner data-icon="inline-start" />
-                        ) : (
-                            <Save data-icon="inline-start" />
-                        )}
-                        Save Changes
                     </Button>
                 </fieldset>
 
@@ -181,25 +182,49 @@ function EditAuthorsPage() {
                     />
 
                     <AlertDialog open={openDeleteAuthor} onOpenChange={setOpenDeleteAuthor}>
-                        <AlertDialogContent>
+                        <AlertDialogContent size='sm'>
                             <AlertDialogHeader>
-                                <AlertDialogTitle>Delete Author</AlertDialogTitle>
+                                <AlertDialogTitle className="p-3 bg-destructive/10 rounded-full mb-2">
+                                    <TriangleAlert className='size-8 text-destructive' />
+                                </AlertDialogTitle>
+                                <AlertDialogTitle>Delete Author?</AlertDialogTitle>
                                 <AlertDialogDescription>
-                                    This action cannot be undone. This will permanently delete the author.
+                                    This action <strong>cannot be undone</strong>. This will permanently remove the author from this abstract.
                                 </AlertDialogDescription>
                             </AlertDialogHeader>
                             <AlertDialogFooter>
                                 <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                <Button type='submit' form='authors-form' onClick={onDeleteAuthor} disabled={loading}>
-                                    {loading && (
-                                        <Spinner data-icon="inline-start" />
-                                    )}
-                                    Save
+                                <Button variant='destructive' onClick={onDeleteAuthor} disabled={loading}>
+                                    {loading ? (<>
+                                        <Spinner className="mr-2" />
+                                        Deleting...
+                                    </>) : 'Delete Author'}
                                 </Button>
                             </AlertDialogFooter>
                         </AlertDialogContent>
                     </AlertDialog>
                 </>)}
+
+                <Separator />
+
+                <fieldset disabled={loading} className='flex justify-between items-start gap-2 w-full'>
+                    <Button type='button' onClick={onStepBack}>
+                        <ChevronLeft /> Back
+                    </Button>
+
+                    <Button type='button' onClick={onSaveAuthors} disabled={!isDirty || !authors || authors.length === 0}>
+                        {loading ? (
+                            <Spinner data-icon="inline-start" />
+                        ) : (
+                            <Save data-icon="inline-start" />
+                        )}
+                        Save Changes
+                    </Button>
+
+                    <Button type='button' onClick={onStepForward}>
+                        Next <ChevronRight />
+                    </Button>
+                </fieldset>
             </div>
         </div>
     )

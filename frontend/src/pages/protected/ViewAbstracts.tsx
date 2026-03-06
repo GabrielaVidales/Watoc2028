@@ -1,20 +1,24 @@
+import React from 'react'
+import axiosClient from '@/clients/axiosClient'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger, } from "@/components/ui/dialog"
-import { CircleAlert,  MailWarning, Pencil, Search, Send, Trash2 } from 'lucide-react'
-import React from 'react'
+import { CircleAlert, MailWarning, Pencil, Search, Send, Trash2 } from 'lucide-react'
 import { Link, useNavigate } from 'react-router'
 import { urls } from '@/routes/routes'
 import { useProfiles } from '@/hooks/use-profiles'
-import axiosClient from '@/clients/axiosClient'
 import { presentationTypes, type AbstractSchema } from '@/schemas/abstract-schemas'
 import { isAxiosError } from 'axios'
 import { Badge } from '@/components/ui/badge'
 import { InfoAlert } from '@/components/InfoAlert'
+import { useMutation } from '@/hooks/use-mutation'
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger, } from "@/components/ui/alert-dialog"
+import { Spinner } from '@/components/ui/spinner'
 
 
 function ViewAbstracts() {
     const navigate = useNavigate()
-    const { profile } = useProfiles()
+    const { profile, fetchProfile } = useProfiles()
+    const { loading, mutate } = useMutation()
 
     const handleCreate = async () => {
         try {
@@ -29,17 +33,10 @@ function ViewAbstracts() {
         }
     }
 
-    const handlePreview = async (id: number | string, name: string = 'abstract') => {
+    const handleDelete = async (id: number) => {
         try {
-            const response = await axiosClient.get<Blob>(`/abstracts/${id}/preview`, {
-                responseType: 'blob',
-            })
-            console.log(response);
-            const href = URL.createObjectURL(response.data);
-            const link = document.createElement('a');
-            link.href = href;
-            link.setAttribute('download', `${name.replaceAll(" ", "_")}_preview.pdf`);
-            link.click();
+            await mutate<never>('delete', `/abstracts/${id}/`)
+            await fetchProfile()
         } catch (error) {
             if (import.meta.env.DEV) {
                 if (isAxiosError(error)) {
@@ -49,11 +46,13 @@ function ViewAbstracts() {
         }
     }
 
+
+
     return (
         <div className='w-full max-w-5xl gap-3 p-3 mx-auto'>
             <div className='min-h-50 w-full flex gap-3 justify-center'>
                 <div className='w-full bg-background border-2 p-3 rounded-lg shadow-lg flex flex-col gap-5'>
-                    <div className='w-full py-9 pt-4 space-y-5 px-5 sm:px-9'>
+                    <fieldset disabled={loading} className='w-full py-9 pt-4 space-y-5 px-5 sm:px-9'>
                         <h2 className='text-2xl font-semibold'>Abstract submission</h2>
                         <InfoAlert
                             title="Abstract submission deadline: June 10, 2026"
@@ -103,7 +102,7 @@ function ViewAbstracts() {
 
                                         <div className="flex items-center gap-1 bg-muted/30 p-1 rounded-lg">
                                             <Button variant='outline' className="shadow-sm" title="Preview" onClick={() => {
-                                                handlePreview(a.id, a.title)
+                                                navigate(urls.users.previewAbstract.build(a.id))
                                             }}>
                                                 <Search className="size-4" />
                                                 <span className='max-sm:hidden'>Preview</span>
@@ -119,9 +118,27 @@ function ViewAbstracts() {
                                                 <span className='max-sm:hidden'>Submit</span>
                                             </Button>
                                             <div className="w-px h-4 bg-border mx-1" />
-                                            <Button variant="destructive" size="icon" title="Delete">
-                                                <Trash2 className="size-4" />
-                                            </Button>
+                                            <AlertDialog>
+                                                <AlertDialogTrigger asChild>
+                                                    <Button variant="destructive" size="icon" title="Delete">
+                                                        {loading ? <Spinner /> : <Trash2 className="size-4" />}
+                                                    </Button>
+                                                </AlertDialogTrigger>
+                                                <AlertDialogContent size='sm'>
+                                                    <AlertDialogHeader>
+                                                        <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                                                        <AlertDialogDescription>
+                                                            This action cannot be undone. This will permanently delete your
+                                                            account from our servers.
+                                                        </AlertDialogDescription>
+                                                    </AlertDialogHeader>
+                                                    <AlertDialogFooter>
+                                                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                                        <AlertDialogAction onClick={async () => await handleDelete(a.id)}>Continue</AlertDialogAction>
+                                                    </AlertDialogFooter>
+                                                </AlertDialogContent>
+                                            </AlertDialog>
+
                                         </div>
                                     </div>
                                 </div>
@@ -152,9 +169,7 @@ function ViewAbstracts() {
                                 </DialogFooter>
                             </DialogContent>
                         </Dialog>
-
-
-                    </div>
+                    </fieldset>
                 </div>
             </div>
         </div>

@@ -1,17 +1,19 @@
 import React, { useCallback, useState } from 'react'
-import { Card, CardAction, CardContent, CardDescription, CardFooter, CardHeader, CardTitle, } from "@/components/ui/card"
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
-import { ChevronsLeft, ChevronsRight } from 'lucide-react'
 import AbstractDeclarations from '@/forms/AbstractDeclarationsForm'
 import { StepperLabel } from '@/components/ui/stepper'
 import BeforeSubmitPage from './BeforeSubmitPage'
 import EditAuthorsPage from './EditAuthorsPage'
-import { InfoAlert } from '@/components/InfoAlert'
 import EditAbstractBody from '@/forms/wrappers/EditAbstractBody'
+import { useNavigate } from 'react-router'
+import { urls } from '@/routes/routes'
 
+export type EditAbstractCallbacks = {
+    onStepBack?: () => void
+    onStepForward?: () => void
+}
 
 function EditAbstractPage() {
+    const navigate = useNavigate()
 
     const [currStep, setCurrState] = useState(0)
     const nextStep = () => {
@@ -28,15 +30,14 @@ function EditAbstractPage() {
     const renderStep = useCallback((step: number) => {
         switch (step) {
             case 0:
-                return (<EditAbstractBody />)
+                return (<EditAbstractBody onStepBack={() => navigate(urls.users.viewAbstracts)} onStepForward={nextStep} />)
             case 1:
-                return (<EditAuthorsPage />)
+                return (<EditAuthorsPage onStepBack={previousStep} onStepForward={nextStep} />)
             case 2:
                 return (
                     <div className='w-full space-y-5 p-5'>
                         <h2 className='text-2xl font-semibold'>Abstract Declarations</h2>
-
-                        <AbstractDeclarations />
+                        <AbstractDeclarations onStepBack={previousStep} onStepForward={nextStep} />
                     </div>
                 )
             case 3:
@@ -44,7 +45,7 @@ function EditAbstractPage() {
                     <div className='w-full space-y-5 p-5'>
                         <h2 className='text-2xl font-semibold'>Abstract Preview</h2>
 
-                        <BeforeSubmitPage />
+                        <BeforeSubmitPage onStepBack={previousStep} onStepForward={nextStep} />
                     </div>
                 </>)
             default:
@@ -94,44 +95,6 @@ function EditAbstractPage() {
                 <div className='w-full bg-background border-2 p-3 rounded-lg shadow-lg flex flex-col'>
                     {renderStep(currStep)}
                 </div>
-            </div>
-
-            <div className='col-span-3 flex flex-col gap-3'>
-                <Card className='col-span-1 h-fit'>
-                    <CardHeader className='items-start justify-start'>
-                        <CardTitle>Estado de envío</CardTitle>
-                        <CardAction>
-                            <Badge>
-                                Borrador
-                            </Badge>
-                        </CardAction>
-                    </CardHeader>
-                    <CardContent>
-                        <CardDescription className='text-balance'>
-                            Envía tu resumen al proeso de revisión. Puedes modificar tu trabajo después de enviarlo, siempre que sea antes de la fecha límite de envío.
-                        </CardDescription>
-                    </CardContent>
-                    <CardFooter>
-                        <div className='w-full flex items-center justify-between'>
-                            <Button type='button' onClick={previousStep}>
-                                <ChevronsLeft />
-                                Back
-                            </Button>
-                            <Button type='button' onClick={nextStep}>
-                                Next
-                                <ChevronsRight />
-                            </Button>
-                        </div>
-                    </CardFooter>
-                </Card>
-
-                <InfoAlert
-                    variant='warning'
-                    title='Testeo'
-                    messages={[
-                        'alskdja sldhas jldas hdjka hskdja shdka sdkj'
-                    ]}
-                />
             </div>
         </div>
     )

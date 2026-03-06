@@ -31,6 +31,7 @@ import { urls } from './routes/routes'
 import UserProfile from './pages/protected/UserProfile'
 import ViewAbstracts from './pages/protected/ViewAbstracts'
 import EditAbstractPage from './pages/protected/EditAbstractPage'
+import AbstractPreview from './pages/protected/AbstractPreview'
 
 function App() {
 	const { pathname } = useLocation()
@@ -80,6 +81,7 @@ function App() {
 							<Route path={urls.users.viewAbstracts} element={<ViewAbstracts />} />
 							<Route path={urls.users.editAbstract.url} element={<EditAbstractPage />} />
 							<Route path={urls.users.submitAbstract} element={<CreateAbstractPage />} />
+							<Route path={urls.users.previewAbstract.url} element={<AbstractPreview />} />
 						</Route>
 					</Route>
 

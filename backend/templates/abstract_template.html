@@ -27,10 +27,7 @@
         <div class="footer-container">
             <hr>
             <div class="flex-between">
-                <div>
-                    World Association of Theoretical and Computational Chemists
-                </div>
-
+                World Association of Theoretical and Computational Chemists
             </div>
         </div>
         <div style="text-align: center;">
@@ -64,7 +61,7 @@
     <p class="text">{{ abstract.text|default:'Not set' }}</p>
 
     <h2 class="subtitle">References</h2>
-    <p class="text">{{ abstract.references|default:'Not set'|linebreaks }}</p>
+    <p class="references">{{ abstract.references|default:'Not set'|linebreaksbr }}</p>
 </body>
 
 </html>

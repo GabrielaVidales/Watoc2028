@@ -191,7 +191,6 @@ class AbstractSerializer(serializers.ModelSerializer):
         request = self.context.get("request", None)
         instance.user = request.user
         instance.save()
-
         # transaction.on_commit(lambda: signals.on_abstract_created(instance))
         return instance
 

@@ -71,30 +71,20 @@ export const abstractSchema = z.object({
         .default(''),
 
     text: z.string()
-        .refine((val) => countWords(val, 500), "Abstract must be at most 500 words")
+        .refine((val) => countWords(val, 350), "Abstract must be at most 350 words")
         .refine((val) => !countWords(val, 199), "Abstract must be at least 200 words")
         .default(''),
 
     authors: z.array(authorSchema)
-        // .min(1, "At least one author is required")
+        .min(1, "At least one author is required")
         .superRefine((authors, ctx) => {
             if (authors.length === 0) {
                 ctx.addIssue({
                     code: 'custom',
                     message: "No authors",
-                    path: [],
+                    path: ['root'],
                 });
             }
-            // const correspondingCount = authors.filter(a => a.is_corresponding).length;
-            // console.log(correspondingCount);
-
-            // if (correspondingCount !== 1) {
-            //     ctx.addIssue({
-            //         code: 'custom',
-            //         message: "Exactly one (1) corresponding author must be designated",
-            //         path: [],
-            //     });
-            // }
         })
         .optional()
         .default([]),
@@ -142,6 +132,9 @@ export const authorDefaults: z.input<typeof authorSchema> = authorSchema.partial
 export const submitAbstractDefaults = abstractSchema.extend({
     authorsConsent: z.boolean().default(false)
 })
+
+export const validateAbstractsSchema = abstractSchema.omit({ authors: true })
+export const validateAuthorsSchema = abstractSchema.pick({ authors: true })
 
 
 

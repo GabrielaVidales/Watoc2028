@@ -227,12 +227,12 @@ class AbstractView(ModelViewSet):
     def update_declarations(self, request, pk=None):
         instance = self.get_object()
         if request.method == "GET":
-            declarations, created = AbstractDeclarations.objects.get_or_create(abstract=instance)
+            declarations, _ = AbstractDeclarations.objects.get_or_create(abstract=instance)
             serializer = AbstractDeclarationsSerializer(declarations)
             return Response(serializer.data)
 
         if request.method == "PATCH":
-            declarations, created = AbstractDeclarations.objects.update_or_create(
+            declarations, _ = AbstractDeclarations.objects.update_or_create(
                 abstract=instance,
                 defaults={
                     "confirm_accuracy": request.data.get("confirm_accuracy", False),

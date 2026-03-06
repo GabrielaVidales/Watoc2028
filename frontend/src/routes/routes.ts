@@ -17,6 +17,11 @@ export const urls = {
             url: '/user/abstract/:id/edit',
             build: (id: number | string) => `/user/abstract/${id}/edit`
         },
+        previewAbstract: {
+            url: '/user/abstract/:id/preview',
+            build: (id: number | string) => `/user/abstract/${id}/preview`
+        },
+
         submitAbstract: '/user/abstract',
         profile: '/user/profile',
     }

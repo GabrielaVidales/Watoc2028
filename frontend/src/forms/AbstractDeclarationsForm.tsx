@@ -1,24 +1,22 @@
 import axiosClient from '@/clients/axiosClient'
 import { Button } from '@/components/ui/button'
 import { Field, FieldContent, FieldDescription, FieldError, FieldLabel, FieldTitle } from '@/components/ui/field'
+import { Separator } from '@/components/ui/separator'
 import { Spinner } from '@/components/ui/spinner'
 import { Switch } from '@/components/ui/switch'
 import { useFetch } from '@/hooks/use-fetch'
+import type { EditAbstractCallbacks } from '@/pages/protected/EditAbstractPage'
 import { type AbstractDeclarationValues } from '@/schemas/abstract-declaration-schema'
 import { isAxiosError } from 'axios'
-import { Save } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Save } from 'lucide-react'
 import React, { useEffect } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { useParams } from 'react-router'
 
 
-type AbstractFormProps = {
-    onSubmit?: () => Promise<void> | void
-}
-
-function AbstractDeclarations({ onSubmit }: AbstractFormProps) {
+function AbstractDeclarations({ onStepBack, onStepForward }: EditAbstractCallbacks) {
     const { id } = useParams()
-    const { control, handleSubmit, reset, formState: { isSubmitting } } = useForm({
+    const { control, handleSubmit, reset, formState: { isSubmitting, isDirty } } = useForm({
         // resolver: zodResolver(abstractDeclarationSchema),
         mode: 'onChange',
         defaultValues: {
@@ -45,7 +43,6 @@ function AbstractDeclarations({ onSubmit }: AbstractFormProps) {
                 console.log(res.data);
             }
             await fetchDeclarations()
-            await onSubmit?.()
         } catch (error) {
             if (import.meta.env.DEV) {
                 if (isAxiosError(error)) {
@@ -62,7 +59,7 @@ function AbstractDeclarations({ onSubmit }: AbstractFormProps) {
     }, [declarationsData])
 
     return (
-        <form onSubmit={onFormSubmit}>
+        <form onSubmit={onFormSubmit} id='abstract-declarations-form'>
             <fieldset className='space-y-5'>
                 <Controller
                     name="confirm_accuracy"
@@ -227,16 +224,34 @@ function AbstractDeclarations({ onSubmit }: AbstractFormProps) {
                     )}
                 />
 
-                <div className='flex justify-end col-span-1 md:col-span-2'>
-                    <Button type='submit' className='p-5 w-60 uppercase'>
-                        {isSubmitting ? (
-                            <Spinner data-icon="inline-start" />
-                        ) : (
-                            <Save data-icon="inline-start" />
-                        )}
-                        Save changes
+                <Separator />
+
+                <fieldset disabled={isSubmitting} className='flex justify-between items-start gap-2 w-full'>
+                    <Button type='button' onClick={onStepBack}>
+                        <ChevronLeft /> Back
                     </Button>
-                </div>
+
+                    <div className='flex flex-col'>
+                        <Button
+                            type='submit'
+                            form='abstract-declarations-form'
+                            disabled={!isDirty}
+                        >
+                            {isSubmitting ? <Spinner /> : <Save />}
+                            Save Changes
+                        </Button>
+
+                        {!isDirty && !isSubmitting && (
+                            <p className="text-xs text-muted-foreground animate-in fade-in slide-in-from-top-1">
+                                No changes were made.
+                            </p>
+                        )}
+                    </div>
+
+                    <Button type='button' onClick={onStepForward}>
+                        Next <ChevronRight />
+                    </Button>
+                </fieldset>
             </fieldset>
         </form>
     )
