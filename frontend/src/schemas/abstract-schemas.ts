@@ -134,9 +134,16 @@ export const submitAbstractSchema = abstractSchema.extend({
     })
 
 // Default values
+export const authorDefaults: z.input<typeof authorSchema> = authorSchema.partial().parse({
+    affiliation: {}
+})
+
+
 export const submitAbstractDefaults = abstractSchema.extend({
     authorsConsent: z.boolean().default(false)
 })
+
+
 
 
 export type AbstractSchema = z.infer<typeof abstractSchema>

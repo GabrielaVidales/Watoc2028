@@ -33,7 +33,7 @@ export const declarationsLabels = {
   }
 }
 
-export const abstractDeclaration = z.object({
+export const abstractDeclarationSchema = z.object({
   confirm_accuracy: z.boolean().default(false).refine((val) => val === true, {
     message: "You must confirm that the information is correct.",
   }),
@@ -54,4 +54,4 @@ export const abstractDeclaration = z.object({
   }),
 })
 
-export type AbstractDeclarationValues = z.infer<typeof abstractDeclaration>
+export type AbstractDeclarationValues = z.infer<typeof abstractDeclarationSchema>

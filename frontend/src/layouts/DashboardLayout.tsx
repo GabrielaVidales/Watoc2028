@@ -7,15 +7,13 @@ import logo from '@/assets/WatocPNGLogo.png';
 import Footer from "@/components/Footer"
 import { urls } from "@/routes/routes"
 import { useAuth } from "@/contexts/AuthContext"
-import background from '@/assets/background.png'
+import background from '@/assets/field.png'
 import { cn } from "@/lib/utils"
 import {
     NavigationMenu,
-    NavigationMenuContent,
     NavigationMenuItem,
     NavigationMenuLink,
     NavigationMenuList,
-    NavigationMenuTrigger,
     navigationMenuTriggerStyle,
 } from "@/components/ui/navigation-menu"
 
@@ -45,6 +43,16 @@ function DashboardLayout() {
 
                             <NavigationMenuItem className="p-0 w-full">
                                 <NavigationMenuLink asChild className={navigationMenuTriggerStyle()}>
+                                    <Link to={urls.users.viewAbstracts}>
+                                        <Button variant="ghost" className="p-0 flex flex-row gap-2 w-full text-lg">
+                                            My Submissions
+                                        </Button>
+                                    </Link>
+                                </NavigationMenuLink>
+                            </NavigationMenuItem>
+
+                            <NavigationMenuItem className="p-0 w-full">
+                                <NavigationMenuLink asChild className={navigationMenuTriggerStyle()}>
                                     <Link to={urls.users.profile}>
                                         <Button variant="ghost" className="p-0 flex flex-row gap-2 w-full text-lg">
                                             Profile
@@ -68,7 +76,7 @@ function DashboardLayout() {
             </div>
         </header>
 
-        <main className="bg-gray-100" >
+        <main className="bg-gray-100 opacity-90 bg-fixed">
             <Outlet />
         </main>
         <Footer />

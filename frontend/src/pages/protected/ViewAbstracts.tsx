@@ -1,31 +1,15 @@
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent } from '@/components/ui/card'
-import {
-    Dialog,
-    DialogClose,
-    DialogContent,
-    DialogDescription,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
-    DialogTrigger,
-} from "@/components/ui/dialog"
-import { useAuth, type UserProfile } from '@/contexts/AuthContext'
-import { formatDate } from '@/utils/formatDate'
-import { Calendar, Camera, CircleAlert, LockOpen, Mail, MailWarning, MapPin, Pencil, Search, Send, Trash2 } from 'lucide-react'
-import React, { useEffect, useState } from 'react'
-import { InfoAlert } from './CreateAbstractPage'
-import { Link, NavLink, useNavigate } from 'react-router'
-import AuthorForm from '@/forms/AuthorForm'
+import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger, } from "@/components/ui/dialog"
+import { CircleAlert,  MailWarning, Pencil, Search, Send, Trash2 } from 'lucide-react'
+import React from 'react'
+import { Link, useNavigate } from 'react-router'
 import { urls } from '@/routes/routes'
-import { useFetch } from '@/hooks/use-fetch'
 import { useProfiles } from '@/hooks/use-profiles'
 import axiosClient from '@/clients/axiosClient'
 import { presentationTypes, type AbstractSchema } from '@/schemas/abstract-schemas'
 import { isAxiosError } from 'axios'
-import { cn } from '@/lib/utils'
 import { Badge } from '@/components/ui/badge'
+import { InfoAlert } from '@/components/InfoAlert'
 
 
 function ViewAbstracts() {

@@ -1,14 +1,13 @@
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { useAuth, type UserProfile } from '@/contexts/AuthContext'
-import React, { useEffect, useState } from 'react'
+import React from 'react'
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Camera, Calendar, Mail, MapPin, UserRoundPen, House, Image, LockKeyhole, LogOut, Clock, FileText, CreditCard, PlusCircle, Wallet } from "lucide-react";
+import {  Calendar, Mail, MapPin, UserRoundPen, House, Image, LockKeyhole, LogOut, Clock, FileText, CreditCard, Wallet } from "lucide-react";
 import { formatDate } from '@/utils/formatDate';
 import 'react-image-crop/dist/ReactCrop.css';
-import { InfoAlert } from './CreateAbstractPage';
 import { UserPictureForm } from '@/forms/UserPictureForm';
-import { Link, NavLink } from 'react-router';
+import {  NavLink } from 'react-router';
 import ChangePasswordForm from '@/forms/ChangePasswordForm';
 import EditUserForm from '@/forms/EditUserForm';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -16,6 +15,7 @@ import DinnerForm from '@/forms/DinnerForm';
 import { urls } from '@/routes/routes';
 import { useProfiles } from '@/hooks/use-profiles';
 import { Badge } from '@/components/ui/badge';
+import { InfoAlert } from '@/components/InfoAlert';
 
 
 export default function UserProfile() {

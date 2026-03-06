@@ -1,31 +1,44 @@
 import { Button } from '@/components/ui/button'
-import { Checkbox } from '@/components/ui/checkbox'
-import { Field, FieldContent, FieldDescription, FieldError, FieldLabel, FieldLegend, FieldSet } from '@/components/ui/field'
+import { Field, FieldContent, FieldDescription, FieldError, FieldLabel } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Spinner } from '@/components/ui/spinner'
 import { Textarea } from '@/components/ui/textarea'
-import { abstractSchema, presentationTypes, submitAbstractDefaults, submitAbstractSchema, type AbstractSchema } from '@/schemas/abstract-schemas'
+import { abstractSchema, presentationTypes, submitAbstractDefaults, type AbstractSchema } from '@/schemas/abstract-schemas'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { GripVertical, Save, Trash2, UserPlus } from 'lucide-react'
-import { AnimatePresence, Reorder } from 'motion/react'
+import { Save } from 'lucide-react'
 import React, { useEffect } from 'react'
-import { Controller, useFieldArray, useForm, useWatch } from 'react-hook-form'
-import { InfoAlert } from '@/pages/protected/CreateAbstractPage'
+import { Controller, useForm, useWatch, type FormState } from 'react-hook-form'
 import axiosClient from '@/clients/axiosClient'
+import { InfoAlert } from '@/components/InfoAlert'
+import { forwardRef, useImperativeHandle, type Ref } from "react";
 
+export type AbstractFormState = {
+    isValid?: boolean
+    trigger: () => Promise<boolean>
+}
 
 type AbstractFormProps = {
     abstract?: AbstractSchema,
     onSubmit?: () => Promise<void> | void
 }
 
-function AbstractForm({ abstract, onSubmit }: AbstractFormProps) {
-    const { handleSubmit, reset, control, formState: { isValid, isSubmitting } } = useForm({
+function AbstractForm({ abstract, onSubmit }: AbstractFormProps, ref?: Ref<AbstractFormState>) {
+    const { handleSubmit, reset, control, watch, trigger, formState: { isValid, isSubmitting } } = useForm({
         resolver: zodResolver(abstractSchema),
         defaultValues: submitAbstractDefaults.parse({}),
         mode: 'onSubmit',
     })
+
+    useImperativeHandle(ref, () => ({
+        isValid,
+        trigger: async () => {
+            const value = await trigger()
+
+            return value
+        }
+     }));
+
 
     useEffect(() => {
         reset(abstract || {})
@@ -33,9 +46,6 @@ function AbstractForm({ abstract, onSubmit }: AbstractFormProps) {
 
     const onFormSubmit = handleSubmit(async (data) => {
         await new Promise(r => setTimeout(r, 1000))
-
-        console.log(data);
-        console.log(abstract);
 
         if (!data.id || data.id === -1) {
             console.log('Invalid ID');
@@ -51,6 +61,9 @@ function AbstractForm({ abstract, onSubmit }: AbstractFormProps) {
         console.log(invalid);
     })
 
+    const textContent = watch('text')
+
+    const countWords = (input: string) => input?.split(/\s+/).filter(Boolean).length
 
     return (
         <form onSubmit={onFormSubmit} id='abstract-submission-form'>
@@ -116,11 +129,6 @@ function AbstractForm({ abstract, onSubmit }: AbstractFormProps) {
                             <Field data-invalid={fieldState.invalid}>
                                 <FieldLabel htmlFor={field.name}>Abstract text</FieldLabel>
                                 <FieldDescription>Enter the abstract content below.</FieldDescription>
-                                <InfoAlert
-                                    title='IMPORTANT'
-                                    messages={'Total character count is 2,600 and includes spaces. Tables and images are not included, as only text is allowed. You will be able to see your character count below the text boxes.'}
-                                    className='mx-auto'
-                                />
                                 <Textarea
                                     {...field}
                                     id={field.name}
@@ -139,6 +147,21 @@ function AbstractForm({ abstract, onSubmit }: AbstractFormProps) {
                             </Field>
                         )}
                     />
+
+                    <Field data-invalid={countWords(textContent) > 500}>
+                        <FieldLabel htmlFor={'field.name'}>Word Count</FieldLabel>
+                        <FieldContent>
+                            Words: {countWords(textContent)} / 500
+                        </FieldContent>
+                        <InfoAlert
+                            variant='warning'
+                            title='IMPORTANT'
+                            messages={'Total character count is 2,600 and includes spaces. Tables and images are not included, as only text is allowed. You will be able to see your character count below the text boxes.'}
+                            className='mx-auto'
+                        />
+                        {countWords(textContent) > 500 && <FieldError errors={[{ message: 'Se excedió el límite de palabras para el abstract.' }]} />}
+                    </Field>
+
                     <Controller
                         name="references"
                         control={control}
@@ -166,7 +189,7 @@ function AbstractForm({ abstract, onSubmit }: AbstractFormProps) {
                     />
 
                     <div className='flex flex-col items-start gap-3 w-full'>
-                        <Button type='submit' className='p-5 w-60 uppercase' disabled={!isValid}>
+                        <Button type='submit' className='p-5 w-60 uppercase' >
                             {isSubmitting ? (
                                 <Spinner data-icon="inline-start" />
                             ) : (
@@ -181,7 +204,7 @@ function AbstractForm({ abstract, onSubmit }: AbstractFormProps) {
     )
 }
 
-export default AbstractForm
+export default forwardRef(AbstractForm)
 
 
 const WordCounter = ({ control, name, limit }: { control: any, name: string, limit: number }) => {

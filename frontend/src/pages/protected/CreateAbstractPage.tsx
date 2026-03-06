@@ -1,23 +1,9 @@
 import AbstractForm from '@/forms/AbstractForm'
-import React, { type HTMLAttributes, type ReactNode } from 'react'
-import {
-    Alert,
-    AlertDescription,
-    AlertTitle,
-} from "@/components/ui/alert"
-import { AlertCircleIcon } from 'lucide-react'
-import { cn } from '@/lib/utils'
-import {
-    Card,
-    CardAction,
-    CardContent,
-    CardDescription,
-    CardFooter,
-    CardHeader,
-    CardTitle,
-} from "@/components/ui/card"
+import React from 'react'
+import { Card, CardAction, CardContent, CardDescription, CardFooter, CardHeader, CardTitle, } from "@/components/ui/card"
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
+import { InfoAlert } from '@/components/InfoAlert'
 
 
 function CreateAbstractPage() {
@@ -69,35 +55,3 @@ function CreateAbstractPage() {
 }
 
 export default CreateAbstractPage
-
-type AlertVariant = 'info' | 'warning' | 'destructive' | 'custom';
-
-const variantStyles: Record<AlertVariant, string> = {
-    info: "border-indigo-200 bg-indigo-50 text-indigo-900 dark:border-indigo-900 dark:bg-indigo-950 dark:text-indigo-50",
-    warning: "border-amber-200 bg-amber-50 text-amber-900 dark:border-amber-900 dark:bg-amber-950 dark:text-amber-50",
-    destructive: "border-red-200 bg-red-50 text-red-900 dark:border-red-900 dark:bg-red-950 dark:text-red-50",
-    custom: '',
-};
-
-type MyAlertProps = Omit<HTMLAttributes<HTMLDivElement>, 'title'> & {
-    title: ReactNode
-    messages: ReactNode | ReactNode[];
-    variant?: AlertVariant,
-    icon?: ReactNode
-}
-
-export function InfoAlert({ title, messages, className, variant = 'info', icon: Icon, ...props }: MyAlertProps) {
-    return (
-        <Alert className={cn(variantStyles[variant], className)} {...props}>
-            {Icon ? (Icon):(
-                <AlertCircleIcon />
-            )}
-            <AlertTitle className='tracking-wider'>{title}</AlertTitle>
-            <AlertDescription>
-                {Array.isArray(messages) ? (messages as string[]).map((m, i) => (
-                    <span key={i}>{m}</span>
-                )) : messages}
-            </AlertDescription>
-        </Alert>
-    )
-}

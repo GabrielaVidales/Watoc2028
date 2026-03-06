@@ -8,9 +8,7 @@ export const useFetch = <T>(url?: string | null) => {
     const [error, setError] = useState(null)
 
     const fetchData = useCallback(async () => {
-        if (!url) {
-            return
-        }
+        if (!url) return
 
         setFetching(true)
         try {
@@ -29,8 +27,7 @@ export const useFetch = <T>(url?: string | null) => {
         }
     }, [url])
 
-    useEffect(() => { fetchData() }, [url, fetchData])
+    useEffect(() => { fetchData() }, [fetchData])
 
     return { data, fetching, error, fetchData, setData }
 }
-

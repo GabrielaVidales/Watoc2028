@@ -1,13 +1,16 @@
 import { Button } from '@/components/ui/button'
 import { Field, FieldContent, FieldDescription, FieldError, FieldTitle } from '@/components/ui/field'
-import { Switch } from '@/components/ui/switch'
 import { useFetch } from '@/hooks/use-fetch'
 import { cn } from '@/lib/utils'
-import { abstractDeclaration, declarationsLabels, type AbstractDeclarationValues } from '@/schemas/abstract-declaration-schema'
-import { abstractSchema, authorSchema, presentationTypes, type AbstractSchema, type AuthorAffiliationSchema, type AuthorSchema } from '@/schemas/abstract-schemas'
+import { abstractDeclarationSchema, declarationsLabels, type AbstractDeclarationValues } from '@/schemas/abstract-declaration-schema'
+import { abstractSchema, presentationTypes, type AbstractSchema, type AuthorSchema } from '@/schemas/abstract-schemas'
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { useParams } from 'react-router'
 import z from 'zod'
+import { CircleCheckBig } from 'lucide-react'
+import { useMutation } from '@/hooks/use-mutation'
+import { isAxiosError } from 'axios'
+import { InfoAlert } from '@/components/InfoAlert'
 
 
 function BeforeSubmitPage() {
@@ -17,7 +20,7 @@ function BeforeSubmitPage() {
     const { data: authors } = useFetch<AuthorSchema[]>(`/abstracts/${id}/authors/`)
     const { data: declarations } = useFetch<AbstractDeclarationValues>(`/abstracts/${id}/declarations/`)
 
-    const [abstractErrors, setAbstractErrors] = useState(null)
+    const [abstractErrors, setAbstractErrors] = useState(undefined)
     useEffect(() => {
         if (abstract) {
             const absParse = abstractSchema.safeParse(abstract)
@@ -31,11 +34,10 @@ function BeforeSubmitPage() {
 
     }, [abstract])
 
-
-    const [declarationsErrors, setDeclarationsErrors] = useState(null)
+    const [declarationsErrors, setDeclarationsErrors] = useState(undefined)
     useEffect(() => {
         if (declarations) {
-            const declParse = abstractDeclaration.safeParse(declarations)
+            const declParse = abstractDeclarationSchema.safeParse(declarations)
             if (!declParse.success) {
                 const treifiedError = z.treeifyError(declParse.error)?.properties
                 setDeclarationsErrors(treifiedError)
@@ -45,7 +47,7 @@ function BeforeSubmitPage() {
         setDeclarationsErrors(null)
     }, [declarations])
 
-    const [authorErrors, setAuthorErrors] = useState(null)
+    const [authorErrors, setAuthorErrors] = useState(undefined)
     useEffect(() => {
         if (authors) {
             const declAuthor = abstractSchema.shape.authors.safeParse(authors)
@@ -58,6 +60,7 @@ function BeforeSubmitPage() {
         setAuthorErrors(null)
     }, [authors])
 
+
     const { loading, action } = useAsyncAction(async () => {
         const payload = {
             abstract,
@@ -67,11 +70,51 @@ function BeforeSubmitPage() {
         console.log(payload);
         await new Promise(r => setTimeout(r, 1000))
     })
+    
+    const { mutate, loading: mutating } = useMutation()
+
+    const sendSubmission = async () => {
+        try {
+            const res = await mutate<any>('post', `/abstracts/${id}/`, {})
+            if (import.meta.env.DEV) {
+                console.log(res);
+            }
+        } catch (error) {
+            if (import.meta.env.DEV) {
+                if (isAxiosError(error)) {
+                    console.log(error.response.data);
+                }
+            }
+        }
+    }
+
+
 
     return (
-        <div className='space-y-2'>
-            <h2 className='font-semibold pb-1 border-b-2 border-b-input'>Abstract Content</h2>
+        <div className='space-y-4'>
 
+            {authorErrors === null && abstractErrors === null && declarationsErrors === null ? (
+                <InfoAlert
+                    icon={<CircleCheckBig />}
+                    title='You are almost done'
+                    variant='success'
+                    messages={[
+                        "Don't forget to click the “Submit” button to the right to complete your abstract submission."
+                    ]}
+                />
+            ) : (
+                <InfoAlert
+                    title='Please review the highlighted section(s).'
+                    variant='destructive'
+                    messages={[
+                        abstractErrors && "Check the Abstract details (title, text, or references).",
+                        authorErrors && "There are issues with the Authors list or their information.",
+                        declarationsErrors && "Please review and accept all the required declarations.",
+                    ].filter(Boolean) as string[]}
+                />
+            )}
+
+            <h2 className='font-semibold pb-1 border-b-2 border-b-input'>Abstract Content</h2>
             <>
                 <ShowField
                     hasError={Boolean(abstractErrors?.title)}
@@ -105,7 +148,11 @@ function BeforeSubmitPage() {
                     hasError={Boolean(abstractErrors?.references)}
                     errors={abstractErrors?.references?.errors}
                     name='References'
-                    value={abstract?.references}
+                    value={abstract?.references.split('\n').map(p => (
+                        <p key={p} className='mb-2'>
+                            {p}
+                        </p>
+                    ))}
                 />
 
             </>
@@ -113,7 +160,7 @@ function BeforeSubmitPage() {
             <h2 className='font-semibold pb-1 border-b-2 border-b-input'>Declarations</h2>
 
             {declarations && Object.keys(declarations).map(field => (
-                <div className={cn(
+                <div key={field} className={cn(
                     'grid grid-cols-1 sm:grid-cols-[1fr_10rem] px-3 py-2',
                     Boolean(declarationsErrors?.[field]) ? "bg-destructive/10 rounded-md" : ""
                 )}>
@@ -121,7 +168,7 @@ function BeforeSubmitPage() {
                         <FieldTitle>
                             {declarationsLabels?.[field]?.title}
                         </FieldTitle>
-                        <FieldDescription>
+                        <FieldDescription className='text-balance'>
                             {declarationsLabels?.[field]?.description}
                         </FieldDescription>
                         {Boolean(declarationsErrors?.[field]) && <FieldError errors={[declarationsErrors?.[field]?.error]} />}
@@ -165,7 +212,7 @@ const ShowField = ({ hasError, errors, name, value }: ShowFieldProps) => {
 
             <div className="flex flex-col gap-2">
                 <div className={cn(
-                    "text-sm leading-snug",
+                    "text-balance text-sm leading-snug",
                     hasError ? "text-destructive italic" : "text-foreground"
                 )}>
                     {value || "Not set"}
@@ -237,8 +284,6 @@ const AuthorsPreview = ({ authors }) => {
         </div>
     );
 };
-
-
 
 
 export const useAsyncAction = <T,>(callback: () => Promise<T>) => {

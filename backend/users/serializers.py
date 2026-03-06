@@ -140,6 +140,7 @@ class AuthorSerializer(serializers.ModelSerializer):
                 department=affiliation_data.get("department", None),
                 nationality=affiliation_data.get("nationality", None),
                 city=affiliation_data.get("city", None),
+                abstract = abstract,
             )
             validated_data["affiliation"] = affiliation
 
