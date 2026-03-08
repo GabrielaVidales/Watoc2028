@@ -29,7 +29,7 @@ const webmasters = [
 
 export default function Footer() {
     return (
-        <footer className='pt-12 pb-6 text-white bg-bottom relative bg-[#2a2a50] -z-10'>
+        <footer className='pt-12 pb-6 text-white bg-bottom relative bg-primary-dark -z-10'>
             <div
                 className="absolute inset-0 opacity-50 bg-cover bg-center bg-fixed pointer-events-none -z-10"
                 style={{ backgroundImage: `url(${fieldPng})` }}

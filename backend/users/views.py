@@ -8,7 +8,6 @@ from rest_framework.response import Response
 from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
 from django.contrib.auth import get_user_model
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
-from rest_framework_simplejwt.exceptions import TokenError, InvalidToken
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth.models import update_last_login
 from django.conf import settings
@@ -114,7 +113,7 @@ class CustomTokenObtainPairView(TokenObtainPairView):
                 httponly=True,
                 secure=settings.COOKIE_SECURE,
                 samesite="Lax",
-                max_age=86400,
+                max_age=900,
             )
 
             response.set_cookie(
@@ -123,9 +122,8 @@ class CustomTokenObtainPairView(TokenObtainPairView):
                 httponly=True,
                 secure=settings.COOKIE_SECURE,
                 samesite="Lax",
-                max_age=2592000,
+                max_age=86400,
             )
-
         return response
 
 
@@ -136,39 +134,49 @@ class CustomTokenRefreshView(TokenRefreshView):
     def post(self, request, *args, **kwargs):
         token = request.COOKIES.get("refresh_token")
         if token:
-            data = {"refresh": token}
+            request.data.update({"refresh": token})
         else:
-            data = request.data
-
-        serializer = self.get_serializer(data=data)
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
         try:
-            serializer.is_valid(raise_exception=True)
-        except TokenError as e:
-            raise InvalidToken(e.args[0])
-        token_data = serializer.validated_data
-
-        access_token = token_data.get("access")
-        refresh_roken = token_data.get("refresh")
-        response = Response(token_data, status=200)
-        response.set_cookie(
-            "access_token",
-            access_token,
-            httponly=True,
-            secure=settings.COOKIE_SECURE,
-            samesite="Lax",
-            max_age=86400,
-        )
-
-        response.set_cookie(
-            "refresh_token",
-            refresh_roken,
-            httponly=True,
-            secure=settings.COOKIE_SECURE,
-            samesite="Lax",
-            max_age=2592000,
-        )
-
-        return response
+            response = super().post(request, *args, **kwargs)
+            access_token = response.data.get("access")
+            refresh_token = response.data.get("refresh")
+            response.set_cookie(
+                "access_token",
+                access_token,
+                httponly=True,
+                secure=settings.COOKIE_SECURE,
+                samesite="Lax",
+                max_age=900,
+            )
+            response.set_cookie(
+                "refresh_token",
+                refresh_token,
+                httponly=True,
+                secure=settings.COOKIE_SECURE,
+                samesite="Lax",
+                max_age=86400,
+            )
+            return response
+        except:
+            no_token_res = Response(status=status.HTTP_401_UNAUTHORIZED)
+            no_token_res.set_cookie(
+                "access_token",
+                "",
+                httponly=True,
+                secure=settings.COOKIE_SECURE,
+                samesite="Lax",
+                max_age=0,
+            )
+            no_token_res.set_cookie(
+                "refresh_token",
+                "",
+                httponly=True,
+                secure=settings.COOKIE_SECURE,
+                samesite="Lax",
+                max_age=0,
+            )
+            return no_token_res
 
 
 class LogoutView(APIView):

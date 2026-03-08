@@ -1,6 +1,7 @@
 import { LinearProgress } from "@mui/material";
 import { useWatch, type Control, type FieldValues } from "react-hook-form";
 import { Progress } from "./ui/progress";
+import type { HTMLAttributes } from "react";
 
 const getPasswordStrength = (password: string) => {
     let score = 0;
@@ -12,7 +13,7 @@ const getPasswordStrength = (password: string) => {
     return score;
 };
 
-const PasswordStrengthMeter = ({ control }: { control: any }) => {
+const PasswordStrengthMeter = ({ control, className }: { control: any } & HTMLAttributes<HTMLDivElement>) => {
     const password = useWatch({ control, name: "password.value", defaultValue: "" });
     const score = getPasswordStrength(password);
 
@@ -27,7 +28,7 @@ const PasswordStrengthMeter = ({ control }: { control: any }) => {
     const current = config[score - 1] || { color: 'inherit', label: '', value: 0 };
 
     return (
-        <div >
+        <div className={className}>
             <Progress value={current.value} className="h-1" />
             <div className="flex justify-between text-sm mt-1">
                 <span className="text-xs">Password strength</span>

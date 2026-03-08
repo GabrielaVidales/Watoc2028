@@ -31,7 +31,24 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = models.User
-        fields = ["id", "email", "first_name", "middle_name", "last_name", "prefix", "pronouns", "nationality", "city", "photo", "full_name", "roles", "last_login", "date_joined", "participant"]
+        fields = [
+            "id",
+            "email",
+            "password",
+            "first_name",
+            "middle_name",
+            "last_name",
+            "prefix",
+            "pronouns",
+            "nationality",
+            "city",
+            "photo",
+            "full_name",
+            "roles",
+            "last_login",
+            "date_joined",
+            "participant",
+        ]
         extra_kwargs = {
             "first_name": {
                 "validators": [valid_name],
@@ -55,7 +72,6 @@ class UserSerializer(serializers.ModelSerializer):
     def get_photo(self, obj):
         if not obj.photo:
             return None
-
         try:
             photo_url = obj.photo.url
             timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
@@ -70,17 +86,16 @@ class UserSerializer(serializers.ModelSerializer):
 
     def validate_email(self, email):
         user_id = self.instance.id if self.instance else None
-
         if User.objects.filter(email__iexact=email).exclude(id=user_id).exists():
             raise serializers.ValidationError("This email is already registered.")
-
         return email
 
     @transaction.atomic
     def create(self, validated_data):
-        participant_data = validated_data.pop("participant", None)
-
-        user = super().create(validated_data)
+        participant_data = validated_data.pop("participant", None)        
+        email = validated_data.pop("email", None)
+        password = validated_data.pop("password", None)
+        user = User.objects.create_user(email=email, password=password, **validated_data)
 
         participant_serializer = ParticipantSerializer(data=participant_data)
         if participant_serializer.is_valid(raise_exception=True):
@@ -140,7 +155,7 @@ class AuthorSerializer(serializers.ModelSerializer):
                 department=affiliation_data.get("department", None),
                 nationality=affiliation_data.get("nationality", None),
                 city=affiliation_data.get("city", None),
-                abstract = abstract,
+                abstract=abstract,
             )
             validated_data["affiliation"] = affiliation
 

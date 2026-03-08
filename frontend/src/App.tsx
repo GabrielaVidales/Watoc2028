@@ -4,10 +4,10 @@ import { Route } from 'react-router'
 import { ProtectedRoute } from './contexts/ProtectedRoute'
 import { GuestRoute } from './contexts/GuestRoute'
 
-import Login from './pages/Login'
+import LoginPage from './pages/LoginPage'
 import { ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
-import Register from './pages/Register'
+import RegisterPage from './pages/RegisterPage'
 import Home from './pages/home/Home'
 import VenuePage from './pages/venue/VenuePage'
 import HotelBooking from './pages/hotelBooking/HotelBooking'
@@ -66,8 +66,8 @@ function App() {
 					{/* Rutas sólo para usuarios no loggeados */}
 					<Route element={<GuestRoute />}>
 						<Route element={<AuthLayout />}>
-							<Route path='/login' element={<Login />} />
-							<Route path='/register' element={<Register />} />
+							<Route path='/login' element={<LoginPage />} />
+							<Route path='/register' element={<RegisterPage />} />
 						</Route>
 					</Route>
 

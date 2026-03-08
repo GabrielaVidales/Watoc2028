@@ -6,13 +6,13 @@ import { abstractSchema } from "./abstract-schemas";
 const countriesArray = countries.map(country => country.code)
 
 export const prefixes = [
-  { value: "Miss", label: "Miss" },
-  { value: "Ms.", label: "Ms." },
-  { value: "Mrs.", label: "Mrs." },
-  { value: "Mr.", label: "Mr." },
-  { value: "Dr.", label: "Dr." },
-  { value: "Prof.", label: "Prof." },
-  { value: "Mx.", label: "Mx." },
+    { value: "Miss", label: "Miss" },
+    { value: "Ms.", label: "Ms." },
+    { value: "Mrs.", label: "Mrs." },
+    { value: "Mr.", label: "Mr." },
+    { value: "Dr.", label: "Dr." },
+    { value: "Prof.", label: "Prof." },
+    { value: "Mx.", label: "Mx." },
 ] as const;
 
 export const UserRole = {
@@ -73,16 +73,16 @@ export const userSchema = z.object({
 
 export const participantSchema = z.object({
     affiliation: z.string().trim()
-        .min(1, "Institución requerida")
-        .max(100, 'Inut too long')
+        .min(1, "Affiliation is required")
+        .max(100, "Institution name is too long")
         .default(''),
     job_title: z.string().trim()
-        .min(1, "Departamento requerido")
-        .max(100, 'Inut too long')
+        .min(1, "Position or Job Title is required")
+        .max(100, "Position title is too long")
         .default(''),
     field_of_study: z.string().trim()
-        .min(1, "Departamento requerido")
-        .max(100, 'Inut too long')
+        .min(1, "Field of study is required")
+        .max(100, "Field name is too long")
         .default(''),
     abstracts: z.array(abstractSchema)
         .default([])
@@ -119,6 +119,7 @@ export const registrationSchema = userSchema
                 .min(1, 'Field required *')
                 .max(100, 'Input too long'),
             confirm: z.string()
+                .min(1, "Field required *")
                 .max(100, 'Input too long'),
         })
             .default({ value: '', confirm: '' })
@@ -144,11 +145,6 @@ export const registrationSchema = userSchema
                 error: "Passwords do not match",
                 path: ["confirm"]
             }),
-        // captcha: z.string()
-        //     .min(1, "Field required *")
-        //     .max(100, 'Input too long')
-        //     .default('')
-        //     .optional()
     })
 
 

@@ -1,4 +1,4 @@
-import { Box, Container, Grid, Stack, Typography, Avatar, Collapse, ListItemButton, ListItemText, Divider } from '@mui/material';
+import { Box, Container, Typography, Avatar, Collapse, ListItemButton, ListItemText, Divider } from '@mui/material';
 import { Quote, ChevronUp, ChevronDown } from 'lucide-react';
 import { useState } from 'react';
 import mayaCalendar from '../../../assets/calendario_maya_rojo.png';
