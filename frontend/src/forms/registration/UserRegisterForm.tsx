@@ -57,7 +57,7 @@ export default function UserRegisterForm({ }: IUserRegisterFormProps) {
             
             await handleLogin(data.email, data.password)
 
-            // navigate('/success', { replace: true, })
+            navigate('/success', { replace: true, })
         } catch (error) {
             const axiosErr = error as AxiosError
             const backendErrors: any = axiosErr?.response?.data

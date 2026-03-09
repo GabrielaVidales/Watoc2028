@@ -29,7 +29,7 @@ class UserRegistrationView(generics.CreateAPIView):
 class UserProfileView(generics.RetrieveUpdateAPIView):
     serializer_class = CustomUserUpdateSerializer
     permission_classes = [permissions.IsAuthenticated] 
-    parser_classes = (MultiPartParser, FormParser) 
+    parser_classes = (MultiPartParser, FormParser,JSONParser) 
 
     def get_object(self):
             return self.request.user  
