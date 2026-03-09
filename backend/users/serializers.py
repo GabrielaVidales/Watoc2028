@@ -1,187 +1,233 @@
-from rest_framework import serializers
+from django.contrib.auth.models import Group
 from django.contrib.auth import get_user_model
-from utils.mixins import EmptyStringToNoneMixin
-from django.contrib.auth.password_validation import validate_password
-from .models import PasswordResetCode
-from django.utils.http import urlsafe_base64_decode
-from django.utils.encoding import force_str
-from django.contrib.auth.tokens import default_token_generator
-from django.utils import timezone
-from datetime import timedelta
-from participants.models import Participant
-from participants.serializers import ParticipantSerializer
+from django.db import transaction
+from rest_framework import serializers
+from utils.validators import valid_email, valid_name
+from datetime import datetime
+from . import models
 
 User = get_user_model()
 
-class CustomUserSerializer(EmptyStringToNoneMixin, serializers.ModelSerializer):
 
-    participant_profile = ParticipantSerializer(required=False)
+class ParticipantSerializer(serializers.ModelSerializer):
+    abstracts = serializers.SerializerMethodField()
 
     class Meta:
-        model = User
+        model = models.Participant
+        fields = (
+            "affiliation",
+            "job_title",
+            "field_of_study",
+            "abstracts",
+        )
+
+    def get_abstracts(self, obj: models.Participant):
+        serializer = AbstractSerializer(obj.user.abstracts, many=True)
+        return serializer.data
+
+
+class UserSerializer(serializers.ModelSerializer):
+    participant = ParticipantSerializer(required=False, write_only=True)
+    photo = serializers.SerializerMethodField()
+
+    class Meta:
+        model = models.User
         fields = [
-            'id', 'email', 'password', 'first_name', 'last_name', 
-            'middle_name', 'prefix', 'pronouns', 'nationality', 'photo', 'user_type', 'participant_profile'
+            "id",
+            "email",
+            "password",
+            "first_name",
+            "middle_name",
+            "last_name",
+            "prefix",
+            "pronouns",
+            "nationality",
+            "city",
+            "photo",
+            "full_name",
+            "roles",
+            "last_login",
+            "date_joined",
+            "participant",
         ]
-        # Configuraciones extra de seguridad
         extra_kwargs = {
-            'password': {'write_only': True}, 
-            'photo': {'required': False}  
+            "first_name": {
+                "validators": [valid_name],
+                "allow_blank": False,
+            },
+            "last_name": {
+                "validators": [valid_name],
+                "allow_blank": False,
+            },
+            "email": {
+                "validators": [valid_email],
+                "allow_blank": False,
+            },
+            "city": {
+                "allow_blank": False,
+            },
+            "password": {"write_only": True},
+            "photo": {"required": False},
         }
 
+    def get_photo(self, obj):
+        if not obj.photo:
+            return None
+        try:
+            photo_url = obj.photo.url
+            timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
+            request = self.context.get("request")
+
+            if request is not None:
+                photo_url = request.build_absolute_uri(photo_url)
+
+            return f"{photo_url}?t={timestamp}"
+        except Exception:
+            return None
+
+    def validate_email(self, email):
+        user_id = self.instance.id if self.instance else None
+        if User.objects.filter(email__iexact=email).exclude(id=user_id).exists():
+            raise serializers.ValidationError("This email is already registered.")
+        return email
+
+    @transaction.atomic
     def create(self, validated_data):
-        """
-        La creación del usuario
-        y su perfil de participante en una sola transacción.
-        """
-        participant_data = validated_data.pop('participant_profile', None)
-        password = validated_data.pop('password', None)
-        # Instanciamos el modelo con los datos validados
-        instance = self.Meta.model(**validated_data)
+        participant_data = validated_data.pop("participant", None)        
+        email = validated_data.pop("email", None)
+        password = validated_data.pop("password", None)
         
-        if password is not None:
-            instance.set_password(password) # Encripta el password
+        user = User.objects.create_user(email=email, password=password, **validated_data)
+        
+        participant = Group.objects.get(name='participant')    
+        user.groups.add(participant)
 
-        instance.save()    
+        participant_serializer = ParticipantSerializer(data=participant_data)
+        if participant_serializer.is_valid(raise_exception=True):
+            p_instance = participant_serializer.save(user=user)
+            models.Dinner.objects.create(participant=p_instance)
 
-        if participant_data:
-            Participant.objects.create(user=instance, **participant_data)     
-          
-        return instance
-    
-class CustomUserUpdateSerializer(EmptyStringToNoneMixin, serializers.ModelSerializer):
-    participant_profile = ParticipantSerializer(required=False)
+        return user
+
+    @transaction.atomic
+    def update(self, instance, validated_data):
+        participant_data = validated_data.pop("participant", None)
+
+        user = super().update(instance, validated_data)
+
+        p_instance = user.participant
+        participant_serializer = ParticipantSerializer(p_instance, data=participant_data, partial=True)
+        if participant_serializer.is_valid(raise_exception=True):
+            p_instance = participant_serializer.save(user=user)
+
+        return user
+
+
+""""""
+
+
+class AuthorAffiliationSerializer(serializers.ModelSerializer):
+    id = serializers.IntegerField(required=False)
+
     class Meta:
-        model = User
-        fields = [
-            'id', 'email', 'first_name', 'last_name', 
-            'middle_name', 'prefix', 'pronouns', 'nationality', 'photo', 'user_type', 'participant_profile'
-        ]
-        # Configuraciones extra de seguridad
+        model = models.AuthorAffiliation
+        fields = "__all__"
+
+
+class AuthorSerializer(serializers.ModelSerializer):
+    affiliation = AuthorAffiliationSerializer(allow_null=True, required=False)
+    abstract_id = serializers.PrimaryKeyRelatedField(queryset=models.Abstract.objects.all(), source="abstract", write_only=True)
+
+    class Meta:
+        model = models.Author
+        exclude = ["abstract"]
         extra_kwargs = {
-            'photo': {'required': False} 
-        }    
-    def update(self, instance, validated_data):
-        """
-        instance: Es el objeto User que se está editando.
-        validated_data: Es el diccionario con los datos nuevos.
-        """
-        participant_data = validated_data.pop('participant_profile', None)
-        instance = super().update(instance, validated_data)
+            "order": {
+                "required": False,
+                "read_only": True,
+            },
+        }
 
-        # --- Actualización del Participante (Participant) ---
-        if participant_data:
-            participant, created = Participant.objects.get_or_create(user=instance)
-            for attr, value in participant_data.items():
-                setattr(participant, attr, value)
-            
-            participant.save()
+    @transaction.atomic
+    def create(self, validated_data):
+        abstract = validated_data.get("abstract")
+        validated_data["order"] = abstract.authors.count()
 
-        return instance    
-        
+        affiliation_data = validated_data.pop("affiliation")
+        if affiliation_data is not None:
+            affiliation, created = models.AuthorAffiliation.objects.get_or_create(
+                institute=affiliation_data.get("institute", None),
+                department=affiliation_data.get("department", None),
+                nationality=affiliation_data.get("nationality", None),
+                city=affiliation_data.get("city", None),
+                abstract=abstract,
+            )
+            validated_data["affiliation"] = affiliation
 
-class ChangePasswordSerializer(serializers.Serializer):
-    old_password = serializers.CharField(required = True, write_only=True) 
-    new_password = serializers.CharField(required = True, write_only=True, validators=[validate_password])  
-
-    def validate_old_password(self,value):
-        user = self.context['request'].user
-        print("user:",user)
-
-        if not user.check_password(value):
-            raise serializers.ValidationError("Your current password is incorrect.")  
-        return value
-
-    def validate(self, data):
-        if data['old_password'] == data['new_password']:
-            raise serializers.ValidationError("The new password must be different from your previous password.") 
-        return data
-   
-    def update(self, instance, validated_data):
-        instance.set_password(validated_data['new_password'])
-        instance.save()  
+        instance = super().create(validated_data)
+        normalize_author_order(instance.abstract)
+        # transaction.set_rollback(True)
         return instance
-    
-class RequestResetCodeSerializer(serializers.Serializer):
-    email = serializers.EmailField(required = True, write_only= True)
-    
-    def validate_email(self, value):
-        if value is None or value=="":
-            raise serializers.ValidationError("This field cannot be empty")
-        if not User.objects.filter(email= value).exists():
-            raise serializers.ValidationError("There is no user with this email addres.")
-        return value
-    
-class VerifyCodeSerializer(serializers.Serializer):
-    email = serializers.EmailField()
-    verification_code = serializers.CharField(max_length=6,required = True)
 
-    def validate(self, data):
-        email = data.get('email')
-        code = data.get('verification_code')
-        
+    @transaction.atomic
+    def update(self, instance, validated_data):
+        affiliation_data = validated_data.pop("affiliation")
+        if affiliation_data is not None:
+            affiliation, created = models.AuthorAffiliation.objects.update_or_create(
+                institute=affiliation_data.get("institute", None),
+                department=affiliation_data.get("department", None),
+                nationality=affiliation_data.get("nationality", None),
+                city=affiliation_data.get("city", None),
+                abstract=instance.abstract,
+            )
+            validated_data["affiliation"] = affiliation
 
-        # Buscamos el código en la BD
-        try:
-            user = User.objects.get(email=email)
-            reset_code = PasswordResetCode.objects.get(user=user)
-            current_time= timezone.now()   
-        except (User.DoesNotExist, PasswordResetCode.DoesNotExist):
-            raise serializers.ValidationError("Datos inválidos.")
+        instance = super().update(instance, validated_data)
+        normalize_author_order(instance.abstract)
+        # transaction.set_rollback(True)
+        return instance
 
-        if reset_code.code != code:
-            raise serializers.ValidationError("El código de verificación es incorrecto.")
-        
-        if reset_code.created_at + timedelta(minutes=15) < current_time:
-            raise serializers.ValidationError("Tu código de verificación a experido.")
-                        
-        # Opcional: Aquí podrías verificar si 'reset_code.created_at' expiró (ej. > 15 min)
 
-        return data    
+def normalize_author_order(abstract):
+    if abstract is None:
+        return
 
-class SetNewPasswordSerializer(serializers.Serializer):
-    password = serializers.CharField(write_only=True, min_length=8)
-    uidb64 = serializers.CharField(write_only=True)
-    token = serializers.CharField(write_only=True)
+    authors = abstract.authors.order_by("order")
+    for index, author in enumerate(authors, start=1):
+        if author.order != index:
+            author.order = index
+            author.save(update_fields=["order"])
 
-    def validate(self, data):
-        uidb64 = data.get('uidb64')
-        token = data.get('token')
-        password = data.get('password')
 
-        # 1. Decodificar el UID para obtener el usuario
-        try:
-            uid = force_str(urlsafe_base64_decode(uidb64))
-            user = User.objects.get(pk=uid)
-        except (TypeError, ValueError, OverflowError, User.DoesNotExist):
-            raise serializers.ValidationError("Token inválido o usuario no encontrado.")
+class AbstractSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.Abstract
+        fields = "__all__"
+        read_only_fields = ["created_at", "last_update", "needs_review"]
 
-        # 2. Verificar que el token sea válido para ese usuario
-        if not default_token_generator.check_token(user, token):
-            raise serializers.ValidationError("El token es inválido o ha expirado.")
+    @transaction.atomic
+    def create(self, validated_data):
+        instance = models.Abstract()
+        request = self.context.get("request", None)
+        instance.user = request.user
+        instance.save()
+        # transaction.on_commit(lambda: signals.on_abstract_created(instance))
+        return instance
 
-        # Guardamos el usuario en el contexto para usarlo en la vista o save()
-        self.user = user
-        return data             
-    
-# class RecoveryPassword(serializers.Serializer):
-#     verification_code = serializers.CharField(max_length=6, required = True, write_only=True)
+    @transaction.atomic
+    def update(self, instance: models.Abstract, validated_data):
+        extra_kwargs = {"previous_status": instance.status}
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+        instance.extra_kwargs = extra_kwargs
+        instance.save()
+        # transaction.on_commit(lambda: signals.on_abstract_updated(instance))
+        return instance
 
-#     def validate_verification_code(self,value):
-#         if value is None or value=="":
-#             raise serializers.ValidationError("This field cannot be empty")
-        
-#         if not value.isdigit():
-#             raise serializers.ValidationError("The verification code must only be digit")
-#         return value
-    
-#     def validate(self,data):
-#         correct_code = "123445"
-#         input_code = data.get('verification_code')
-#         if input_code !=  correct_code:
-#             raise serializers.ValidationError("Your verification code is incorrect")
-        
-#         return data
-    
-    
-        
+
+class AbstractDeclarationsSerializer(serializers.ModelSerializer):
+    abstract_id = serializers.PrimaryKeyRelatedField(queryset=models.Abstract.objects.all(), source="abstract", write_only=True)
+
+    class Meta:
+        model = models.AbstractDeclarations
+        exclude = ["abstract"]

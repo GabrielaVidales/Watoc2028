@@ -90,6 +90,7 @@ export const ControlledSelect = <T extends BaseOption>({ label, name, id, defaul
                         id={id}
                         options={options}
                         autoHighlight
+                        size='small'
                         getOptionLabel={getOptionLabel} //Este es lo que se muestra como elegido
                         value={
                             // Esto indica el valor que almacena el input para submit

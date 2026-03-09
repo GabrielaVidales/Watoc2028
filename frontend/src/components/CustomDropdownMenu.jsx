@@ -1,32 +1,23 @@
 import { Box, Typography } from "@mui/material";
-import { KeyboardArrowDown } from "@mui/icons-material";
 import './CustomDropdownMenu.css'
+import { ChevronDown } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 const CustomDropdownMenu = ({ textBlack = false, children }) => {
-
+    const style = cn(
+        'text-lg font-medium tracking-wider',
+        (textBlack) ? 'text-black after:bg-black' : 'text-white',
+    )
     return (
-        <Box className="dropdown">
-            <Box sx={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: 0.5,
-                cursor: 'pointer',
-                color: (textBlack) ? 'black' : 'white',
-            }} >
-                <Typography component="div" sx={{
-                    fontSize: '1.2rem',
-                    fontWeight: 500,
-                    textAlign: 'center',
-                }} >
-                    About
-                </Typography>
-                <KeyboardArrowDown />
-            </Box>
-            {/* NO USAR OTRO COMPONENTE, SINO SE ROMPE */}
+        <div className="dropdown">
+            <div className='flex gap-1 items-center cursor-pointer'>
+                <span className={style}>About</span>
+                <ChevronDown className={style} />
+            </div>
             <div className="dropdown-content">
                 {children}
             </div>
-        </Box>
+        </div>
     );
 };
 

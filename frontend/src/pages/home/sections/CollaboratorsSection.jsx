@@ -1,14 +1,31 @@
 import { Box, Container, Stack, Typography, Paper } from '@mui/material';
-import { Diversity3 } from '@mui/icons-material';
+import { UsersRound } from 'lucide-react';
 import { Link } from 'react-router';
 import watocLogo from '../../../assets/watocLogo.png'
 import cinvestavLogo from '../../../assets/cinvestavlogo.png'
 import uamLogo from '../../../assets/uam.png'
+import theochem from '@/assets/theochemmid.jpg'
+import { div } from 'motion/react-client';
 
 const collaborators = [
-    { name: 'WATOC', src: watocLogo, url: 'https://www.watoc.net/' },
-    { name: 'Cinvestav', src: cinvestavLogo, url: 'https://www.cinvestav.mx/' },
-    { name: 'UAM', src: uamLogo, url: 'http://www.iztapalapa.uam.mx/' },
+    {
+        name: 'WATOC',
+        src: watocLogo,
+        url: 'https://www.watoc.net/',
+        title: 'Host Organization'
+    },
+    {
+        name: 'Cinvestav',
+        src: cinvestavLogo,
+        url: 'https://www.cinvestav.mx/',
+        title: 'Host Research Centre'
+    },
+    {
+        name: 'TheoChemMerida',
+        src: theochem,
+        url: 'https://www.theochemmerida.org/',
+        title: 'Host Group'
+    },
 ];
 
 export default function CollaboratorsSection() {
@@ -18,13 +35,12 @@ export default function CollaboratorsSection() {
             sx={{
                 py: { xs: 6, md: 8 },
                 px: { xs: 2, sm: 3 },
-                bgcolor: 'grey.50',
                 borderTop: '1px solid',
                 borderBottom: '1px solid',
                 borderColor: 'divider',
             }}
         >
-            <Container maxWidth="lg">
+            <Container maxWidth="md">
                 <Stack alignItems="center" spacing={2} mb={6} textAlign="center">
                     <Box
                         sx={{
@@ -38,7 +54,7 @@ export default function CollaboratorsSection() {
                             mb: 1,
                         }}
                     >
-                        <Diversity3 sx={{ fontSize: 32, color: 'white' }} />
+                        <UsersRound size={32} color="white" />
                     </Box>
 
                     <Typography
@@ -48,81 +64,24 @@ export default function CollaboratorsSection() {
                     >
                         Organized In Collaboration With
                     </Typography>
-
-                    <Typography variant="body1" color="text.secondary" sx={{ maxWidth: 600 }}>
-                        Leading institutions committed to advancing theoretical and computational chemistry
-                    </Typography>
                 </Stack>
 
-                <Stack
-                    direction={{ xs: 'column', sm: 'row' }}
-                    spacing={4}
-                    justifyContent="center"
-                    alignItems="center"
-                    flexWrap="wrap"
-                    sx={{ gap: { xs: 3, md: 5 } }}
-                >
-                    {collaborators.map((collab, index) => (
-                        <Link to={collab.url} key={index}>
-                            <Box
-                                sx={{
-                                    transition: 'all 0.4s ease',
-                                    '&:hover': {
-                                        transform: 'scale(1.08)',
-                                        '& .logo-box': {
-                                            borderColor: 'primary.main',
-                                            boxShadow: '0 8px 24px rgba(25, 118, 210, 0.15)',
-                                        },
-                                    },
-                                }}
-                            >
-                                <Paper
-                                    className="logo-box"
-                                    elevation={0}
-                                    sx={{
-                                        width: { xs: 140, sm: 160, md: 180 },
-                                        height: { xs: 140, sm: 160, md: 180 },
-                                        borderRadius: 4,
-                                        border: '2px solid',
-                                        borderColor: 'divider',
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        justifyContent: 'center',
-                                        p: 3,
-                                        bgcolor: 'white',
-                                        transition: 'all 0.3s ease',
-                                        cursor: 'pointer',
-                                    }}
+                <div className='grid grid-cols-1 md:grid-cols-3 gap-5'>
+                    {collaborators.map((c, index) => (
+                        <Link to={c.url} key={index}>
+                            <div className='flex flex-col gap-2'>
+                                <span className='text-center text-xl font-semibold'>{c.title}</span>
+                                <div className='w-auto h-30 border-2 border-gray-300 px-4 py-2 flex justify-center rounded-2xl
+                                    transition-all duration-200 cursor-pointer
+                                    hover:scale-105 hover:border-indigo-600 hover:shadow-xl'
                                 >
-                                    <Box
-                                        component="img"
-                                        src={collab.src}
-                                        alt={collab.name}
-                                        sx={{
-                                            maxWidth: '100%',
-                                            maxHeight: '100%',
-                                            objectFit: 'contain',
-                                            filter: 'grayscale(20%)',
-                                            transition: 'filter 0.3s ease',
-                                            '&:hover': {
-                                                filter: 'grayscale(0%)',
-                                            },
-                                        }}
-                                    />
-                                </Paper>
-                            </Box>
+
+                                    <img src={c.src} alt={c.name} className='h-full object-contain' />
+                                </div>
+                            </div>
                         </Link>
                     ))}
-                </Stack>
-
-                <Typography
-                    variant="caption"
-                    color="text.secondary"
-                    textAlign="center"
-                    sx={{ display: 'block', mt: 5, opacity: 0.7 }}
-                >
-                    Proud to partner with world-renowned research institutions
-                </Typography>
+                </div>
             </Container>
         </Box>
     );

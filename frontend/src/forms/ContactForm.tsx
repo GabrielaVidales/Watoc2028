@@ -1,6 +1,6 @@
 import { Button, Typography, Stack, Divider, Box, InputAdornment, Alert, Collapse, IconButton, AlertTitle, FormControl, useMediaQuery, useTheme } from '@mui/material'
 import { FormProvider, useForm } from 'react-hook-form'
-import { Close, ErrorOutline, MailOutline, Send } from '@mui/icons-material'
+import { X, AlertCircle, Mail, Send } from 'lucide-react'
 import { REGEX_EMAIL, REGEX_NAME } from '../utils/formRegex'
 import HCaptcha from '@hcaptcha/react-hcaptcha'
 import { useEffect, useState } from 'react'
@@ -55,7 +55,7 @@ function StatusAlert({ isSuccess, error, onClose }: { isSuccess: boolean, error?
                 variant='filled'
                 action={(
                     <IconButton color="inherit" size="small" onClick={handleClose}>
-                        <Close fontSize="inherit" />
+                        <X size={20} />
                     </IconButton>
                 )}
             >
@@ -199,7 +199,7 @@ export default function ContactForm() {
                             inputAdornment={{
                                 startAdornment: (
                                     <InputAdornment position="start">
-                                        <MailOutline />
+                                        <Mail size={20} />
                                     </InputAdornment>
                                 )
                             }}
@@ -252,15 +252,15 @@ export default function ContactForm() {
                                         }}
                                     />
                                     {methods.formState.errors?.captcha && (
-                                        <Typography color="error" variant="caption">
-                                            <ErrorOutline fontSize='small' /> {methods.formState.errors?.captcha?.message?.toString()}
+                                        <Typography color="error" variant="caption" sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                                            <AlertCircle size={14} /> {methods.formState.errors?.captcha?.message?.toString()}
                                         </Typography>
                                     )}
                                 </FormControl>
                             </Box>
                         )}
 
-                        <Button onClick={onSubmit} type='submit' variant='contained' loading={methods.formState.isSubmitting} disabled={methods.formState.isSubmitSuccessful} size='large' fullWidth endIcon={<Send />} >Submit</Button>
+                        <Button onClick={onSubmit} type='submit' variant='contained' loading={methods.formState.isSubmitting} disabled={methods.formState.isSubmitSuccessful} size='large' fullWidth endIcon={<Send size={18} />} >Submit</Button>
                     </Stack>
                 </Stack>
             </Box>

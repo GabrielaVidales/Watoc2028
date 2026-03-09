@@ -1,6 +1,6 @@
 import { Box, Button, Divider, InputAdornment, LinearProgress, Paper, Stack, Typography } from '@mui/material';
 import { FormProvider, useForm, useFormContext, useWatch } from 'react-hook-form';
-import { Lock, Mail, Person } from '@mui/icons-material';
+import { Lock, Mail, User, ShieldCheck } from 'lucide-react'; // Íconos de Lucide
 import FormSectionTitle from '../../components/wizard registration/inputs/FormSectionTitle';
 import { REGEX_EMAIL, REGEX_NAME } from '../../utils/formRegex';
 import { countries } from '../../utils/countriesInfo';
@@ -56,8 +56,6 @@ export default function UserRegisterForm({ }: IUserRegisterFormProps) {
             console.log(res);
             
             await handleLogin(data.email, data.password)
-
-            navigate('/success', { replace: true, })
         } catch (error) {
             const axiosErr = error as AxiosError
             const backendErrors: any = axiosErr?.response?.data
@@ -84,10 +82,10 @@ export default function UserRegisterForm({ }: IUserRegisterFormProps) {
     return (
         <FormProvider {...methods}>
             <Paper elevation={5} sx={{ py: 6, px: { xs: 3, sm: 6, md: 9 }, borderTop: 12, borderColor: 'primary.main', }}>
-                <Box component='fieldset' disabled={methods.formState.isSubmitting}>
+                <Box component='fieldset' disabled={methods.formState.isSubmitting} sx={{ border: 'none', p: 0, m: 0 }}>
 
                     {import.meta.env.DEV && (
-                        <Button fullWidth onClick={handleDebugData}>Debug data</Button>
+                        <Button fullWidth onClick={handleDebugData} sx={{ mb: 2 }}>Debug data</Button>
                     )}
 
                     <TitleSection />
@@ -142,18 +140,10 @@ const TitleSection = () => {
         </Typography>
         <Divider />
         <ul>
-            <li>
-                Important deadlines for abstract submission.
-            </li>
-            <li>
-                Early-bird registration alerts.
-            </li>
-            <li>
-                Updates on congress speakers and the scientific program.
-            </li>
-            <li>
-                Travel and accommodation tips for visiting the Yucatán Peninsula.
-            </li>
+            <li>Important deadlines for abstract submission.</li>
+            <li>Early-bird registration alerts.</li>
+            <li>Updates on congress speakers and the scientific program.</li>
+            <li>Travel and accommodation tips for visiting the Yucatán Peninsula.</li>
         </ul>
     </>)
 }
@@ -173,7 +163,7 @@ const PersonalInfo = () => {
         <Stack spacing={2} py={2}>
             <FormSectionTitle
                 text='Personal Information'
-                icon={<Person />}
+                icon={<User size={20} />}
             />
             <ControlledSelect
                 id='prefix'
@@ -229,13 +219,11 @@ const PersonalInfo = () => {
 }
 
 const ContactInfo = () => {
-    ['email', 'country', 'city']
-
     return <>
         <Stack spacing={2} py={2}>
             <FormSectionTitle
                 text='Contact Information'
-                icon={<Person />}
+                icon={<Mail size={20} />}
             />
 
             <ControlledTextField
@@ -253,7 +241,7 @@ const ContactInfo = () => {
                 inputAdornment={{
                     endAdornment: (
                         <InputAdornment position='end'>
-                            <Mail />
+                            <Mail size={18} />
                         </InputAdornment>
                     )
                 }}
@@ -271,6 +259,7 @@ const ContactInfo = () => {
                     <img
                         loading="lazy"
                         width="20"
+                        style={{ marginRight: 8 }}
                         srcSet={`https://flagcdn.com/w40/${option.value.toString().toLowerCase()}.png 2x`}
                         src={`https://flagcdn.com/w20/${option.value.toString().toLowerCase()}.png`}
                         alt=""
@@ -295,7 +284,7 @@ const AffiliationInfo = () => {
         <Stack spacing={2} py={2}>
             <FormSectionTitle
                 text='Affiliation Information'
-                icon={<Lock />}
+                icon={<User size={20} />}
             />
             <ControlledTextField
                 id='affiliation'
@@ -313,7 +302,6 @@ const AffiliationInfo = () => {
                 maxLength={128}
                 hideLengthLabel
             />
-
         </Stack>
     </>
 }
@@ -325,7 +313,7 @@ const PasswordInfo = () => {
         <Stack spacing={2} py={2}>
             <FormSectionTitle
                 text='Security'
-                icon={<Lock />}
+                icon={<Lock size={20} />}
             />
             <PasswordStrengthMeter control={control} />
             <ControlledTextField
@@ -343,7 +331,7 @@ const PasswordInfo = () => {
                 inputAdornment={{
                     startAdornment: (
                         <InputAdornment position='start'>
-                            <Lock />
+                            <Lock size={18} />
                         </InputAdornment>
                     )
                 }}
@@ -363,7 +351,7 @@ const PasswordInfo = () => {
                 inputAdornment={{
                     startAdornment: (
                         <InputAdornment position='start'>
-                            <Lock />
+                            <ShieldCheck size={18} />
                         </InputAdornment>
                     )
                 }}

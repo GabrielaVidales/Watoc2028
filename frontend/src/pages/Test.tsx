@@ -1,27 +1,50 @@
 import { HeroSection } from '@/components/HeroSection'
 import UserRegisterForm from '../forms/registration/UserRegisterForm'
+import { Progress } from '@/components/ui/progress'
+import { CircleCheckBig, CircleEllipsis } from 'lucide-react'
+import React, { useEffect, useState } from 'react'
+import { cn } from '@/lib/utils'
+import { StepperLabel } from '@/components/ui/stepper'
 
 export default function Test() {
 
+  const [state, setState] = useState(false)
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setState(prev => !prev)
+    }, 1000)
+
+    return () => {
+      if (timer) {
+        clearTimeout(timer)
+      }
+    }
+
+  }, [state])
+
   return (
     <>
-      <HeroSection />
-      <div className='bg-amber-300'>
-        <div className='row h-100 justify-content-center'>
-          {/* <div className='col-12 col-sm-10 col-lg-4 p-1 p-sm-3'>
-            <UserRegisterForm />
-          </div> */}
-          {/* 
-        <div className='col-12 col-sm-10 col-lg-8 p-1 p-sm-3'>
-          <AbstractSubmissionForm/>
-        </div>
+      <div className='w-full max-w-5xl grid grid-cols-1 gap-3 p-3 mx-auto'>
+        <div className='w-full bg-background border-2 p-3 rounded-lg shadow-lg flex flex-col gap-5'>
+          <div className='min-h-90 grid grid-cols-4'>
+            <StepperLabel
+              completed={state}
+              label='Abstract Content'
+            />
+            <StepperLabel
+              completed={!state}
+              label='Authors'
+            />
+            <StepperLabel
+              completed={state}
+              label='Declarations'
+            />
+            <StepperLabel
+              completed={!state}
+              label='Submit'
+            />
 
-        <div className='col-12 col-sm-10 col-lg-8 p-1 p-sm-3 h-100'>
-          <RegistrationSteper/>
-        </div> */}
-
-
-
+          </div>
         </div>
       </div>
     </>

@@ -1,11 +1,9 @@
-import NavBar from '../../components/NavBar'
-import Footer from '../../components/Footer'
 import { Box, Card, CardContent, Container, Grid, Stack, Typography } from '@mui/material'
-import { DirectionsBus, ElectricBolt, LocalTaxi, DirectionsWalk } from '@mui/icons-material'
 import { TransportationHeroContent } from './components/TransportationHeroContent'
 import { HeroSection } from '../../components/HeroSection'
 import vayvenImg from '../../assets/vayven.png'
 import ietranImg from '../../assets/ietram.jpg'
+import { Bus, Car, Footprints, Zap } from 'lucide-react'
 
 const TransportCard = ({ icon, title, text, image }) => (
     <Card
@@ -71,10 +69,12 @@ const TransportCard = ({ icon, title, text, image }) => (
                 variant="body1"
                 color="text.secondary"
                 lineHeight={1.85}
-                sx={{ fontSize: '1.05rem',
-                      lineHeight: 1.85,
-                      textAlign: 'justify',
-                      textJustify: 'inter-word' }}
+                sx={{
+                    fontSize: '1.05rem',
+                    lineHeight: 1.85,
+                    textAlign: 'justify',
+                    textJustify: 'inter-word'
+                }}
             >
                 {text}
             </Typography>
@@ -139,138 +139,134 @@ const TransportHighlight = ({ icon, title, text }) => (
 export default function TransportationPage() {
     return (
         <>
-            <NavBar />
-            <Box component="main">
-                <HeroSection
-                    height="70dvh"
-                    enableParticles
-                    enableRadialGradient
-                > <TransportationHeroContent />
-                </HeroSection>
+            <HeroSection
+                height="70dvh"
+                enableParticles
+                enableRadialGradient
+            > <TransportationHeroContent />
+            </HeroSection>
 
-                <Box
-                    component="section"
-                    sx={{
-                        py: { xs: 6, md: 8 },
-                        px: { xs: 2, sm: 3, md: 4 },
-                        bgcolor: 'background.default',
-                    }}
-                >
-                    <Container maxWidth="lg">
-                        <Box textAlign="center" mb={6}>
-                            <Typography
-                                variant="overline"
-                                color="primary"
-                                fontWeight="bold"
-                                sx={{ fontSize: '1rem', letterSpacing: 2 }}
-                            >
-                                TRANSPORTATION OPTIONS
-                            </Typography>
-                            <Typography
-                                variant="h3"
-                                fontWeight="bold"
-                                sx={{
-                                    mt: 1,
-                                    mb: 2,
-                                    fontSize: { xs: '2rem', md: '2.5rem' },
-                                }}
-                            >
-                                Getting Here & Around
-                            </Typography>
-                            <Box
-                                sx={{
-                                    width: 100,
-                                    height: 4,
-                                    bgcolor: 'primary.main',
-                                    mx: 'auto',
-                                    borderRadius: 2,
-                                    mb: 6,
-                                }}
-                            />
-                            <Typography
-                                sx={{
-                                    maxWidth: 760,
-                                    mx: 'auto',
-                                    fontSize: { xs: '1rem', md: '1.15rem' },
-                                    opacity: 0.95,
-                                    lineHeight: 1.7,
-                                }}
-                            >
-                                Mérida offers safe, modern, and convenient transportation options,
-                                making it easy for attendees to move around the city during WATOC 2028.
-                            </Typography>
-                        </Box>
-                        <Stack spacing={4} mb={8} maxWidth={900} mx="auto">
-                            <TransportHighlight
-                                icon={<LocalTaxi />}
-                                title="Taxis & Ride-Sharing"
-                                text="Uber, Didi, and local taxis are widely available for convenient travel throughout the city."
-                            />
-                            <TransportHighlight
-                                icon={<DirectionsWalk />}
-                                title="Walking"
-                                text="The congress center is within comfortable walking distance of numerous hotels, restaurants, and attractions along Paseo de Montejo."
-                            />
-                        </Stack>
-                        <Box textAlign="center" mb={5}>
-                            <Typography
-                                variant="overline"
-                                color="primary"
-                                fontWeight="bold"
-                                sx={{ fontSize: '1rem', letterSpacing: 2 }}
-                            >
-                                PUBLIC TRANSPORTATION DETAILS
-                            </Typography>
-                            <Typography
-                                variant="h3"
-                                fontWeight="bold"
-                                sx={{
-                                    mt: 1,
-                                    mb: 2,
-                                    fontSize: { xs: '2rem', md: '2.5rem' },
-                                }}
-                            >
-                                Modern & Sustainable Options
-                            </Typography>
-                            <Box
-                                sx={{
-                                    width: 100,
-                                    height: 4,
-                                    bgcolor: 'primary.main',
-                                    mx: 'auto',
-                                    borderRadius: 2,
-                                    mb: 6,
-                                }}
-                            />
-                        </Box>
-                        <Grid container spacing={4}>
-                            <Grid item size={{ xs: 12, sm: 6}}>
-                                <TransportCard
-                                    icon={<DirectionsBus />}
-                                    title="Va-y-Ven System"
-                                    image={vayvenImg}
-                                    text='The main public transport system with modern, air-conditioned buses.
+            <Box
+                component="section"
+                sx={{
+                    py: { xs: 6, md: 8 },
+                    px: { xs: 2, sm: 3, md: 4 },
+                    bgcolor: 'background.default',
+                }}
+            >
+                <Container maxWidth="lg">
+                    <Box textAlign="center" mb={6}>
+                        <Typography
+                            variant="overline"
+                            color="primary"
+                            fontWeight="bold"
+                            sx={{ fontSize: '1rem', letterSpacing: 2 }}
+                        >
+                            TRANSPORTATION OPTIONS
+                        </Typography>
+                        <Typography
+                            variant="h3"
+                            fontWeight="bold"
+                            sx={{
+                                mt: 1,
+                                mb: 2,
+                                fontSize: { xs: '2rem', md: '2.5rem' },
+                            }}
+                        >
+                            Getting Here & Around
+                        </Typography>
+                        <Box
+                            sx={{
+                                width: 100,
+                                height: 4,
+                                bgcolor: 'primary.main',
+                                mx: 'auto',
+                                borderRadius: 2,
+                                mb: 6,
+                            }}
+                        />
+                        <Typography
+                            sx={{
+                                maxWidth: 760,
+                                mx: 'auto',
+                                fontSize: { xs: '1rem', md: '1.15rem' },
+                                opacity: 0.95,
+                                lineHeight: 1.7,
+                            }}
+                        >
+                            Mérida offers safe, modern, and convenient transportation options,
+                            making it easy for attendees to move around the city during WATOC 2028.
+                        </Typography>
+                    </Box>
+                    <Stack spacing={4} mb={8} maxWidth={900} mx="auto">
+                        <TransportHighlight
+                            icon={<Car />}
+                            title="Taxis & Ride-Sharing"
+                            text="Uber, Didi, and local taxis are widely available for convenient travel throughout the city."
+                        />
+                        <TransportHighlight
+                            icon={<Footprints />}
+                            title="Walking"
+                            text="The congress center is within comfortable walking distance of numerous hotels, restaurants, and attractions along Paseo de Montejo."
+                        />
+                    </Stack>
+                    <Box textAlign="center" mb={5}>
+                        <Typography
+                            variant="overline"
+                            color="primary"
+                            fontWeight="bold"
+                            sx={{ fontSize: '1rem', letterSpacing: 2 }}
+                        >
+                            PUBLIC TRANSPORTATION DETAILS
+                        </Typography>
+                        <Typography
+                            variant="h3"
+                            fontWeight="bold"
+                            sx={{
+                                mt: 1,
+                                mb: 2,
+                                fontSize: { xs: '2rem', md: '2.5rem' },
+                            }}
+                        >
+                            Modern & Sustainable Options
+                        </Typography>
+                        <Box
+                            sx={{
+                                width: 100,
+                                height: 4,
+                                bgcolor: 'primary.main',
+                                mx: 'auto',
+                                borderRadius: 2,
+                                mb: 6,
+                            }}
+                        />
+                    </Box>
+                    <Grid container spacing={4}>
+                        <Grid item size={{ xs: 12, sm: 6 }}>
+                            <TransportCard
+                                icon={<Bus />}
+                                title="Va-y-Ven System"
+                                image={vayvenImg}
+                                text='The main public transport system with modern, air-conditioned buses.
                                     The "Ruta Centro–Hoteles–CIC" connects the historic center, major hotels
                                     along Paseo de Montejo, and the Congress Center. Payment is made using
                                     a rechargeable smart card.'
-                                />
-                            </Grid>
+                            />
+                        </Grid>
 
-                            <Grid item size={{ xs: 12, sm: 6}}>
-                                <TransportCard
-                                    icon={<ElectricBolt />}
-                                    title="IE-TRAM Yucatán"
-                                    image={ietranImg}
-                                    text='A 100% electric, tram-like bus system connecting Mérida with nearby
+                        <Grid item size={{ xs: 12, sm: 6 }}>
+                            <TransportCard
+                                icon={<Zap />}
+                                title="IE-TRAM Yucatán"
+                                image={ietranImg}
+                                text='A 100% electric, tram-like bus system connecting Mérida with nearby
                                     towns such as Kanasín and Umán. The "Ruta La Plancha–Facultad de Ingeniería"
                                     is useful for reaching the Teya train station (Tren Maya) from the city center.'
-                                />
-                            </Grid>
+                            />
                         </Grid>
-                    </Container>
-                </Box>
+                    </Grid>
+                </Container>
             </Box>
-            <Footer />
         </>
     )
 }

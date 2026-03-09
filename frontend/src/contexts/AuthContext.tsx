@@ -1,42 +1,24 @@
 import { createContext, type PropsWithChildren, useContext, useEffect, useState } from "react";
 import axiosClient from "../clients/axiosClient";
+import type { ParticipantSchema, ReviewerSchema, UserSchema } from "@/schemas/user-schemas";
 
 
-export type UserData = {
-    prefix: string
-    firstName: string
-    lastName: string
-    phone: string
-    country: string
-    city: string
-    affiliation: string
-    department: string
-    cargo: string
-    emailConfirmed: boolean
+export type UserProfile = {
+    participant?: ParticipantSchema
+    reviewer?: ReviewerSchema
 }
 
-export type User = {
-    id: Number,
-    email: string,
-    role: 'admin' | 'user',
-    data?: UserData
-
-}
-
-/*
-Se usa optional (?) porque eso permite en los fetching a la API
-esperar a que se esté autenticando. Optional se mapea a undefined,
-de modo que, mientras authToken sea undefined, es que se está esperando
-a la API para que retorne un valor: null si no está autenticado y string|User
-cuando sí se autentique
-*/
 export type AuthContextValue = {
-    currentUser?: User | null,
+    currentUser?: UserSchema | null,
     handleLogin: (email: string, password: string) => Promise<void>
     handleLogout: () => Promise<void>
+    fetchUser: () => Promise<void>
+    getProfile: () => Promise<UserProfile>
 }
 
+
 const AuthContext = createContext<AuthContextValue | undefined>(undefined)
+
 
 export const useAuth = () => {
     const context = useContext(AuthContext)
@@ -46,19 +28,20 @@ export const useAuth = () => {
     return context;
 }
 
+
 export const AuthProvider = ({ children }: PropsWithChildren) => {
-    const [currentUser, setCurrentUser] = useState<User | null>()
+    const [currentUser, setCurrentUser] = useState<UserSchema | null>()
 
     async function fetchUser() {
         try {
-            const res = await axiosClient.get('/profile/');
-            setCurrentUser({
-                id: res.data.id,
-                email: res.data.email,
-                role: res.data.role,
-                data: res.data.data,
-            });
-        } catch {
+            const res = await axiosClient.get('/users/session/');            
+            if (res.data.anonymous) {
+                setCurrentUser(null);
+            } else setCurrentUser(res.data.user)
+        } catch (error) {
+            if (import.meta.env.DEV) {
+                console.log(error.response);
+            }
             setCurrentUser(null);
         }
     }
@@ -73,6 +56,18 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
         setCurrentUser(null)
     }
 
+    async function getProfile() {
+        try {
+            const res = await axiosClient.get<UserProfile>('/users/profile/');
+            return res.data
+        } catch (error) {
+            if (import.meta.env.DEV) {
+                console.log(error.response);
+            }
+            return {}
+        }
+    }
+
     useEffect(() => {
         fetchUser()
     }, [])
@@ -80,7 +75,9 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
     const value: AuthContextValue = {
         currentUser,
         handleLogin,
-        handleLogout
+        handleLogout,
+        fetchUser,
+        getProfile,
     }
 
     return (

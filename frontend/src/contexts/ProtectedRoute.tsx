@@ -1,35 +1,30 @@
 import * as React from 'react';
-import { useAuth, type User } from './AuthContext';
-import { Navigate, Outlet } from 'react-router';
+import { useAuth } from './AuthContext';
 import LoadingPage from './LoadingPage';
+import { Navigate, Outlet } from 'react-router-dom';
+import type { UserRole } from '@/schemas/user-schemas';
 
 type ProtectedRouteProps = React.PropsWithChildren & {
-    allowedRoles?: User['role'][]
+    allowedRoles?: UserRole[]
 }
 
 export function ProtectedRoute({ allowedRoles }: ProtectedRouteProps) {
     const { currentUser } = useAuth()
-
+    
     if (currentUser === undefined) {
         return <LoadingPage/>
-    }    
-
-    if (currentUser === null || (allowedRoles && !allowedRoles.includes(currentUser?.role))) {
-        return <Navigate to='/register' replace />
     }
-
-    // if (!currentUser?.data?.emailConfirmed) {
-    //     return <div>You must confirm your email!</div>
-    // }
-
-    return <Outlet />;
-}
-
-export function GuestRoute() {
-    const { currentUser } = useAuth()
-
-    if (currentUser) {
-        return <Navigate to="/success" replace />;
+    
+    if (!currentUser) {
+        return <Navigate to='/login' replace />
+    }
+        
+    const authorized = currentUser?.roles.some(
+        role => allowedRoles?.includes(role)
+    )
+    
+    if (!authorized) {
+        return <Navigate to='/login' replace />
     }
 
     return <Outlet />;

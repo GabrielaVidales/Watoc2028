@@ -13,7 +13,7 @@ export function getCountryImage(country: string) {
     return null
 }
 
-interface Country extends BaseOption {
+export interface Country extends BaseOption {
     label: string,
     phone: string,
     suggested?: boolean

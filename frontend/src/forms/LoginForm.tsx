@@ -1,108 +1,123 @@
-import { Button, Stack, InputAdornment, Paper, Box, IconButton, Typography } from '@mui/material'
-import { FormProvider, useForm } from 'react-hook-form'
-import MailOutlineIcon from '@mui/icons-material/MailOutline';
-import { ControlledTextField } from './components/ControlledInputs';
-import { LockOutline, Visibility, VisibilityOff } from '@mui/icons-material';
+import { Stack, InputAdornment, Paper, Box, IconButton, Typography } from '@mui/material'
+import { Controller, FormProvider, useForm } from 'react-hook-form'
+import { Mail, Lock, Eye, EyeOff, Send, LogIn } from 'lucide-react'; // Íconos de Lucide
 import React from 'react';
 import { Link, useNavigate } from 'react-router';
 import { REGEX_EMAIL } from '../utils/formRegex';
 import { useAuth } from '../contexts/AuthContext';
+import { Field, FieldError, FieldLabel } from '@/components/ui/field';
+import { Input } from '@/components/ui/input';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { loginSchema } from '@/schemas/user-schemas';
+import { InputGroup, InputGroupAddon, InputGroupButton, InputGroupInput } from '@/components/ui/input-group';
+import { Button } from '@/components/ui/button';
+import { Spinner } from '@/components/ui/spinner';
 
 export default function LoginForm() {
-    const { handleLogin } = useAuth()
+    const { handleLogin, fetchUser } = useAuth()
+
     const navigate = useNavigate()
-    const methods = useForm()
-    const onSubmit = methods.handleSubmit(async (data) => {
+
+    const methods = useForm({
+        resolver: zodResolver(loginSchema),
+        defaultValues: loginSchema.parse({}),
+        mode: 'onChange',
+    })
+
+    const { isValid, isSubmitting } = methods.formState
+
+
+    const onFormSubmit = methods.handleSubmit(async (data) => {
         try {
             await handleLogin(data.email, data.password)
-            navigate('/success')
+            navigate('/user/profile')
         } catch (error) {
-            console.error("...");
+            if (import.meta.env.DEV) {
+                console.error(error.response);
+            }
         }
     })
-    
+
     const [showPassword, setShowPassword] = React.useState(false);
-    const handleClickShowPassword = () => setShowPassword((show) => !show);
+    const toggleVisibility = () => setShowPassword((show) => !show);
 
     return (
-        <FormProvider {...methods}>
-            <Paper component='form' onSubmit={onSubmit} elevation={5} sx={{ py: 6, px: { xs: 3, sm: 6, md: 9 }, borderTop: 12, borderColor: 'primary.main', }}>
-                <Box component='fieldset' disabled={methods.formState.isSubmitting}>
-                    <Stack spacing={2} py={2}>
-                        <Typography variant='h4' fontWeight={500} textAlign='center'>
-                            Welcome back
-                        </Typography>
-                        <Typography textAlign='center'>
-                            Sign in to access your dashboard and conference materials
-                        </Typography>
+        <form onSubmit={onFormSubmit}>
+            <fieldset disabled={isSubmitting} className='space-y-5'>
+                <Controller
+                    name="email"
+                    control={methods.control}
+                    render={({ field, fieldState }) => (
+                        <Field data-invalid={fieldState.invalid}>
+                            <FieldLabel htmlFor={field.name}>Email</FieldLabel>
+                            <InputGroup>
+                                <InputGroupInput
+                                    {...field}
+                                    id={field.name}
+                                    aria-invalid={fieldState.invalid}
+                                    placeholder="yourmail@example.com"
+                                />
+                                <InputGroupAddon align="inline-start">
+                                    <Mail />
+                                </InputGroupAddon>
+                            </InputGroup>
+                            {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                        </Field>
+                    )}
+                />
+                <Controller
+                    name="password"
+                    control={methods.control}
+                    render={({ field, fieldState }) => (
+                        <Field data-invalid={fieldState.invalid}>
+                            <FieldLabel htmlFor={field.name}>Password</FieldLabel>
+                            <InputGroup>
+                                <InputGroupInput
+                                    {...field}
+                                    id={field.name}
+                                    aria-invalid={fieldState.invalid}
+                                    autoComplete="off"
+                                    type={showPassword ? 'text' : 'password'}
+                                    placeholder="**********"
+                                />
+                                <InputGroupAddon align="inline-start">
+                                    <Lock />
+                                </InputGroupAddon>
+                                <InputGroupAddon align="inline-end">
+                                    <InputGroupButton
+                                        title='toggle-visibility'
+                                        size='icon-xs'
+                                        onClick={toggleVisibility}
+                                    >
+                                        {showPassword ?
+                                            <EyeOff className='shrink-0 size-5' /> :
+                                            <Eye className='shrink-0 size-5' />
+                                        }
+                                    </InputGroupButton>
+                                </InputGroupAddon>
+                            </InputGroup>
+                            {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                        </Field>
+                    )}
+                />
 
-                        <ControlledTextField
-                            id='email'
-                            name='email'
-                            label='Email'
-                            defaultValue=''
-                            placeholder='example@domain.com'
-                            rules={{
-                                required: 'Please provide your email',
-                                maxLength: { value: 128, message: 'Max length is 128 characters' },
-                                pattern: { value: REGEX_EMAIL, message: 'Invalid email' }
-                            }}
-                            maxLength={50}
-                            hideLengthLabel
-                            inputAdornment={{
-                                startAdornment: (
-                                    <InputAdornment position='start'>
-                                        <MailOutlineIcon />
-                                    </InputAdornment>
-                                )
-                            }}
-                        />
-                        <ControlledTextField
-                            id='password'
-                            name='password'
-                            label='Password'
-                            defaultValue=''
-                            placeholder='**********'
-                            rules={{
-                                required: 'Please provide your email',
-                                maxLength: { value: 128, message: 'Max length is 64 characters' },
-                            }}
-                            type={showPassword ? 'text' : 'password'}
-                            maxLength={50}
-                            hideLengthLabel
-                            inputAdornment={{
-                                startAdornment: (
-                                    <InputAdornment position='start'>
-                                        <LockOutline />
-                                    </InputAdornment>
-                                ),
-                                endAdornment: (
-                                    <InputAdornment position="end">
-                                        <IconButton
-                                            aria-label={showPassword ? 'hide the password' : 'display the password'}
-                                            onClick={handleClickShowPassword}
-                                        >
-                                            {showPassword ? <VisibilityOff /> : <Visibility />}
-                                        </IconButton>
-                                    </InputAdornment>
-                                )
-                            }}
-                        />
+                <div className='flex justify-end'>
+                    <Link to='#' className='w-fit text-primary-main hover:text-primary-light active:text-primary-dark'>
+                        Forgot password?
+                    </Link>
+                </div>
 
-                        <Link to='#' style={{ width: 'fit-content', marginLeft: 'auto', marginBottom: 15 }}>
-                            Forgot password?
-                        </Link>
-
-                        <Button type='submit' variant='contained' loading={methods.formState.isSubmitting} sx={{ borderRadius: 5, width: '70%', alignSelf: 'center' }} >
-                            Submit
-                        </Button>
-
-                        <Typography textAlign='center'>
-                            Not registered yet? <Link to='/register'> Create an account</Link>
-                        </Typography>
-                    </Stack>
-                </Box>
-            </Paper>
-        </FormProvider>
+                <div className='flex justify-center w-full'>
+                    <Button type='submit' className='w-40 p-5 text-xl' data-icon="inline-start" disabled={!isValid}>
+                        {isSubmitting ? (
+                            <Spinner data-icon="inline-start" />
+                        ) : (
+                            <LogIn className='size-5' />
+                        )}
+                        Login
+                    </Button>
+                </div>
+            </fieldset>
+        </form>
     )
 }

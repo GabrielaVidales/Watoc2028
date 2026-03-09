@@ -1,6 +1,6 @@
 import { Typography, Stack, Chip, Box } from '@mui/material';
-import { CalendarToday, LocationOn, ArrowDownward } from '@mui/icons-material';
 import { useState, useEffect } from 'react';
+import { ArrowDown, CalendarDays, MapPin } from 'lucide-react';
 
 const QuickCountdown = () => {
     const [days, setDays] = useState(0);
@@ -19,7 +19,7 @@ const QuickCountdown = () => {
 
     return (
         <Chip
-            icon={<CalendarToday />}
+            icon={<CalendarDays />}
             label={`${days} days until WATOC 2028`}
             sx={{
                 bgcolor: 'rgba(255,255,255,0.15)',
@@ -77,7 +77,7 @@ export const HotelBookingHeroContent = () => {
                         sx={{ mb: 2 }}
                     >
                         <Chip
-                            icon={<LocationOn />}
+                            icon={<MapPin />}
                             label="Mérida, México"
                             sx={{
                                 bgcolor: 'rgba(255,255,255,0.1)',
@@ -97,7 +97,7 @@ export const HotelBookingHeroContent = () => {
                             •
                         </Typography>
                         <Chip
-                            icon={<CalendarToday />}
+                            icon={<CalendarDays />}
                             label="January 9-14, 2028"
                             sx={{
                                 bgcolor: 'rgba(255,255,255,0.1)',
@@ -126,14 +126,7 @@ export const HotelBookingHeroContent = () => {
                     },
                 }}
             >
-                <ArrowDownward
-                    sx={{
-                        color: 'white',
-                        fontSize: 40,
-                        opacity: 0.7,
-                        '&:hover': { opacity: 1 },
-                    }}
-                />
+                <ArrowDown />
             </Box>
         </>
     );
