@@ -1,5 +1,3 @@
-import NavBar from '../../components/NavBar'
-import Footer from '../../components/Footer'
 import { Box, Card, CardContent, Container, Grid, Stack, Typography } from '@mui/material'
 import { TransportationHeroContent } from './components/TransportationHeroContent'
 import { HeroSection } from '../../components/HeroSection'

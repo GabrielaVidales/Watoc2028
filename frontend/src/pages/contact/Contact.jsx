@@ -1,13 +1,10 @@
 import { Box, Container, Fade, Grow, Paper, Slide, Toolbar, Typography } from '@mui/material'
 import React, { useRef, useState } from 'react'
 import ContactForm from '../../forms/ContactForm'
-import NavBar from '../../components/NavBar'
-import Footer from '../../components/Footer'
 import { GenericHeroContent } from '../../components/GenericHeroContent'
 import GenericCTASection from '../../components/GenericCTASection'
 import TitleSection from './sections/TitleSection'
 import { HeroSection } from '../../components/HeroSection'
-import { MainLayout } from '../../components/MainLayout'
 
 export default function Contact() {
     return (

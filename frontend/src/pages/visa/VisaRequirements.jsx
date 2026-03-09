@@ -1,6 +1,4 @@
-import NavBar from '../../components/NavBar'
 import { Box, Container, Grid, Typography, Divider, Button, Paper } from '@mui/material'
-import Footer from '../../components/Footer'
 import { GenericHeroContent } from '../../components/GenericHeroContent'
 import VisaMainSection from './sections/VisaMainSection'
 import VisaInvitationSection from './sections/VisaInvitationSection'

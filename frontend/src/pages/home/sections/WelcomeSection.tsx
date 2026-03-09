@@ -1,8 +1,9 @@
-import { Box, Container, Typography, Avatar, Collapse, ListItemButton, ListItemText, Divider } from '@mui/material';
+import { Box, Container, Typography, Avatar, Collapse, ListItemButton, ListItemText } from '@mui/material';
 import { Quote, ChevronUp, ChevronDown } from 'lucide-react';
 import { useState } from 'react';
 import mayaCalendar from '../../../assets/calendario_maya_rojo.png';
 import drMerino from '../../../assets/drmerino.jpg';
+import { Button } from '@/components/ui/button';
 
 
 const organizer = {
@@ -71,8 +72,6 @@ function WelcomeSection() {
 
                 <Box sx={{
                     position: 'relative', px: { xs: 2, md: 4 }, mt: 4, pb: 2,
-                    borderBottom: '4px solid',
-                    borderColor: 'divider',
                 }}>
                     <Quote className='absolute -top-4 left-6 text-primary-light opacity-20 size-14' />
                     <Typography variant="h6" fontWeight="bold" color="primary.main" gutterBottom sx={{ ml: 2 }}>
@@ -92,15 +91,15 @@ function WelcomeSection() {
                     </Collapse>
 
                     <div className='flex w-full'>
-                        <ListItemButton onClick={() => setOpen(!open)} sx={{
-                            borderRadius: 2,
-                            width: 'fit-content',
-                            color: 'primary.main',
-                            '&:hover': { opacity: 0.9 }
-                        }} >
-                            <ListItemText primary={open ? "Read less" : "Read the full invitation"} />
-                            {open ? <ChevronUp /> : <ChevronDown />}
-                        </ListItemButton>
+                        <Button variant='ghost' className='w-full text-primary-main text-base' onClick={() => setOpen(!open)}>
+                            {open ? (<>
+                                Read less
+                                <ChevronUp />
+                            </>) : (<>
+                                Read the full invitation
+                                <ChevronDown />
+                            </>)}
+                        </Button>
                     </div>
 
                     <Box sx={{ mt: 2, display: 'flex', alignItems: 'center', gap: 2 }}>
@@ -126,13 +125,13 @@ function WelcomeSection() {
                             </Typography>
                         </div>
                     </Box>
-                </Box>
 
-                <div className='py-2 mx-auto text-center max-w-lg'>
-                    <span className='text-sm text-gray-500'>
-                        We look forward to welcoming you to Mérida for what promises to be a scientifically stimulating, intellectually enriching, and culturally memorable WATOC congress.
-                    </span>
-                </div>
+                    <div className='border-t-2 mt-6 py-3 text-center'>
+                        <div className='max-w-md mx-auto text-sm leading-6 text-muted-foreground'>
+                            We look forward to welcoming you to Mérida for what promises to be a scientifically stimulating, intellectually enriching, and culturally memorable WATOC congress.
+                        </div>
+                    </div>
+                </Box>
             </Container>
         </section>
     );

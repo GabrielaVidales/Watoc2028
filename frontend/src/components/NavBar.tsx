@@ -1,4 +1,4 @@
-import { AppBar, Box, Toolbar, Typography, useScrollTrigger, IconButton, Menu, MenuItem, ListItemText, MenuList, ListItemButton, Collapse, List } from '@mui/material';
+import { AppBar, Toolbar, useScrollTrigger, IconButton, Menu, MenuItem, ListItemText, MenuList, ListItemButton, Collapse, List } from '@mui/material';
 import { useMemo, useRef, useState } from 'react';
 import { Link, NavLink } from 'react-router';
 import { ScrollTop } from './ScrollTop';
@@ -6,18 +6,12 @@ import CustomDropdownMenu from './CustomDropdownMenu';
 import logo from '../assets/WatocPNGLogo.png';
 import { ChevronDown, ChevronUp, MenuIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import {
-    NavigationMenu,
-    NavigationMenuContent,
-    NavigationMenuItem,
-    NavigationMenuLink,
-    NavigationMenuList,
-    NavigationMenuTrigger,
-} from "@/components/ui/navigation-menu"
 import { useAuth } from '@/contexts/AuthContext';
+import { urls } from '@/routes/routes';
 
 
 const MobileNavMenu = ({ open, anchorEl, handleClose, aboutSubmenus }) => {
+    const { currentUser } = useAuth()
     const [submenuOpen, setSubmenuOpen] = useState(false)
 
     const handleClick = () => {
@@ -74,7 +68,7 @@ const MobileNavMenu = ({ open, anchorEl, handleClose, aboutSubmenus }) => {
                     <ListItemText primary='Contact' />
                 </MenuItem>
             </Link>
-            <Link to="/register" style={{ textDecoration: 'none', color: 'black' }}>
+            <Link to={currentUser ? urls.users.profile : urls.auth.login} style={{ textDecoration: 'none', color: 'black' }}>
                 <MenuItem onClick={handleClose}>
                     <ListItemText primary='Registration' />
                 </MenuItem>
@@ -102,35 +96,6 @@ export default function NavBar({ invertImg = true }) {
         disableHysteresis: true,
         threshold: 50,
     });
-
-    const linkStyle = {
-        fontSize: '1.2rem',
-        fontWeight: 500,
-        textAlign: 'center',
-        color: (trigger || !invertImg) ? 'black' : 'white',
-        transition: 'color 0.3s ease',
-
-        '&:hover': {
-            transition: 'all .3s ease',
-            transform: 'translateY(-5px) scale(1.05)'
-        },
-        '&::after': {
-            content: '""',
-            position: 'relative',
-            display: 'block',
-            transform: 'scaleX(0)',
-            transformOrigin: 'bottom',
-            height: 2,
-            borderRadius: 10,
-            transition: 'all .3s ease',
-        },
-        '&:hover::after': {
-            content: '""',
-            transform: 'scaleX(1)',
-            transition: 'all .3s ease',
-            backgroundColor: (trigger || !invertImg) ? 'black' : 'white',
-        }
-    }
 
     const aboutSubmenus = useMemo(() => [
         {
@@ -187,8 +152,8 @@ export default function NavBar({ invertImg = true }) {
                 backgroundColor: (trigger || !invertImg) ? 'white' : 'transparent',
                 transition: 'all 0.3s ease',
             }}>
-                <Toolbar className="flex justify-end lg:justify-between h-16 lg:h-22">
-                    <div className="flex justify-center absolute left-1/2 -translate-x-1/2 lg:static lg:left-auto lg:translate-x-0">
+                <div className="my-2 px-3 flex items-center justify-end lg:justify-between max-w-7xl mx-auto w-full">
+                    <div className="h-16 lg:h-24 flex items-center justify-center absolute left-1/2 -translate-x-1/2 lg:static lg:left-auto lg:translate-x-0">
                         <Link to='/'>
                             <img
                                 src={logo}
@@ -196,6 +161,7 @@ export default function NavBar({ invertImg = true }) {
                                 className={cn(
                                     'w-auto transition-all duration-300',
                                     'max-h-13  md:max-h-15 lg:max-h-18',
+                                    'transition-transform hover:scale-105',
                                     (trigger || !invertImg) ? 'invert-0' : 'invert',
                                 )}
                             />
@@ -218,9 +184,9 @@ export default function NavBar({ invertImg = true }) {
                         </CustomDropdownMenu>
                         <HomeMenuLink path='/contact' label='Contact' />
                         {currentUser ? (
-                            <HomeMenuLink path='/user/profile' label='My Profile' />
-                        ): (
-                            <HomeMenuLink path='/register' label='Registration' />
+                            <HomeMenuLink path={urls.users.profile} label='My Profile' />
+                        ) : (
+                            <HomeMenuLink path={urls.auth.login} label='Registration' />
                         )}
                     </div>
                     <div className="flex lg:hidden items-center justify-end gap-4">
@@ -233,7 +199,7 @@ export default function NavBar({ invertImg = true }) {
                             <MenuIcon />
                         </IconButton>
                     </div>
-                </Toolbar>
+                </div>
             </AppBar >
             <MobileNavMenu open={open} anchorEl={mobileMenuAnchorEl} handleClose={handleClose} aboutSubmenus={aboutSubmenus} />
             <ScrollTop ref={scrollRef} />

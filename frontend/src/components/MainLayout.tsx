@@ -1,7 +1,7 @@
 import { Box } from "@mui/material";
-import NavBar from "./NavBar";
 import { HeroSection } from "./HeroSection";
 import Footer from "./Footer";
+import NavBar from "./NavBar";
 
 export function MainLayout({ heroContent = null, heroProps = {}, children }) {
     return <>

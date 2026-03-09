@@ -184,7 +184,6 @@ class LogoutView(APIView):
 
     def post(self, request):
         try:
-            # Blacklist de simplejwt,
             token = RefreshToken(request.COOKIES.get("refresh_token"))
             token.blacklist()
             pass
@@ -230,7 +229,6 @@ class AbstractView(ModelViewSet):
         serializer = AuthorSerializer(abstract.authors, many=True)
         return Response(serializer.data)
 
-    @transaction.atomic
     @action(detail=True, methods=["get", "patch"], url_path="declarations")
     def update_declarations(self, request, pk=None):
         instance = self.get_object()
@@ -253,7 +251,6 @@ class AbstractView(ModelViewSet):
             )
             declarations.save()
             serializer = AbstractDeclarationsSerializer(declarations)
-            # transaction.set_rollback(True)
             return Response(serializer.data)
 
         return Response(status=status.HTTP_400_BAD_REQUEST)
@@ -275,6 +272,17 @@ class AbstractView(ModelViewSet):
         response = HttpResponse(pdf_file, content_type="application/pdf")
         response["Content-Disposition"] = f'attachment; filename="{abstract.title or f'abstract_{abstract}'}.pdf"'
         return response
+    
+    @action(detail=True, methods=["get"], url_path="authors-preview")
+    def get_abstract_author_context(self, request, pk=None):
+        abstract = Abstract.objects.prefetch_related("authors__affiliation").get(id=pk)
+        context = self.get_abstract_context(abstract)
+        print(context)
+        return Response({
+            'authors_list': context['authors_list'],
+            'affiliations_list': context['affiliations_list'],
+        })    
+
 
     def get_abstract_context(self, abstract):
         authors_data = []
@@ -300,11 +308,14 @@ class AbstractView(ModelViewSet):
                 {
                     "full_name": f"{author.first_name[0]}. {author.last_name}",
                     "aff_index": affiliations_set.get(aff_id),
-                    # 'is_corresponding': author.is_corresponding
                 }
             )
 
-        return {"abstract": abstract, "authors_list": authors_data, "affiliations_list": unique_affiliations}
+        return {
+            "abstract": abstract,
+            "authors_list": authors_data,
+            "affiliations_list": unique_affiliations,
+        }
 
 
 class AuthorsView(ModelViewSet):

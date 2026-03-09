@@ -64,7 +64,7 @@ function App() {
 
 
 					{/* Rutas sólo para usuarios no loggeados */}
-					<Route element={<GuestRoute />}>
+					<Route element={<GuestRoute redirectTo={urls.users.profile} />}>
 						<Route element={<AuthLayout />}>
 							<Route path='/login' element={<LoginPage />} />
 							<Route path='/register' element={<RegisterPage />} />
@@ -74,7 +74,7 @@ function App() {
 					{/* Rutas protegidas van aquí */}
 					<Route element={<ProtectedRoute allowedRoles={['admin', 'participant']} />} >
 						<Route path='/success' element={<SuccessRegisterPage />} />
-						<Route element={<DashboardLayout />}>
+						<Route element={<AuthLayout />}>
 
 							<Route path='/test' element={<Test />} />
 							<Route path={urls.users.profile} element={<UserProfile />} />

@@ -1,3 +1,4 @@
+from django.contrib.auth.models import Group
 from django.contrib.auth import get_user_model
 from django.db import transaction
 from rest_framework import serializers
@@ -95,7 +96,11 @@ class UserSerializer(serializers.ModelSerializer):
         participant_data = validated_data.pop("participant", None)        
         email = validated_data.pop("email", None)
         password = validated_data.pop("password", None)
+        
         user = User.objects.create_user(email=email, password=password, **validated_data)
+        
+        participant = Group.objects.get(name='participant')    
+        user.groups.add(participant)
 
         participant_serializer = ParticipantSerializer(data=participant_data)
         if participant_serializer.is_valid(raise_exception=True):

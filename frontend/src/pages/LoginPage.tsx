@@ -3,16 +3,19 @@ import LoginForm from '../forms/LoginForm'
 import { Card, CardContent } from "@/components/ui/card"
 import { Link } from 'react-router'
 import { ClipboardSignature, CheckCircle2, SquareUserRound } from 'lucide-react'
+import { useHeader } from '@/contexts/HeaderContext'
+import { useEffect } from 'react'
 
 
 export default function LoginPage() {
+	const { setTitle } = useHeader()
+
+	useEffect(() => {
+		setTitle('Sign Up to Attend WATOC 2028')
+	}, [setTitle])
+
 	return (
 		<section className='md:p-9 bg-fixed space-y-5'>
-			<div className='space-y-3 py-5'>
-				<h1 className='text-center text-3xl md:text-4xl font-semibold'>Sign Up to Attend WATOC 2028</h1>
-				<div className='h-1 w-30 mx-auto bg-primary-main rounded-full' />
-			</div>
-
 			<Card className='max-w-xl md:max-w-2xl: lg:max-w-6xl mx-auto shadow-xl border overflow-hidden gap-0 p-0'>
 				<CardContent className='p-0'>
 					<div className='flex flex-col lg:flex-row items-stretch'>

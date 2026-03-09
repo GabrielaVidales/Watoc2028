@@ -6,7 +6,6 @@ import centro1 from '../../assets/centro1.jpg'
 import centro2 from '../../assets/centro2.jpg'
 import centro3 from '../../assets/centro3.jpg'
 import centroConvenciones from '../../assets/centroconvenciones.webp'
-import { MainLayout } from '../../components/MainLayout'
 import { Bed, Leaf, MapPin, Plane, UsersRound, Wifi } from 'lucide-react'
 import { Link } from 'react-router';
 import { HeroSection } from '@/components/HeroSection';

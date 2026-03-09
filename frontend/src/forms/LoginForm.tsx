@@ -14,7 +14,7 @@ import { Button } from '@/components/ui/button';
 import { Spinner } from '@/components/ui/spinner';
 
 export default function LoginForm() {
-    const { handleLogin } = useAuth()
+    const { handleLogin, fetchUser } = useAuth()
 
     const navigate = useNavigate()
 
@@ -30,7 +30,7 @@ export default function LoginForm() {
     const onFormSubmit = methods.handleSubmit(async (data) => {
         try {
             await handleLogin(data.email, data.password)
-            navigate('/success')
+            navigate('/user/profile')
         } catch (error) {
             if (import.meta.env.DEV) {
                 console.error(error.response);
@@ -109,7 +109,11 @@ export default function LoginForm() {
 
                 <div className='flex justify-center w-full'>
                     <Button type='submit' className='w-40 p-5 text-xl' data-icon="inline-start" disabled={!isValid}>
-                        <LogIn className='size-5' />
+                        {isSubmitting ? (
+                            <Spinner data-icon="inline-start" />
+                        ) : (
+                            <LogIn className='size-5' />
+                        )}
                         Login
                     </Button>
                 </div>

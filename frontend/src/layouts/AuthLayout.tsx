@@ -1,13 +1,44 @@
-import Footer from '@/components/Footer'
-import React from 'react'
-import { Outlet } from 'react-router'
+import { Link, Outlet } from 'react-router'
 import { Button } from '@/components/ui/button';
-import { ChevronsLeft } from 'lucide-react';
+import { ChevronsLeft, ClipboardList, FileText, IdCard, LogIn } from 'lucide-react';
+import { urls } from '@/routes/routes';
+import { HeaderProvider, useHeader } from '@/contexts/HeaderContext';
+import React, { useEffect } from 'react'
+import Footer from '@/components/Footer'
 import logo from '@/assets/WatocPNGLogoBlank.png';
 import mayaBackground from '@/assets/field.png'
-import mesh from '@/assets/mesh.png'
+import { useAuth } from '@/contexts/AuthContext';
+
+const guessRoutes = [
+    {
+        url: urls.auth.login,
+        label: 'Login',
+        icon: <LogIn className="size-5" />,
+    },
+    {
+        url: urls.auth.register,
+        label: 'Registration',
+        icon: <ClipboardList className="size-5" />,
+    },
+]
+
+const authRoutes = [
+    {
+        url: urls.users.profile,
+        label: 'My Profile',
+        icon: <IdCard className="size-5" />,
+    },
+    {
+        url: urls.users.viewAbstracts,
+        label: 'My Submissions',
+        icon: <FileText className="size-5" />,
+    },
+]
 
 function AuthLayout() {
+    const { currentUser } = useAuth()
+    const { title } = useHeader()
+
     return (
         <>
             <svg width="0" height="0" style={{ position: 'absolute' }}>
@@ -17,34 +48,53 @@ function AuthLayout() {
                     </clipPath>
                 </defs>
             </svg>
-            <header className='relative border-b-2 z-10 bg-primary-dark bg-fixed pt-4 pb-8'
-            style={{
+            <header className='relative border-b-2 z-10 bg-primary-dark pb-10' style={{
                 clipPath: 'url(#waveClip)',
-            }}
-            >
-                <div
-                    className="absolute inset-0 opacity-50 bg-cover bg-bottom bg-fixed pointer-events-none -z-10"
-                    style={{
-                        backgroundImage: `url(${mayaBackground})`,
-                    }}
-                />
-                <div className='max-w-4xl h-20 py-1 mx-auto flex justify-between items-center'>
-                    <img
-                        alt="WATOC 2028 Logo"
-                        src={logo}
-                        className='h-12 sm:h-full'
-                    />
+            }}>
+                <div className="absolute inset-0 opacity-40 bg-cover bg-bottom bg-fixed pointer-events-none -z-10" style={{
+                    backgroundImage: `url(${mayaBackground})`
+                }} />
 
-                    <Button variant='link' className='flex items-center gap-3 text-white'>
-                        <ChevronsLeft />
-                        Return to homepage
-                    </Button>
+                <div className='max-w-7xl min-h-24 my-2 px-3 mx-auto flex flex-col sm:flex-row justify-between items-center gap-6'>
+                    <div className='flex flex-col items-center sm:items-start gap-3 max-w-sm'>
+                        <Link to={urls.home.index} className="flex items-center h-full">
+                            <img
+                                alt="WATOC 2028 Logo"
+                                src={logo}
+                                className='h-16 sm:h-15 md:h-18 w-auto object-contain transition-transform hover:scale-105'
+                            />
+                        </Link>
+                    </div>
 
+                    <div className='flex'>
+                        <Link to={urls.home.index} className="sm:flex">
+                            <Button variant='ghost' className='flex items-center gap-2 text-white sm:text-lg hover:bg-white/10 hover:text-white transition-all font-medium px-4'>
+                                <ChevronsLeft className="size-6" />
+                                <span>Home</span>
+                            </Button>
+                        </Link>
+
+                        {(currentUser ? authRoutes : guessRoutes).map(routes => (
+                            <Link to={routes.url} key={routes.url} className="sm:flex">
+                                <Button variant='ghost' className='flex items-center gap-2 text-white sm:text-lg hover:bg-white/10 hover:text-white transition-all font-medium px-4'>
+                                    {routes.icon}
+                                    <span>{routes.label}</span>
+                                </Button>
+                            </Link>
+                        ))}
+                    </div>
                 </div>
+
+                {title && (
+                    <div className='space-y-3 mb-3 mt-3 text-primary-contrast px-4'>
+                        <h1 className='text-center text-xl sm:text-2xl md:text-3xl font-semibold'>
+                            {title}
+                        </h1>
+                        <div className='h-1 w-20 sm:w-32 mx-auto bg-primary-contrast rounded-full' />
+                    </div>
+                )}
             </header>
-            <main className='bg-fixed bg-no-repeat' style={{
-                // backgroundImage: `url(${mesh})`,
-            }} >
+            <main className='bg-fixed bg-no-repeat'>
                 <Outlet />
             </main>
             <Footer />
@@ -52,4 +102,8 @@ function AuthLayout() {
     )
 }
 
-export default AuthLayout
+export default () => (
+    <HeaderProvider>
+        <AuthLayout />
+    </HeaderProvider>
+);

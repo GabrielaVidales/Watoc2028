@@ -1,6 +1,4 @@
 import React from 'react'
-import NavBar from '../../components/NavBar'
-import Footer from '../../components/Footer'
 import { Box, Container, Grid, Paper, Typography } from '@mui/material'
 import HospitalitySection from './sections/HospitalitySection'
 import { HotelBookingHeroContent } from './components/HotelBookingHeroContent'

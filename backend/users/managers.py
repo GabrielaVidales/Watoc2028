@@ -3,12 +3,11 @@ from django.contrib.auth.models import UserManager
 
 class CustomUserManager(UserManager):
     def create_user(self, email, password=None, **extra_fields):
-        print('PUTA')
         if not email:
             raise ValueError('El Email es obligatorio')
         
         email = self.normalize_email(email)
-        if self.get(email=email) is not None:
+        if self.filter(email=email).exists():
             raise ValueError('Ya existe una cuenta registrada con este correo.')            
         
         user = self.model(email=email, **extra_fields)

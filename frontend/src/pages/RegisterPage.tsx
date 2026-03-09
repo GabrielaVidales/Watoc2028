@@ -5,17 +5,20 @@ import RegisterForm from '@/forms/RegisterForm';
 import { Card, CardContent } from '@/components/ui/card';
 import { CheckCircle2, ClipboardSignature, SquareUserRound } from 'lucide-react';
 import handwriting from '@/assets/handwritting.png'
+import { useHeader } from '@/contexts/HeaderContext';
+import { useEffect } from 'react';
 
 export default function RegisterPage() {
+    const { setTitle } = useHeader()
+
+    useEffect(() => {
+        setTitle('Create your Profile for WATOC 2028')
+    }, [setTitle])
 
     return (
         <>
             {import.meta.env.DEV && (
                 <section className='md:p-9 bg-fixed space-y-5'>
-                    <div className='space-y-3 py-5'>
-                        <h1 className='text-center text-3xl md:text-4xl font-semibold'>Create your Profile</h1>
-                        <div className='h-1 w-30 mx-auto bg-primary-main rounded-full' />
-                    </div>
                     <Card className='max-w-xl md:max-w-2xl: lg:max-w-4xl xl:max-w-6xl mx-auto shadow-xl border overflow-hidden gap-0 p-0'>
                         <CardContent className='p-0'>
                             <div className='flex flex-col lg:flex-row items-stretch'>
@@ -72,12 +75,6 @@ export default function RegisterPage() {
                                                 </li>
                                             </ul>
                                         </div>
-
-                                        {/* <Link to='/register'>
-                                            <Button className='w-full py-5 text-xl font-bold gap-3 shadow-lg'>
-                                                Join WATOC now
-                                            </Button>
-                                        </Link> */}
                                     </div>
                                 </section>
                             </div>

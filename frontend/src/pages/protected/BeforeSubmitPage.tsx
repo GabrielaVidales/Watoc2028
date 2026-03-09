@@ -53,11 +53,12 @@ function BeforeSubmitPage({ onStepBack, onStepForward }: EditAbstractCallbacks) 
         }
 
         try {
-            const res = await mutate<any>('post', `/abstracts/${id}/`, payload)
-            if (import.meta.env.DEV) {
-                console.log(payload);
-                console.log(res);
-            }
+            alert('Not allowed at this moment!')
+            // const res = await mutate<any>('post', `/abstracts/${id}/submit`, payload)
+            // if (import.meta.env.DEV) {
+            //     console.log(payload);
+            //     console.log(res);
+            // }
         } catch (error) {
             if (import.meta.env.DEV) {
                 if (isAxiosError(error)) {

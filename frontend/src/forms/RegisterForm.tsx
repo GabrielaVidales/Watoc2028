@@ -7,13 +7,11 @@ import { Field, FieldContent, FieldDescription, FieldError, FieldLabel, } from "
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { KeySquare, Landmark, Lock, Send, User } from 'lucide-react';
+import { KeySquare, Lock, Send, User } from 'lucide-react';
 import PasswordStrengthMeter from '@/components/PasswordStrengthMeter';
 import axiosClient from '@/clients/axiosClient';
 import { InputGroup, InputGroupAddon, InputGroupInput } from '@/components/ui/input-group';
-import HCaptcha from '@hcaptcha/react-hcaptcha';
 import { Spinner } from '@/components/ui/spinner';
-import { useEffect } from 'react';
 import { Separator } from '@/components/ui/separator';
 
 type TitleProps = {
@@ -60,9 +58,6 @@ export default function RegisterForm() {
                 field_of_study,
             }
         }
-        console.log(payload);
-        
-
         try {
             const res = await axiosClient.post('/users/', payload)
             if (import.meta.env.DEV) {
@@ -90,7 +85,7 @@ export default function RegisterForm() {
                 <div className='flex flex-col gap-5 py-5'>
                     <Title title='Personal Information' icon={User} />
 
-                    <div className='grid sm:grid-cols-5 gap-3 justify-start items-start'>
+                    <div className='grid grid-cols-1 sm:grid-cols-3 gap-5 justify-start items-start'>
                         <Controller
                             name="prefix"
                             control={control}
@@ -122,31 +117,11 @@ export default function RegisterForm() {
                                 </Field>
                             )}
                         />
-                        {/* <Controller
-                            name="pronouns"
-                            control={control}
-                            render={({ field, fieldState }) => (
-                                <Field data-invalid={fieldState.invalid}>
-                                    <FieldLabel htmlFor={field.name}   >Pronouns</FieldLabel>
-                                    <Input
-                                        {...field}
-                                        id={field.name}
-                                        aria-invalid={fieldState.invalid}
-                                        placeholder="Pronouns"
-                                        autoComplete="off"
-                                    />
-                                    {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-                                </Field>
-                            )}
-                        /> */}
-                        {/* </div>
-
-                    <div className='grid grid-cols-1 sm:grid-cols-3 gap-5 mb-5'> */}
                         <Controller
                             name="first_name"
                             control={control}
                             render={({ field, fieldState }) => (
-                                <Field className='col-span-2' data-invalid={fieldState.invalid}>
+                                <Field data-invalid={fieldState.invalid}>
                                     <FieldLabel htmlFor={field.name}>
                                         First name <div className="text-destructive">*</div>
                                     </FieldLabel>
@@ -161,28 +136,11 @@ export default function RegisterForm() {
                                 </Field>
                             )}
                         />
-                        {/* <Controller
-                            name="middle_name"
-                            control={control}
-                            render={({ field, fieldState }) => (
-                                <Field data-invalid={fieldState.invalid}>
-                                    <FieldLabel htmlFor={field.name}>Middle name</FieldLabel>
-                                    <Input
-                                        {...field}
-                                        id={field.name}
-                                        aria-invalid={fieldState.invalid}
-                                        placeholder="Middle name"
-                                        autoComplete="off"
-                                    />
-                                    {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-                                </Field>
-                            )}
-                        /> */}
                         <Controller
                             name="last_name"
                             control={control}
                             render={({ field, fieldState }) => (
-                                <Field className='col-span-2' data-invalid={fieldState.invalid}>
+                                <Field data-invalid={fieldState.invalid}>
                                     <FieldLabel htmlFor={field.name}>
                                         Last name <div className="text-destructive">*</div>
                                     </FieldLabel>
@@ -440,9 +398,6 @@ export default function RegisterForm() {
                             <Send data-icon="inline-start" />
                         )}
                         Create account
-                    </Button>
-                    <Button>
-                        adasd
                     </Button>
                 </fieldset>
             </fieldset>

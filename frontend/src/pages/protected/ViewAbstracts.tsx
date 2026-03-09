@@ -1,8 +1,8 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import axiosClient from '@/clients/axiosClient'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger, } from "@/components/ui/dialog"
-import { CircleAlert, MailWarning, Pencil, Search, Send, Trash2 } from 'lucide-react'
+import { BookType, CircleAlert, Inbox, Pencil, Plus, Search, Send, Trash2 } from 'lucide-react'
 import { Link, useNavigate } from 'react-router'
 import { urls } from '@/routes/routes'
 import { useProfiles } from '@/hooks/use-profiles'
@@ -13,7 +13,8 @@ import { InfoAlert } from '@/components/InfoAlert'
 import { useMutation } from '@/hooks/use-mutation'
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger, } from "@/components/ui/alert-dialog"
 import { Spinner } from '@/components/ui/spinner'
-
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle, } from "@/components/ui/card"
+import { formatDate } from '@/utils/formatDate'
 
 function ViewAbstracts() {
     const navigate = useNavigate()
@@ -47,6 +48,58 @@ function ViewAbstracts() {
     }
 
 
+    type Author = {
+        full_name: string
+        aff_index: number
+    }
+    type Affiliation = {
+        index: number
+        text: string
+    }
+    type AbstractContext = {
+        authors_list: Author[]
+        affiliations_list: Affiliation[]
+    }
+    const [abstractDetails, setAbstractDetails] = useState<Record<number, AbstractContext>>({})
+    useEffect(() => {
+        if (profile?.participant?.abstracts) {
+            const fetchAll = async () => {
+                const allResults = await Promise.all(
+                    profile.participant.abstracts.map(abstract =>
+                        axiosClient.get(`/abstracts/${abstract.id}/authors-preview`)
+                    )
+                )
+                const map = {}
+                allResults.forEach((res, i) => {
+                    map[profile.participant.abstracts[i].id] = res.data
+                })
+                console.log(map);
+                setAbstractDetails(map)
+            }
+            fetchAll()
+        }
+    }, [profile])
+
+
+    const getAuthorPreview = (authors: Author[]) => {
+        return authors.map((author, i) => (
+            <span key={i}>
+                {author.full_name}
+                <sup>{author.aff_index}</sup>
+                {i < authors.length - 1 && ", "}
+            </span>
+        ))
+    }
+
+    const getAffiliationPreview = (affiliations: Affiliation[]) => {
+        return affiliations.map((aff, i) => (
+            <div key={i}>
+                <sup>{aff.index}</sup>
+                {aff.text}
+                {i < affiliations.length - 1 && ", "}
+            </div>
+        ))
+    }
 
     return (
         <div className='w-full max-w-5xl gap-3 p-3 mx-auto'>
@@ -64,92 +117,125 @@ function ViewAbstracts() {
                             ]}
                         />
 
-                        {profile?.participant?.abstracts.map(a => (
-                            <div key={a.id} className='border rounded-md shadow p-3'>
-                                <div className='flex gap-5'>
-                                    <div className='size-20 flex flex-col items-center justify-center border-3 gap-1 p-3 rounded-md border-primary/20 bg-primary/5'>
-                                        <MailWarning className='size-5' />
-                                        <span className='uppercase text-xs font-semibold'>
-                                            {a.status}
-                                        </span>
+                        {profile?.participant?.abstracts.map((abstract) => (
+                            <Card key={abstract.id} className="group hover:shadow-lg transition-shadow">
+                                <CardHeader className="flex flex-row items-start justify-between gap-4">
+                                    <div className="space-y-1">
+                                        <CardTitle className="text-lg font-semibold leading-tight">
+                                            {abstract.title ? (
+                                                <Link to={urls.users.previewAbstract.build(abstract.id)} className="block hover:underline">
+                                                    <BookType className="inline-block mr-2 mb-1 shrink-0 size-5" />
+                                                    {abstract.title}
+                                                </Link>
+                                            ) : (
+                                                <span className="flex items-center gap-2 text-destructive">
+                                                    <CircleAlert className="shrink-0 size-5" />
+                                                    No title set
+                                                </span>
+                                            )}
+                                        </CardTitle>
+
+                                        <CardDescription className="text-sm text-muted-foreground">
+                                            <b>Preferred presentation:{" "}</b>
+                                            {presentationTypes?.find((p) => p.value === abstract.presentation_type)?.label || (
+                                                <span className="inline-flex items-center gap-1 text-destructive">
+                                                    <CircleAlert className="size-3.5 shrink-0" />
+                                                    Not set
+                                                </span>
+                                            )}
+                                        </CardDescription>
                                     </div>
 
-                                    <div className='w-full flex flex-col md:flex-row md:justify-between'>
-                                        <div className='w-full'>
-                                            <Badge variant='outline' className='uppercase text-muted-foreground'>
-                                                Folio: {a.id}
-                                            </Badge>
-                                            <p className='text-lg tracking-wide mb-2'>
-                                                {a.title || (
-                                                    <span className='flex items-center gap-1 text-destructive'>
-                                                        <CircleAlert className='size-5 shrink-0' />
-                                                        No title set
-                                                    </span>
+                                    <Badge className="flex items-center gap-1 px-3 py-1">
+                                        <Inbox className="size-3 stroke-[2.5]" /> Draft
+                                    </Badge>
+                                </CardHeader>
+                                <CardContent className='text-muted-foreground text-sm'>
+                                    <p className='font-semibold'>Authors:</p>
+                                    {abstractDetails[abstract.id]?.authors_list?.length > 0 ? (
+                                        <div>
+                                            <p>
+                                                {abstractDetails[abstract.id]?.authors_list && (
+                                                    getAuthorPreview(abstractDetails[abstract.id].authors_list)
                                                 )}
                                             </p>
-                                            <p className='mb-2 text-sm text-muted-foreground flex flex-col sm:flex-row sm:items-center sm:gap-2'>
-                                                Presentation type:
-                                                <span>
-                                                    {presentationTypes?.find(p => p.value === a.presentation_type)?.label || (
-                                                        <span className='inline-flex items-center gap-1 text-destructive'>
-                                                            <CircleAlert className='size-3 shrink-0' />
-                                                            Not set
-                                                        </span>
-                                                    )}
-                                                </span>
-                                            </p>
+                                            <div>
+                                                {abstractDetails[abstract.id]?.affiliations_list && (
+                                                    getAffiliationPreview(abstractDetails[abstract.id].affiliations_list)
+                                                )}
+                                            </div>
                                         </div>
-
-                                        <div className="flex items-center gap-1 bg-muted/30 p-1 rounded-lg">
-                                            <Button variant='outline' className="shadow-sm" title="Preview" onClick={() => {
-                                                navigate(urls.users.previewAbstract.build(a.id))
-                                            }}>
-                                                <Search className="size-4" />
-                                                <span className='max-sm:hidden'>Preview</span>
-                                            </Button>
-                                            <Button variant="outline" className="shadow-sm" title="Edit" onClick={() => {
-                                                navigate(urls.users.editAbstract.build(a.id))
-                                            }}>
-                                                <Pencil className="size-4" />
-                                                <span className='max-sm:hidden'>Edit</span>
-                                            </Button>
-                                            <Button variant="outline" title="Submit">
-                                                <Send className="size-4" />
-                                                <span className='max-sm:hidden'>Submit</span>
-                                            </Button>
-                                            <div className="w-px h-4 bg-border mx-1" />
-                                            <AlertDialog>
-                                                <AlertDialogTrigger asChild>
-                                                    <Button variant="destructive" size="icon" title="Delete">
-                                                        {loading ? <Spinner /> : <Trash2 className="size-4" />}
-                                                    </Button>
-                                                </AlertDialogTrigger>
-                                                <AlertDialogContent size='sm'>
-                                                    <AlertDialogHeader>
-                                                        <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-                                                        <AlertDialogDescription>
-                                                            This action cannot be undone. This will permanently delete your
-                                                            account from our servers.
-                                                        </AlertDialogDescription>
-                                                    </AlertDialogHeader>
-                                                    <AlertDialogFooter>
-                                                        <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                                        <AlertDialogAction onClick={async () => await handleDelete(a.id)}>Continue</AlertDialogAction>
-                                                    </AlertDialogFooter>
-                                                </AlertDialogContent>
-                                            </AlertDialog>
-
-                                        </div>
+                                    ) : (
+                                        <span className="flex items-center gap-2 text-destructive">
+                                            <CircleAlert className="size-4 shrink-0" />
+                                            No authors set
+                                        </span>
+                                    )}
+                                </CardContent>
+                                <CardFooter className="flex flex-wrap items-center justify-between gap-4 pt-0">
+                                    <div className="text-xs text-muted-foreground space-y-1">
+                                        <p>Updated: {formatDate(abstract.last_update)}</p>
+                                        <p>Created: {formatDate(abstract.created_at)}</p>
                                     </div>
-                                </div>
-                            </div>
-                        ))}
 
+                                    <div className="flex items-center ml-auto gap-2">
+                                        <Button variant="outline" size="sm" onClick={() => navigate(urls.users.previewAbstract.build(abstract.id))}>
+                                            <Search className="size-4" />
+                                            <span className="max-sm:hidden">Preview</span>
+                                        </Button>
+
+                                        <Button variant="outline" size="sm" onClick={() => navigate(urls.users.editAbstract.build(abstract.id))}>
+                                            <Pencil className="size-4" />
+                                            <span className="max-sm:hidden">Edit</span>
+                                        </Button>
+
+                                        <Button variant="outline" size="sm">
+                                            <Send className="size-4" />
+                                            <span className="max-sm:hidden">Submit</span>
+                                        </Button>
+
+                                        <AlertDialog>
+                                            <AlertDialogTrigger asChild>
+                                                <Button variant="ghost" size="icon">
+                                                    {loading ? (
+                                                        <Spinner />
+                                                    ) : (
+                                                        <Trash2 className="size-4 text-destructive" />
+                                                    )}
+                                                </Button>
+                                            </AlertDialogTrigger>
+
+                                            <AlertDialogContent size="sm">
+                                                <AlertDialogHeader>
+                                                    <AlertDialogTitle>
+                                                        Delete abstract?
+                                                    </AlertDialogTitle>
+                                                    <AlertDialogDescription>
+                                                        This action cannot be undone. The abstract will be
+                                                        permanently deleted.
+                                                    </AlertDialogDescription>
+                                                </AlertDialogHeader>
+
+                                                <AlertDialogFooter>
+                                                    <AlertDialogCancel>
+                                                        Cancel
+                                                    </AlertDialogCancel>
+                                                    <AlertDialogAction onClick={async () => await handleDelete(abstract.id)}>
+                                                        Delete
+                                                    </AlertDialogAction>
+                                                </AlertDialogFooter>
+                                            </AlertDialogContent>
+                                        </AlertDialog>
+                                    </div>
+                                </CardFooter>
+                            </Card>
+                        ))}
 
                         <Dialog>
                             <DialogTrigger asChild>
                                 <Button>
-                                    Crear nuevo abstract
+                                    <Plus />
+                                    New Submission
                                 </Button>
                             </DialogTrigger>
                             <DialogContent>

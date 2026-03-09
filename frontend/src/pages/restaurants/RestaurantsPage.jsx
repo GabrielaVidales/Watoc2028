@@ -1,5 +1,3 @@
-import NavBar from '../../components/NavBar'
-import Footer from '../../components/Footer'
 import { Box, Card, CardContent, Container, Grid, Paper, Typography } from '@mui/material'
 import { Utensils, MapPin, ChevronRight, Map as MapIcon } from 'lucide-react'
 import { RestaurantHeroContent } from './components/RestaurantsHeroContent'
