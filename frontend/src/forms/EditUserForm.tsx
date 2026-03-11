@@ -81,6 +81,8 @@ function EditUserForm({ defaultValues }: P) {
         <form onSubmit={onFormSubmit}>
             <fieldset disabled={isSubmitting} className='space-y-5'>
                 <h2 className='text-xl font-semibold'>Personal information</h2>
+
+                {/* <div className='grid grid-cols-1 sm:grid-cols-3 gap-5 justify-start items-start'> */}
                 <div className='grid grid-cols-2 sm:grid-cols-3 gap-3'>
                     <Controller
                         name="prefix"
@@ -115,26 +117,6 @@ function EditUserForm({ defaultValues }: P) {
                         )}
                     />
                     <Controller
-                        name="pronouns"
-                        control={control}
-                        render={({ field, fieldState }) => (
-                            <Field data-invalid={fieldState.invalid}>
-                                <FieldLabel htmlFor={field.name}   >Pronouns</FieldLabel>
-                                <Input
-                                    {...field}
-                                    id={field.name}
-                                    aria-invalid={fieldState.invalid}
-                                    placeholder="Pronouns"
-                                    autoComplete="off"
-                                />
-                                {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-                            </Field>
-                        )}
-                    />
-                </div>
-
-                <div className='grid grid-cols-1 sm:grid-cols-3 gap-3'>
-                    <Controller
                         name="first_name"
                         control={control}
                         render={({ field, fieldState }) => (
@@ -145,23 +127,6 @@ function EditUserForm({ defaultValues }: P) {
                                     id={field.name}
                                     aria-invalid={fieldState.invalid}
                                     placeholder="First name"
-                                    autoComplete="off"
-                                />
-                                {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-                            </Field>
-                        )}
-                    />
-                    <Controller
-                        name="middle_name"
-                        control={control}
-                        render={({ field, fieldState }) => (
-                            <Field data-invalid={fieldState.invalid}>
-                                <FieldLabel htmlFor={field.name}>Middle name</FieldLabel>
-                                <Input
-                                    {...field}
-                                    id={field.name}
-                                    aria-invalid={fieldState.invalid}
-                                    placeholder="Middle name"
                                     autoComplete="off"
                                 />
                                 {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
@@ -187,7 +152,7 @@ function EditUserForm({ defaultValues }: P) {
                     />
                 </div>
 
-                <div className='grid grid-cols-1 sm:grid-cols-2 gap-3 pt-5 items-start'>
+                <div className='grid grid-cols-1 sm:grid-cols-2 gap-3 justify-start items-start'>
                     <Controller
                         name="nationality"
                         control={control}

@@ -25,7 +25,7 @@ export default function UserProfile() {
 	return (
 		<div className='w-full max-w-5xl grid grid-cols-1 lg:grid-cols-3 gap-5 p-3 mx-auto'>
 			<section className='col-span-1 mx-auto max-w-sm md:max-w-md w-full'>
-				<Card className='shadow-md border-muted/50'>
+				<Card className='shadow-md border-2 border-input/30'>
 					<CardContent className='p-6'>
 						<div className="flex flex-col items-center">
 							<Avatar className="size-32 border-4 border-secondary shadow-sm mb-4">
@@ -84,7 +84,7 @@ export default function UserProfile() {
 				</Card>
 			</section>
 
-			<section className='col-span-2 min-h-50 w-full flex gap-3 justify-center'>
+			<section className='col-span-1 lg:col-span-2 min-h-50 w-full flex gap-3 justify-center'>
 				<div className='w-full bg-background border-2 p-3 rounded-lg shadow-lg flex flex-col gap-5'>
 					<Tabs defaultValue="home">
 						<TabsList variant='line' className='w-full justify-between overflow-x-auto overflow-y-hidden'>
@@ -113,7 +113,7 @@ export default function UserProfile() {
 								<h2 className='text-2xl font-semibold'>
 									Welcome to the World Association of Theoretical and Computational Chemists Registration Portal
 								</h2>
-								<div className='h-0.75 w-80 mx-auto mb-6 mt-4 bg-primary-main' />
+								<div className='h-0.75 w-20 mx-auto mb-6 mt-4 bg-primary-main' />
 								<p className='text-sm'>
 									You are now logged in to your personal congress account. From this page you can:
 								</p>

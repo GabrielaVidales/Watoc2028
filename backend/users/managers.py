@@ -1,4 +1,4 @@
-from django.contrib.auth.models import UserManager
+from django.contrib.auth.models import UserManager, Group
 
 
 class CustomUserManager(UserManager):
@@ -8,11 +8,15 @@ class CustomUserManager(UserManager):
         
         email = self.normalize_email(email)
         if self.filter(email=email).exists():
-            raise ValueError('Ya existe una cuenta registrada con este correo.')            
+            raise ValueError('Ya existe una cuenta registrada con este correo.')       
         
         user = self.model(email=email, **extra_fields)
         user.set_password(password)
         user.save(using=self._db)
+        
+        admin_group = Group.objects.get_or_create(name='admin')
+        user.groups.add(admin_group)
+        
         return user
 
     def create_superuser(self, email, password=None, **extra_fields):

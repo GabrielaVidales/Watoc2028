@@ -56,7 +56,7 @@ function AuthLayout() {
                 }} />
 
                 <div className='max-w-7xl min-h-24 my-2 px-3 mx-auto flex flex-col sm:flex-row justify-between items-center gap-6'>
-                    <div className='flex flex-col items-center sm:items-start gap-3 max-w-sm'>
+                    <div className='flex flex-col items-center sm:items-start gap-3 max-w-sm shrink-0'>
                         <Link to={urls.home.index} className="flex items-center h-full">
                             <img
                                 alt="WATOC 2028 Logo"
@@ -66,9 +66,9 @@ function AuthLayout() {
                         </Link>
                     </div>
 
-                    <div className='flex'>
+                    <div className='flex flex-col sm:flex-row items-center'>
                         <Link to={urls.home.index} className="sm:flex">
-                            <Button variant='ghost' className='flex items-center gap-2 text-white sm:text-lg hover:bg-white/10 hover:text-white transition-all font-medium px-4'>
+                            <Button variant='ghost' className='flex items-center gap-2 text-white sm:text-base lg:text-lg hover:bg-white/10 hover:text-white transition-all font-medium px-4'>
                                 <ChevronsLeft className="size-6" />
                                 <span>Home</span>
                             </Button>
@@ -76,7 +76,7 @@ function AuthLayout() {
 
                         {(currentUser ? authRoutes : guessRoutes).map(routes => (
                             <Link to={routes.url} key={routes.url} className="sm:flex">
-                                <Button variant='ghost' className='flex items-center gap-2 text-white sm:text-lg hover:bg-white/10 hover:text-white transition-all font-medium px-4'>
+                                <Button variant='ghost' className='flex items-center gap-2 text-white sm:text-base lg:text-lg hover:bg-white/10 hover:text-white transition-all font-medium px-4'>
                                     {routes.icon}
                                     <span>{routes.label}</span>
                                 </Button>

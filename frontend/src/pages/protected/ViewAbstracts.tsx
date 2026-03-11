@@ -102,9 +102,38 @@ function ViewAbstracts() {
     return (
         <div className='w-full max-w-5xl gap-3 p-3 mx-auto'>
             <div className='min-h-50 w-full flex gap-3 justify-center'>
-                <div className='w-full bg-background border-2 p-3 rounded-lg shadow-lg flex flex-col gap-5'>
-                    <fieldset disabled={loading} className='w-full py-9 pt-4 space-y-5 px-5 sm:px-9'>
-                        <h2 className='text-2xl font-semibold'>Abstract submission</h2>
+                <div className='w-full bg-background border-2 p-3 sm:p-5 md:p-7 rounded-lg shadow-lg flex flex-col gap-5'>
+                    <fieldset disabled={loading} className='w-full py-9 pt-4 space-y-5'>
+                        <div className='flex flex-col justify-end items-center gap-3 md:flex-row md:justify-between'>
+                            <h2 className='text-2xl font-semibold'>Abstract submission</h2>
+                            <AlertDialog>
+                                <AlertDialogTrigger asChild>
+                                    <Button>
+                                        <Plus />
+                                        New Submission
+                                    </Button>
+                                </AlertDialogTrigger>
+                                <AlertDialogContent size="sm">
+                                    <AlertDialogHeader className="space-y-3">
+                                        <AlertDialogTitle className="flex items-center gap-2 text-lg">
+                                            <Plus className="w-5 h-5 text-primary" />
+                                            Create a New Submission
+                                        </AlertDialogTitle>
+                                        <AlertDialogDescription className="text-sm text-muted-foreground leading-relaxed">
+                                            This will create a new <b>draft submission</b> where you can
+                                            enter your abstract, authors, and additional information before submitting it.
+                                        </AlertDialogDescription>
+                                    </AlertDialogHeader>
+                                    <AlertDialogFooter>
+                                        <AlertDialogCancel>No</AlertDialogCancel>
+                                        <AlertDialogAction type='button' onClick={handleCreate}>
+                                            Continue
+                                        </AlertDialogAction>
+                                    </AlertDialogFooter>
+                                </AlertDialogContent>
+                            </AlertDialog>
+                        </div>
+
                         <InfoAlert
                             title="Abstract submission deadline: June 10, 2026"
                             messages={[
@@ -114,59 +143,58 @@ function ViewAbstracts() {
 
                         {profile?.participant?.abstracts.map((abstract) => (
                             <Card key={abstract.id} className="group hover:shadow-lg transition-shadow">
-                                <CardHeader className="flex flex-row items-start justify-between gap-4">
-                                    <div className="space-y-1">
-                                        <CardTitle className="text-lg font-semibold leading-tight">
-                                            {abstract.title ? (
-                                                <Link to={urls.users.previewAbstract.build(abstract.id)} className="block hover:underline">
-                                                    <BookType className="inline-block mr-2 mb-1 shrink-0 size-5" />
-                                                    {abstract.title}
-                                                </Link>
-                                            ) : (
-                                                <span className="flex items-center gap-2 text-destructive">
-                                                    <CircleAlert className="shrink-0 size-5" />
-                                                    No title set
-                                                </span>
-                                            )}
-                                        </CardTitle>
+                                <CardHeader className="flex flex-col-reverse items-stretch  sm:flex-row sm:items-start sm:justify-between   gap-4">
+                                    <CardTitle className="text-lg font-semibold leading-tight">
+                                        {abstract.title ? (
+                                            <Link to={urls.users.previewAbstract.build(abstract.id)} className="block hover:underline">
+                                                <BookType className="inline-block mr-2 mb-1 shrink-0 size-5" />
+                                                {abstract.title}
+                                            </Link>
+                                        ) : (
+                                            <span className="flex items-center gap-2 text-destructive">
+                                                <CircleAlert className="shrink-0 size-5" />
+                                                No title set
+                                            </span>
+                                        )}
+                                    </CardTitle>
 
-                                        <CardDescription className="text-sm text-muted-foreground">
-                                            <b>Preferred presentation:{" "}</b>
-                                            {presentationTypes?.find((p) => p.value === abstract.presentation_type)?.label || (
-                                                <span className="inline-flex items-center gap-1 text-destructive">
-                                                    <CircleAlert className="size-3.5 shrink-0" />
-                                                    Not set
-                                                </span>
-                                            )}
-                                        </CardDescription>
-                                    </div>
-
-                                    <Badge className="flex items-center uppercase gap-1 px-3 py-1">
+                                    <Badge className="self-end flex items-center uppercase gap-1 px-3 py-1">
                                         <Inbox className="size-3 stroke-[2.5]" />
                                         {abstract.status || 'Not set'}
                                     </Badge>
                                 </CardHeader>
-                                <CardContent className='text-muted-foreground text-sm'>
-                                    <p className='font-semibold'>Authors:</p>
-                                    {abstractDetails[abstract.id]?.authors_list?.length > 0 ? (
-                                        <div>
-                                            <p>
-                                                {abstractDetails[abstract.id]?.authors_list && (
-                                                    getAuthorPreview(abstractDetails[abstract.id].authors_list)
-                                                )}
-                                            </p>
+                                <CardContent className='text-muted-foreground text-sm space-y-3'>
+                                    <CardDescription className="text-sm">
+                                        <p className='font-semibold'>Preferred presentation:</p>
+                                        {presentationTypes?.find((p) => p.value === abstract.presentation_type)?.label || (
+                                            <span className="flex items-center gap-1 text-destructive">
+                                                <CircleAlert className="size-3.5 shrink-0" />
+                                                Not set
+                                            </span>
+                                        )}
+                                    </CardDescription>
+                                    <CardDescription className="text-sm">
+                                        <p className='font-semibold'>Authors:</p>
+                                        {abstractDetails[abstract.id]?.authors_list?.length > 0 ? (
                                             <div>
-                                                {abstractDetails[abstract.id]?.affiliations_list && (
-                                                    getAffiliationPreview(abstractDetails[abstract.id].affiliations_list)
-                                                )}
+                                                <p>
+                                                    {abstractDetails[abstract.id]?.authors_list && (
+                                                        getAuthorPreview(abstractDetails[abstract.id].authors_list)
+                                                    )}
+                                                </p>
+                                                <div>
+                                                    {abstractDetails[abstract.id]?.affiliations_list && (
+                                                        getAffiliationPreview(abstractDetails[abstract.id].affiliations_list)
+                                                    )}
+                                                </div>
                                             </div>
-                                        </div>
-                                    ) : (
-                                        <span className="flex items-center gap-2 text-destructive">
-                                            <CircleAlert className="size-4 shrink-0" />
-                                            No authors set
-                                        </span>
-                                    )}
+                                        ) : (
+                                            <span className="flex items-center gap-2 text-destructive">
+                                                <CircleAlert className="size-4 shrink-0" />
+                                                No authors set
+                                            </span>
+                                        )}
+                                    </CardDescription>
                                 </CardContent>
                                 <CardFooter className="flex flex-wrap items-center justify-between gap-4 pt-0">
                                     <div className="text-xs text-muted-foreground space-y-1">
@@ -227,33 +255,6 @@ function ViewAbstracts() {
                                 </CardFooter>
                             </Card>
                         ))}
-
-                        <AlertDialog>
-                            <AlertDialogTrigger asChild>
-                                <Button>
-                                    <Plus />
-                                    New Submission
-                                </Button>
-                            </AlertDialogTrigger>
-                            <AlertDialogContent size="sm">
-                                <AlertDialogHeader className="space-y-3">
-                                    <AlertDialogTitle className="flex items-center gap-2 text-lg">
-                                        <Plus className="w-5 h-5 text-primary" />
-                                        Create a New Submission
-                                    </AlertDialogTitle>
-                                    <AlertDialogDescription className="text-sm text-muted-foreground leading-relaxed">
-                                        This will create a new <b>draft submission</b> where you can
-                                        enter your abstract, authors, and additional information before submitting it.
-                                    </AlertDialogDescription>
-                                </AlertDialogHeader>
-                                <AlertDialogFooter>
-                                    <AlertDialogCancel>No</AlertDialogCancel>
-                                    <AlertDialogAction type='button' onClick={handleCreate}>
-                                        Continue
-                                    </AlertDialogAction>
-                                </AlertDialogFooter>
-                            </AlertDialogContent>
-                        </AlertDialog>
                     </fieldset>
                 </div>
             </div>
