@@ -44,7 +44,6 @@ INSTALLED_APPS = [
     "rest_framework",
     "rest_framework_simplejwt",
     "rest_framework_simplejwt.token_blacklist",
-    "printpdf",
     "users",
     "contact_requests",
     "admin_honeypot",
@@ -172,7 +171,7 @@ STORAGES = {
 
 # Ruta en la cual se guardarán las imagenes de usuario
 MEDIA_URL = "/media/"
-MEDIA_ROOT = os.path.join(BASE_DIR, "media")
+MEDIA_ROOT = BASE_DIR / "media"
 
 # Para el envío de los datos de contact_request a una cuenta
 EMAIL_BACKEND = os.getenv("EMAIL_BACKEND")

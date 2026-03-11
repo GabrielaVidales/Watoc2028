@@ -25,6 +25,28 @@ export const UserRole = {
 export type UserRole = (typeof UserRole)[keyof typeof UserRole];
 
 
+export const participantSchema = z.object({
+    affiliation: z.string().trim()
+        .min(1, "Affiliation is required")
+        .max(100, "Institution name is too long")
+        .default(''),
+    job_title: z.string().trim()
+        .min(1, "Position or Job Title is required")
+        .max(100, "Position title is too long")
+        .default(''),
+    field_of_study: z.string().trim()
+        .min(1, "Field of study is required")
+        .max(100, "Field name is too long")
+        .default(''),
+    abstracts: z.array(abstractSchema)
+        .default([])
+})
+
+export const reviewerSchema = z.object({
+    assignedAbstracts: z.array(abstractSchema)
+        .default([])
+})
+
 export const userSchema = z.object({
     id: z.number()
         .optional()
@@ -69,29 +91,11 @@ export const userSchema = z.object({
         .optional(),
     last_login: z.coerce.date()
         .optional(),
+
+    participant: participantSchema
+        .optional()
 })
 
-export const participantSchema = z.object({
-    affiliation: z.string().trim()
-        .min(1, "Affiliation is required")
-        .max(100, "Institution name is too long")
-        .default(''),
-    job_title: z.string().trim()
-        .min(1, "Position or Job Title is required")
-        .max(100, "Position title is too long")
-        .default(''),
-    field_of_study: z.string().trim()
-        .min(1, "Field of study is required")
-        .max(100, "Field name is too long")
-        .default(''),
-    abstracts: z.array(abstractSchema)
-        .default([])
-})
-
-export const reviewerSchema = z.object({
-    assignedAbstracts: z.array(abstractSchema)
-        .default([])
-})
 
 export type UserSchema = z.infer<typeof userSchema>
 

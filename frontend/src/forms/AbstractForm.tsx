@@ -1,17 +1,11 @@
-import { Button } from '@/components/ui/button'
+import React, { useEffect } from 'react'
 import { Field, FieldContent, FieldDescription, FieldError, FieldLabel } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Spinner } from '@/components/ui/spinner'
 import { Textarea } from '@/components/ui/textarea'
-import { abstractSchema, presentationTypes, submitAbstractDefaults, type AbstractSchema } from '@/schemas/abstract-schemas'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { Save } from 'lucide-react'
-import React, { useEffect } from 'react'
-import { Controller, useForm, useFormContext, useWatch, type FormState } from 'react-hook-form'
-import axiosClient from '@/clients/axiosClient'
+import { presentationTypes, type AbstractSchema } from '@/schemas/abstract-schemas'
+import { Controller, useFormContext } from 'react-hook-form'
 import { InfoAlert } from '@/components/InfoAlert'
-import { forwardRef, useImperativeHandle, type Ref } from "react";
 
 
 type AbstractFormProps = {
@@ -107,7 +101,7 @@ function AbstractForm({ abstract }: AbstractFormProps) {
                                 autoComplete="off"
                                 autoCorrect="off"
                                 spellCheck="false"
-                                placeholder="Provide a concise summary of your work (max. 500 words)..."
+                                placeholder="Provide a concise summary of your work (max. 350 words)..."
                                 className="min-h-40 wrap-anywhere"
                                 maxLength={3500}
                             />
@@ -134,7 +128,6 @@ function AbstractForm({ abstract }: AbstractFormProps) {
                     render={({ field, fieldState }) => (
                         <Field data-invalid={fieldState.invalid}>
                             <FieldLabel htmlFor={field.name}>References</FieldLabel>
-                            {/* <FieldDescription>Enter the numbered references below in Vancouver format.</FieldDescription> */}
                             <Textarea
                                 {...field}
                                 id={field.name}
@@ -152,9 +145,6 @@ function AbstractForm({ abstract }: AbstractFormProps) {
                                 </span>
                             </FieldContent>
                             {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-                            {/* <FieldDescription className='flex justify-end'>
-                                <WordCounter control={control} limit={150} name={field.name} />
-                            </FieldDescription> */}
                         </Field>
                     )}
                 />

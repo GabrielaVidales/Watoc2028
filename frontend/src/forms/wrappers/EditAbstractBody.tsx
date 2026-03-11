@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import AbstractForm from '../AbstractForm'
 import { useParams } from 'react-router'
 import { useFetch } from '@/hooks/use-fetch'
@@ -8,9 +8,11 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import axiosClient from '@/clients/axiosClient'
 import { Button } from '@/components/ui/button'
 import { Spinner } from '@/components/ui/spinner'
-import { ChevronLeft, ChevronRight, Save } from 'lucide-react'
+import { AlertTriangle, ChevronLeft, ChevronRight, Save } from 'lucide-react'
 import { Separator } from '@/components/ui/separator'
 import type { EditAbstractCallbacks } from '@/pages/protected/EditAbstractPage'
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogMedia, AlertDialogTitle, AlertDialogTrigger, } from "@/components/ui/alert-dialog"
+
 
 function EditAbstractBody({ onStepBack, onStepForward }: EditAbstractCallbacks) {
     const { id } = useParams()
@@ -25,13 +27,19 @@ function EditAbstractBody({ onStepBack, onStepForward }: EditAbstractCallbacks) 
     const { isValid, isSubmitting, isDirty } = form.formState
 
     const onFormSubmit = form.handleSubmit(async (data) => {
-        const res = await axiosClient.patch<AbstractSchema>(`/abstracts/${id}/`, data)
+        await axiosClient.patch<AbstractSchema>(`/abstracts/${id}/`, data)
         await fetchData()
-        console.log(res);
-
-    }, invalid => {
-        console.log(invalid);
     })
+
+    const [open, setOpen] = useState(false)
+    const onValidate = async () => {
+        const valid = await form.trigger(undefined, { shouldFocus: true })
+        if (!valid) {
+            setOpen(true)
+            return
+        }
+        onStepForward?.()
+    }
 
     return (
         <div className='w-full space-y-5 p-5'>
@@ -66,11 +74,39 @@ function EditAbstractBody({ onStepBack, onStepForward }: EditAbstractCallbacks) 
                     )}
                 </div>
 
-                <Button type='button' onClick={onStepForward}>
+                <Button type='button' onClick={onValidate}>
                     Next <ChevronRight />
                 </Button>
             </fieldset>
+            <AlertDialog open={open} onOpenChange={setOpen}>
+                <AlertDialogContent size="sm">
+                    <AlertDialogHeader>
+                        <AlertDialogMedia className="bg-destructive/10 text-destructive dark:bg-destructive/20 dark:text-destructive">
+                            <AlertTriangle />
+                        </AlertDialogMedia>
+                        <AlertDialogTitle>
+                            Some information is incomplete
+                        </AlertDialogTitle>
+                        <AlertDialogDescription className='text-balance'>
+                            Your abstract contains fields that do not meet the submission requirements.
+                        </AlertDialogDescription>
+                        <AlertDialogDescription className='text-balance'>
 
+                            You may continue to the next step, but these issues must be resolved before
+                            the final submission.
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+
+                    <AlertDialogFooter>
+                        <AlertDialogCancel>
+                            Go Back and Fix
+                        </AlertDialogCancel>
+                        <AlertDialogAction variant='destructive' onClick={onStepForward}>
+                            Continue Anyway
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
         </div>
 
     )

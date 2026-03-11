@@ -15,6 +15,14 @@ export const presentationTypes = [
     },
 ]
 
+export const ABSTRACT_STATUS = [
+    "draft",
+    "submitted",
+    "accepted",
+    "rejected",
+    "corrections",
+    "deleted"
+] as const;
 
 export const authorAffiliationSchema = z.object({
     id: z.number()
@@ -52,8 +60,6 @@ export const authorSchema = z.object({
 
     order: z.number()
         .optional(),
-    is_corresponding: z.boolean()
-        .default(false),
 
     affiliation: authorAffiliationSchema
         .optional()
@@ -94,7 +100,7 @@ export const abstractSchema = z.object({
         .refine((val) => countWords(val, 150), "References must be at most 150 words")
         .default(''),
 
-    status: z.string().optional(),
+    status: z.enum(ABSTRACT_STATUS).optional(),
 
     created_at: z.coerce.date().optional(),
 

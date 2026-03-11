@@ -74,9 +74,6 @@ export default function RegisterForm() {
                 console.log(error.response);
             }
         }
-    }, async (invalid) => {
-        console.log(invalid);
-
     })
 
     return (

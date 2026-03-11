@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import axiosClient from '@/clients/axiosClient'
 import { Button } from '@/components/ui/button'
-import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger, } from "@/components/ui/dialog"
-import { BookType, CircleAlert, Inbox, Pencil, Plus, Search, Send, Trash2 } from 'lucide-react'
+import { BookType, CircleAlert, Inbox, Pencil, Plus, Search, Send, Trash2, TriangleAlert } from 'lucide-react'
 import { Link, useNavigate } from 'react-router'
 import { urls } from '@/routes/routes'
 import { useProfiles } from '@/hooks/use-profiles'
@@ -73,7 +72,6 @@ function ViewAbstracts() {
                 allResults.forEach((res, i) => {
                     map[profile.participant.abstracts[i].id] = res.data
                 })
-                console.log(map);
                 setAbstractDetails(map)
             }
             fetchAll()
@@ -110,10 +108,7 @@ function ViewAbstracts() {
                         <InfoAlert
                             title="Abstract submission deadline: June 10, 2026"
                             messages={[
-                                'Read our Abstract Submission Guideline here',
-                                <Link to={urls.users.submitAbstract}>
-                                    <span className='font-semibold text-slate-950'>Ver detalles</span>,
-                                </Link>
+                                'Read our Abstract Submission Guideline',
                             ]}
                         />
 
@@ -146,8 +141,9 @@ function ViewAbstracts() {
                                         </CardDescription>
                                     </div>
 
-                                    <Badge className="flex items-center gap-1 px-3 py-1">
-                                        <Inbox className="size-3 stroke-[2.5]" /> Draft
+                                    <Badge className="flex items-center uppercase gap-1 px-3 py-1">
+                                        <Inbox className="size-3 stroke-[2.5]" />
+                                        {abstract.status || 'Not set'}
                                     </Badge>
                                 </CardHeader>
                                 <CardContent className='text-muted-foreground text-sm'>
@@ -184,15 +180,19 @@ function ViewAbstracts() {
                                             <span className="max-sm:hidden">Preview</span>
                                         </Button>
 
-                                        <Button variant="outline" size="sm" onClick={() => navigate(urls.users.editAbstract.build(abstract.id))}>
-                                            <Pencil className="size-4" />
-                                            <span className="max-sm:hidden">Edit</span>
-                                        </Button>
+                                        {abstract.status !== 'submitted' && (
+                                            <Button variant="outline" size="sm" onClick={() => navigate(urls.users.editAbstract.build(abstract.id))}>
+                                                <Pencil className="size-4" />
+                                                <span className="max-sm:hidden">Edit</span>
+                                            </Button>
+                                        )}
 
-                                        <Button variant="outline" size="sm">
-                                            <Send className="size-4" />
-                                            <span className="max-sm:hidden">Submit</span>
-                                        </Button>
+                                        {abstract.status !== 'submitted' && (
+                                            <Button variant="outline" size="sm" onClick={() => navigate(urls.users.editAbstract.build(abstract.id) + '?action=submit')}>
+                                                <Send className="size-4" />
+                                                <span className="max-sm:hidden">Submit</span>
+                                            </Button>
+                                        )}
 
                                         <AlertDialog>
                                             <AlertDialogTrigger asChild>
@@ -204,23 +204,20 @@ function ViewAbstracts() {
                                                     )}
                                                 </Button>
                                             </AlertDialogTrigger>
-
-                                            <AlertDialogContent size="sm">
+                                            <AlertDialogContent size='sm'>
                                                 <AlertDialogHeader>
-                                                    <AlertDialogTitle>
-                                                        Delete abstract?
+                                                    <AlertDialogTitle className="p-3 bg-destructive/10 rounded-full mb-2">
+                                                        <TriangleAlert className='size-8 text-destructive' />
                                                     </AlertDialogTitle>
+                                                    <AlertDialogTitle>Delete Abstract?</AlertDialogTitle>
                                                     <AlertDialogDescription>
                                                         This action cannot be undone. The abstract will be
                                                         permanently deleted.
                                                     </AlertDialogDescription>
                                                 </AlertDialogHeader>
-
                                                 <AlertDialogFooter>
-                                                    <AlertDialogCancel>
-                                                        Cancel
-                                                    </AlertDialogCancel>
-                                                    <AlertDialogAction onClick={async () => await handleDelete(abstract.id)}>
+                                                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                                    <AlertDialogAction variant='destructive' onClick={async () => await handleDelete(abstract.id)}>
                                                         Delete
                                                     </AlertDialogAction>
                                                 </AlertDialogFooter>
@@ -231,30 +228,32 @@ function ViewAbstracts() {
                             </Card>
                         ))}
 
-                        <Dialog>
-                            <DialogTrigger asChild>
+                        <AlertDialog>
+                            <AlertDialogTrigger asChild>
                                 <Button>
                                     <Plus />
                                     New Submission
                                 </Button>
-                            </DialogTrigger>
-                            <DialogContent>
-                                <DialogHeader>
-                                    <DialogTitle>Submit a new abstract?</DialogTitle>
-                                    <DialogDescription>
-                                        Do you want to continue with a new submission?
-                                    </DialogDescription>
-                                </DialogHeader>
-                                <DialogFooter className="sm:justify-between">
-                                    <DialogClose asChild>
-                                        <Button type="button">Close</Button>
-                                    </DialogClose>
-                                    <Button type="button" onClick={handleCreate} className='bg-primary-main hover:bg-primary-light active:bg-primary-dark'>
-                                        New Submission
-                                    </Button>
-                                </DialogFooter>
-                            </DialogContent>
-                        </Dialog>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent size="sm">
+                                <AlertDialogHeader className="space-y-3">
+                                    <AlertDialogTitle className="flex items-center gap-2 text-lg">
+                                        <Plus className="w-5 h-5 text-primary" />
+                                        Create a New Submission
+                                    </AlertDialogTitle>
+                                    <AlertDialogDescription className="text-sm text-muted-foreground leading-relaxed">
+                                        This will create a new <b>draft submission</b> where you can
+                                        enter your abstract, authors, and additional information before submitting it.
+                                    </AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <AlertDialogFooter>
+                                    <AlertDialogCancel>No</AlertDialogCancel>
+                                    <AlertDialogAction type='button' onClick={handleCreate}>
+                                        Continue
+                                    </AlertDialogAction>
+                                </AlertDialogFooter>
+                            </AlertDialogContent>
+                        </AlertDialog>
                     </fieldset>
                 </div>
             </div>

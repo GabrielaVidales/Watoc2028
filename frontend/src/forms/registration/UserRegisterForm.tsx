@@ -52,9 +52,7 @@ export default function UserRegisterForm({ }: IUserRegisterFormProps) {
             console.log(preparedData);
         }
         try {
-            const res = await axiosClient.post('register/', preparedData)
-            console.log(res);
-            
+            const res = await axiosClient.post('register/', preparedData)            
             await handleLogin(data.email, data.password)
         } catch (error) {
             const axiosErr = error as AxiosError

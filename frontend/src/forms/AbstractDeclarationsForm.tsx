@@ -6,17 +6,19 @@ import { Spinner } from '@/components/ui/spinner'
 import { Switch } from '@/components/ui/switch'
 import { useFetch } from '@/hooks/use-fetch'
 import type { EditAbstractCallbacks } from '@/pages/protected/EditAbstractPage'
-import { type AbstractDeclarationValues } from '@/schemas/abstract-declaration-schema'
+import { abstractDeclarationSchema, type AbstractDeclarationValues } from '@/schemas/abstract-declaration-schema'
+import { zodResolver } from '@hookform/resolvers/zod'
 import { isAxiosError } from 'axios'
 import { ChevronLeft, ChevronRight, Save } from 'lucide-react'
 import React, { useEffect } from 'react'
 import { Controller, useForm } from 'react-hook-form'
+import type { Path } from 'react-router'
 import { useParams } from 'react-router'
 
 
 function AbstractDeclarations({ onStepBack, onStepForward }: EditAbstractCallbacks) {
     const { id } = useParams()
-    const { control, handleSubmit, reset, formState: { isSubmitting, isDirty } } = useForm({
+    const { control, handleSubmit, getValues, reset, setError, setFocus, formState: { isSubmitting, isDirty } } = useForm({
         // resolver: zodResolver(abstractDeclarationSchema),
         mode: 'onChange',
         defaultValues: {
@@ -29,10 +31,7 @@ function AbstractDeclarations({ onStepBack, onStepForward }: EditAbstractCallbac
         }
     })
 
-    const {
-        data: declarationsData,
-        fetchData: fetchDeclarations
-    } = useFetch<AbstractDeclarationValues>(`/abstracts/${id}/declarations/`)
+    const { data: declarationsData, fetchData: fetchDeclarations } = useFetch<AbstractDeclarationValues>(`/abstracts/${id}/declarations/`)
 
     const onFormSubmit = handleSubmit(async (data) => {
         try {
@@ -258,45 +257,3 @@ function AbstractDeclarations({ onStepBack, onStepForward }: EditAbstractCallbac
 }
 
 export default AbstractDeclarations
-
-const DeclarationItem = ({
-    title,
-    description,
-    field,
-    fieldState,
-    index
-}: {
-    title: string;
-    description: string;
-    field: any;
-    fieldState: any;
-    index: number
-}) => (
-    <div className={`
-        relative flex flex-row items-start space-x-4 space-y-0 rounded-xl border p-6 transition-all duration-200
-        ${field.value ? 'bg-indigo-50/30 border-indigo-200 shadow-sm' : 'bg-background border-slate-200'}
-        ${fieldState.invalid ? 'border-red-300 bg-red-50/20' : ''}
-    `}>
-        <div className="flex h-6 items-center">
-            <Switch
-                id={field.name}
-                checked={field.value}
-                onCheckedChange={field.onChange}
-                className='data-[state=checked]:bg-indigo-600 scale-110'
-            />
-        </div>
-        <div className="flex flex-col gap-1">
-            <label
-                htmlFor={field.name}
-                className="text-base font-bold leading-tight cursor-pointer text-slate-800"
-            >
-                <span className="mr-2">{index}.</span>
-                {title}
-            </label>
-            <p className="text-sm text-slate-500 leading-relaxed">
-                {description}
-            </p>
-            {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-        </div>
-    </div>
-);

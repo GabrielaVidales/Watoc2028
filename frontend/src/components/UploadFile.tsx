@@ -30,18 +30,10 @@ export function UploadFile({ onChange, onRejected, disabled = undefined, maxFile
     }, [maxSize])
 
     const onDropAccepted = React.useCallback((acceptedFiles: File[]) => {
-
-        acceptedFiles.map(f => {
-            console.log(getFileSize(f));
-        })
-
         onChange?.(acceptedFiles)
     }, [onChange])
 
     const onDropRejected = React.useCallback((errors: DropZone.FileRejection[]) => {
-        errors.map(e => {
-            console.log(getFileSize(e.file));
-        })
         onRejected?.(errors)
     }, [onRejected])
 

@@ -24,7 +24,7 @@ export default function UserProfile() {
 
 	return (
 		<div className='w-full max-w-5xl grid grid-cols-1 lg:grid-cols-3 gap-5 p-3 mx-auto'>
-			<div className='col-span-1 mx-auto max-w-sm md:max-w-md w-full'>
+			<section className='col-span-1 mx-auto max-w-sm md:max-w-md w-full'>
 				<Card className='shadow-md border-muted/50'>
 					<CardContent className='p-6'>
 						<div className="flex flex-col items-center">
@@ -82,9 +82,9 @@ export default function UserProfile() {
 						</div>
 					</CardContent>
 				</Card>
-			</div>
+			</section>
 
-			<div className='col-span-2 min-h-50 w-full flex gap-3 justify-center'>
+			<section className='col-span-2 min-h-50 w-full flex gap-3 justify-center'>
 				<div className='w-full bg-background border-2 p-3 rounded-lg shadow-lg flex flex-col gap-5'>
 					<Tabs defaultValue="home">
 						<TabsList variant='line' className='w-full justify-between overflow-x-auto overflow-y-hidden'>
@@ -108,8 +108,8 @@ export default function UserProfile() {
 								<span className="hidden md:inline">Change Password</span>
 							</TabsTrigger>
 						</TabsList>
-						<TabsContent value='home' className='w-full py-9 pt-4 space-y-8 px-5 sm:px-9'>
-							<section className="space-y-2">
+						<TabsContent value='home' className='w-full p-9 space-y-8 px-5 sm:px-9'>
+							<section className="space-y-5">
 								<h2 className='text-2xl font-semibold'>
 									Welcome to the World Association of Theoretical and Computational Chemists Registration Portal
 								</h2>
@@ -155,10 +155,9 @@ export default function UserProfile() {
 								</div>
 							</section>
 
-							<section className="space-y-4">
+							{/* <section className="space-y-4">
 								<div className="flex items-center justify-between">
 									<h2 className='text-2xl font-semibold text-primary-main'>Congress Registration</h2>
-									<Badge variant="destructive" className="font-bold">Pending Payment</Badge>
 								</div>
 
 								<InfoAlert
@@ -179,9 +178,9 @@ export default function UserProfile() {
 										</NavLink>
 									</Button>
 								</div>
-							</section>
+							</section> */}
 
-							<section className="space-y-4">
+							{/* <section className="space-y-4">
 								<h2 className='text-2xl font-semibold text-primary-main'>Dietary Survey</h2>
 								<InfoAlert
 									variant='warning'
@@ -196,7 +195,7 @@ export default function UserProfile() {
 									]}
 								/>
 								<DinnerForm />
-							</section>
+							</section> */}
 						</TabsContent>
 						<TabsContent value="account" className='w-full py-9 pt-4 space-y-5 px-5 sm:px-9'>
 							<h2 className='text-2xl font-semibold text-primary-main'>Edit your profile data</h2>
@@ -242,7 +241,7 @@ export default function UserProfile() {
 						</TabsContent>
 					</Tabs>
 				</div>
-			</div>
+			</section>
 		</div>
 	)
 }

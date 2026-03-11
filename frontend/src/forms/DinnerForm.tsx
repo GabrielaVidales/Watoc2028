@@ -272,8 +272,6 @@ function DinnerForm() {
                                                         const newValue = checked
                                                             ? [...field.value, task.value]
                                                             : field.value.filter((value) => value !== task.value)
-                                                        console.log(newValue);
-
                                                         field.onChange(newValue)
                                                     }}
                                                 />

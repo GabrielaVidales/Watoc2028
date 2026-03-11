@@ -73,10 +73,7 @@ function App() {
 
 					{/* Rutas protegidas van aquí */}
 					<Route element={<ProtectedRoute allowedRoles={['admin', 'participant']} />} >
-						<Route path='/success' element={<SuccessRegisterPage />} />
 						<Route element={<AuthLayout />}>
-
-							<Route path='/test' element={<Test />} />
 							<Route path={urls.users.profile} element={<UserProfile />} />
 							<Route path={urls.users.viewAbstracts} element={<ViewAbstracts />} />
 							<Route path={urls.users.editAbstract.url} element={<EditAbstractPage />} />

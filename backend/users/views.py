@@ -1,6 +1,7 @@
 from django.db import transaction
 from rest_framework import permissions, status
 from rest_framework.decorators import action
+from rest_framework.filters import SearchFilter
 from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.request import Request
@@ -11,8 +12,8 @@ from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth.models import update_last_login
 from django.conf import settings
-from .serializers import UserSerializer, AbstractSerializer, ParticipantSerializer, AuthorSerializer, AuthorAffiliationSerializer, AbstractDeclarationsSerializer
-from .models import Abstract, Author, AuthorAffiliation, AbstractDeclarations
+from .serializers import UserSerializer, AbstractSerializer, ParticipantSerializer, AuthorSerializer, AuthorAffiliationSerializer, AbstractDeclarationsSerializer, AbstractSubmitSerializer, AuthorSubmitSerializer
+from .models import Abstract, AbstactStatus, Author, AuthorAffiliation, AbstractDeclarations
 from django.http import HttpResponse
 from django.template.loader import render_to_string
 from weasyprint import HTML, CSS
@@ -26,6 +27,8 @@ class UserView(ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
     parser_classes = (MultiPartParser, FormParser, JSONParser)
+    filter_backends = [SearchFilter]
+    search_fields = ['first_name', 'last_name', 'email']
 
     def get_permissions(self):
         if self.action == "create":
@@ -201,7 +204,7 @@ class LogoutView(APIView):
 class AbstractView(ModelViewSet):
     queryset = Abstract.objects.all()
     serializer_class = AbstractSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.AllowAny]
 
     @action(detail=True, methods=["get"], url_path="affiliations")
     def get_affiliations(self, request, pk=None):
@@ -283,6 +286,16 @@ class AbstractView(ModelViewSet):
             'affiliations_list': context['affiliations_list'],
         })    
 
+    @action(detail=True, methods=["post"], url_path="submit")
+    def subtmit_abstract(self, request, pk=None):
+        abstract = self.get_object()        
+        
+        validator = AbstractSubmitSerializer(abstract)
+        validator.validate()
+        
+        abstract.status = AbstactStatus.SUBMITTED
+        abstract.save()
+        return Response()
 
     def get_abstract_context(self, abstract):
         authors_data = []
@@ -290,7 +303,6 @@ class AbstractView(ModelViewSet):
         unique_affiliations = []
 
         counter = 1
-
         for author in abstract.authors.all():
             aff = author.affiliation
             aff_id = aff.id if aff else None
@@ -303,14 +315,12 @@ class AbstractView(ModelViewSet):
                     }
                 )
                 counter += 1
-
             authors_data.append(
                 {
                     "full_name": f"{author.first_name[0]}. {author.last_name}",
                     "aff_index": affiliations_set.get(aff_id),
                 }
             )
-
         return {
             "abstract": abstract,
             "authors_list": authors_data,

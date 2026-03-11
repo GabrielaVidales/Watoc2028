@@ -5,14 +5,13 @@ from django.conf.urls.static import static
 
 
 urlpatterns = [
-    # URL trampa para que los bots
+    # URL trampa para que los bots boteen
     path('admin/', include('admin_honeypot.urls', namespace='admin_honeypot')),
     # URL secreta, la verdadera
     path('admin-watoc/', admin.site.urls),
 
     path('api/', include('users.urls')),
     path('api/', include('contact_requests.urls')),
-    path('api/', include('printpdf.urls')),
 ]
 
 # Esto permite a Django servir las imágenes en modo DEBUG (desarrollo)

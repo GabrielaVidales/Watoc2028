@@ -18,7 +18,7 @@ function StepperLabel({
     return (
         <div
             className={cn(
-                'flex flex-1 flex-col gap-2 p-2',
+                'flex flex-1 flex-col gap-2 py-2',
                 completed ? 'text-primary-main' : 'text-gray-400',
                 className
             )}

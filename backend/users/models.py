@@ -78,23 +78,37 @@ class Dinner(models.Model):
 
 
 class Abstract(models.Model):
-    class Meta:
-        db_table = "abstract"
-        db_table_comment = "Contenido de los abstracts guardados."
-        ordering = ["-created_at"]
-        get_latest_by = "last_update"
-
-    title = models.CharField(db_column="title", verbose_name="Título", max_length=128, blank=True)
-    text = models.TextField(db_column="text", verbose_name="Texto", blank=True)
-    references = models.TextField(db_column="references", verbose_name="Referencias", blank=True)
-    user = models.ForeignKey(User, on_delete=models.SET_NULL, related_name="abstracts", null=True)
+    title = models.CharField(
+        db_column="title",
+        verbose_name="Título",
+        max_length=128,
+        blank=True,
+    )
+    text = models.TextField(
+        db_column="text",
+        verbose_name="Texto",
+        blank=True,
+    )
+    references = models.TextField(
+        db_column="references",
+        verbose_name="Referencias",
+        blank=True,
+    )
+    user = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        related_name="abstracts",
+        null=True,
+    )
     presentation_type = models.CharField(
+        max_length=10,
         db_column="presentation",
         verbose_name="Tipo de presentación",
         choices=AbstractPresentation.choices,
         default=AbstractPresentation.NOT_SET,
     )
     status = models.CharField(
+        max_length=16,
         db_column="status",
         verbose_name="Estado del abstract",
         choices=AbstactStatus.choices,
@@ -117,6 +131,12 @@ class Abstract(models.Model):
         blank=True,
     )
 
+    class Meta:
+        db_table = "abstract"
+        db_table_comment = "Contenido de los abstracts guardados."
+        ordering = ["-created_at"]
+        get_latest_by = "last_update"
+
     def __str__(self):
         truncated_title = (self.title[:47] + "...") if len(self.title) > 50 else self.title
         username = self.user.email if self.user else "Sin Autor"
@@ -128,7 +148,7 @@ class AuthorAffiliation(models.Model):
     department = models.CharField(max_length=100, blank=True)
     nationality = models.CharField(max_length=5, choices=Nationality.choices, default=Nationality.MEXICO)
     city = models.CharField(max_length=30, blank=False, default="")
-    
+
     abstract = models.ForeignKey(
         Abstract,
         on_delete=models.CASCADE,
@@ -136,16 +156,13 @@ class AuthorAffiliation(models.Model):
         db_column="abstract",
         null=True,
     )
-    
 
 
 class Author(models.Model):
-    first_name = models.CharField(null=False, blank=True)
-    last_name = models.CharField(null=False, blank=True)
+    first_name = models.CharField(null=False, blank=True, max_length=128)
+    last_name = models.CharField(null=False, blank=True, max_length=128)
     email = models.EmailField(blank=True)
-
     order = models.PositiveSmallIntegerField(db_column="order", null=False)
-    is_corresponding = models.BooleanField(db_column="is_corresponding", default=False)
     abstract = models.ForeignKey(
         Abstract,
         on_delete=models.CASCADE,
@@ -159,10 +176,9 @@ class Author(models.Model):
 
     class Meta:
         ordering = ["order"]
-        unique_together = ("abstract", "order")
 
     def __str__(self):
-        return f'{self.first_name} {self.last_name} ({self.email})'
+        return f"{self.first_name} {self.last_name} ({self.email})"
 
 
 class AbstractDeclarations(models.Model):
@@ -197,3 +213,4 @@ class AbstractDeclarations(models.Model):
         verbose_name="No AI Tools Used",
         help_text="I herewith confirm that the abstract was prepared without using the aid of AI tools (such as, but not limited to, ChatGPT).",
     )
+

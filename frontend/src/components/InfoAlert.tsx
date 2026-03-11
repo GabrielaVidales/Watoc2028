@@ -3,6 +3,7 @@ import { Alert, AlertDescription, AlertTitle } from "./ui/alert";
 import { cn } from "@/lib/utils";
 import { AlertCircleIcon } from "lucide-react";
 
+
 type AlertVariant = 'info' | 'warning' | 'destructive' | 'success' | 'custom';
 
 const variantStyles: Record<AlertVariant, string> = {

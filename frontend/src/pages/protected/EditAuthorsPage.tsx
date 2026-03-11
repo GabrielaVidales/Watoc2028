@@ -3,9 +3,9 @@ import { type AuthorSchema } from '@/schemas/abstract-schemas'
 import React, { useEffect, useState } from 'react'
 import { useParams } from 'react-router'
 import { Button } from '@/components/ui/button'
-import { ChevronLeft, ChevronRight, Hand, Menu, PencilLine, Plus, Save, Trash, TriangleAlert, User2 } from 'lucide-react'
+import { AlertTriangle, ChevronLeft, ChevronRight, Hand, Menu, PencilLine, Plus, Save, Trash, TriangleAlert, User2 } from 'lucide-react'
 import { Reorder } from 'motion/react'
-import { AlertDialog, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, } from "@/components/ui/alert-dialog"
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogMedia, AlertDialogTitle, } from "@/components/ui/alert-dialog"
 import { isAxiosError } from 'axios'
 import { Spinner } from '@/components/ui/spinner'
 import AddOrEditAuthorDialog from '@/forms/wrappers/AddOrEditAuthorDialog'
@@ -13,6 +13,7 @@ import { useMutation } from '@/hooks/use-mutation'
 import { InfoAlert } from '@/components/InfoAlert'
 import type { EditAbstractCallbacks } from './EditAbstractPage'
 import { Separator } from '@/components/ui/separator'
+import { useHeader } from '@/contexts/HeaderContext'
 
 
 function EditAuthorsPage({ onStepBack, onStepForward }: EditAbstractCallbacks) {
@@ -69,6 +70,7 @@ function EditAuthorsPage({ onStepBack, onStepForward }: EditAbstractCallbacks) {
             })
             await fetchAuthors()
             setOriginalAuthors(authors)
+
         } catch (error) {
             if (import.meta.env.DEV) {
                 if (isAxiosError(error)) {
@@ -79,9 +81,19 @@ function EditAuthorsPage({ onStepBack, onStepForward }: EditAbstractCallbacks) {
     }
     // #endregion
 
+    const [openInvalid, setOpenInvalid] = useState(false)
+    const onValidate = async () => {
+        const valid = authors.length > 0
+        if (!valid) {
+            setOpenInvalid(true)
+            return
+        }
+        onStepForward?.()
+    }
+
     return (
         <div className='w-full space-y-5 p-5'>
-            <h2 className='text-2xl font-semibold'>Abstract Submission</h2>
+            <h2 className='text-2xl font-semibold'>Authors List</h2>
 
             <div className='space-y-5'>
                 <InfoAlert
@@ -130,8 +142,6 @@ function EditAuthorsPage({ onStepBack, onStepForward }: EditAbstractCallbacks) {
                                         <Button variant='ghost' className='size-8 border-2 border-primary-main' onClick={() => {
                                             setOpen(true)
                                             setAuthorIdToEdit(item.id)
-                                            console.log(item);
-
                                         }}>
                                             <PencilLine className='shrink-0 size-5 stroke-primary-main' />
                                         </Button>
@@ -160,10 +170,7 @@ function EditAuthorsPage({ onStepBack, onStepForward }: EditAbstractCallbacks) {
                 </Reorder.Group>
 
                 <fieldset disabled={loading} className='flex items-center justify-center'>
-                    <Button type='button' onClick={() => {
-                        setOpen(true)
-                        setAuthorIdToEdit(null)
-                    }}>
+                    <Button type='button' onClick={() => { setOpen(true) }}>
                         <Plus data-icon="inline-start" />
                         Add Author
                     </Button>
@@ -174,6 +181,10 @@ function EditAuthorsPage({ onStepBack, onStepForward }: EditAbstractCallbacks) {
                         open={open}
                         setOpen={setOpen}
                         author={authors?.find(x => x.id === authorIdToEdit)}
+                        onClose={() => {
+                            setAuthorIdToDelete(0)
+                            setAuthorIdToEdit(0)
+                        }}
                         onSubmit={async () => {
                             setAuthorIdToDelete(0)
                             setAuthorIdToEdit(0)
@@ -221,11 +232,41 @@ function EditAuthorsPage({ onStepBack, onStepForward }: EditAbstractCallbacks) {
                         Save Changes
                     </Button>
 
-                    <Button type='button' onClick={onStepForward}>
+                    <Button type='button' onClick={onValidate}>
                         Next <ChevronRight />
                     </Button>
                 </fieldset>
             </div>
+
+            <AlertDialog open={openInvalid} onOpenChange={setOpenInvalid}>
+                <AlertDialogContent size="sm">
+                    <AlertDialogHeader>
+                        <AlertDialogMedia className="bg-destructive/10 text-destructive dark:bg-destructive/20 dark:text-destructive">
+                            <AlertTriangle />
+                        </AlertDialogMedia>
+                        <AlertDialogTitle>
+                            Some information is incomplete
+                        </AlertDialogTitle>
+                        <AlertDialogDescription className='text-balance'>
+                            Your abstract contains fields that do not meet the submission requirements.
+                        </AlertDialogDescription>
+                        <AlertDialogDescription className='text-balance'>
+
+                            You may continue to the next step, but these issues must be resolved before
+                            the final submission.
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+
+                    <AlertDialogFooter>
+                        <AlertDialogCancel>
+                            Go Back and Fix
+                        </AlertDialogCancel>
+                        <AlertDialogAction variant='destructive' onClick={onStepForward}>
+                            Continue Anyway
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
         </div>
     )
 }
