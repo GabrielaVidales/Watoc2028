@@ -10,7 +10,6 @@
     box-sizing: border-box;
     cursor: pointer;
 
-    padding: 1.5em;
     min-width: 250px;
     height: calc(var(--dropzone-height));
     color: var(--dropzone-primary-color);

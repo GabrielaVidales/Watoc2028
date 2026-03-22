@@ -71,7 +71,6 @@ export function UserPictureForm() {
                                             })
                                         })
                                     }}
-                                    value={field.value as File}
                                 />
                             </FieldContent>
                             {field.value && (

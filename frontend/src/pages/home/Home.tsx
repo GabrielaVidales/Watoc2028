@@ -8,6 +8,7 @@ import { HeroSection } from '@/components/HeroSection'
 import VenueSection from './sections/VenueSection'
 import WelcomeSection from './sections/WelcomeSection'
 import { HomeHeroContent } from './components/HomeHeroContent'
+import { urls } from '@/routes/routes'
 
 export const MainCTA = () => (
     <GenericCTASection>
@@ -24,7 +25,7 @@ export const MainCTA = () => (
                 spacing={2}
                 sx={{ mt: 3 }}
             >
-                <Link to='/register'>
+                <Link to={urls.auth.register}>
                     <Button
                         variant="contained"
                         size="large"

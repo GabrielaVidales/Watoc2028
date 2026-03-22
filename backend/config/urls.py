@@ -12,6 +12,8 @@ urlpatterns = [
 
     path('api/', include('users.urls')),
     path('api/', include('contact_requests.urls')),
+    
+    path('api/payments/', include('payments.urls')),
 ]
 
 # Esto permite a Django servir las imágenes en modo DEBUG (desarrollo)

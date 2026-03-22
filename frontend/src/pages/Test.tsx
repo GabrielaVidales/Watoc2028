@@ -57,9 +57,75 @@ export default function Test() {
         <>
             <div className='w-full max-w-5xl grid grid-cols-1 gap-3 p-3 mx-auto'>
                 <div className='w-full bg-background border-2 p-3 rounded-lg shadow-lg flex flex-col gap-5'>
+                    <ComboboxMultiple />
                 </div>
             </div>
         </>
     )
 }
 
+import {
+    Combobox,
+    ComboboxChip,
+    ComboboxChips,
+    ComboboxChipsInput,
+    ComboboxContent,
+    ComboboxEmpty,
+    ComboboxItem,
+    ComboboxList,
+    ComboboxValue,
+    useComboboxAnchor,
+} from "@/components/ui/combobox"
+import { useFetch } from '@/hooks/use-fetch'
+import type { Tour } from '@/data/tours-data'
+
+const frameworks = [
+    "Next.js",
+    "SvelteKit",
+    "Nuxt.js",
+    "Remix",
+    "Astro",
+] as const
+
+export function ComboboxMultiple() {
+    const anchor = useComboboxAnchor()
+
+
+    const {
+        data: tours,
+        fetching: loading
+    } = useFetch<Tour[]>('/tours')
+
+
+    return (
+        <Combobox
+            multiple
+            autoHighlight
+            items={tours}
+            defaultValue={[]}
+        >
+            <ComboboxChips ref={anchor} className="w-full max-w-xs">
+                <ComboboxValue>
+                    {(values) => (
+                        <React.Fragment>
+                            {values.map((value: string) => (
+                                <ComboboxChip key={value}>{value}</ComboboxChip>
+                            ))}
+                            <ComboboxChipsInput />
+                        </React.Fragment>
+                    )}
+                </ComboboxValue>
+            </ComboboxChips>
+            <ComboboxContent anchor={anchor}>
+                <ComboboxEmpty>No items found.</ComboboxEmpty>
+                <ComboboxList>
+                    {(item: Tour) => (
+                        <ComboboxItem key={item.id} value={item.name}>
+                            {item.name}
+                        </ComboboxItem>
+                    )}
+                </ComboboxList>
+            </ComboboxContent>
+        </Combobox>
+    )
+}

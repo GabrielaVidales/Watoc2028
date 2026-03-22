@@ -14,7 +14,7 @@ export const useFetch = <T>(url?: string | null) => {
         try {
             const res = await axiosClient.get<T>(url)
             setData(res.data)
-            setError(null)
+            setError(null)            
         } catch (error) {
             if (import.meta.env.DEV) {
                 if (isAxiosError(error)) {

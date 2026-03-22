@@ -27,7 +27,7 @@ export const foodAllergyList = [
     { value: 'other', label: 'Other' },
 ] as const;
 
-export const dietaryRestrictionsForm = z.object({
+export const dinnerAssistanceSchema = z.object({
     willAssistDinner: z.boolean()
         .nonoptional(),
 
@@ -80,4 +80,4 @@ export const dietaryRestrictionsForm = z.object({
 
 
 
-export type DietaryRestrictionsFormValues = z.infer<typeof dietaryRestrictionsForm>
+export type DietaryRestrictionsFormValues = z.infer<typeof dinnerAssistanceSchema>

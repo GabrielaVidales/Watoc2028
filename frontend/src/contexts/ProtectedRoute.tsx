@@ -3,6 +3,7 @@ import { useAuth } from './AuthContext';
 import LoadingPage from './LoadingPage';
 import { Navigate, Outlet } from 'react-router-dom';
 import type { UserRole } from '@/schemas/user-schemas';
+import { urls } from '@/routes/routes';
 
 type ProtectedRouteProps = React.PropsWithChildren & {
     allowedRoles?: UserRole[]
@@ -16,7 +17,7 @@ export function ProtectedRoute({ allowedRoles }: ProtectedRouteProps) {
     }
     
     if (!currentUser) {
-        return <Navigate to='/login' replace />
+        return <Navigate to={urls.auth.login} replace />
     }
         
     const authorized = currentUser?.roles.some(
@@ -24,7 +25,7 @@ export function ProtectedRoute({ allowedRoles }: ProtectedRouteProps) {
     )
     
     if (!authorized) {
-        return <Navigate to='/login' replace />
+        return <Navigate to={urls.auth.login} replace />
     }
 
     return <Outlet />;

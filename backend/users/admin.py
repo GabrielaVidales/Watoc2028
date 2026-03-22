@@ -1,11 +1,12 @@
 from django.contrib import admin
-from .models import User, Participant, Dinner, Abstract, Author, AuthorAffiliation, AbstractDeclarations
+from . import models
 
-admin.site.register(User)
-admin.site.register(Participant)
-admin.site.register(Dinner)
-admin.site.register(Abstract)
-admin.site.register(AuthorAffiliation)
-admin.site.register(Author)
-admin.site.register(AbstractDeclarations)
+admin.site.register(models.User)
+admin.site.register(models.Participant)
+admin.site.register(models.Dinner)
+admin.site.register(models.Abstract)
+admin.site.register(models.AuthorAffiliation)
+admin.site.register(models.Author)
+admin.site.register(models.AbstractDeclarations)
+admin.site.register(models.Tour)
 

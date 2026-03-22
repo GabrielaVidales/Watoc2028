@@ -5,13 +5,10 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-# SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv("DEBUG", "False") == "True"
 
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.getenv("SECRET_KEY")
 
 ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS").split(",")
@@ -47,6 +44,7 @@ INSTALLED_APPS = [
     "users",
     "contact_requests",
     "admin_honeypot",
+    "payments",
 ]
 
 REST_FRAMEWORK = {
@@ -191,3 +189,8 @@ CSRF_COOKIE_SECURE = False
 SESSION_EXPIRE_AT_BROWSER_CLOSE = False
 SESSION_SAVE_EVERY_REQUEST = True
 SESSION_ENGINE = 'django.contrib.sessions.backends.db'
+
+
+STRIPE_SECRET_KEY = os.getenv("STRIPE_SECRET_KEY", "invalid key")
+STRIPE_PUBLISHABLE_KEY  = os.getenv("STRIPE_PUBLISHABLE_KEY", "invalid key")
+DOMAIN  = os.getenv("DOMAIN", "invalid domain")

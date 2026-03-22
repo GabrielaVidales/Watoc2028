@@ -12,8 +12,8 @@ from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth.models import update_last_login
 from django.conf import settings
-from .serializers import UserSerializer, AbstractSerializer, ParticipantSerializer, AuthorSerializer, AuthorAffiliationSerializer, AbstractDeclarationsSerializer, AbstractSubmitSerializer, AuthorSubmitSerializer
-from .models import Abstract, AbstactStatus, Author, AuthorAffiliation, AbstractDeclarations
+from .serializers import UserSerializer, AbstractSerializer, ParticipantSerializer, AuthorSerializer, AuthorAffiliationSerializer, AbstractDeclarationsSerializer, AbstractSubmitSerializer, TourSerializer
+from .models import Abstract, AbstactStatus, Author, AuthorAffiliation, AbstractDeclarations, Tour
 from django.http import HttpResponse
 from django.template.loader import render_to_string
 from weasyprint import HTML, CSS
@@ -344,3 +344,10 @@ class AuthorDeclarationsView(ModelViewSet):
     queryset = AbstractDeclarations.objects.all()
     serializer_class = AbstractDeclarationsSerializer
     permission_classes = [permissions.IsAuthenticated]
+
+
+class TourView(ModelViewSet):
+    queryset = Tour.objects.all()
+    serializer_class = TourSerializer
+    permission_classes = [permissions.AllowAny]
+    http_method_names = ['get']

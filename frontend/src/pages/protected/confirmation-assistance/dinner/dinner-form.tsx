@@ -4,15 +4,18 @@ import { Field, FieldContent, FieldDescription, FieldError, FieldGroup, FieldLab
 import { Input } from '@/components/ui/input'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { Spinner } from '@/components/ui/spinner'
-import { dietaryNeedsList, dietaryRestrictionsForm, foodAllergyList } from '@/schemas/dinner- schema'
+import { dietaryNeedsList, dinnerAssistanceSchema, foodAllergyList } from '@/schemas/dinner- schema'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Save } from 'lucide-react'
 import { Controller, useForm } from 'react-hook-form'
 import React, { useEffect } from 'react'
+import { useRegistrationStore } from '@/data/store'
+import { useNavigate } from 'react-router'
+import { urls } from '@/routes/routes'
 
 function DinnerForm() {
-    const { handleSubmit, watch, getValues, formState, control } = useForm({
-        resolver: zodResolver(dietaryRestrictionsForm),
+    const { handleSubmit, watch, getValues, reset, formState, control } = useForm({
+        resolver: zodResolver(dinnerAssistanceSchema),
         mode: 'onSubmit',
         defaultValues: {
             dietaryNeeds: [],
@@ -29,7 +32,7 @@ function DinnerForm() {
         if (import.meta.env.DEV) {
             console.log(data);
         }
-
+        setData({ dinner: data })
     }, async (invalid) => {
         if (import.meta.env.DEV) {
             console.log(invalid);
@@ -42,6 +45,21 @@ function DinnerForm() {
     const restrictions = watch('dietaryNeeds')
     const hasFoodAllergy = watch('hasFoodAllergy')
     const allergies = watch('foodAllergies')
+
+
+    const navigate = useNavigate()
+    const { dinner, fee, setData } = useRegistrationStore()
+    useEffect(() => {
+        if (!useRegistrationStore.persist.hasHydrated) return
+        if (!fee) {
+            navigate(urls.users.confirmAssistance.fee)
+            return
+        }
+        else if (dinner) {
+            reset(dinner)
+        }
+    }, [useRegistrationStore.persist.hasHydrated, dinner])
+
 
     return (
         <form onSubmit={onFormSubmit} id='dinner-form'>
@@ -69,18 +87,21 @@ function DinnerForm() {
                                     title: 'No, I will not attend',
                                     value: false
                                 }].map((plan) => (
-                                    <FieldLabel key={plan.id} htmlFor={`${field.name}-${plan.id}`} className='cursor-pointer'>
-                                        <Field orientation="horizontal" data-invalid={fieldState.invalid}>
-                                            <RadioGroupItem
-                                                value={`${plan.value}`}
-                                                id={`${field.name}-${plan.id}`}
-                                                aria-invalid={fieldState.invalid}
-                                            />
-                                            <FieldContent>
-                                                <FieldTitle>{plan.title}</FieldTitle>
-                                            </FieldContent>
-                                        </Field>
-                                    </FieldLabel>
+                                    <Field
+                                        key={plan.id}
+                                        orientation="horizontal"
+                                        data-invalid={fieldState.invalid}
+                                        className='gap-x-3 pl-3 rounded-md border border-transparent hover:bg-black/5 hover:border-input/50'
+                                    >
+                                        <RadioGroupItem
+                                            value={`${plan.value}`}
+                                            id={`${field.name}-${plan.id}`}
+                                            aria-invalid={fieldState.invalid}
+                                        />
+                                        <FieldLabel htmlFor={`${field.name}-${plan.id}`} className='p-2 cursor-pointer'>
+                                            <FieldTitle>{plan.title}</FieldTitle>
+                                        </FieldLabel>
+                                    </Field>
                                 ))}
                             </RadioGroup>
                             {fieldState.invalid && <FieldError errors={[fieldState.error]} />}

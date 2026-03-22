@@ -1,10 +1,11 @@
 import { Button } from '@/components/ui/button'
-import LoginForm from '../forms/LoginForm'
 import { Card, CardContent } from "@/components/ui/card"
 import { Link } from 'react-router'
 import { ClipboardSignature, CheckCircle2, SquareUserRound } from 'lucide-react'
 import { useHeader } from '@/contexts/HeaderContext'
 import { useEffect } from 'react'
+import { urls } from '@/routes/routes'
+import LoginForm from '@/forms/LoginForm'
 
 
 export default function LoginPage() {
@@ -67,7 +68,7 @@ export default function LoginPage() {
 									</ul>
 								</div>
 
-								<Link to='/register'>
+								<Link to={urls.auth.register}>
 									<Button className='w-full py-5 text-xl font-bold gap-3 shadow-lg'>
 										Join WATOC now
 									</Button>

@@ -9,7 +9,7 @@ const navigation = {
         { label: "What's WATOC?", href: '/watoc' },
         { label: 'Abstract Submission', href: '/abstract-submission' },
         { label: 'Visa Requirements', href: '/visa' },
-        { label: 'Registration', href: '/register' },
+        { label: 'Registration', href: urls.auth.register },
     ],
     venue: [
         { label: 'Venue Information', href: '/venue' },

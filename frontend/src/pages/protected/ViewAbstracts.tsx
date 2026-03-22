@@ -23,7 +23,7 @@ function ViewAbstracts() {
     const handleCreate = async () => {
         try {
             const response = await axiosClient.post<AbstractSchema>('abstracts/')
-            navigate(urls.users.editAbstract.build(response.data.id))
+            navigate(urls.users.editAbstract.build({ id: response.data.id }))
         } catch (error) {
             if (import.meta.env.DEV) {
                 if (isAxiosError(error)) {
@@ -45,6 +45,9 @@ function ViewAbstracts() {
             }
         }
     }
+
+    console.log(typeof urls.users.previewAbstract.build);
+    
 
 
     type Author = {
@@ -146,7 +149,7 @@ function ViewAbstracts() {
                                 <CardHeader className="flex flex-col-reverse items-stretch  sm:flex-row sm:items-start sm:justify-between   gap-4">
                                     <CardTitle className="text-lg font-semibold leading-tight">
                                         {abstract.title ? (
-                                            <Link to={urls.users.previewAbstract.build(abstract.id)} className="block hover:underline">
+                                            <Link to={urls.users.previewAbstract.build({ id: 22 })} className="block hover:underline">
                                                 <BookType className="inline-block mr-2 mb-1 shrink-0 size-5" />
                                                 {abstract.title}
                                             </Link>
@@ -203,20 +206,20 @@ function ViewAbstracts() {
                                     </div>
 
                                     <div className="flex items-center ml-auto gap-2">
-                                        <Button variant="outline" size="sm" onClick={() => navigate(urls.users.previewAbstract.build(abstract.id))}>
+                                        <Button variant="outline" size="sm" onClick={() => navigate(urls.users.previewAbstract.build({ id: abstract.id }))}>
                                             <Search className="size-4" />
                                             <span className="max-sm:hidden">Preview</span>
                                         </Button>
 
                                         {abstract.status !== 'submitted' && (
-                                            <Button variant="outline" size="sm" onClick={() => navigate(urls.users.editAbstract.build(abstract.id))}>
+                                            <Button variant="outline" size="sm" onClick={() => navigate(urls.users.editAbstract.build({ id: abstract.id }))}>
                                                 <Pencil className="size-4" />
                                                 <span className="max-sm:hidden">Edit</span>
                                             </Button>
                                         )}
 
                                         {abstract.status !== 'submitted' && (
-                                            <Button variant="outline" size="sm" onClick={() => navigate(urls.users.editAbstract.build(abstract.id) + '?action=submit')}>
+                                            <Button variant="outline" size="sm" onClick={() => navigate(urls.users.editAbstract.build({ id: abstract.id }) + '?action=submit')}>
                                                 <Send className="size-4" />
                                                 <span className="max-sm:hidden">Submit</span>
                                             </Button>

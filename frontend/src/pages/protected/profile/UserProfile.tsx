@@ -3,18 +3,15 @@ import { useAuth, type UserProfile } from '@/contexts/AuthContext'
 import React from 'react'
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import {  Calendar, Mail, MapPin, UserRoundPen, House, Image, LockKeyhole, LogOut, Clock, FileText, CreditCard, Wallet } from "lucide-react";
+import { Calendar, Mail, MapPin, UserRoundPen, House, Image, LockKeyhole, LogOut, Clock, FileText } from "lucide-react";
 import { formatDate } from '@/utils/formatDate';
-import 'react-image-crop/dist/ReactCrop.css';
 import { UserPictureForm } from '@/forms/UserPictureForm';
-import {  NavLink } from 'react-router';
+import { NavLink } from 'react-router';
 import ChangePasswordForm from '@/forms/ChangePasswordForm';
 import EditUserForm from '@/forms/EditUserForm';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import DinnerForm from '@/forms/DinnerForm';
 import { urls } from '@/routes/routes';
 import { useProfiles } from '@/hooks/use-profiles';
-import { Badge } from '@/components/ui/badge';
 import { InfoAlert } from '@/components/InfoAlert';
 
 
@@ -109,29 +106,47 @@ export default function UserProfile() {
 							</TabsTrigger>
 						</TabsList>
 						<TabsContent value='home' className='w-full p-9 space-y-8 px-5 sm:px-9'>
-							<section className="space-y-5">
-								<h2 className='text-2xl font-semibold'>
-									Welcome to the World Association of Theoretical and Computational Chemists Registration Portal
+							<section className="space-y-2">
+								<h2 className="text-2xl font-semibold">
+									Welcome back
 								</h2>
-								<div className='h-0.75 w-20 mx-auto mb-6 mt-4 bg-primary-main' />
-								<p className='text-sm'>
-									You are now logged in to your personal congress account. From this page you can:
+								<p className="text-muted-foreground text-sm">
+									Manage your registration and abstract submissions for WATOC 2028.
 								</p>
-								<ul className='list-disc text-sm pl-4 pr-8 space-y-2'>
-									<li>
-										<b>Register as a delegate:</b> complete your registration for the congress and select any additional options.
-									</li>
-									<li>
-										<b>Submit an abstract</b>: start a new submission or continue working on an existing one.
-									</li>
-								</ul>
-								<p className='text-sm'>
-									Please note that submitting an abstract does not automatically register you for the congress.
+							</section>
+							<div className="flex items-center justify-between rounded-lg border p-4">
+								<div className="space-y-1">
+									<p className="font-medium">Complete your registration</p>
+									<p className="text-sm text-muted-foreground">
+										Confirm your attendance and finish your payment.
+									</p>
+								</div>
+
+								<Button asChild>
+									<NavLink to={urls.users.confirmAssistance.start}>
+										Start
+									</NavLink>
+								</Button>
+							</div>
+
+
+							<section className='space-y-4'>
+								<h2 className='text-2xl font-semibold text-primary-main'>Registration</h2>
+								<p>
+									<b>Confirm your assistance to WATOC 2028:</b> complete your registration for the congress and finish your payment.
 								</p>
+								<Button className="w-full px-5 sm:w-auto font-bold rounded-full" asChild>
+									<NavLink to={urls.users.confirmAssistance.start}>
+										Start Registration
+									</NavLink>
+								</Button>
 							</section>
 
 							<section className="space-y-4">
 								<h2 className='text-2xl font-semibold text-primary-main'>Abstract submission</h2>
+								<p>
+									<b>Submit an abstract</b>: start a new submission or continue working on an existing one.
+								</p>
 								<InfoAlert
 									title="Abstract submission deadline: June 1, 2027"
 									messages={[
@@ -145,57 +160,13 @@ export default function UserProfile() {
 									icon={<Clock />}
 								/>
 
-								<div className='flex justify-end'>
-									<Button className="w-full sm:w-auto font-bold" asChild>
-										<NavLink to={urls.users.viewAbstracts}>
-											<FileText className="mr-2 size-4" />
-											View My Submissions
-										</NavLink>
-									</Button>
-								</div>
+								<Button className="w-full px-5 sm:w-auto font-bold rounded-full" asChild>
+									<NavLink to={urls.users.viewAbstracts}>
+										View My Submissions
+									</NavLink>
+								</Button>
 							</section>
 
-							{/* <section className="space-y-4">
-								<div className="flex items-center justify-between">
-									<h2 className='text-2xl font-semibold text-primary-main'>Congress Registration</h2>
-								</div>
-
-								<InfoAlert
-									variant='warning'
-									title="Early Bird Deadline: April 15, 2027"
-									messages={[
-										"Register now to take advantage of reduced fees and book social events.",
-										"Your registration includes access to all scientific sessions and coffee breaks.",
-									]}
-									icon={<CreditCard className="size-5" />}
-								/>
-
-								<div className='flex flex-col sm:flex-row justify-end gap-3'>
-									<Button className="w-full sm:w-auto font-bold bg-green-600 hover:bg-green-700 text-white" asChild>
-										<NavLink to={'#'}>
-											<Wallet className="mr-2 size-4" />
-											Complete Registration & Pay
-										</NavLink>
-									</Button>
-								</div>
-							</section> */}
-
-							{/* <section className="space-y-4">
-								<h2 className='text-2xl font-semibold text-primary-main'>Dietary Survey</h2>
-								<InfoAlert
-									variant='warning'
-									title="Attendance to Congress Dinner"
-									messages={[
-										<span className='text-slate-950'>
-											<b>Time: </b>19:00 - 22:00.
-										</span>,
-										<span className='text-slate-950'>
-											<b>Location: </b>Centro Internacional de Congresos, Mérida
-										</span>,
-									]}
-								/>
-								<DinnerForm />
-							</section> */}
 						</TabsContent>
 						<TabsContent value="account" className='w-full py-9 pt-4 space-y-5 px-5 sm:px-9'>
 							<h2 className='text-2xl font-semibold text-primary-main'>Edit your profile data</h2>

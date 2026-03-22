@@ -4,17 +4,16 @@ import { Route } from 'react-router'
 import { ProtectedRoute } from './contexts/ProtectedRoute'
 import { GuestRoute } from './contexts/GuestRoute'
 
-import LoginPage from './pages/LoginPage'
 import { ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
-import RegisterPage from './pages/RegisterPage'
+import RegisterPage from './pages/auth/register/RegisterPage'
 import Home from './pages/home/Home'
 import VenuePage from './pages/venue/VenuePage'
 import HotelBooking from './pages/hotelBooking/HotelBooking'
 import AbstractSubmissionInfo from './pages/abstractSubmission/AbstractSubmissionInfo'
 import AboutWATOC from './pages/aboutWATOC/AboutWATOC'
 import Contact from './pages/contact/Contact';
-import NotFound from './pages/error/NotFound';
+import NotFound from './pages/404/NotFound';
 import YoungWatoc from './pages/youngWATOC/YoungWatoc';
 import Restaurants from './pages/restaurants/RestaurantsPage';
 import Transportation from './pages/transportation/TransportationPage';
@@ -28,10 +27,17 @@ import AuthLayout from './layouts/AuthLayout'
 import DashboardLayout from './layouts/DashboardLayout'
 import CreateAbstractPage from './pages/protected/CreateAbstractPage'
 import { urls } from './routes/routes'
-import UserProfile from './pages/protected/UserProfile'
+import UserProfile from './pages/protected/profile/UserProfile'
 import ViewAbstracts from './pages/protected/ViewAbstracts'
 import EditAbstractPage from './pages/protected/EditAbstractPage'
 import AbstractPreview from './pages/protected/AbstractPreview'
+import ConfirmationPage from './pages/protected/confirmation-assistance/page'
+import PaymentSuccess from './pages/protected/success/payment-success'
+import { SelectFeePage } from './pages/protected/confirmation-assistance/fee/page'
+import { SelectTourPage } from './pages/protected/confirmation-assistance/tour/page'
+import { DinnerPage } from './pages/protected/confirmation-assistance/dinner/page'
+import ConfirmPaymentPage from './pages/protected/confirmation-assistance/payment/page'
+import LoginPage from './pages/auth/login/LoginPage'
 
 function App() {
 	const { pathname } = useLocation()
@@ -66,8 +72,8 @@ function App() {
 					{/* Rutas sólo para usuarios no loggeados */}
 					<Route element={<GuestRoute redirectTo={urls.users.profile} />}>
 						<Route element={<AuthLayout />}>
-							<Route path='/login' element={<LoginPage />} />
-							<Route path='/register' element={<RegisterPage />} />
+							<Route path={urls.auth.login} element={<LoginPage />} />
+							<Route path={urls.auth.register} element={<RegisterPage />} />
 						</Route>
 					</Route>
 
@@ -79,11 +85,21 @@ function App() {
 							<Route path={urls.users.editAbstract.url} element={<EditAbstractPage />} />
 							<Route path={urls.users.submitAbstract} element={<CreateAbstractPage />} />
 							<Route path={urls.users.previewAbstract.url} element={<AbstractPreview />} />
+
+							<Route path={urls.users.confirmAssistance.start} element={<ConfirmationPage />} />
+							<Route path={urls.users.confirmAssistance.fee} element={<SelectFeePage />} />
+							<Route path={urls.users.confirmAssistance.dinner} element={<DinnerPage />} />
+							<Route path={urls.users.confirmAssistance.tour} element={<SelectTourPage />} />
+							<Route path={urls.users.confirmAssistance.payment} element={<ConfirmPaymentPage />} />
+
+							{/* Confirmar pagos en stripe */}
+							<Route path={urls.payments.success} element={<PaymentSuccess />} />
 						</Route>
 					</Route>
 
 
 					{/* Para rutas diferentes */}
+					<Route path='test' element={<Test />} />
 					<Route path='*' element={<NotFound />} />
 				</Routes>
 			</ThemeProvider>

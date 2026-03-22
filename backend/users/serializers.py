@@ -342,3 +342,10 @@ class AuthorSubmitSerializer(serializers.ListSerializer):
         if not instance.abstract.authors.filter(pk=instance.pk).exist():
             raise serializers.ValidationError("Unrelated abstract data")
         return attrs
+
+
+"""TOURS DATA"""
+class TourSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.Tour
+        fields = "__all__"

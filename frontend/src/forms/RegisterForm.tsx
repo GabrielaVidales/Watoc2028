@@ -13,6 +13,7 @@ import axiosClient from '@/clients/axiosClient';
 import { InputGroup, InputGroupAddon, InputGroupInput } from '@/components/ui/input-group';
 import { Spinner } from '@/components/ui/spinner';
 import { Separator } from '@/components/ui/separator';
+import { urls } from '@/routes/routes';
 
 type TitleProps = {
     icon: React.ElementType
@@ -30,7 +31,6 @@ const Title = ({ icon: Icon, title }: TitleProps) => {
                 )}
                 <div className='text-xl font-semibold w-full'>{title}</div>
             </div>
-            {/* <div className='h-1 w-full mx-auto bg-primary-main rounded-full' /> */}
         </div>
     )
 }
@@ -68,7 +68,7 @@ export default function RegisterForm() {
                 keepIsValid: false,
                 keepValues: false,
             })
-            navigate('/login', { replace: true })
+            navigate(urls.auth.login, { replace: true })
         } catch (error) {
             if (import.meta.env.DEV) {
                 console.log(error.response);
