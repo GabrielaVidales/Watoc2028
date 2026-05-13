@@ -6,6 +6,9 @@ import { Textarea } from '@/components/ui/textarea'
 import { presentationTypes, type AbstractSchema } from '@/schemas/abstract-schemas'
 import { Controller, useFormContext } from 'react-hook-form'
 import { InfoAlert } from '@/components/InfoAlert'
+import { InputGroup, InputGroupAddon, InputGroupInput, InputGroupText, InputGroupTextarea } from '@/components/ui/input-group'
+import { useIsMobile } from '@/hooks/use-mobile'
+import { cn } from '@/lib/utils'
 
 
 type AbstractFormProps = {
@@ -14,6 +17,8 @@ type AbstractFormProps = {
 }
 
 function AbstractForm({ abstract }: AbstractFormProps) {
+    const mobile = useIsMobile()
+
     const { reset, control, watch, formState: { isSubmitting } } = useFormContext<AbstractSchema>()
 
     useEffect(() => {
@@ -35,20 +40,25 @@ function AbstractForm({ abstract }: AbstractFormProps) {
                     render={({ field, fieldState }) => (
                         <Field data-invalid={fieldState.invalid} className='w-full'>
                             <FieldLabel htmlFor={field.name}>Abstract title</FieldLabel>
-                            <Input
-                                {...field}
-                                id={field.name}
-                                aria-invalid={fieldState.invalid}
-                                placeholder="Your awesome title..."
-                                maxLength={128}
-                                autoComplete="off"
-                                className='h-12 text-xl! tracking-wide placeholder:font-normal'
-                            />
-                            <FieldContent>
-                                <span className='text-sm'>
-                                    <span className='font-medium'>Word count:</span> {countWords(titleContent)} / 10
-                                </span>
-                            </FieldContent>
+                            <InputGroup>
+                                <InputGroupInput
+                                    {...field}
+                                    id={field.name}
+                                    aria-invalid={fieldState.invalid}
+                                    maxLength={128}
+                                    autoComplete="off"
+                                    className='h-12 text-xl! tracking-wide placeholder:font-normal'
+                                />
+                                <InputGroupAddon align={mobile ? 'block-end' : "inline-end"}>
+                                    <InputGroupText className={mobile ? 'ml-auto' : "tabular-nums"}>
+                                        <FieldLabel htmlFor={field.name} className={cn(
+                                            countWords(field.value || "") > 10 && 'text-destructive'
+                                        )}>
+                                            {countWords(field.value || "")}/10 words
+                                        </FieldLabel>
+                                    </InputGroupText>
+                                </InputGroupAddon>
+                            </InputGroup>
                             {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                         </Field>
                     )}
@@ -94,22 +104,28 @@ function AbstractForm({ abstract }: AbstractFormProps) {
                     render={({ field, fieldState }) => (
                         <Field data-invalid={fieldState.invalid}>
                             <FieldLabel htmlFor={field.name}>Abstract text</FieldLabel>
-                            <Textarea
-                                {...field}
-                                id={field.name}
-                                aria-invalid={fieldState.invalid}
-                                autoComplete="off"
-                                autoCorrect="off"
-                                spellCheck="false"
-                                placeholder="Provide a concise summary of your work (max. 350 words)..."
-                                className="min-h-40 wrap-anywhere"
-                                maxLength={3500}
-                            />
-                            <FieldContent>
-                                <span className='text-sm'>
-                                    <span className='font-medium'>Word count:</span> {countWords(textContent)} / 350
-                                </span>
-                            </FieldContent>
+                            <InputGroup>
+                                <InputGroupTextarea
+                                    {...field}
+                                    id={field.name}
+                                    aria-invalid={fieldState.invalid}
+                                    autoComplete="off"
+                                    autoCorrect="off"
+                                    spellCheck="false"
+                                    placeholder="Provide a concise summary of your work (max. 350 words)..."
+                                    className="min-h-40 wrap-anywhere max-h-80"
+                                    maxLength={3500}
+                                />
+                                <InputGroupAddon align={"block-end"}>
+                                    <InputGroupText className={'ml-auto'}>
+                                        <FieldLabel htmlFor={field.name} className={cn(
+                                            countWords(field.value || "") > 350 && 'text-destructive'
+                                        )}>
+                                            {countWords(field.value || "")}/350 words
+                                        </FieldLabel>
+                                    </InputGroupText>
+                                </InputGroupAddon>
+                            </InputGroup>
                             {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                         </Field>
                     )}
@@ -128,22 +144,28 @@ function AbstractForm({ abstract }: AbstractFormProps) {
                     render={({ field, fieldState }) => (
                         <Field data-invalid={fieldState.invalid}>
                             <FieldLabel htmlFor={field.name}>References</FieldLabel>
-                            <Textarea
-                                {...field}
-                                id={field.name}
-                                aria-invalid={fieldState.invalid}
-                                autoComplete="off"
-                                autoCorrect="off"
-                                spellCheck="false"
-                                className="min-h-25 wrap-anywhere"
-                                placeholder="Enter your numbered references here (max. 150 words)..."
-                                maxLength={1500}
-                            />
-                            <FieldContent>
-                                <span className='text-sm'>
-                                    <span className='font-medium'>Word count:</span> {countWords(referencesContent)} / 150
-                                </span>
-                            </FieldContent>
+                            <InputGroup>
+                                <InputGroupTextarea
+                                    {...field}
+                                    id={field.name}
+                                    aria-invalid={fieldState.invalid}
+                                    autoComplete="off"
+                                    autoCorrect="off"
+                                    spellCheck="false"
+                                    placeholder="Provide a concise summary of your work (max. 350 words)..."
+                                    className="min-h-20 wrap-anywhere max-h-70"
+                                    maxLength={1500}
+                                />
+                                <InputGroupAddon align={"block-end"}>
+                                    <InputGroupText className={'ml-auto'}>
+                                        <FieldLabel htmlFor={field.name} className={cn(
+                                            countWords(field.value || "") > 150 && 'text-destructive'
+                                        )}>
+                                            {countWords(field.value || "")}/150 words
+                                        </FieldLabel>
+                                    </InputGroupText>
+                                </InputGroupAddon>
+                            </InputGroup>
                             {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                         </Field>
                     )}

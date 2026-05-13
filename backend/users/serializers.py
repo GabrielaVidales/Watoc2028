@@ -1,3 +1,5 @@
+from django.contrib.auth import password_validation
+from django.core import exceptions
 from django.contrib.auth.models import Group
 from django.contrib.auth import get_user_model
 from django.db import transaction
@@ -14,6 +16,7 @@ class ParticipantSerializer(serializers.ModelSerializer):
     abstracts = serializers.SerializerMethodField()
 
     class Meta:
+        db_table = "participants"
         model = models.Participant
         fields = (
             "affiliation",
@@ -28,10 +31,8 @@ class ParticipantSerializer(serializers.ModelSerializer):
 
 
 class UserSerializer(serializers.ModelSerializer):
-    participant = ParticipantSerializer(required=False)
-    photo = serializers.SerializerMethodField()
-
     class Meta:
+        db_table = "users"
         model = models.User
         fields = [
             "id",
@@ -71,6 +72,9 @@ class UserSerializer(serializers.ModelSerializer):
             "photo": {"required": False},
         }
 
+    participant = ParticipantSerializer(required=False)
+    photo = serializers.SerializerMethodField()
+
     def get_photo(self, obj):
         if not obj.photo:
             return None
@@ -91,6 +95,14 @@ class UserSerializer(serializers.ModelSerializer):
         if User.objects.filter(email__iexact=email).exclude(id=user_id).exists():
             raise serializers.ValidationError("This email is already registered.")
         return email
+
+    def validate_password(self, value):
+        try:
+            password_validation.validate_password(value)
+        except exceptions.ValidationError as e:
+            print(e.messages)
+            raise exceptions.ValidationError(list(e.messages))
+        return value
 
     @transaction.atomic
     def create(self, validated_data):
@@ -152,7 +164,9 @@ class AuthorAffiliationSerializer(serializers.ModelSerializer):
 
 class AuthorSerializer(serializers.ModelSerializer):
     affiliation = AuthorAffiliationSerializer(allow_null=True, required=False)
-    abstract_id = serializers.PrimaryKeyRelatedField(queryset=models.Abstract.objects.all(), source="abstract", write_only=True)
+    abstract_id = serializers.PrimaryKeyRelatedField(
+        queryset=models.Abstract.objects.all(), source="abstract", write_only=True
+    )
 
     class Meta:
         model = models.Author
@@ -277,7 +291,9 @@ class AbstractSerializer(serializers.ModelSerializer):
 
 
 class AbstractDeclarationsSerializer(serializers.ModelSerializer):
-    abstract_id = serializers.PrimaryKeyRelatedField(queryset=models.Abstract.objects.all(), source="abstract", write_only=True)
+    abstract_id = serializers.PrimaryKeyRelatedField(
+        queryset=models.Abstract.objects.all(), source="abstract", write_only=True
+    )
 
     class Meta:
         model = models.AbstractDeclarations
@@ -345,6 +361,8 @@ class AuthorSubmitSerializer(serializers.ListSerializer):
 
 
 """TOURS DATA"""
+
+
 class TourSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Tour

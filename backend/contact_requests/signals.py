@@ -35,7 +35,7 @@ def send_contact_email(sender, instance, created, **kwargs):
         -------------------------------------------------------
 
         MENSAJE DEL USUARIO:
-        "{instance.description}"
+        "{instance.message}"
 
         -------------------------------------------------------
         Saludos,

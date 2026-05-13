@@ -38,10 +38,5 @@ axiosClient.interceptors.response.use(
     }
 )
 
-function getCookie(name: string) {
-    var cookies = '; ' + document.cookie;
-    var splitCookie = cookies.split('; ' + name + '=');
-    if (splitCookie.length == 2) return splitCookie.pop();
-}
 
 export default axiosClient

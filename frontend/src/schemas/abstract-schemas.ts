@@ -78,7 +78,7 @@ export const abstractSchema = z.object({
 
     text: z.string()
         .refine((val) => countWords(val, 350), "Abstract must be at most 350 words")
-        .refine((val) => !countWords(val, 199), "Abstract must be at least 200 words")
+        .refine((val) => !countWords(val, 99), "Abstract must be at least 100 words")
         .default(''),
 
     authors: z.array(authorSchema)

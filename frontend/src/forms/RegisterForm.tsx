@@ -1,19 +1,24 @@
 import { Controller, useForm } from 'react-hook-form'
 import { useNavigate } from 'react-router'
 import { zodResolver } from '@hookform/resolvers/zod';
-import { prefixes, registrationSchema } from '@/schemas/user-schemas'
+import { prefixes, registrationSchema, type RegisterFormValues } from '@/schemas/user-schemas'
 import { countries } from '@/utils/countriesInfo'
 import { Field, FieldContent, FieldDescription, FieldError, FieldLabel, } from "@/components/ui/field"
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { KeySquare, Lock, Send, User } from 'lucide-react';
+import { Eye, EyeOff, KeySquare, Lock, Send, User } from 'lucide-react';
 import PasswordStrengthMeter from '@/components/PasswordStrengthMeter';
 import axiosClient from '@/clients/axiosClient';
-import { InputGroup, InputGroupAddon, InputGroupInput } from '@/components/ui/input-group';
+import { InputGroup, InputGroupAddon, InputGroupButton, InputGroupInput } from '@/components/ui/input-group';
 import { Spinner } from '@/components/ui/spinner';
 import { Separator } from '@/components/ui/separator';
 import { urls } from '@/routes/routes';
+import { AnimatePresence, motion } from 'motion/react';
+import { InfoAlert } from '@/components/InfoAlert';
+import { isAxiosError } from 'axios';
+import { scrollToElement } from '@/lib/utils';
+import { useMemo, useState } from 'react';
 
 type TitleProps = {
     icon: React.ElementType
@@ -25,8 +30,8 @@ const Title = ({ icon: Icon, title }: TitleProps) => {
         <div className='space-y-2'>
             <div className='flex items-center gap-3'>
                 {Icon && (
-                    <div className="size-10 flex justify-center items-center shrink-0 rounded-full bg-primary-main">
-                        <Icon className='text-primary-contrast size-6' />
+                    <div className="size-8 flex justify-center items-center shrink-0 rounded-full bg-primary-main">
+                        <Icon className='text-primary-contrast size-5' />
                     </div>
                 )}
                 <div className='text-xl font-semibold w-full'>{title}</div>
@@ -37,55 +42,108 @@ const Title = ({ icon: Icon, title }: TitleProps) => {
 
 export default function RegisterForm() {
     const navigate = useNavigate()
-    const { handleSubmit, reset, control, formState: { isValid, isSubmitting } } = useForm({
+
+    const {
+        handleSubmit,
+        setError,
+        clearErrors,
+        control,
+        formState: {
+            isValid,
+            isSubmitting,
+            errors,
+        }
+    } = useForm({
         resolver: zodResolver(registrationSchema),
-        defaultValues: registrationSchema.parse({}),
         mode: 'onChange',
     })
 
-    const onSubmit = handleSubmit(async (data) => {
-        const affiliation = data.affiliation
-        const job_title = data.job_title
-        const field_of_study = data.field_of_study
-
-        const payload = {
-            ...data,
-            email: data.email.value,
-            password: data.password.value,
-            participant: {
-                affiliation,
-                job_title,
-                field_of_study,
-            }
-        }
+    const onFormSubmit = handleSubmit(async (data) => {
         try {
-            const res = await axiosClient.post('/users/', payload)
-            if (import.meta.env.DEV) {
-                console.log(res.data);
-            }
-            reset(registrationSchema.parse({}), {
-                keepIsSubmitted: false,
-                keepIsValid: false,
-                keepValues: false,
-            })
-            navigate(urls.auth.login, { replace: true })
+            await axiosClient.post('/users/', data)
+            // navigate(urls.auth.login, { replace: true })
+
         } catch (error) {
-            if (import.meta.env.DEV) {
-                console.log(error.response);
+            if (isAxiosError(error)) {
+                if (import.meta.env.DEV) {
+                    console.log(error);
+                }
+                
+                const serverErrors = error.response.data
+                Object.keys(serverErrors).forEach((key) => {
+                    const fieldName = key as keyof RegisterFormValues
+                    const errorValue = serverErrors[fieldName]
+                    const schemaName =
+                        (fieldName === 'email') ? 'email.value' :
+                            (fieldName === 'password') ? 'password.value' : fieldName
+                    setError(schemaName, {
+                        type: "server",
+                        message: errorValue
+                    })
+                })
+                setError('root', {
+                    message: 'Registration failed. Please check your details and try again.',
+                    type: "custom",
+                })
+
+            } else {
+                setError('root', {
+                    message: 'Connection failed. Please try again later.',
+                    type: "custom",
+                })
             }
         }
     })
 
+    const [showPassword, setShowPassword] = useState(false);
+    const toggleVisibility = () => setShowPassword((show) => !show);
+
+    const countryItems = useMemo(() => countries.map(c => (
+        <SelectItem value={c.value as string} key={c.value}>
+            <img loading="lazy" width="20"
+                src={`https://flagcdn.com/w20/${c.value.toString().toLowerCase()}.png`}
+                srcSet={`https://flagcdn.com/w40/${c.value.toString().toLowerCase()}.png 2x`}
+                alt="" />
+            {c.label}
+        </SelectItem>
+    )), [countries])
+
     return (
-        <form action="#" onSubmit={onSubmit}>
-            <fieldset className='space-y-3' disabled={isSubmitting}>
-                <div className='flex flex-col gap-5 py-5'>
+        <form id='registration-form' onSubmit={onFormSubmit} onInput={() => clearErrors('root')}>
+            <AnimatePresence>
+                {errors.root && (
+                    <motion.div
+                        initial={{ opacity: 0, y: -10, height: 0 }}
+                        animate={{ opacity: 1, y: 0, height: 'auto' }}
+                        exit={{ opacity: 0, y: -10, height: 0 }}
+                        onAnimationComplete={() => {
+                            if (errors.root) {
+                                scrollToElement('registration-form', 175)
+                            }
+                        }}
+                        className="mb-4"
+                    >
+                        <InfoAlert
+                            variant='destructive'
+                            messages={[
+                                <span className='text-red-950'>
+                                    {errors.root.message}
+                                </span>
+                            ]}
+                            title='Server responded with an error:'
+                        />
+                    </motion.div>
+                )}
+            </AnimatePresence>
+            <fieldset className='space-y-5' disabled={isSubmitting}>
+                <div className='flex flex-col gap-5'>
                     <Title title='Personal Information' icon={User} />
 
                     <div className='grid grid-cols-1 sm:grid-cols-3 gap-5 justify-start items-start'>
                         <Controller
                             name="prefix"
                             control={control}
+                            defaultValue='Mr.'
                             render={({ field, fieldState }) => (
                                 <Field orientation="responsive" data-invalid={fieldState.invalid}>
                                     <FieldContent>
@@ -117,6 +175,7 @@ export default function RegisterForm() {
                         <Controller
                             name="first_name"
                             control={control}
+                            defaultValue=''
                             render={({ field, fieldState }) => (
                                 <Field data-invalid={fieldState.invalid}>
                                     <FieldLabel htmlFor={field.name}>
@@ -136,6 +195,7 @@ export default function RegisterForm() {
                         <Controller
                             name="last_name"
                             control={control}
+                            defaultValue=''
                             render={({ field, fieldState }) => (
                                 <Field data-invalid={fieldState.invalid}>
                                     <FieldLabel htmlFor={field.name}>
@@ -158,6 +218,7 @@ export default function RegisterForm() {
                         <Controller
                             name="nationality"
                             control={control}
+                            defaultValue=''
                             render={({ field, fieldState }) => (
                                 <Field orientation="responsive" data-invalid={fieldState.invalid}>
                                     <FieldContent>
@@ -178,18 +239,7 @@ export default function RegisterForm() {
                                             <SelectValue placeholder="Country..." />
                                         </SelectTrigger>
                                         <SelectContent position="item-aligned">
-                                            {countries.map(c => (
-                                                <SelectItem value={c.value as string} key={c.value}>
-                                                    <img
-                                                        loading="lazy"
-                                                        width="20"
-                                                        srcSet={`https://flagcdn.com/w40/${c.value.toString().toLowerCase()}.png 2x`}
-                                                        src={`https://flagcdn.com/w20/${c.value.toString().toLowerCase()}.png`}
-                                                        alt=""
-                                                    />
-                                                    {c.label}
-                                                </SelectItem>
-                                            ))}
+                                            {countryItems}
                                         </SelectContent>
                                     </Select>
                                     {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
@@ -199,6 +249,7 @@ export default function RegisterForm() {
                         <Controller
                             name="city"
                             control={control}
+                            defaultValue=''
                             render={({ field, fieldState }) => (
                                 <Field data-invalid={fieldState.invalid}>
                                     <FieldLabel htmlFor={field.name}>
@@ -218,18 +269,18 @@ export default function RegisterForm() {
                     </div>
                 </div>
 
-                <Separator className='bg-input' />
+                <Separator />
 
-                <div className='flex flex-col gap-5 py-5'>
+                <div className='flex flex-col gap-5'>
                     <Controller
                         name="affiliation"
                         control={control}
+                        defaultValue=''
                         render={({ field, fieldState }) => (
                             <Field data-invalid={fieldState.invalid} className='col-span-full'>
                                 <FieldLabel htmlFor={field.name}>
                                     Affiliation <div className="text-destructive">*</div>
                                 </FieldLabel>
-                                <FieldDescription>Name of your institution</FieldDescription>
                                 <Input
                                     {...field}
                                     id={field.name}
@@ -243,12 +294,12 @@ export default function RegisterForm() {
                     <Controller
                         name="job_title"
                         control={control}
+                        defaultValue=''
                         render={({ field, fieldState }) => (
                             <Field data-invalid={fieldState.invalid}>
                                 <FieldLabel htmlFor={field.name}>
                                     Job title <div className="text-destructive">*</div>
                                 </FieldLabel>
-                                <FieldDescription>Your current position or role</FieldDescription>
                                 <Input
                                     {...field}
                                     id={field.name}
@@ -262,12 +313,12 @@ export default function RegisterForm() {
                     <Controller
                         name="field_of_study"
                         control={control}
+                        defaultValue=''
                         render={({ field, fieldState }) => (
                             <Field data-invalid={fieldState.invalid}>
                                 <FieldLabel htmlFor={field.name}>
                                     Field of study <div className="text-destructive">*</div>
                                 </FieldLabel>
-                                <FieldDescription>The major or primary area of your degree.</FieldDescription>
                                 <Input
                                     {...field}
                                     id={field.name}
@@ -287,12 +338,12 @@ export default function RegisterForm() {
                         <Controller
                             name="email.value"
                             control={control}
+                            defaultValue=''
                             render={({ field, fieldState }) => (
                                 <Field data-invalid={fieldState.invalid}>
                                     <FieldLabel htmlFor={field.name}>
                                         Email address <div className="text-destructive">*</div>
                                     </FieldLabel>
-                                    <FieldDescription>This will be your login email</FieldDescription>
                                     <Input
                                         {...field}
                                         id={field.name}
@@ -308,6 +359,7 @@ export default function RegisterForm() {
                         <Controller
                             name="email.confirm"
                             control={control}
+                            defaultValue=''
                             render={({ field, fieldState }) => (
                                 <Field data-invalid={fieldState.invalid}>
                                     <FieldLabel htmlFor={field.name}>
@@ -327,52 +379,64 @@ export default function RegisterForm() {
                         />
                     </div>
 
-                    <Separator className='bg-input my-3' />
+                    <Separator />
 
                     <div className='grid grid-cols-1 sm:grid-cols-1 gap-5'>
                         <Controller
                             name="password.value"
                             control={control}
+                            defaultValue=''
                             render={({ field, fieldState }) => (
                                 <Field data-invalid={fieldState.invalid}>
                                     <FieldLabel htmlFor={field.name}>
                                         Password <div className="text-destructive">*</div>
                                     </FieldLabel>
-                                    <FieldDescription>Create a secure password</FieldDescription>
                                     <InputGroup>
                                         <InputGroupInput
                                             {...field}
                                             id={field.name}
                                             aria-invalid={fieldState.invalid}
                                             autoComplete="off"
-                                            type='password'
+                                            type={showPassword ? 'text' : 'password'}
                                             placeholder="**********"
                                         />
                                         <InputGroupAddon align="inline-start">
                                             <Lock />
                                         </InputGroupAddon>
+                                        <InputGroupAddon align="inline-end">
+                                            <InputGroupButton
+                                                title='toggle-visibility'
+                                                size='icon-xs'
+                                                onClick={toggleVisibility}
+                                            >
+                                                {showPassword ?
+                                                    <EyeOff className='shrink-0 size-5' /> :
+                                                    <Eye className='shrink-0 size-5' />
+                                                }
+                                            </InputGroupButton>
+                                        </InputGroupAddon>
                                     </InputGroup>
-                                    <PasswordStrengthMeter control={control} className='mt-2' />
                                     {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                                    <PasswordStrengthMeter control={control} className='mt-2' />
                                 </Field>
                             )}
                         />
                         <Controller
                             name="password.confirm"
                             control={control}
+                            defaultValue=''
                             render={({ field, fieldState }) => (
                                 <Field data-invalid={fieldState.invalid}>
                                     <FieldLabel htmlFor={field.name}>
                                         Confirm password <div className="text-destructive">*</div>
                                     </FieldLabel>
-                                    <FieldDescription>Re-enter your password</FieldDescription>
                                     <InputGroup>
                                         <InputGroupInput
                                             {...field}
                                             id={field.name}
                                             aria-invalid={fieldState.invalid}
                                             autoComplete="off"
-                                            type='password'
+                                            type={showPassword ? 'text' : 'password'}
                                             placeholder="Re-type your password"
                                         />
                                         <InputGroupAddon align="inline-start">
@@ -386,8 +450,7 @@ export default function RegisterForm() {
                     </div>
                 </div>
 
-
-                <fieldset className='flex flex-col items-center gap-3 w-full'>
+                <div className='flex flex-col items-center gap-3 w-full'>
                     <Button type='submit' className='p-5 text-xl' disabled={!isValid}>
                         {isSubmitting ? (
                             <Spinner data-icon="inline-start" />
@@ -396,7 +459,7 @@ export default function RegisterForm() {
                         )}
                         Create account
                     </Button>
-                </fieldset>
+                </div>
             </fieldset>
         </form>
     )

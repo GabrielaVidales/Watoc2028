@@ -1,4 +1,3 @@
-from django.db import transaction
 from rest_framework import permissions, status
 from rest_framework.decorators import action
 from rest_framework.filters import SearchFilter
@@ -12,11 +11,19 @@ from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth.models import update_last_login
 from django.conf import settings
-from .serializers import UserSerializer, AbstractSerializer, ParticipantSerializer, AuthorSerializer, AuthorAffiliationSerializer, AbstractDeclarationsSerializer, AbstractSubmitSerializer, TourSerializer
+from .serializers import (
+    UserSerializer,
+    AbstractSerializer,
+    ParticipantSerializer,
+    AuthorSerializer,
+    AuthorAffiliationSerializer,
+    AbstractDeclarationsSerializer,
+    AbstractSubmitSerializer,
+    TourSerializer,
+)
 from .models import Abstract, AbstactStatus, Author, AuthorAffiliation, AbstractDeclarations, Tour
 from django.http import HttpResponse
 from django.template.loader import render_to_string
-from weasyprint import HTML, CSS
 import os
 
 
@@ -28,22 +35,23 @@ class UserView(ModelViewSet):
     serializer_class = UserSerializer
     parser_classes = (MultiPartParser, FormParser, JSONParser)
     filter_backends = [SearchFilter]
-    search_fields = ['first_name', 'last_name', 'email']
+    search_fields = ["first_name", "last_name", "email"]
 
     def get_permissions(self):
-        if self.action == "create":
+        if self.action == "create" or self.action == "session":
             return [permissions.AllowAny()]
         return [permissions.IsAuthenticated()]
 
     @action(detail=False, methods=["get"], url_path="session")
-    def whoami(self, request):
+    def session(self, request):
         user = request.user
         data = {}
         data["anonymous"] = user.is_anonymous
         if user.is_authenticated:
             data["user"] = self.get_serializer(user).data
+            return Response(data)
 
-        return Response(data)
+        return Response(data, status=status.HTTP_401_UNAUTHORIZED)
 
     @action(detail=False, methods=["get"], url_path="profile")
     def profiles(self, request):
@@ -100,33 +108,58 @@ class UserView(ModelViewSet):
 
 
 class CustomTokenObtainPairView(TokenObtainPairView):
-    def post(self, request, *args, **kwargs):
-        response = super().post(request, *args, **kwargs)
+    def post(self, request):
+        try:
+            serializer = self.get_serializer(data=request.data)
+            serializer.is_valid(raise_exception=True)
+            response = Response(serializer.validated_data, status=status.HTTP_200_OK)
+        except Exception:
+            email = request.data.get("email")
+            email_registered = User.objects.filter(email=email).exists()
+            if not email_registered:
+                return Response(
+                    {
+                        "errors": {
+                            "email": ["This email is not registered for WATOC 2028."],
+                            "root": ["Authentication failed. Please check your details and try again."],
+                        }
+                    },
+                    status=status.HTTP_401_UNAUTHORIZED,
+                )
+            else:
+                return Response(
+                    {
+                        "errors": {
+                            "password": ["Incorrect password. Please verify your credentials."],
+                            "root": ["Authentication failed. Please check your details and try again."],
+                        }
+                    },
+                    status=status.HTTP_401_UNAUTHORIZED,
+                )
 
-        if response.status_code == 200:
-            email = request.data.get("email", None)
-            user = User.objects.get(email=email)
-            update_last_login(None, user)
+        user = serializer.user
+        update_last_login(None, user)
 
-            access_token = response.data.get("access")
-            refresh_token = response.data.get("refresh")
-            response.set_cookie(
-                "access_token",
-                access_token,
-                httponly=True,
-                secure=settings.COOKIE_SECURE,
-                samesite="Lax",
-                max_age=900,
-            )
-
-            response.set_cookie(
-                "refresh_token",
-                refresh_token,
-                httponly=True,
-                secure=settings.COOKIE_SECURE,
-                samesite="Lax",
-                max_age=86400,
-            )
+        access_token = response.data.get("access")
+        refresh_token = response.data.get("refresh")
+        response.set_cookie(
+            "access_token",
+            access_token,
+            httponly=True,
+            secure=settings.COOKIE_SECURE,
+            samesite="Lax",
+            max_age=900,
+            path="/",
+        )
+        response.set_cookie(
+            "refresh_token",
+            refresh_token,
+            httponly=True,
+            secure=settings.COOKIE_SECURE,
+            samesite="Lax",
+            max_age=604800,
+            path="/",
+        )
         return response
 
 
@@ -140,6 +173,7 @@ class CustomTokenRefreshView(TokenRefreshView):
             request.data.update({"refresh": token})
         else:
             return Response(status=status.HTTP_401_UNAUTHORIZED)
+        
         try:
             response = super().post(request, *args, **kwargs)
             access_token = response.data.get("access")
@@ -151,6 +185,7 @@ class CustomTokenRefreshView(TokenRefreshView):
                 secure=settings.COOKIE_SECURE,
                 samesite="Lax",
                 max_age=900,
+                path="/",
             )
             response.set_cookie(
                 "refresh_token",
@@ -158,7 +193,8 @@ class CustomTokenRefreshView(TokenRefreshView):
                 httponly=True,
                 secure=settings.COOKIE_SECURE,
                 samesite="Lax",
-                max_age=86400,
+                max_age=604800,
+                path="/",
             )
             return response
         except:
@@ -263,6 +299,8 @@ class AbstractView(ModelViewSet):
         abstract = Abstract.objects.prefetch_related("authors__affiliation").get(id=pk)
         context = self.get_abstract_context(abstract)
 
+        from weasyprint import HTML, CSS
+
         html_string = render_to_string("abstract_template.html", context)
         path_to_css = os.path.join(settings.BASE_DIR, "static", "css", "abstract_styles.css")
         path_to_static = os.path.join(settings.BASE_DIR, "static")
@@ -275,24 +313,26 @@ class AbstractView(ModelViewSet):
         response = HttpResponse(pdf_file, content_type="application/pdf")
         response["Content-Disposition"] = f'attachment; filename="{abstract.title or f'abstract_{abstract}'}.pdf"'
         return response
-    
+
     @action(detail=True, methods=["get"], url_path="authors-preview")
     def get_abstract_author_context(self, request, pk=None):
         abstract = Abstract.objects.prefetch_related("authors__affiliation").get(id=pk)
         context = self.get_abstract_context(abstract)
         print(context)
-        return Response({
-            'authors_list': context['authors_list'],
-            'affiliations_list': context['affiliations_list'],
-        })    
+        return Response(
+            {
+                "authors_list": context["authors_list"],
+                "affiliations_list": context["affiliations_list"],
+            }
+        )
 
     @action(detail=True, methods=["post"], url_path="submit")
     def subtmit_abstract(self, request, pk=None):
-        abstract = self.get_object()        
-        
+        abstract = self.get_object()
+
         validator = AbstractSubmitSerializer(abstract)
         validator.validate()
-        
+
         abstract.status = AbstactStatus.SUBMITTED
         abstract.save()
         return Response()
@@ -350,4 +390,4 @@ class TourView(ModelViewSet):
     queryset = Tour.objects.all()
     serializer_class = TourSerializer
     permission_classes = [permissions.AllowAny]
-    http_method_names = ['get']
+    http_method_names = ["get"]

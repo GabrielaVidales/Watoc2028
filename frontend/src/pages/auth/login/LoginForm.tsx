@@ -1,39 +1,55 @@
-import { Stack, InputAdornment, Paper, Box, IconButton, Typography } from '@mui/material'
-import { Controller, FormProvider, useForm } from 'react-hook-form'
-import { Mail, Lock, Eye, EyeOff, Send, LogIn } from 'lucide-react'; // Íconos de Lucide
 import React from 'react';
+import { Controller, useForm } from 'react-hook-form'
+import { Mail, Lock, Eye, EyeOff, LogIn } from 'lucide-react';
 import { Link, useNavigate } from 'react-router';
-import { REGEX_EMAIL } from '../utils/formRegex';
-import { useAuth } from '../contexts/AuthContext';
+import { useAuth } from '../../../contexts/AuthContext';
 import { Field, FieldError, FieldLabel } from '@/components/ui/field';
-import { Input } from '@/components/ui/input';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { loginSchema } from '@/schemas/user-schemas';
+import { loginSchema, type LoginFormValues } from '@/schemas/user-schemas';
 import { InputGroup, InputGroupAddon, InputGroupButton, InputGroupInput } from '@/components/ui/input-group';
 import { Button } from '@/components/ui/button';
 import { Spinner } from '@/components/ui/spinner';
+import { isAxiosError } from 'axios';
+import { InfoAlert } from '@/components/InfoAlert';
+import { cn } from '@/lib/utils';
+import { AnimatePresence, motion } from 'motion/react';
 
 export default function LoginForm() {
-    const { handleLogin, fetchUser } = useAuth()
-
     const navigate = useNavigate()
+    const { handleLogin } = useAuth()
 
-    const methods = useForm({
+    const form = useForm({
         resolver: zodResolver(loginSchema),
         defaultValues: loginSchema.parse({}),
         mode: 'onChange',
+        reValidateMode: 'onChange'
     })
 
-    const { isValid, isSubmitting } = methods.formState
+    const { isValid, isSubmitting, errors } = form.formState
+    const { setError, clearErrors } = form
 
-
-    const onFormSubmit = methods.handleSubmit(async (data) => {
+    const onFormSubmit = form.handleSubmit(async (data) => {
         try {
-            await handleLogin(data.email, data.password)
+            await handleLogin(data.email.toLowerCase(), data.password)
             navigate('/user/profile')
         } catch (error) {
-            if (import.meta.env.DEV) {
-                console.error(error.response);
+            if (isAxiosError(error)) {
+                const serverErrors = error.response.data.errors
+                Object.keys(serverErrors).forEach((key) => {
+                    const fieldName = key as keyof LoginFormValues
+                    const errorValue = serverErrors[fieldName]
+                    const message = Array.isArray(errorValue) ? errorValue.join('. ') : errorValue
+                    setError(fieldName, {
+                        type: "server",
+                        message: message
+                    }, { shouldFocus: true })
+                })
+
+            } else {
+                setError('root', {
+                    message: 'Connection failed. Please try again later.',
+                    type: "400",
+                })
             }
         }
     })
@@ -42,11 +58,32 @@ export default function LoginForm() {
     const toggleVisibility = () => setShowPassword((show) => !show);
 
     return (
-        <form onSubmit={onFormSubmit}>
+        <form onSubmit={onFormSubmit} onInput={() => clearErrors('root')}>
+            <AnimatePresence>
+                {errors.root && (
+                    <motion.div
+                        initial={{ opacity: 0, y: -10, height: 0 }}
+                        animate={{ opacity: 1, y: 0, height: 'auto' }}
+                        exit={{ opacity: 0, y: -10, height: 0 }}
+                        className="mb-4"
+                    >
+                        <InfoAlert
+                            variant='destructive'
+                            messages={[
+                                <span className='text-red-950'>
+                                    {errors.root.message}
+                                </span>
+                            ]}
+                            title='Server responded with an error:'
+                        />
+                    </motion.div>
+                )}
+            </AnimatePresence>
+
             <fieldset disabled={isSubmitting} className='space-y-5'>
                 <Controller
                     name="email"
-                    control={methods.control}
+                    control={form.control}
                     render={({ field, fieldState }) => (
                         <Field data-invalid={fieldState.invalid}>
                             <FieldLabel htmlFor={field.name}>Email</FieldLabel>
@@ -57,7 +94,9 @@ export default function LoginForm() {
                                     aria-invalid={fieldState.invalid}
                                     placeholder="yourmail@example.com"
                                 />
-                                <InputGroupAddon align="inline-start">
+                                <InputGroupAddon align="inline-start" className={
+                                    cn(fieldState.invalid ? 'text-destructive' : '')
+                                }>
                                     <Mail />
                                 </InputGroupAddon>
                             </InputGroup>
@@ -67,7 +106,7 @@ export default function LoginForm() {
                 />
                 <Controller
                     name="password"
-                    control={methods.control}
+                    control={form.control}
                     render={({ field, fieldState }) => (
                         <Field data-invalid={fieldState.invalid}>
                             <FieldLabel htmlFor={field.name}>Password</FieldLabel>
@@ -108,7 +147,7 @@ export default function LoginForm() {
                 </div>
 
                 <div className='flex justify-center w-full'>
-                    <Button type='submit' className='w-40 p-5 text-xl' data-icon="inline-start" disabled={!isValid}>
+                    <Button type='submit' variant='main' className='w-40 p-5 text-xl' data-icon="inline-start" disabled={!isValid}>
                         {isSubmitting ? (
                             <Spinner data-icon="inline-start" />
                         ) : (

@@ -1,9 +1,10 @@
-import { Box, Container, Typography, Avatar, Collapse, ListItemButton, ListItemText } from '@mui/material';
+import { Box, Container, Typography, Collapse, ListItemButton, ListItemText } from '@mui/material';
 import { Quote, ChevronUp, ChevronDown } from 'lucide-react';
 import { useState } from 'react';
 import mayaCalendar from '../../../assets/calendario_maya_rojo.png';
 import drMerino from '../../../assets/drmerino.jpg';
 import { Button } from '@/components/ui/button';
+import { Avatar, AvatarImage } from '@/components/ui/avatar';
 
 
 const organizer = {
@@ -103,16 +104,13 @@ function WelcomeSection() {
                     </div>
 
                     <Box sx={{ mt: 2, display: 'flex', alignItems: 'center', gap: 2 }}>
-                        <Avatar
-                            src={organizer.url}
-                            alt={organizer.name}
-                            sx={{
-                                width: 100,
-                                height: 100,
-                                border: '3px solid',
-                                borderColor: 'primary.light',
-                            }}
-                        />
+                        <Avatar className='size-25 ring-2'>
+                            <AvatarImage
+                                src={organizer.url}
+                                alt={organizer.name}
+                                className='object-cover'
+                            />
+                        </Avatar>
                         <div>
                             <Typography variant="subtitle1" fontWeight="bold">
                                 {organizer.name}

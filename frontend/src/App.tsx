@@ -12,19 +12,15 @@ import VenuePage from './pages/venue/VenuePage'
 import HotelBooking from './pages/hotelBooking/HotelBooking'
 import AbstractSubmissionInfo from './pages/abstractSubmission/AbstractSubmissionInfo'
 import AboutWATOC from './pages/aboutWATOC/AboutWATOC'
-import Contact from './pages/contact/Contact';
 import NotFound from './pages/404/NotFound';
 import YoungWatoc from './pages/youngWATOC/YoungWatoc';
 import Restaurants from './pages/restaurants/RestaurantsPage';
 import Transportation from './pages/transportation/TransportationPage';
 import { useEffect } from 'react';
 import globalTheme from './themes/Themes';
-import { SuccessRegisterPage } from './pages/protected/SuccessRegisterPage'
 import HomeLayout from './layouts/HomeLayout'
-import Test from './pages/Test'
 import VisaRequirements from '@/pages/visa/VisaRequirements'
 import AuthLayout from './layouts/AuthLayout'
-import DashboardLayout from './layouts/DashboardLayout'
 import CreateAbstractPage from './pages/protected/CreateAbstractPage'
 import { urls } from './routes/routes'
 import UserProfile from './pages/protected/profile/UserProfile'
@@ -37,7 +33,9 @@ import { SelectFeePage } from './pages/protected/confirmation-assistance/fee/pag
 import { SelectTourPage } from './pages/protected/confirmation-assistance/tour/page'
 import { DinnerPage } from './pages/protected/confirmation-assistance/dinner/page'
 import ConfirmPaymentPage from './pages/protected/confirmation-assistance/payment/page'
-import LoginPage from './pages/auth/login/LoginPage'
+import LoginPage from './pages/auth/login/page'
+import ContactPage from './pages/contact/page'
+import DashboardLayout from './layouts/DashboardLayout'
 
 function App() {
 	const { pathname } = useLocation()
@@ -65,7 +63,7 @@ function App() {
 						<Route path='/visa' element={<VisaRequirements />} />
 						<Route path='/restaurants' element={<Restaurants />} />
 						<Route path='/transportation' element={<Transportation />} />
-						<Route path='/contact' element={<Contact />} />
+						<Route path='/contact' element={<ContactPage />} />
 					</Route>
 
 
@@ -78,8 +76,10 @@ function App() {
 					</Route>
 
 					{/* Rutas protegidas van aquí */}
-					<Route element={<ProtectedRoute allowedRoles={['admin', 'participant']} />} >
-						<Route element={<AuthLayout />}>
+					<Route element={<AuthLayout />}>
+
+						<Route element={<ProtectedRoute allowedRoles={['admin', 'participant']} />} >
+
 							<Route path={urls.users.profile} element={<UserProfile />} />
 							<Route path={urls.users.viewAbstracts} element={<ViewAbstracts />} />
 							<Route path={urls.users.editAbstract.url} element={<EditAbstractPage />} />
@@ -97,9 +97,13 @@ function App() {
 						</Route>
 					</Route>
 
+					<Route element={<ProtectedRoute allowedRoles={['admin', 'participant']} />} >
+						<Route element={<DashboardLayout />}>
+							<Route path='/test' element={<UserProfile />} />
+						</Route>
+					</Route>
 
 					{/* Para rutas diferentes */}
-					<Route path='test' element={<Test />} />
 					<Route path='*' element={<NotFound />} />
 				</Routes>
 			</ThemeProvider>

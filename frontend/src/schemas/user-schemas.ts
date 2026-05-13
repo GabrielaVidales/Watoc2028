@@ -134,12 +134,13 @@ export const registrationSchema = userSchema
 
         password: z.object({
             value: z.string()
-                .min(8, "Minimum 8 characters")
-                .max(100, 'Input too long')
-                .regex(/[A-Z]/, "Must contain at least one uppercase letter")
-                .regex(/[a-z]/, "Must contain at least one lowercase letter")
-                .regex(/[0-9]/, "Must contain at least one digit")
-                .regex(/[^A-Za-z0-9]/, "Must contain one special character"),
+                // .min(8, "Minimum 8 characters")
+                // .max(100, 'Input too long')
+                // .regex(/[A-Z]/, "Must contain at least one uppercase letter")
+                // .regex(/[a-z]/, "Must contain at least one lowercase letter")
+                // .regex(/[0-9]/, "Must contain at least one digit")
+                // .regex(/[^A-Za-z0-9]/, "Must contain one special character")
+                ,
             confirm: z.string()
                 .min(1, "Field required *")
                 .max(100, 'Input too long')
@@ -149,6 +150,19 @@ export const registrationSchema = userSchema
                 error: "Passwords do not match",
                 path: ["confirm"]
             }),
+    })
+    .transform(value => {
+        const { email, password, affiliation, job_title, field_of_study, ...rest } = value;
+        return {
+            ...rest,
+            email: email.value,
+            password: password.value,
+            participant: {
+                affiliation,
+                job_title,
+                field_of_study,
+            }
+        }
     })
 
 
@@ -168,9 +182,24 @@ export const profilePicSchema = z.object({
     photo: z.instanceof(File, { error: 'Please upload an valid image' })
 })
 
-export const changePasswordSchema = registrationSchema.pick({
-    password: true
-}).extend({
+export const changePasswordSchema = z.object({
+    password: z.object({
+        value: z.string()
+            .min(8, "Minimum 8 characters")
+            .max(100, 'Input too long')
+            .regex(/[A-Z]/, "Must contain at least one uppercase letter")
+            .regex(/[a-z]/, "Must contain at least one lowercase letter")
+            .regex(/[0-9]/, "Must contain at least one digit")
+            .regex(/[^A-Za-z0-9]/, "Must contain one special character"),
+        confirm: z.string()
+            .min(1, "Field required *")
+            .max(100, 'Input too long')
+    })
+        .default({ value: '', confirm: '' })
+        .refine(data => data.value === data.confirm, {
+            error: "Passwords do not match",
+            path: ["confirm"]
+        }),
     oldPassword: z.string()
         .min(1, 'Password required')
         .max(100, 'Input too long')
@@ -204,4 +233,6 @@ export const editUserFormSchema = userSchema
         full_name: true,
     })
 
+export type LoginFormValues = z.infer<typeof loginSchema>
+export type RegisterFormValues = z.infer<typeof registrationSchema>
 export type EditUserFormValues = z.infer<typeof editUserFormSchema>

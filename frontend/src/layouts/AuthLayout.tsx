@@ -48,20 +48,20 @@ function AuthLayout() {
                     </clipPath>
                 </defs>
             </svg>
-            <header className='relative border-b-2 z-10 bg-primary-dark pb-10' style={{
-                clipPath: 'url(#waveClip)',
+            <header className='relative border-b-2 z-10 bg-primary-dark' style={{
+                // clipPath: 'url(#waveClip)',
             }}>
                 <div className="absolute inset-0 opacity-40 bg-cover bg-bottom bg-fixed pointer-events-none -z-10" style={{
                     backgroundImage: `url(${mayaBackground})`
                 }} />
 
-                <div className='max-w-7xl min-h-24 my-2 px-3 mx-auto flex flex-col sm:flex-row justify-between items-center gap-6'>
+                <div className='max-w-7xl min-h-14 my-2 px-3 mx-auto flex flex-col sm:flex-row justify-between items-center gap-6'>
                     <div className='flex flex-col items-center sm:items-start gap-3 max-w-sm shrink-0'>
                         <Link to={urls.home.index} className="flex items-center h-full">
                             <img
                                 alt="WATOC 2028 Logo"
                                 src={logo}
-                                className='h-16 sm:h-15 md:h-18 w-auto object-contain transition-transform hover:scale-105'
+                                className='h-10 sm:h-12 md:h-14 w-auto object-contain transition-transform hover:scale-105'
                             />
                         </Link>
                     </div>
@@ -85,14 +85,14 @@ function AuthLayout() {
                     </div>
                 </div>
 
-                {title && (
+                {/* {title && (
                     <div className='space-y-3 mb-3 mt-3 text-primary-contrast px-4'>
                         <h1 className='text-center text-xl sm:text-2xl md:text-3xl font-semibold'>
                             {title}
                         </h1>
                         <div className='h-1 w-20 sm:w-32 mx-auto bg-primary-contrast rounded-full' />
                     </div>
-                )}
+                )} */}
             </header>
             <main className='bg-fixed bg-no-repeat'>
                 <Outlet />

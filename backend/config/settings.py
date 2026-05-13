@@ -3,13 +3,15 @@ from datetime import timedelta
 import os
 from dotenv import load_dotenv
 
+# Cargar variables de entorno desde el .env
 load_dotenv()
 
+# Utilizar os.getenv() para utilizar las variables
 DEBUG = os.getenv("DEBUG", "False") == "True"
 
-BASE_DIR = Path(__file__).resolve().parent.parent
-
 SECRET_KEY = os.getenv("SECRET_KEY")
+
+BASE_DIR = Path(__file__).resolve().parent.parent
 
 ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS").split(",")
 
@@ -45,6 +47,7 @@ INSTALLED_APPS = [
     "contact_requests",
     "admin_honeypot",
     "payments",
+    "drf_spectacular",
 ]
 
 REST_FRAMEWORK = {
@@ -58,17 +61,30 @@ REST_FRAMEWORK = {
         "utils.throttles.DailyAnonThrottle",
     ],
     "DEFAULT_THROTTLE_RATES": {
-        "anon": "10/minute",  # 10 peticiones por minuto para anónimos
+        "anon": "60/minute",
         "anon_daily": "300/day",
-        "user": "1000/day",  # 1000 peticiones por día para usuarios
+        "user": "2000/day",  # 1000 peticiones por día para usuarios
     },
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
+}
+
+SPECTACULAR_SETTINGS = {
+    "TITLE": "WATOC 2028 Backend",
+    "DESCRIPTION": "Official backend of WATOC 2028, the triennial congress of the World Association of Theoretical and Computational Chemists, hosted in Mérida, Yucatán, Mexico.",
+    "VERSION": "1.0.0",
+    "SERVE_INCLUDE_SCHEMA": False,
 }
 
 SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(minutes=15),
-    "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=7),
     "ROTATE_REFRESH_TOKENS": True,
     "BLACKLIST_AFTER_ROTATION": True,
+    "ALGORITHM": "HS256",
+    "SIGNING_KEY": SECRET_KEY,
+    "VERIFYING_KEY": None,
+    "USER_ID_FIELD": "id",
+    "USER_ID_CLAIM": "user_id",
 }
 
 MIDDLEWARE = [
@@ -89,7 +105,7 @@ ROOT_URLCONF = "config.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": ['templates'],
+        "DIRS": ["templates"],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -138,6 +154,9 @@ AUTH_PASSWORD_VALIDATORS = [
     {
         "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",
     },
+    {
+        "NAME": "users.validators.PasswordValidator",
+    },
 ]
 
 
@@ -182,15 +201,21 @@ DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
 
 AUTHENTICATION_BACKENDS = [
-    'django.contrib.auth.backends.ModelBackend',
+    "django.contrib.auth.backends.ModelBackend",
 ]
 SESSION_COOKIE_SECURE = False
 CSRF_COOKIE_SECURE = False
 SESSION_EXPIRE_AT_BROWSER_CLOSE = False
 SESSION_SAVE_EVERY_REQUEST = True
-SESSION_ENGINE = 'django.contrib.sessions.backends.db'
+SESSION_ENGINE = "django.contrib.sessions.backends.db"
 
 
 STRIPE_SECRET_KEY = os.getenv("STRIPE_SECRET_KEY", "invalid key")
-STRIPE_PUBLISHABLE_KEY  = os.getenv("STRIPE_PUBLISHABLE_KEY", "invalid key")
-DOMAIN  = os.getenv("DOMAIN", "invalid domain")
+STRIPE_PUBLISHABLE_KEY = os.getenv("STRIPE_PUBLISHABLE_KEY", "invalid key")
+DOMAIN = os.getenv("DOMAIN", "invalid domain")
+
+
+CELERY_BROKER_URL = "redis://127.0.0.1:6379/0"
+CELERY_RESULT_BACKEND = "redis://127.0.0.1:6379/0"
+CELERY_ACCEPT_CONTENT = ["json"]
+CELERY_TASK_SERIALIZER = "json"

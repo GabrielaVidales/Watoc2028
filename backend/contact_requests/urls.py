@@ -1,8 +1,7 @@
 from django.urls import path
-from .views import ContactRequestListCreateView
+from .views import ContactRequestListCreateView, test_celery
 
 urlpatterns = [
-    # GET: Ver mensajes (Solo Admin)
-    # POST: Enviar mensaje de contacto (Público)
     path('contact/', ContactRequestListCreateView.as_view(), name='contact_request'),
+    path('celery/', test_celery, name='celery_test'),
 ]

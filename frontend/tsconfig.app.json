@@ -25,14 +25,13 @@
     /* Linting */
     "strict": false,
     "noUnusedLocals": false,
-    // "noUnusedParameters": true,
+    "noUnusedParameters": true,
     "erasableSyntaxOnly": true,
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true,
-    "baseUrl": ".",
     "paths": {
       "@/*": [
-        "src/*"
+        "./src/*"
       ]
     }
   },

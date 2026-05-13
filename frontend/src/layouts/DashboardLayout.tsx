@@ -1,85 +1,118 @@
 import { Button } from "@/components/ui/button"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { ChevronDown, LogOut, SquareUserRound } from "lucide-react"
+import { ChevronDown, ChevronsLeft, ClipboardList, FileText, Frame, IdCard, LogIn, LogOut, PieChart, SquareUserRound, Map, type LucideIcon } from "lucide-react"
 import React from 'react'
 import { Link, NavLink, Outlet, useNavigate } from "react-router"
 import logo from '@/assets/WatocPNGLogo.png';
-import Footer from "@/components/Footer"
 import { urls } from "@/routes/routes"
 import { useAuth } from "@/contexts/AuthContext"
-import background from '@/assets/field.png'
-import { cn } from "@/lib/utils"
-import {
-    NavigationMenu,
-    NavigationMenuItem,
-    NavigationMenuLink,
-    NavigationMenuList,
-    navigationMenuTriggerStyle,
-} from "@/components/ui/navigation-menu"
+import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar"
+import { AppSidebar } from "@/components/app-sidebar"
 
+
+const guessRoutes = [
+    {
+        url: urls.auth.login,
+        label: 'Login',
+        icon: <LogIn className="size-5" />,
+    },
+    {
+        url: urls.auth.register,
+        label: 'Registration',
+        icon: <ClipboardList className="size-5" />,
+    },
+]
+
+const authRoutes = [
+    {
+        url: urls.users.profile,
+        label: 'My Profile',
+        icon: <IdCard className="size-5" />,
+    },
+    {
+        url: urls.users.viewAbstracts,
+        label: 'My Submissions',
+        icon: <FileText className="size-5" />,
+    },
+]
+
+const projects: {
+    name: string
+    url: string
+    icon: LucideIcon
+}[] = [
+        {
+            name: "My Profile",
+            url: "#",
+            icon: Frame,
+        },
+        {
+            name: "Abstract Submission",
+            url: "#",
+            icon: PieChart,
+        },
+        {
+            name: "Registration",
+            url: "#",
+            icon: Map,
+        },
+        {
+            name: "Registration",
+            url: "#",
+            icon: Map,
+        },
+    ]
 
 function DashboardLayout() {
-    const { handleLogout } = useAuth()
+    const { handleLogout, currentUser } = useAuth()
 
     const onLogout = async () => {
         await handleLogout()
     }
 
     return (<>
-        <header className="flex flex-col shadow-xl border-b-2">
-            <div className="max-w-4xl w-full mx-auto flex justify-center sm:justify-between items-center">
-                <div className="h-full py-2">
-                    <Link to={'/'}>
-                        <img
-                            alt="WATOC 2028 Logo"
-                            src={logo}
-                            className='w-50 sm:w-80'
-                        />
-                    </Link>
-                </div>
-                <div className="max-sm:hidden">
-                    <NavigationMenu>
-                        <NavigationMenuList>
+        <SidebarProvider>
+            <div className="flex w-full h-screen">
 
-                            <NavigationMenuItem className="p-0 w-full">
-                                <NavigationMenuLink asChild className={navigationMenuTriggerStyle()}>
-                                    <Link to={urls.users.viewAbstracts}>
-                                        <Button variant="ghost" className="p-0 flex flex-row gap-2 w-full text-lg">
-                                            My Submissions
-                                        </Button>
-                                    </Link>
-                                </NavigationMenuLink>
-                            </NavigationMenuItem>
+                <AppSidebar
+                    projects={projects}
+                />
 
-                            <NavigationMenuItem className="p-0 w-full">
-                                <NavigationMenuLink asChild className={navigationMenuTriggerStyle()}>
-                                    <Link to={urls.users.profile}>
-                                        <Button variant="ghost" className="p-0 flex flex-row gap-2 w-full text-lg">
-                                            Profile
-                                        </Button>
-                                    </Link>
-                                </NavigationMenuLink>
-                            </NavigationMenuItem>
+                <div className="flex flex-col flex-1">
+                    <header className='border-b-2 z-10 sticky top-0 bg-background'>
+                        <div className=' min-h-14 my-2 px-3 mx-auto flex flex-col sm:flex-row justify-between items-center gap-6'>
 
-                            <NavigationMenuItem className="p-0 w-full">
-                                <NavigationMenuLink asChild className={navigationMenuTriggerStyle()}>
-                                    <Button variant="ghost" onClick={onLogout} className="p-0 flex flex-row gap-2 w-full text-lg">
-                                        Logout
-                                        <LogOut className="text-foreground" />
+                            <div className='flex flex-row items-center sm:items-start gap-3 max-w-sm shrink-0'>
+                                <SidebarTrigger />
+                             
+                            </div>
+
+                            <div className='flex flex-col sm:flex-row items-center'>
+                                <Link to={urls.home.index} className="sm:flex">
+                                    <Button variant='ghost' className='flex items-center gap-2 text-foreground sm:text-base lg:text-lg transition-all font-medium px-4'>
+                                        <ChevronsLeft className="size-6" />
+                                        <span>Home</span>
                                     </Button>
-                                </NavigationMenuLink>
-                            </NavigationMenuItem>
+                                </Link>
 
-                        </NavigationMenuList>
-                    </NavigationMenu>
+                                {(currentUser ? authRoutes : guessRoutes).map(routes => (
+                                    <Link to={routes.url} key={routes.url} className="sm:flex">
+                                        <Button variant='ghost' className='flex items-center gap-2 text-foreground sm:text-base lg:text-lg transition-all font-medium px-4'>
+                                            {routes.icon}
+                                            <span>{routes.label}</span>
+                                        </Button>
+                                    </Link>
+                                ))}
+                            </div>
+                        </div>
+                    </header>
+
+                    <main className="bg-muted">
+                        <Outlet />
+                    </main>
                 </div>
-            </div>
-        </header>
 
-        <main className="bg-gray-100 opacity-90 bg-fixed">
-            <Outlet />
-        </main>
-        <Footer />
+            </div>
+        </SidebarProvider>
     </>)
 }
 

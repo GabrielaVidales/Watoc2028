@@ -14,7 +14,7 @@ class CustomUserManager(UserManager):
         user.set_password(password)
         user.save(using=self._db)
         
-        admin_group = Group.objects.get_or_create(name='admin')
+        admin_group, _ = Group.objects.get_or_create(name='admin')
         user.groups.add(admin_group)
         
         return user

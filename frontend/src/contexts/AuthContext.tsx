@@ -1,5 +1,5 @@
 import { createContext, type PropsWithChildren, useContext, useEffect, useState } from "react";
-import axiosClient from "../clients/axiosClient";
+import axiosClient, { axiosGuestInstance } from "../clients/axiosClient";
 import type { ParticipantSchema, ReviewerSchema, UserSchema } from "@/schemas/user-schemas";
 
 
@@ -35,6 +35,9 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
     async function fetchUser() {
         try {
             const res = await axiosClient.get('/users/session/');
+            if (import.meta.env.DEV){
+                console.log(res.data);
+            }
             if (res.data.anonymous) {
                 setCurrentUser(null);
             } else setCurrentUser(res.data.user)
@@ -47,7 +50,7 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
     }
 
     async function handleLogin(email: string, password: string) {
-        await axiosClient.post('/login/', { email, password })
+        await axiosGuestInstance.post('/login/', { email, password })
         await fetchUser()
     }
 

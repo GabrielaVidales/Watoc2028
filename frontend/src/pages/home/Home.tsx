@@ -1,6 +1,5 @@
 import { Box, Button, Card, CardContent, Stack, Typography } from '@mui/material'
 import { useEffect, useState } from 'react'
-import CollaboratorsSection from './sections/CollaboratorsSection'
 import GenericCTASection from '../../components/GenericCTASection'
 import { Link } from 'react-router'
 import { ArrowRight } from 'lucide-react'
@@ -9,6 +8,7 @@ import VenueSection from './sections/VenueSection'
 import WelcomeSection from './sections/WelcomeSection'
 import { HomeHeroContent } from './components/HomeHeroContent'
 import { urls } from '@/routes/routes'
+import CollaboratorsSection from './sections/CollaboratorsSection'
 
 export const MainCTA = () => (
     <GenericCTASection>
@@ -164,7 +164,6 @@ export default function Home() {
                 </Typography>
                 <CounterCard />
             </Box>
-            {/* <VenueSection /> */}
             <CollaboratorsSection />
         </>
     )

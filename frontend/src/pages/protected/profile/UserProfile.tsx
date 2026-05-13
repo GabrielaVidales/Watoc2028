@@ -13,6 +13,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { urls } from '@/routes/routes';
 import { useProfiles } from '@/hooks/use-profiles';
 import { InfoAlert } from '@/components/InfoAlert';
+import { Separator } from '@/components/ui/separator';
 
 
 export default function UserProfile() {
@@ -20,199 +21,201 @@ export default function UserProfile() {
 	const { profile } = useProfiles()
 
 	return (
-		<div className='w-full max-w-5xl grid grid-cols-1 lg:grid-cols-3 gap-5 p-3 mx-auto'>
-			<section className='col-span-1 mx-auto max-w-sm md:max-w-md w-full'>
-				<Card className='shadow-md border-2 border-input/30'>
-					<CardContent className='p-6'>
-						<div className="flex flex-col items-center">
-							<Avatar className="size-32 border-4 border-secondary shadow-sm mb-4">
-								<AvatarImage src={currentUser.photo as string} alt="Profile" />
-								<AvatarFallback className="text-2xl">JD</AvatarFallback>
-							</Avatar>
+		<>
+			<div className='w-full max-w-5xl grid grid-cols-1 lg:grid-cols-3 gap-5 p-3 mx-auto'>
+				<section className='col-span-1 mx-auto max-w-sm md:max-w-md w-full'>
+					<Card className='shadow-md border-2 border-input/30'>
+						<CardContent className='p-6'>
+							<div className="flex flex-col items-center">
+								<Avatar className="size-32 border-4 border-secondary shadow-sm mb-4">
+									<AvatarImage src={currentUser.photo as string} alt="Profile" />
+									<AvatarFallback className="text-2xl">JD</AvatarFallback>
+								</Avatar>
 
-							<div className="space-y-2 mb-6 text-center">
-								<h1 className="text-2xl font-bold text-foreground">
-									{currentUser.full_name}
-								</h1>
+								<div className="space-y-2 mb-6 text-center">
+									<h1 className="text-2xl font-bold text-foreground">
+										{currentUser.full_name}
+									</h1>
 
-								{profile?.participant && (
-									<div className="flex flex-col text-sm leading-relaxed">
-										<span className="font-medium text-primary">
-											{profile.participant.job_title}
-										</span>
-										<span className="text-muted-foreground">
-											{profile.participant.affiliation}
-										</span>
-										<span className="font-medium text-primary mt-2">
-											Field of Study
-										</span>
-										<span className="text-muted-foreground">
-											{profile.participant.field_of_study}
-										</span>
+									{profile?.participant && (
+										<div className="flex flex-col text-sm leading-relaxed">
+											<span className="font-medium text-primary">
+												{profile.participant.job_title}
+											</span>
+											<span className="text-muted-foreground">
+												{profile.participant.affiliation}
+											</span>
+											<span className="font-medium text-primary mt-2">
+												Field of Study
+											</span>
+											<span className="text-muted-foreground">
+												{profile.participant.field_of_study}
+											</span>
+										</div>
+									)}
+								</div>
+
+								<div className='h-0.75 w-50 bg-primary-main' />
+
+								<div className="w-full space-y-3 py-4 border-y border-muted/50 mb-6">
+									<div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
+										<Mail className="size-4 shrink-0 text-primary/70" />
+										<span className="truncate px-1">{currentUser.email}</span>
 									</div>
-								)}
+
+									<div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
+										<MapPin className="size-4 shrink-0 text-primary/70" />
+										<span>{currentUser.city}, {currentUser.nationality}</span>
+									</div>
+
+									<div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
+										<Calendar className="size-4 shrink-0 text-primary/70" />
+										<span>Joined {formatDate(currentUser.date_joined)}</span>
+									</div>
+								</div>
+
+								<Button variant="destructive" onClick={handleLogout} className="w-full sm:w-auto px-8 transition-transform active:scale-95">
+									<LogOut />
+									Logout
+								</Button>
 							</div>
+						</CardContent>
+					</Card>
+				</section>
 
-							<div className='h-0.75 w-50 bg-primary-main' />
+				<section className='col-span-1 lg:col-span-2 min-h-50 w-full flex gap-3 justify-center'>
+					<div className='w-full bg-background border-2 p-3 rounded-lg shadow-lg flex flex-col gap-5'>
+						<Tabs defaultValue="home">
+							<TabsList variant='line' className='w-full justify-between overflow-x-auto overflow-y-hidden'>
+								<TabsTrigger value="home" className="flex-1 gap-2">
+									<House className="size-5" />
+									<span className="hidden md:inline">Home</span>
+								</TabsTrigger>
 
-							<div className="w-full space-y-3 py-4 border-y border-muted/50 mb-6">
-								<div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
-									<Mail className="size-4 shrink-0 text-primary/70" />
-									<span className="truncate px-1">{currentUser.email}</span>
-								</div>
+								<TabsTrigger value="account" className="flex-1 gap-2">
+									<UserRoundPen className="size-5" />
+									<span className="hidden md:inline">Edit Account</span>
+								</TabsTrigger>
 
-								<div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
-									<MapPin className="size-4 shrink-0 text-primary/70" />
-									<span>{currentUser.city}, {currentUser.nationality}</span>
-								</div>
+								<TabsTrigger value="picture" className="flex-1 gap-2">
+									<Image className="size-5" />
+									<span className="hidden md:inline">Change Photo</span>
+								</TabsTrigger>
 
-								<div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
-									<Calendar className="size-4 shrink-0 text-primary/70" />
-									<span>Joined {formatDate(currentUser.date_joined)}</span>
-								</div>
-							</div>
-
-							<Button variant="destructive" onClick={handleLogout} className="w-full sm:w-auto px-8 transition-transform active:scale-95">
-								<LogOut />
-								Logout
-							</Button>
-						</div>
-					</CardContent>
-				</Card>
-			</section>
-
-			<section className='col-span-1 lg:col-span-2 min-h-50 w-full flex gap-3 justify-center'>
-				<div className='w-full bg-background border-2 p-3 rounded-lg shadow-lg flex flex-col gap-5'>
-					<Tabs defaultValue="home">
-						<TabsList variant='line' className='w-full justify-between overflow-x-auto overflow-y-hidden'>
-							<TabsTrigger value="home" className="flex-1 gap-2">
-								<House className="size-5" />
-								<span className="hidden md:inline">Home</span>
-							</TabsTrigger>
-
-							<TabsTrigger value="account" className="flex-1 gap-2">
-								<UserRoundPen className="size-5" />
-								<span className="hidden md:inline">Edit Account</span>
-							</TabsTrigger>
-
-							<TabsTrigger value="picture" className="flex-1 gap-2">
-								<Image className="size-5" />
-								<span className="hidden md:inline">Change Photo</span>
-							</TabsTrigger>
-
-							<TabsTrigger value="password" className="flex-1 gap-2">
-								<LockKeyhole className="size-5" />
-								<span className="hidden md:inline">Change Password</span>
-							</TabsTrigger>
-						</TabsList>
-						<TabsContent value='home' className='w-full p-9 space-y-8 px-5 sm:px-9'>
-							<section className="space-y-2">
-								<h2 className="text-2xl font-semibold">
-									Welcome back
-								</h2>
-								<p className="text-muted-foreground text-sm">
-									Manage your registration and abstract submissions for WATOC 2028.
-								</p>
-							</section>
-							<div className="flex items-center justify-between rounded-lg border p-4">
-								<div className="space-y-1">
-									<p className="font-medium">Complete your registration</p>
-									<p className="text-sm text-muted-foreground">
-										Confirm your attendance and finish your payment.
+								<TabsTrigger value="password" className="flex-1 gap-2">
+									<LockKeyhole className="size-5" />
+									<span className="hidden md:inline">Change Password</span>
+								</TabsTrigger>
+							</TabsList>
+							<TabsContent value='home' className='w-full p-9 space-y-8 px-5 sm:px-9'>
+								<section className="space-y-2">
+									<h2 className="text-2xl font-semibold">
+										Welcome back
+									</h2>
+									<p className="text-muted-foreground text-sm">
+										Manage your registration and abstract submissions for WATOC 2028.
 									</p>
+								</section>
+								<div className="flex items-center justify-between rounded-lg border p-4">
+									<div className="space-y-1">
+										<p className="font-medium">Complete your registration</p>
+										<p className="text-sm text-muted-foreground">
+											Confirm your attendance and finish your payment.
+										</p>
+									</div>
+
+									<Button asChild>
+										<NavLink to={urls.users.confirmAssistance.start}>
+											Start
+										</NavLink>
+									</Button>
 								</div>
 
-								<Button asChild>
-									<NavLink to={urls.users.confirmAssistance.start}>
-										Start
-									</NavLink>
-								</Button>
-							</div>
 
-
-							<section className='space-y-4'>
-								<h2 className='text-2xl font-semibold text-primary-main'>Registration</h2>
-								<p>
-									<b>Confirm your assistance to WATOC 2028:</b> complete your registration for the congress and finish your payment.
-								</p>
-								<Button className="w-full px-5 sm:w-auto font-bold rounded-full" asChild>
-									<NavLink to={urls.users.confirmAssistance.start}>
-										Start Registration
-									</NavLink>
-								</Button>
-							</section>
-
-							<section className="space-y-4">
-								<h2 className='text-2xl font-semibold text-primary-main'>Abstract submission</h2>
-								<p>
-									<b>Submit an abstract</b>: start a new submission or continue working on an existing one.
-								</p>
-								<InfoAlert
-									title="Abstract submission deadline: June 1, 2027"
-									messages={[
-										"Don't forget to review the submission guidelines before uploading",
-										<NavLink to={urls.users.viewAbstracts}>
-											<Button variant="link" className="h-auto p-0 text-blue-600 font-semibold">
-												Read Guidelines
-											</Button>
+								<section className='space-y-4'>
+									<h2 className='text-2xl font-semibold text-primary-main'>Registration</h2>
+									<p>
+										<b>Confirm your assistance to WATOC 2028:</b> complete your registration for the congress and finish your payment.
+									</p>
+									<Button className="w-full px-5 sm:w-auto font-bold rounded-full" asChild>
+										<NavLink to={urls.users.confirmAssistance.start}>
+											Start Registration
 										</NavLink>
+									</Button>
+								</section>
+
+								<section className="space-y-4">
+									<h2 className='text-2xl font-semibold text-primary-main'>Abstract submission</h2>
+									<p>
+										<b>Submit an abstract</b>: start a new submission or continue working on an existing one.
+									</p>
+									<InfoAlert
+										title="Abstract submission deadline: June 1, 2027"
+										messages={[
+											"Don't forget to review the submission guidelines before uploading",
+											<NavLink to={urls.users.viewAbstracts}>
+												<Button variant="link" className="h-auto p-0 text-blue-600 font-semibold">
+													Read Guidelines
+												</Button>
+											</NavLink>
+										]}
+										icon={<Clock />}
+									/>
+
+									<Button className="w-full px-5 sm:w-auto font-bold rounded-full" asChild>
+										<NavLink to={urls.users.viewAbstracts}>
+											View My Submissions
+										</NavLink>
+									</Button>
+								</section>
+
+							</TabsContent>
+							<TabsContent value="account" className='w-full py-9 pt-4 space-y-5 px-5 sm:px-9'>
+								<h2 className='text-2xl font-semibold text-primary-main'>Edit your profile data</h2>
+								{profile?.participant && (
+									<EditUserForm defaultValues={{
+										...currentUser,
+										email: {
+											value: '',
+											confirm: ''
+										},
+										participant: {
+											affiliation: profile.participant.affiliation,
+											job_title: profile.participant.job_title,
+											field_of_study: profile.participant.field_of_study
+										}
+									}} />
+								)}
+							</TabsContent>
+							<TabsContent value="picture" className='w-full py-9 pt-4 space-y-5 px-5 sm:px-9'>
+								<h2 className='text-2xl font-semibold text-primary-main'>Edit Profile Picture</h2>
+								<InfoAlert
+									title="Profile Picture Guidelines"
+									messages={[
+										'Resolution: Square, 400x400px or higher.',
+										'Max file size: 1.00 MB.',
+										'Format: Use solid backgrounds (no transparency).',
 									]}
-									icon={<Clock />}
 								/>
-
-								<Button className="w-full px-5 sm:w-auto font-bold rounded-full" asChild>
-									<NavLink to={urls.users.viewAbstracts}>
-										View My Submissions
-									</NavLink>
-								</Button>
-							</section>
-
-						</TabsContent>
-						<TabsContent value="account" className='w-full py-9 pt-4 space-y-5 px-5 sm:px-9'>
-							<h2 className='text-2xl font-semibold text-primary-main'>Edit your profile data</h2>
-							{profile?.participant && (
-								<EditUserForm defaultValues={{
-									...currentUser,
-									email: {
-										value: '',
-										confirm: ''
-									},
-									participant: {
-										affiliation: profile.participant.affiliation,
-										job_title: profile.participant.job_title,
-										field_of_study: profile.participant.field_of_study
-									}
-								}} />
-							)}
-						</TabsContent>
-						<TabsContent value="picture" className='w-full py-9 pt-4 space-y-5 px-5 sm:px-9'>
-							<h2 className='text-2xl font-semibold text-primary-main'>Edit Profile Picture</h2>
-							<InfoAlert
-								title="Profile Picture Guidelines"
-								messages={[
-									'Resolution: Square, 400x400px or higher.',
-									'Max file size: 1.00 MB.',
-									'Format: Use solid backgrounds (no transparency).',
-								]}
-							/>
-							<UserPictureForm />
-						</TabsContent>
-						<TabsContent value="password" className='w-full py-9 pt-4 space-y-5 px-5 sm:px-9'>
-							<h2 className='text-2xl font-semibold text-primary-main'>Change password</h2>
-							<InfoAlert
-								title="Password Requirements"
-								messages={[
-									'Minimum 8 characters.',
-									'Include at least one uppercase letter.',
-									'Include at least one number.',
-									'Include at least one special character (e.g., !@#$%).',
-								]}
-							/>
-							<ChangePasswordForm />
-						</TabsContent>
-					</Tabs>
-				</div>
-			</section>
-		</div>
+								<UserPictureForm />
+							</TabsContent>
+							<TabsContent value="password" className='w-full py-9 pt-4 space-y-5 px-5 sm:px-9'>
+								<h2 className='text-2xl font-semibold text-primary-main'>Change password</h2>
+								<InfoAlert
+									title="Password Requirements"
+									messages={[
+										'Minimum 8 characters.',
+										'Include at least one uppercase letter.',
+										'Include at least one number.',
+										'Include at least one special character (e.g., !@#$%).',
+									]}
+								/>
+								<ChangePasswordForm />
+							</TabsContent>
+						</Tabs>
+					</div>
+				</section>
+			</div>
+		</>
 	)
 }

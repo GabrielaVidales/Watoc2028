@@ -15,8 +15,8 @@ class ContactRequest(models.Model):
     subject = models.PositiveSmallIntegerField(
         choices=ContactType.choices, default=ContactType.OTHERS
     )
-    description = models.TextField()
-    contact_date = models.DateTimeField(auto_now_add=True)
+    message = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         verbose_name = "Contact Request"

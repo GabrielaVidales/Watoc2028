@@ -1,7 +1,7 @@
 type RouteTree<T> = {
     [K in keyof T]:
-    T[K] extends { build: (...args: any) => any } // 👈 CLAVE
-    ? T[K] 
+    T[K] extends { build: (...args: any) => any } 
+    ? T[K]
     : T[K] extends string
     ? string
     : T[K] extends object
@@ -60,7 +60,10 @@ const withBuilder = <T extends string>(url: T) => ({
 
 export const urls = {
     home: {
-        index: '/'
+        index: '/',
+        watoc: '/watoc',
+        youngWatoc: '/young-watoc',
+        contact: '/contact',
     },
     auth: createRouteGroup('/auth', {
         login: '/login',

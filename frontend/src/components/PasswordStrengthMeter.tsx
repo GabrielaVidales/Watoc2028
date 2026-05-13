@@ -1,7 +1,7 @@
-import { LinearProgress } from "@mui/material";
-import { useWatch, type Control, type FieldValues } from "react-hook-form";
-import { Progress } from "./ui/progress";
 import type { HTMLAttributes } from "react";
+import { useWatch } from "react-hook-form";
+import { Progress } from "./ui/progress";
+import { cn } from "@/lib/utils";
 
 const getPasswordStrength = (password: string) => {
     let score = 0;
@@ -18,21 +18,20 @@ const PasswordStrengthMeter = ({ control, className }: { control: any } & HTMLAt
     const score = getPasswordStrength(password);
 
     const config = [
-        { color: 'text-destructive text-xs', label: 'Very weak', value: 20 },
-        { color: 'text-amber-500 text-xs', label: 'Weak', value: 40 },
-        { color: 'text-amber-800 text-xs', label: 'Medium', value: 60 },
-        { color: 'text-primary text-xs', label: 'Strong', value: 80 },
-        { color: 'text-primary text-xs', label: 'Very strong', value: 100 },
+        { color: 'text-destructive', label: 'Very weak', value: 20 },
+        { color: 'text-amber-500', label: 'Weak', value: 40 },
+        { color: 'text-amber-800', label: 'Medium', value: 60 },
+        { color: 'text-primary', label: 'Strong', value: 80 },
+        { color: 'text-primary', label: 'Very strong', value: 100 },
     ];
 
-    const current = config[score - 1] || { color: 'inherit', label: '', value: 0 };
+    const current = config[score - 1] || { color: 'inherit', label: 'Password strength', value: 0 };
 
     return (
         <div className={className}>
             <Progress value={current.value} className="h-1" />
-            <div className="flex justify-between text-sm mt-1">
-                <span className="text-xs">Password strength</span>
-                <span className={current.color}>
+            <div className="flex justify-end text-sm mt-1">
+                <span className={cn('text-xs', current.color)}>
                     {current.label}
                 </span>
             </div>
