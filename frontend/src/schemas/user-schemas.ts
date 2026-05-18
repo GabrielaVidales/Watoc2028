@@ -70,6 +70,12 @@ export const userSchema = z.object({
     email: z.email('Please provide a valid email address')
         .max(100, 'Input too long')
         .default(''),
+
+    is_active: z.boolean()
+        .optional(),
+    email_verified: z.boolean()
+        .optional(),
+
     prefix: z.enum(prefixes.map(p => p.value), 'Choose a valid option')
         .default('Prof.'),
     pronouns: z.string().trim()
@@ -123,7 +129,7 @@ export const registrationSchema = userSchema
                 .min(1, 'Field required *')
                 .max(100, 'Input too long'),
             confirm: z.string()
-                .min(1, "Field required *")
+                .min(1, "You must confirm your email *")
                 .max(100, 'Input too long'),
         })
             .default({ value: '', confirm: '' })
@@ -134,15 +140,14 @@ export const registrationSchema = userSchema
 
         password: z.object({
             value: z.string()
-                // .min(8, "Minimum 8 characters")
-                // .max(100, 'Input too long')
-                // .regex(/[A-Z]/, "Must contain at least one uppercase letter")
-                // .regex(/[a-z]/, "Must contain at least one lowercase letter")
-                // .regex(/[0-9]/, "Must contain at least one digit")
-                // .regex(/[^A-Za-z0-9]/, "Must contain one special character")
-                ,
+                .min(8, "Minimum 8 characters")
+                .max(100, 'Input too long')
+                .regex(/[A-Z]/, "Must contain at least one uppercase letter")
+                .regex(/[a-z]/, "Must contain at least one lowercase letter")
+                .regex(/[0-9]/, "Must contain at least one digit")
+                .regex(/[^A-Za-z0-9]/, "Must contain one special character"),
             confirm: z.string()
-                .min(1, "Field required *")
+                .min(1, "You must confirm your password *")
                 .max(100, 'Input too long')
         })
             .default({ value: '', confirm: '' })

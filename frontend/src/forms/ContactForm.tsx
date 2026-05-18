@@ -6,6 +6,7 @@ import HCaptcha from '@hcaptcha/react-hcaptcha'
 import { useEffect, useState } from 'react'
 import axiosClient from '../clients/axiosClient'
 import { type BaseOption, ControlledDropdown, ControlledTextField } from './components/ControlledInputs'
+import { isAxiosError } from 'axios'
 
 interface ContactType extends BaseOption {
     label: string
@@ -95,10 +96,21 @@ export default function ContactForm() {
                 throw new Error('Bad response!')
             }
         } catch (error) {
-            methods.setError('root', {
-                type: 'root',
-                message: 'Something went wrong. Try again later.',
-            })
+            if (isAxiosError(error)) {
+                if (import.meta.env.DEV) {
+                    console.log(error.response);
+                }
+                if (error.response.data.message){
+                    methods.setError('root', {
+                        type: 'root',
+                        message: error.response.data.message,
+                    })
+                }
+            }
+            // methods.setError('root', {
+            //             type: 'root',
+            //             message: 'Something went wrong. Try again later.',
+            //         })
             throw error
         } finally {
             window.scroll({

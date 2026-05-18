@@ -36,6 +36,8 @@ import ConfirmPaymentPage from './pages/protected/confirmation-assistance/paymen
 import LoginPage from './pages/auth/login/page'
 import ContactPage from './pages/contact/page'
 import DashboardLayout from './layouts/DashboardLayout'
+import SidebarsLayout from './layouts/SidebarsLayout'
+import VerifyPage from './pages/auth/verify/page'
 
 function App() {
 	const { pathname } = useLocation()
@@ -98,10 +100,12 @@ function App() {
 					</Route>
 
 					<Route element={<ProtectedRoute allowedRoles={['admin', 'participant']} />} >
-						<Route element={<DashboardLayout />}>
+						<Route element={<SidebarsLayout />}>
 							<Route path='/test' element={<UserProfile />} />
 						</Route>
 					</Route>
+
+					<Route path={urls.auth.verify} element={<VerifyPage />} />
 
 					{/* Para rutas diferentes */}
 					<Route path='*' element={<NotFound />} />

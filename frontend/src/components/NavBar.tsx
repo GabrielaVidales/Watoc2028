@@ -120,7 +120,10 @@ export default function NavBar({
                     {menus.map((item, i) => (
                         <React.Fragment key={i}>
                             {item.url ? (
-                                <NavLink to={item.url} end key={i} className='group text-xl font-medium flex flex-col cursor-pointer hover:scale-105 transition-transform'>
+                                <NavLink to={item.url} end key={i} className={cn(
+                                    'group text-xl font-medium flex flex-col',
+                                    'cursor-pointer hover:scale-105 transition-transform'
+                                )}>
                                     {({ isActive }) => (
                                         <>
                                             <span className={cn(
@@ -141,7 +144,10 @@ export default function NavBar({
                                     )}
                                 </NavLink>
                             ) : (
-                                <div className='group text-xl font-medium flex flex-col cursor-pointer hover:scale-105 transition-transform'>
+                                <div className={cn(
+                                    'group text-xl font-medium flex flex-col',
+                                    'cursor-pointer hover:scale-105 transition-transform'
+                                )}>
                                     <HoverCard openDelay={100} closeDelay={200}>
                                         <HoverCardTrigger>
                                             <div className='flex items-center gap-1 transition-colors'>
@@ -280,7 +286,7 @@ export default function NavBar({
                         </PopoverContent>
                     </Popover>
                 </div>
-            </div>
+            </div>  
         </header >
     )
 }

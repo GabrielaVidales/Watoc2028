@@ -176,18 +176,20 @@ function EditUserForm({ defaultValues }: P) {
                                         <SelectValue placeholder="Country..." />
                                     </SelectTrigger>
                                     <SelectContent position="item-aligned">
-                                        {countries.map(c => (
-                                            <SelectItem value={c.value as string} key={c.value}>
-                                                <img
-                                                    loading="lazy"
-                                                    width="20"
-                                                    srcSet={`https://flagcdn.com/w40/${c.value.toString().toLowerCase()}.png 2x`}
-                                                    src={`https://flagcdn.com/w20/${c.value.toString().toLowerCase()}.png`}
-                                                    alt=""
-                                                />
-                                                {c.label}
-                                            </SelectItem>
-                                        ))}
+                                        {countries
+                                            .sort((a, b) => a.label.localeCompare(b.label))
+                                            .map(c => (
+                                                <SelectItem value={c.value as string} key={c.value}>
+                                                    <img
+                                                        loading="lazy"
+                                                        width="20"
+                                                        srcSet={`https://flagcdn.com/w40/${c.value.toString().toLowerCase()}.png 2x`}
+                                                        src={`https://flagcdn.com/w20/${c.value.toString().toLowerCase()}.png`}
+                                                        alt=""
+                                                    />
+                                                    {c.label}
+                                                </SelectItem>
+                                            ))}
                                     </SelectContent>
                                 </Select>
                                 {fieldState.invalid && <FieldError errors={[fieldState.error]} />}

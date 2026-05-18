@@ -1,7 +1,10 @@
-import re
 from django.core.exceptions import ValidationError
-from django.utils.translation import gettext as _
 from django.core.validators import RegexValidator
+from django.utils.translation import gettext as _
+from django.contrib.auth import get_user_model
+import re
+
+User = get_user_model()
 
 REGEX_NAME = r"^([a-zA-ZÀ-ú]{2,})([ -]?[a-zA-ZÀ-ú]{2,})*$"
 REGEX_EMAIL = r"^([a-zA-Z].[\w]+(?:\.\w+)?)+@([\w]+(?:\.[a-z]{2,10})+)$"
@@ -12,16 +15,30 @@ valid_name = RegexValidator(
 )
 
 
-valid_email = RegexValidator(
-    regex=REGEX_EMAIL,
-    message="Este email no es válido",
-)
+def validate_email(email: str, user_id=None):
+    email = email.lower()
+
+    if not re.match(REGEX_EMAIL, email):
+        raise ValidationError(
+            _("The email format is invalid."),
+            code="email_invalid_format",
+        )
+
+    if User.objects.filter(email=email).exclude(id=user_id).exists():
+        raise ValidationError(
+            _("This email is already registered."),
+            code="email_already_registered",
+        )
+
+    return email
 
 
 class PasswordValidator:
     def validate(self, password, user=None):
         if len(password) < 8:
-            raise ValidationError(_("Minimum 8 characters"), code="password_too_short")
+            raise ValidationError(
+                _("This password is too short. It must contain at least 8 characters."), code="password_too_short"
+            )
         if len(password) > 100:
             raise ValidationError(_("Password too long"), code="password_too_long")
 

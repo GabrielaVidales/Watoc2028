@@ -149,7 +149,10 @@ export default function Footer() {
                             key={index}
                             size="icon-lg"
                             variant='ghost'
-                            className='rounded-full transition-all bg-primary-light/20 hover:bg-primary-light hover:text-white hover:scale-110'
+                            className={cn(
+                                'rounded-full transition-all bg-primary-light/20',
+                                'hover:bg-primary-light hover:text-white hover:scale-110'
+                            )}
                         >
                             {social.icon}
                         </Button>

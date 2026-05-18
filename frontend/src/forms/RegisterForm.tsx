@@ -47,6 +47,7 @@ export default function RegisterForm() {
         handleSubmit,
         setError,
         clearErrors,
+        trigger,
         control,
         formState: {
             isValid,
@@ -61,14 +62,14 @@ export default function RegisterForm() {
     const onFormSubmit = handleSubmit(async (data) => {
         try {
             await axiosClient.post('/users/', data)
-            // navigate(urls.auth.login, { replace: true })
+            navigate(urls.auth.login, { replace: true })
 
         } catch (error) {
             if (isAxiosError(error)) {
                 if (import.meta.env.DEV) {
-                    console.log(error);
+                    console.log(error.response);
                 }
-                
+
                 const serverErrors = error.response.data
                 Object.keys(serverErrors).forEach((key) => {
                     const fieldName = key as keyof RegisterFormValues
@@ -82,7 +83,7 @@ export default function RegisterForm() {
                     })
                 })
                 setError('root', {
-                    message: 'Registration failed. Please check your details and try again.',
+                    message: 'Registration failed. Please check details and try again.',
                     type: "custom",
                 })
 
@@ -347,6 +348,7 @@ export default function RegisterForm() {
                                     <Input
                                         {...field}
                                         id={field.name}
+                                        onInput={() => trigger('email.confirm')}
                                         aria-invalid={fieldState.invalid}
                                         autoComplete="off"
                                         type='email'
@@ -395,6 +397,7 @@ export default function RegisterForm() {
                                         <InputGroupInput
                                             {...field}
                                             id={field.name}
+                                            onInput={() => trigger('password.confirm')}
                                             aria-invalid={fieldState.invalid}
                                             autoComplete="off"
                                             type={showPassword ? 'text' : 'password'}

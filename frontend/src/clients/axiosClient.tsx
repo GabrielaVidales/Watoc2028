@@ -2,21 +2,53 @@ import axios, { type AxiosRequestConfig } from "axios"
 
 const BASE_URL = import.meta.env.VITE_API_URL || ''
 
-const axiosClient = axios.create({
+const config = {
     baseURL: BASE_URL,
     withCredentials: true,
+    xsrfCookieName: 'csrftoken',
+    xsrfHeaderName: 'X-CSRFToken',
     headers: {
         'Content-Type': 'application/json'
     }
-})
+};
 
-export const axiosGuestInstance = axios.create({
-    baseURL: BASE_URL,
-    withCredentials: true,
-    headers: {
-        'Content-Type': 'application/json'
-    }
-})
+export const axiosClient = axios.create(config)
+
+export const axiosGuestInstance = axios.create(config)
+
+axiosGuestInstance.interceptors.request.use(
+    (config) => {
+        const getCookie = (name: string) => {
+            const value = `; ${document.cookie}`;
+            const parts = value.split(`; ${name}=`);
+            if (parts.length === 2) return parts.pop()?.split(';').shift();
+        };
+
+        const token = getCookie('csrftoken');
+        if (token) {
+            config.headers['X-CSRFToken'] = token;
+        }
+
+        return config
+    },
+)
+
+axiosClient.interceptors.request.use(
+    (config) => {
+        const getCookie = (name: string) => {
+            const value = `; ${document.cookie}`;
+            const parts = value.split(`; ${name}=`);
+            if (parts.length === 2) return parts.pop()?.split(';').shift();
+        };
+
+        const token = getCookie('csrftoken');
+        if (token) {
+            config.headers['X-CSRFToken'] = token;
+        }
+
+        return config
+    },
+)
 
 axiosClient.interceptors.response.use(
     (config) => config,
@@ -37,6 +69,5 @@ axiosClient.interceptors.response.use(
         }
     }
 )
-
 
 export default axiosClient

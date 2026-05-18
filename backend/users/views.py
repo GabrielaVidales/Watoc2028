@@ -6,10 +6,13 @@ from rest_framework.viewsets import ModelViewSet
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
-from django.contrib.auth import get_user_model
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from rest_framework_simplejwt.tokens import RefreshToken
+
+from django.views.decorators.csrf import ensure_csrf_cookie
+from django.utils.decorators import method_decorator
 from django.contrib.auth.models import update_last_login
+from django.contrib.auth import get_user_model
 from django.conf import settings
 from .serializers import (
     UserSerializer,
@@ -21,11 +24,18 @@ from .serializers import (
     AbstractSubmitSerializer,
     TourSerializer,
 )
+from .text_choices import AbstractPresentation
 from .models import Abstract, AbstactStatus, Author, AuthorAffiliation, AbstractDeclarations, Tour
 from django.http import HttpResponse
 from django.template.loader import render_to_string
+from config.permissions import HasCSRFToken
+from . import tasks as celery_tasks
 import os
+from itsdangerous import BadSignature
+from itsdangerous import SignatureExpired
+from itsdangerous import URLSafeTimedSerializer
 
+serializer = URLSafeTimedSerializer(settings.SECRET_KEY)
 
 User = get_user_model()
 
@@ -39,10 +49,15 @@ class UserView(ModelViewSet):
 
     def get_permissions(self):
         if self.action == "create" or self.action == "session":
-            return [permissions.AllowAny()]
-        return [permissions.IsAuthenticated()]
+            return [HasCSRFToken()]
+        return [permissions.IsAuthenticated(), HasCSRFToken()]
+
+    def perform_create(self, serializer):
+        user = serializer.save(is_active=False)
+        celery_tasks.send_email_confirmation_email(user.id)
 
     @action(detail=False, methods=["get"], url_path="session")
+    @method_decorator(ensure_csrf_cookie)
     def session(self, request):
         user = request.user
         data = {}
@@ -50,8 +65,12 @@ class UserView(ModelViewSet):
         if user.is_authenticated:
             data["user"] = self.get_serializer(user).data
             return Response(data)
-
         return Response(data, status=status.HTTP_401_UNAUTHORIZED)
+
+    @action(detail=False, methods=["post"], url_path="send-verification-email")
+    def send_verification_email(self, request):
+
+        return Response()
 
     @action(detail=False, methods=["get"], url_path="profile")
     def profiles(self, request):
@@ -108,20 +127,24 @@ class UserView(ModelViewSet):
 
 
 class CustomTokenObtainPairView(TokenObtainPairView):
+    permission_classes = [HasCSRFToken]
+
     def post(self, request):
         try:
             serializer = self.get_serializer(data=request.data)
             serializer.is_valid(raise_exception=True)
             response = Response(serializer.validated_data, status=status.HTTP_200_OK)
-        except Exception:
+        except Exception as e:
             email = request.data.get("email")
             email_registered = User.objects.filter(email=email).exists()
+            print(e)
+            print(email_registered)
             if not email_registered:
                 return Response(
                     {
                         "errors": {
                             "email": ["This email is not registered for WATOC 2028."],
-                            "root": ["Authentication failed. Please check your details and try again."],
+                            "root": ["Authentication failed. Please check details and try again."],
                         }
                     },
                     status=status.HTTP_401_UNAUTHORIZED,
@@ -168,54 +191,41 @@ class CustomTokenRefreshView(TokenRefreshView):
     permission_classes = [permissions.AllowAny]
 
     def post(self, request, *args, **kwargs):
-        token = request.COOKIES.get("refresh_token")
-        if token:
-            request.data.update({"refresh": token})
-        else:
+        refresh_token = request.COOKIES.get("refresh_token")
+        if not refresh_token:
             return Response(status=status.HTTP_401_UNAUTHORIZED)
-        
+
+        serializer = self.get_serializer(data={"refresh": refresh_token})
         try:
-            response = super().post(request, *args, **kwargs)
-            access_token = response.data.get("access")
-            refresh_token = response.data.get("refresh")
-            response.set_cookie(
-                "access_token",
-                access_token,
-                httponly=True,
-                secure=settings.COOKIE_SECURE,
-                samesite="Lax",
-                max_age=900,
-                path="/",
-            )
+            serializer.is_valid(raise_exception=True)
+        except TokenError:
+            response = Response(status=status.HTTP_401_UNAUTHORIZED)
+            response.delete_cookie("access_token", path="/")
+            response.delete_cookie("refresh_token", path="/")
+            return response
+
+        access_token = serializer.validated_data["access"]
+        response = Response(status=status.HTTP_200_OK)
+        response.set_cookie(
+            "access_token",
+            access_token,
+            httponly=True,
+            secure=settings.COOKIE_SECURE,
+            samesite="Lax",
+            max_age=900,
+            path="/",
+        )
+        if "refresh" in serializer.validated_data:
             response.set_cookie(
                 "refresh_token",
-                refresh_token,
+                serializer.validated_data["refresh"],
                 httponly=True,
                 secure=settings.COOKIE_SECURE,
                 samesite="Lax",
                 max_age=604800,
                 path="/",
             )
-            return response
-        except:
-            no_token_res = Response(status=status.HTTP_401_UNAUTHORIZED)
-            no_token_res.set_cookie(
-                "access_token",
-                "",
-                httponly=True,
-                secure=settings.COOKIE_SECURE,
-                samesite="Lax",
-                max_age=0,
-            )
-            no_token_res.set_cookie(
-                "refresh_token",
-                "",
-                httponly=True,
-                secure=settings.COOKIE_SECURE,
-                samesite="Lax",
-                max_age=0,
-            )
-            return no_token_res
+        return response
 
 
 class LogoutView(APIView):
@@ -226,15 +236,47 @@ class LogoutView(APIView):
             token = RefreshToken(request.COOKIES.get("refresh_token"))
             token.blacklist()
             pass
-        except Exception as e:
+        except Exception:
             pass
 
         response = Response({"message": "Logout exitoso"}, status=status.HTTP_200_OK)
-
         response.delete_cookie("access_token")
         response.delete_cookie("refresh_token")
-
         return response
+
+
+class EmailVeriricationView(APIView):
+    permission_classes = [permissions.AllowAny]
+
+    def post(self, request: Request):
+        token = request.data.get("token")
+        try:
+            data = serializer.loads(token, max_age=60 * 60 * 24, salt="email-verification")
+        except SignatureExpired:
+            return Response({"detail": "Your token has expired!"}, status=status.HTTP_400_BAD_REQUEST)
+        except BadSignature as e:
+            print(e)
+            return Response({"detail": "Invalid token"}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            user = User.objects.get(id=data["user_id"])
+        except User.DoesNotExist:
+            return Response({"detail": "User does not exist."}, status=status.HTTP_400_BAD_REQUEST)
+
+        user = User.objects.get(id=data["user_id"])
+
+        if user.email != data["email"]:
+            return Response({"detail": "Token has invalid data!"}, status=status.HTTP_400_BAD_REQUEST)
+
+        if user.email_verified:
+            return Response({"detail": "Email already verified!"}, status=status.HTTP_400_BAD_REQUEST)
+
+        user.email_verified = True
+        user.is_active = True
+        user.save()
+        user.save(update_fields=["email_verified", "is_active"])
+
+        return Response({"detail": "Email verificado"})
 
 
 class AbstractView(ModelViewSet):
@@ -242,6 +284,7 @@ class AbstractView(ModelViewSet):
     serializer_class = AbstractSerializer
     permission_classes = [permissions.AllowAny]
 
+    # region otras vistas
     @action(detail=True, methods=["get"], url_path="affiliations")
     def get_affiliations(self, request, pk=None):
         abstract = self.get_object()
@@ -366,6 +409,25 @@ class AbstractView(ModelViewSet):
             "authors_list": authors_data,
             "affiliations_list": unique_affiliations,
         }
+
+    # endregion
+
+    @action(detail=False, methods=["get"], url_path="pending-posters")
+    def get_pending_posters(self, request):
+        # Empieza con todos los abstracts
+        queryset_base = Abstract.objects.all()
+
+        # encadena varios filtros pero sin ejecutar
+        pending_posters = (
+            queryset_base.filter(status=AbstactStatus.SUBMITTED)
+            .filter(presentation_type=AbstractPresentation.POSTER)
+            .filter(user__email_verified=True)
+            .order_by("-last_update")
+        )
+
+        # aquí es donde realmente ejecuta la consulta, al momento de leer
+        serializer = self.get_serializer(pending_posters, many=True)
+        return Response(serializer.data)
 
 
 class AuthorsView(ModelViewSet):

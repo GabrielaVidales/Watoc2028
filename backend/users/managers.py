@@ -8,7 +8,7 @@ class CustomUserManager(UserManager):
         
         email = self.normalize_email(email)
         if self.filter(email=email).exists():
-            raise ValueError('Ya existe una cuenta registrada con este correo.')       
+            raise ValueError('This email is already registered.')       
         
         user = self.model(email=email, **extra_fields)
         user.set_password(password)

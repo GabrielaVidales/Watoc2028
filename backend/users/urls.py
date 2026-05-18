@@ -10,8 +10,10 @@ router.register(r"users", views.UserView, "users")
 router.register(r"abstract-declarations", views.AuthorDeclarationsView, "abstract_declarations")
 router.register(r"tours", views.TourView, "tours")
 
+
 urlpatterns = [
     path("login/", views.CustomTokenObtainPairView.as_view(), name="login"),
     path("token/refresh/", views.CustomTokenRefreshView.as_view(), name="token_refresh"),
     path("logout/", views.LogoutView.as_view(), name="logout"),
+    path("verify-email/", views.EmailVeriricationView.as_view(), name="verify-email"),
 ] + router.urls

@@ -1,0 +1,45 @@
+{% extends "emails/email_base.html" %}
+
+{% block content %}
+
+<h1 style="margin:0 0 8px 0;color:#040b22;font-size:32px;line-height:1.2;font-weight:600;letter-spacing:-1px;">
+    Nueva solicitud de contacto
+</h1>
+
+<p class="text" style="margin:0;">
+    Se ha recibido una nueva solicitud de contacto a través del sitio web.
+</p>
+
+<hr>
+
+<h2 style="margin:0 0 12px 0;color:#040b22;font-size:24px;line-height:1.2;font-weight:600;letter-spacing:-1px;">
+    INFORMACIÓN DEL CONTACTO
+</h2>
+
+<div class="text">
+    <ul style="padding-left:20px;margin:0;">
+        <li style="margin-bottom:4px;">
+            Nombre: {{ first_name }} {{ last_name }}
+        </li>
+
+        <li style="margin-bottom:4px;">
+            Email: {{ email }}
+        </li>
+
+        <li style="margin-bottom:4px;">
+            Asunto: {{ subject }}
+        </li>
+    </ul>
+</div>
+
+<hr>
+
+<h2 style="margin:0 0 12px 0;color:#040b22;font-size:24px;line-height:1.2;font-weight:600;letter-spacing:-1px;">
+    Mensaje
+</h2>
+
+<p class="text" style="margin:0;">
+    {{ message }}
+</p>
+
+{% endblock %}

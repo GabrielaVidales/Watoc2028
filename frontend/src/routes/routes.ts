@@ -68,6 +68,7 @@ export const urls = {
     auth: createRouteGroup('/auth', {
         login: '/login',
         register: '/register',
+        verify: '/verify',
     }),
     users: createRouteGroup('/user', {
         profile: '/profile',

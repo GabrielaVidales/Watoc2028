@@ -16,7 +16,6 @@ export type AuthContextValue = {
     getProfile: () => Promise<UserProfile>
 }
 
-
 const AuthContext = createContext<AuthContextValue | undefined>(undefined)
 
 

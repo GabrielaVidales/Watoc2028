@@ -35,12 +35,13 @@ function ContactForm() {
             countyStateRegion: '',
             zip: '',
         },
-        mode: 'onChange',
+        mode: 'onTouched',
     })
 
     const { handleSubmit, formState: { errors, isDirty, isSubmitting, isSubmitSuccessful } } = form
 
     const onFormSubmit = handleSubmit(async (validData) => {
+        if (isSubmitting || isSubmitSuccessful) return
         try {
             const response = await axiosClient.post('/contact/', validData)
             if (import.meta.env.DEV) {
@@ -52,10 +53,17 @@ function ContactForm() {
                 if (import.meta.env.DEV) {
                     console.log(error.response)
                 }
-                form.setError('root', {
-                    type: 'root',
-                    message: 'Something went wrong. Try again later.',
-                })
+                if (error.response.data.message) {
+                    form.setError('root', {
+                        type: 'root',
+                        message: error.response.data.message,
+                    })
+                } else {
+                    form.setError('root', {
+                        type: 'root',
+                        message: 'Something went wrong. Try again later.',
+                    })
+                }
             }
         }
     })
@@ -91,10 +99,10 @@ function ContactForm() {
                             variant='success'
                             messages={[
                                 <span className='text-green-950'>
-                                    Your message was succesfully received. Our team will get back to you shortly.
+                                    Your message was successfully received. Our team will get back to you shortly.
                                 </span>
                             ]}
-                            title='Server responded with an error:'
+                            title='Message Sent!'
                         />
                     </motion.div>
                 )}
@@ -367,8 +375,3 @@ function ContactForm() {
 }
 
 export default ContactForm
-
-function ContactFormControllers() {
-
-
-}

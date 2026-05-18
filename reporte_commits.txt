@@ -1,0 +1,41 @@
+3433051 - edescal, Wed May 13 02:20:10 2026 -0600 : big update
+3cb3428 - edescal, Sat Mar 21 18:33:37 2026 -0600 : routing — stripe
+de5e34b - edescal, Wed Mar 11 14:19:56 2026 -0600 : mejoras en ui
+0c843d2 - edescal, Wed Mar 11 03:30:46 2026 -0600 : presentación
+f9fb381 - edescal, Mon Mar 9 01:24:44 2026 -0600 : Mejoras generales
+8dd6565 - edescal, Sun Mar 8 02:52:53 2026 -0600 : Mejora en registro
+3698acd - edescal, Fri Mar 6 13:56:08 2026 -0600 : pdf abstract
+617425b - edescal, Thu Mar 5 19:00:41 2026 -0600 : decouple abstract forms
+2b327a0 - edescal, Thu Mar 5 00:38:42 2026 -0600 : User profile, abstract y otros cambios
+e8fa9e6 - edescal, Wed Mar 4 01:42:04 2026 -0600 : download pdf abstracts
+87bf258 - edescal, Mon Mar 2 12:29:38 2026 -0600 : avance
+03c4438 - edescal, Sun Mar 1 19:27:37 2026 -0600 : avance
+ba0833f - edescal, Fri Feb 27 13:10:45 2026 -0600 : mejora de modelos del backend Author y Dinner
+bfd63f4 - edescal, Thu Feb 26 00:42:47 2026 -0600 : tabs al profile
+3448fb5 - edescal, Wed Feb 25 20:12:33 2026 -0600 : dashboard
+76d7742 - edescal, Sat Feb 21 01:41:16 2026 -0600 : Tailwind
+0e8d136 - edescal, Fri Feb 20 20:21:33 2026 -0600 : quitar mui icons
+d9b9968 - edescal, Tue Feb 17 00:23:21 2026 -0600 : README
+59ed770 - edescal, Tue Feb 17 00:06:53 2026 -0600 : tailwind confirmed
+3b2cbd3 - edescal, Fri Feb 13 18:16:43 2026 -0600 : Migrando a TypeScript
+37be70e - edescal, Thu Jan 29 02:03:41 2026 -0600 : fix
+7c8b72f - edescal, Wed Jan 28 23:52:46 2026 -0600 : listo para loggin
+5380649 - edescal, Wed Jan 28 19:23:14 2026 -0600 : registro
+455d2ba - edescal, Tue Jan 27 01:07:12 2026 -0600 : Abstract Form
+d83433b - edescal, Mon Jan 26 17:07:36 2026 -0600 : Login
+4adcf22 - edescal, Mon Jan 26 17:06:21 2026 -0600 : Login
+03f1c05 - edescal, Tue Jan 6 19:13:19 2026 -0600 : mejoras
+0734244 - edescal, Tue Jan 6 17:32:02 2026 -0600 : cambio de imágenes de /public a /src/assets
+534186a - edescal, Tue Jan 6 17:31:34 2026 -0600 : housekeeping
+e359743 - edescal, Fri Jan 2 02:09:47 2026 -0600 : ready for server
+1e76848 - edescal, Fri Jan 2 02:09:31 2026 -0600 : ready for server
+6b8bc71 - edescal, Tue Dec 23 14:16:46 2025 -0600 : add webmasters
+2b79380 - edescal, Tue Dec 23 12:48:27 2025 -0600 : Merge branch 'main' of https://github.com/GabrielaVidales/Watoc2028
+2bddef1 - edescal, Tue Dec 23 12:48:17 2025 -0600 : correcciones
+dcf8030 - edescal, Mon Dec 22 21:44:55 2025 -0600 : .
+84421e9 - edescal, Mon Dec 22 21:44:26 2025 -0600 : remove .env.*
+be09e6c - edescal, Mon Dec 22 21:37:18 2025 -0600 : clean
+183d90f - edescal, Mon Dec 22 14:58:00 2025 -0600 : backend
+95a9b95 - edescal, Mon Dec 22 14:54:57 2025 -0600 : frontend
+b3d834d - edescal, Sun Dec 21 14:21:13 2025 -0600 : clean main
+d84c249 - edescal, Sun Dec 21 14:20:28 2025 -0600 : clean main

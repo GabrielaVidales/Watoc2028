@@ -22,29 +22,38 @@ export default function LoginForm() {
         resolver: zodResolver(loginSchema),
         defaultValues: loginSchema.parse({}),
         mode: 'onChange',
-        reValidateMode: 'onChange'
     })
 
+    // Desestructuramos form para obtener atributos como variables
     const { isValid, isSubmitting, errors } = form.formState
-    const { setError, clearErrors } = form
+    // Desestructuramos form para obtener funciones como variables
+    const { setError, clearErrors, handleSubmit } = form
 
-    const onFormSubmit = form.handleSubmit(async (data) => {
+    // handleSubmit -> toma de argumento una función y devuelve otra función
+    const onFormSubmit = handleSubmit(async (data) => {
         try {
             await handleLogin(data.email.toLowerCase(), data.password)
             navigate('/user/profile')
         } catch (error) {
             if (isAxiosError(error)) {
+                if (error.response.data.message) {
+                    setError('root', {
+                        message: error.response.data.message,
+                        type: "400",
+                    })
+                }
                 const serverErrors = error.response.data.errors
-                Object.keys(serverErrors).forEach((key) => {
-                    const fieldName = key as keyof LoginFormValues
-                    const errorValue = serverErrors[fieldName]
-                    const message = Array.isArray(errorValue) ? errorValue.join('. ') : errorValue
-                    setError(fieldName, {
-                        type: "server",
-                        message: message
-                    }, { shouldFocus: true })
-                })
-
+                if (serverErrors) {
+                    Object.keys(serverErrors).forEach((key) => {
+                        const fieldName = key as keyof LoginFormValues
+                        const errorValue = serverErrors[fieldName]
+                        const message = Array.isArray(errorValue) ? errorValue.join('. ') : errorValue
+                        setError(fieldName, {
+                            type: "server",
+                            message: message
+                        }, { shouldFocus: true })
+                    })
+                }
             } else {
                 setError('root', {
                     message: 'Connection failed. Please try again later.',
@@ -147,7 +156,11 @@ export default function LoginForm() {
                 </div>
 
                 <div className='flex justify-center w-full'>
-                    <Button type='submit' variant='main' className='w-40 p-5 text-xl' data-icon="inline-start" disabled={!isValid}>
+                    <Button type='submit' variant='main'
+                        className='w-40 p-5 text-xl'
+                        data-icon="inline-start"
+                        disabled={!isValid}
+                    >
                         {isSubmitting ? (
                             <Spinner data-icon="inline-start" />
                         ) : (

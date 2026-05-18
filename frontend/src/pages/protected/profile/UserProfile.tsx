@@ -13,7 +13,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { urls } from '@/routes/routes';
 import { useProfiles } from '@/hooks/use-profiles';
 import { InfoAlert } from '@/components/InfoAlert';
-import { Separator } from '@/components/ui/separator';
 
 
 export default function UserProfile() {
@@ -36,7 +35,7 @@ export default function UserProfile() {
 									<h1 className="text-2xl font-bold text-foreground">
 										{currentUser.full_name}
 									</h1>
-
+									
 									{profile?.participant && (
 										<div className="flex flex-col text-sm leading-relaxed">
 											<span className="font-medium text-primary">

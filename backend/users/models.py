@@ -1,12 +1,38 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from .managers import CustomUserManager
-from .text_choices import Nationality, PrefixType, AbstractPresentation, AbstactStatus, DietaryRestrictionsList, FoodAllergiesList
+from .text_choices import (
+    Nationality,
+    PrefixType,
+    AbstractPresentation,
+    AbstactStatus,
+    DietaryRestrictionsList,
+    FoodAllergiesList,
+)
 
 
 class User(AbstractUser):
     username = None
-    email = models.EmailField(unique=True)
+    USERNAME_FIELD = "email"
+    REQUIRED_FIELDS = []
+
+    class Meta:
+        db_table = "user"
+        ordering = ["email"]
+        verbose_name = "Usuario"
+        verbose_name_plural = "Usuarios"
+
+    email = models.EmailField(
+        unique=True,
+        blank=False,
+        null=False,
+        error_messages={
+            "unique": "This email is already registered.",
+            "invalid": "That email format looks wrong.",
+        },
+    )
+    
+    # region Otros atributos...
     middle_name = models.CharField(max_length=100, blank=True, default="")
 
     prefix = models.CharField(max_length=10, choices=PrefixType.choices, default=PrefixType.PROF)
@@ -17,10 +43,10 @@ class User(AbstractUser):
 
     photo = models.ImageField(upload_to="users/photos/", blank=True, null=True)
 
-    USERNAME_FIELD = "email"
-    REQUIRED_FIELDS = []
-
     objects = CustomUserManager()
+    
+    email_verified = models.BooleanField(default=False)
+    # endregion
 
     @property
     def full_name(self):
@@ -36,6 +62,9 @@ class User(AbstractUser):
 
 
 class Participant(models.Model):
+    class Meta:
+        db_table = "participant"
+        
     user = models.OneToOneField(
         User,
         primary_key=True,
@@ -220,6 +249,6 @@ class Tour(models.Model):
     description = models.TextField()
     image = models.ImageField(upload_to="tours/image/", blank=True, null=True)
     price = models.DecimalField(max_digits=10, decimal_places=2)
-    
+
     def __str__(self):
         return f"[{self.pk}] Tour {self.name} (${self.price} MXN): {self.description[:50] + '...' if len(self.description) > 50 else ''}"

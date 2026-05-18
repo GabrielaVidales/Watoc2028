@@ -1,8 +1,6 @@
 import React, { useEffect } from 'react'
-import { Field, FieldContent, FieldDescription, FieldError, FieldLabel } from '@/components/ui/field'
-import { Input } from '@/components/ui/input'
+import { Field, FieldDescription, FieldError, FieldLabel } from '@/components/ui/field'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Textarea } from '@/components/ui/textarea'
 import { presentationTypes, type AbstractSchema } from '@/schemas/abstract-schemas'
 import { Controller, useFormContext } from 'react-hook-form'
 import { InfoAlert } from '@/components/InfoAlert'
@@ -19,16 +17,16 @@ type AbstractFormProps = {
 function AbstractForm({ abstract }: AbstractFormProps) {
     const mobile = useIsMobile()
 
-    const { reset, control, watch, formState: { isSubmitting } } = useFormContext<AbstractSchema>()
+    const { reset, control, formState: { isSubmitting } } = useFormContext<AbstractSchema>()
 
     useEffect(() => {
         reset(abstract || {})
     }, [abstract])
 
-    const textContent = watch('text')
-    const titleContent = watch('title')
-    const referencesContent = watch('references')
-
+    // Esta función toma un input, separa las palabras en un Array de string
+    // Luego utiliza filter con la función Boolean(value) para eliminar
+    // strings vacíos "" que son evaluados como Boolean("") = false y cuenta
+    // las palabras reales
     const countWords = (input: string) => input?.split(/\s+/).filter(Boolean).length
 
     return (
@@ -46,6 +44,7 @@ function AbstractForm({ abstract }: AbstractFormProps) {
                                     id={field.name}
                                     aria-invalid={fieldState.invalid}
                                     maxLength={128}
+                                    spellCheck='false'
                                     autoComplete="off"
                                     className='h-12 text-xl! tracking-wide placeholder:font-normal'
                                 />

@@ -4,10 +4,9 @@ from django.contrib.auth.models import Group
 from django.contrib.auth import get_user_model
 from django.db import transaction
 from rest_framework import serializers
-from utils.validators import valid_email, valid_name
 from datetime import datetime
-from . import models
-from . import text_choices
+from . import models, text_choices, validators
+import bleach
 
 User = get_user_model()
 
@@ -37,6 +36,8 @@ class UserSerializer(serializers.ModelSerializer):
         fields = [
             "id",
             "email",
+            "email_verified",
+            "is_active",
             "password",
             "first_name",
             "middle_name",
@@ -54,15 +55,14 @@ class UserSerializer(serializers.ModelSerializer):
         ]
         extra_kwargs = {
             "first_name": {
-                "validators": [valid_name],
+                "validators": [validators.valid_name],
                 "allow_blank": False,
             },
             "last_name": {
-                "validators": [valid_name],
+                "validators": [validators.valid_name],
                 "allow_blank": False,
             },
             "email": {
-                "validators": [valid_email],
                 "allow_blank": False,
             },
             "city": {
@@ -90,17 +90,24 @@ class UserSerializer(serializers.ModelSerializer):
         except Exception:
             return None
 
+    def validate_first_name(self, value):
+        return bleach.clean(value, [], [])
+
+    def validate_last_name(self, value):
+        return bleach.clean(value, [], [])
+
     def validate_email(self, email):
-        user_id = self.instance.id if self.instance else None
-        if User.objects.filter(email__iexact=email).exclude(id=user_id).exists():
-            raise serializers.ValidationError("This email is already registered.")
+        try:
+            user_id = self.instance.id if self.instance else None
+            validators.validate_email(email, user_id)
+        except exceptions.ValidationError as e:
+            raise exceptions.ValidationError(list(e.messages))
         return email
 
     def validate_password(self, value):
         try:
             password_validation.validate_password(value)
         except exceptions.ValidationError as e:
-            print(e.messages)
             raise exceptions.ValidationError(list(e.messages))
         return value
 
@@ -269,10 +276,18 @@ class AbstractSerializer(serializers.ModelSerializer):
         model = models.Abstract
         fields = "__all__"
         read_only_fields = ["created_at", "last_update", "needs_review"]
+        
+    def validate_title(self, value):
+        sanitized_value = bleach.clean(value, [], {})
+        return sanitized_value
+
+    def validate_text(self, value):
+        sanitized_value = bleach.clean(value, [], {})
+        return sanitized_value
 
     @transaction.atomic
     def create(self, validated_data):
-        instance = models.Abstract()
+        instance = models.Abstract(**validated_data)
         request = self.context.get("request", None)
         instance.user = request.user
         instance.save()
