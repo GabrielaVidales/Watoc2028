@@ -10,6 +10,7 @@ import { urls } from '@/routes/routes'
 import { useAuth } from '@/contexts/AuthContext'
 import { useProfiles } from '@/hooks/use-profiles'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import EnrichedTextArea from '@/components/EnrichedTextArea'
 
 
 function SidebarsLayout() {
@@ -152,6 +153,8 @@ function SidebarsLayout() {
                                     Editar Datos
                                 </h1>
                             </header>
+
+                            <EnrichedTextArea/>
 
                             <section className='min-h-screen'>
                                 <div className="flex flex-col gap-10 md:flex-[1.3]">

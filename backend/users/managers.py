@@ -14,7 +14,7 @@ class CustomUserManager(UserManager):
         user.set_password(password)
         user.save(using=self._db)
         
-        admin_group, _ = Group.objects.get_or_create(name='admin')
+        admin_group, _ = Group.objects.get_or_create(name='participant')
         user.groups.add(admin_group)
         
         return user
@@ -29,4 +29,8 @@ class CustomUserManager(UserManager):
         if extra_fields.get('is_superuser') is not True:
             raise ValueError('Superuser debe tener is_superuser=True.')
 
-        return self.create_user(email, password, **extra_fields)
+        superuser = self.create_user(email, password, **extra_fields)
+        
+        admin_group, _ = Group.objects.get_or_create(name='admin')
+        superuser.groups.add(admin_group)
+        return superuser

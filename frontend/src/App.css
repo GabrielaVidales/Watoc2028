@@ -6,115 +6,28 @@
   padding: 0rem;
   display: flex;
   flex-direction: column;
-  /* text-align: center; */
 }
 
-
-/* Estilo por defecto para pantallas grandes */
-/* h1 {
-  font-size: 4rem;
+.tiptap p.is-editor-empty:first-child::before {
+  color: var(--muted-foreground);
+  content: attr(data-placeholder);
+  float: left;
+  height: 0;
+  pointer-events: none;
 }
 
-h2 {
-  font-size: 3rem;
+.ProseMirror {
+  font-family: Georgia, serif;
 }
 
-h3 {
-  font-size: 2.5rem;
+.ProseMirror em {
+  font-style: italic;
 }
 
-h4 {
-  font-size: 2rem;
+.ProseMirror strong {
+  font-weight: bold;
 }
 
-h5 {
-  font-size: 1.5rem;
+.ProseMirror u {
+  text-decoration: underline;
 }
-
-h6 {
-  font-size: 1.25rem;
-}
-
-body,
-p,
-span {
-  font-size: 0.9rem;
-}
-
-small {
-  font-size: 0.8rem;
-} */
-
-/* Estilos para pantallas medianas (por ejemplo, tabletas) */
-/* @media (max-width: 1024px) {
-  h1 {
-    font-size: 3rem;
-  }
-
-  h2 {
-    font-size: 2.5rem;
-  }
-
-  h3 {
-    font-size: 2rem;
-  }
-
-  h4 {
-    font-size: 1.75rem;
-  }
-
-  h5 {
-    font-size: 1.25rem;
-  }
-
-  h6 {
-    font-size: 1.125rem;
-  }
-
-  body,
-  p,
-  span {
-    font-size: 0.9rem;
-  }
-
-  small {
-    font-size: 0.7rem;
-  }
-} */
-
-/* Estilos para pantallas pequeñas (por ejemplo, teléfonos móviles) */
-/* @media (max-width: 600px) {
-  h1 {
-    font-size: 2rem;
-  }
-
-  h2 {
-    font-size: 1.75rem;
-  }
-
-  h3 {
-    font-size: 1.5rem;
-  }
-
-  h4 {
-    font-size: 1.25rem;
-  }
-
-  h5 {
-    font-size: 1rem;
-  }
-
-  h6 {
-    font-size: 0.875rem;
-  }
-
-  body,
-  p,
-  span {
-    font-size: 0.875rem;
-  }
-
-  small {
-    font-size: 0.7rem;
-  }
-} */

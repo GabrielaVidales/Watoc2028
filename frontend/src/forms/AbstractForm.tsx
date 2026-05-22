@@ -7,6 +7,7 @@ import { InfoAlert } from '@/components/InfoAlert'
 import { InputGroup, InputGroupAddon, InputGroupInput, InputGroupText, InputGroupTextarea } from '@/components/ui/input-group'
 import { useIsMobile } from '@/hooks/use-mobile'
 import { cn } from '@/lib/utils'
+import RichTextEditor from '@/components/EnrichedTextArea'
 
 
 type AbstractFormProps = {
@@ -16,6 +17,9 @@ type AbstractFormProps = {
 
 function AbstractForm({ abstract }: AbstractFormProps) {
     const mobile = useIsMobile()
+
+    console.log(abstract);
+
 
     const { reset, control, formState: { isSubmitting } } = useFormContext<AbstractSchema>()
 
@@ -63,6 +67,8 @@ function AbstractForm({ abstract }: AbstractFormProps) {
                     )}
                 />
 
+
+
                 <Controller
                     name="presentation_type"
                     defaultValue='oral'
@@ -97,34 +103,36 @@ function AbstractForm({ abstract }: AbstractFormProps) {
                     )}
                 />
 
+                {/* <RichTextEditor /> */}
+
+
                 <Controller
                     name="text"
                     control={control}
                     render={({ field, fieldState }) => (
                         <Field data-invalid={fieldState.invalid}>
                             <FieldLabel htmlFor={field.name}>Abstract text</FieldLabel>
-                            <InputGroup>
-                                <InputGroupTextarea
-                                    {...field}
-                                    id={field.name}
-                                    aria-invalid={fieldState.invalid}
-                                    autoComplete="off"
-                                    autoCorrect="off"
-                                    spellCheck="false"
-                                    placeholder="Provide a concise summary of your work (max. 350 words)..."
-                                    className="min-h-40 wrap-anywhere max-h-80"
-                                    maxLength={3500}
-                                />
-                                <InputGroupAddon align={"block-end"}>
+                            {/* <InputGroup> */}
+                            <RichTextEditor
+                                {...field}
+                                invalid={fieldState.invalid}
+                                id={field.name}
+                                autoComplete="off"
+                                autoCorrect="off"
+                                spellCheck="false"
+                                placeholder="Provide a concise summary of your work (max. 350 words)..."
+                                className="min-h-40 wrap-anywhere max-h-80"
+                                maxLength={3500}
+                                footer={
                                     <InputGroupText className={'ml-auto'}>
                                         <FieldLabel htmlFor={field.name} className={cn(
-                                            countWords(field.value || "") > 350 && 'text-destructive'
+                                            (fieldState.invalid || countWords(field.value || "") > 350) && 'text-destructive'
                                         )}>
                                             {countWords(field.value || "")}/350 words
                                         </FieldLabel>
                                     </InputGroupText>
-                                </InputGroupAddon>
-                            </InputGroup>
+                                }
+                            />
                             {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                         </Field>
                     )}

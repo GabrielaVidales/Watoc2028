@@ -20,6 +20,16 @@ export function ProtectedRoute({ allowedRoles }: ProtectedRouteProps) {
         return <Navigate to={urls.auth.login} replace />
     }
 
+    if (!currentUser.is_active) {
+        return (
+            <div className='h-screen flex flex-col justify-center items-center'>
+                <h1 className='text-2xl font-semibold'>
+                    Your account is deactivated
+                </h1>
+            </div>
+        )
+    }
+
     const authorized = currentUser?.roles.some(
         role => allowedRoles?.includes(role)
     )
@@ -28,21 +38,11 @@ export function ProtectedRoute({ allowedRoles }: ProtectedRouteProps) {
         return <Navigate to={urls.auth.login} replace />
     }
 
-    if (!currentUser.email_verified) {
+    if (!currentUser.roles.includes('admin') && !currentUser.email_verified) {
         return (
             <div className='h-screen flex flex-col justify-center items-center'>
                 <h1 className='text-2xl font-semibold'>
                     You must verify your email!
-                </h1>
-            </div>
-        )
-    }
-
-     if (!currentUser.is_active) {
-        return (
-            <div className='h-screen flex flex-col justify-center items-center'>
-                <h1 className='text-2xl font-semibold'>
-                    Your account is deactivated
                 </h1>
             </div>
         )

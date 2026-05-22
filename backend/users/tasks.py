@@ -8,7 +8,6 @@ from django.core.mail import EmailMultiAlternatives
 serializer = URLSafeTimedSerializer(settings.SECRET_KEY)
 
 @shared_task(
-    bind=True,
     autoretry_for=(Exception,),
     retry_backoff=True,
     retry_kwargs={"max_retries": 3},
@@ -48,7 +47,7 @@ If you did not create this account, you can safely ignore this email.
     email = EmailMultiAlternatives(
         subject="<no-reply> — Please verify your email",
         body=text_content,
-        to=[settings.EMAIL_HOST_USER],
+        to=[user.email],
         from_email=settings.DEFAULT_FROM_EMAIL,
     )
     email.attach_alternative(html_content, "text/html")

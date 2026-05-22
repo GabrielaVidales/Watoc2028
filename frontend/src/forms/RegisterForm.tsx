@@ -62,7 +62,13 @@ export default function RegisterForm() {
     const onFormSubmit = handleSubmit(async (data) => {
         try {
             await axiosClient.post('/users/', data)
-            navigate(urls.auth.login, { replace: true })
+            navigate(urls.auth.login, {
+                replace: true,
+                state: {
+                    title: "Registration Successful",
+                    message: "Your account has been created. Please log in."
+                }
+            })
 
         } catch (error) {
             if (isAxiosError(error)) {

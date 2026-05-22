@@ -8,7 +8,8 @@ from rest_framework.response import Response
 from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from rest_framework_simplejwt.tokens import RefreshToken
-
+from rest_framework_simplejwt.exceptions import TokenError
+from rest_framework.exceptions import AuthenticationFailed
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.utils.decorators import method_decorator
 from django.contrib.auth.models import update_last_login
@@ -29,7 +30,7 @@ from .models import Abstract, AbstactStatus, Author, AuthorAffiliation, Abstract
 from django.http import HttpResponse
 from django.template.loader import render_to_string
 from config.permissions import HasCSRFToken
-from . import tasks as celery_tasks
+from .tasks import send_email_confirmation_email
 import os
 from itsdangerous import BadSignature
 from itsdangerous import SignatureExpired
@@ -53,8 +54,8 @@ class UserView(ModelViewSet):
         return [permissions.IsAuthenticated(), HasCSRFToken()]
 
     def perform_create(self, serializer):
-        user = serializer.save(is_active=False)
-        celery_tasks.send_email_confirmation_email(user.id)
+        user = serializer.save(email_verified=False)
+        send_email_confirmation_email.delay(user.id)
 
     @action(detail=False, methods=["get"], url_path="session")
     @method_decorator(ensure_csrf_cookie)
@@ -136,8 +137,15 @@ class CustomTokenObtainPairView(TokenObtainPairView):
             response = Response(serializer.validated_data, status=status.HTTP_200_OK)
         except Exception as e:
             email = request.data.get("email")
+            print(email)
             email_registered = User.objects.filter(email=email).exists()
             print(e)
+            print(request.data)
+            
+            user = User.objects.filter(email=email).first()
+            pene = user.check_password(request.data['password'])
+            print(pene)
+            
             print(email_registered)
             if not email_registered:
                 return Response(
@@ -198,7 +206,14 @@ class CustomTokenRefreshView(TokenRefreshView):
         serializer = self.get_serializer(data={"refresh": refresh_token})
         try:
             serializer.is_valid(raise_exception=True)
-        except TokenError:
+        except TokenError as e:
+            print(e)
+            response = Response(status=status.HTTP_401_UNAUTHORIZED)
+            response.delete_cookie("access_token", path="/")
+            response.delete_cookie("refresh_token", path="/")
+            return response
+        except AuthenticationFailed as e:
+            print(e)
             response = Response(status=status.HTTP_401_UNAUTHORIZED)
             response.delete_cookie("access_token", path="/")
             response.delete_cookie("refresh_token", path="/")

@@ -99,10 +99,10 @@ class UserSerializer(serializers.ModelSerializer):
     def validate_email(self, email):
         try:
             user_id = self.instance.id if self.instance else None
-            validators.validate_email(email, user_id)
+            valid_email=validators.validate_email(email, user_id)
         except exceptions.ValidationError as e:
             raise exceptions.ValidationError(list(e.messages))
-        return email
+        return valid_email
 
     def validate_password(self, value):
         try:
@@ -118,9 +118,6 @@ class UserSerializer(serializers.ModelSerializer):
         password = validated_data.pop("password", None)
 
         user = User.objects.create_user(email=email, password=password, **validated_data)
-
-        participant = Group.objects.get(name="participant")
-        user.groups.add(participant)
 
         participant_serializer = ParticipantSerializer(data=participant_data)
         if participant_serializer.is_valid(raise_exception=True):
