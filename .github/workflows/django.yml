@@ -1,0 +1,44 @@
+name: Django CI
+
+on:
+  push:
+    branches: [ "escalante" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    strategy:
+      max-parallel: 4
+      matrix:
+        python-version: [3.12]
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Check secret
+        run: |
+          if [ -z "$VPS_HOST" ]; then
+            echo "HOST VACÍO"
+            exit 1
+          else
+            echo "HOST OK"
+          fi
+        env:
+          VPS_HOST: ${{ secrets.VPS_HOST }}
+      
+      - name: SSH Deploy
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          timeout: 10m
+          command_timeout: 10m
+          script: |
+            echo "Starting deploy..."
+            /var/www/watoc2028development/deploy.sh
+            echo "Deploy finished!"
+            
+            
+
