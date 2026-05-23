@@ -137,16 +137,7 @@ class CustomTokenObtainPairView(TokenObtainPairView):
             response = Response(serializer.validated_data, status=status.HTTP_200_OK)
         except Exception as e:
             email = request.data.get("email")
-            print(email)
             email_registered = User.objects.filter(email=email).exists()
-            print(e)
-            print(request.data)
-            
-            user = User.objects.filter(email=email).first()
-            pene = user.check_password(request.data['password'])
-            print(pene)
-            
-            print(email_registered)
             if not email_registered:
                 return Response(
                     {
@@ -158,15 +149,28 @@ class CustomTokenObtainPairView(TokenObtainPairView):
                     status=status.HTTP_401_UNAUTHORIZED,
                 )
             else:
-                return Response(
-                    {
-                        "errors": {
-                            "password": ["Incorrect password. Please verify your credentials."],
-                            "root": ["Authentication failed. Please check your details and try again."],
-                        }
-                    },
-                    status=status.HTTP_401_UNAUTHORIZED,
-                )
+                user = User.objects.filter(email=email).first()
+                # Contraseña equivocada
+                if user and user.check_password(request.data["password"]):
+                    return Response(
+                        {
+                            "errors": {
+                                "password": ["Incorrect password. Please verify your credentials."],
+                                "root": ["Authentication failed. Please check your details and try again."],
+                            }
+                        },
+                        status=status.HTTP_401_UNAUTHORIZED,
+                    )
+                # otro error
+                else:
+                    return Response(
+                        {
+                            "errors": {
+                                "root": ["Authentication failed. Please try again."],
+                            }
+                        },
+                        status=status.HTTP_401_UNAUTHORIZED,
+                    )
 
         user = serializer.user
         update_last_login(None, user)
