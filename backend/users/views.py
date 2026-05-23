@@ -151,7 +151,7 @@ class CustomTokenObtainPairView(TokenObtainPairView):
             else:
                 user = User.objects.filter(email=email).first()
                 # Contraseña equivocada
-                if user and user.check_password(request.data["password"]):
+                if user and not user.check_password(request.data["password"]):
                     return Response(
                         {
                             "errors": {

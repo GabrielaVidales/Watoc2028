@@ -37,7 +37,7 @@ jobs:
           command_timeout: 10m
           script: |
             echo "Starting deploy..."
-            /var/www/watoc2028development/deploy.sh
+            /home/watoc/scripting/deploy_watoc_dev.sh
             echo "Deploy finished!"
             
             
