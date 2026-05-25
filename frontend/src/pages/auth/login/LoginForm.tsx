@@ -25,12 +25,9 @@ export default function LoginForm() {
         mode: 'onChange',
     })
 
-    // Desestructuramos form para obtener atributos como variables
     const { isValid, isSubmitting, errors } = form.formState
-    // Desestructuramos form para obtener funciones como variables
     const { setError, clearErrors, handleSubmit } = form
 
-    // handleSubmit -> toma de argumento una función y devuelve otra función
     const onFormSubmit = handleSubmit(async (data) => {
         try {
             await handleLogin(data.email.toLowerCase(), data.password)
@@ -131,11 +128,13 @@ export default function LoginForm() {
                                     {...field}
                                     id={field.name}
                                     aria-invalid={fieldState.invalid}
+                                    type='email'
+                                    autoComplete='email'
                                     placeholder="yourmail@example.com"
                                 />
-                                <InputGroupAddon align="inline-start" className={
-                                    cn(fieldState.invalid ? 'text-destructive' : '')
-                                }>
+                                <InputGroupAddon align="inline-start" className={cn(
+                                    fieldState.invalid ? 'text-destructive' : ''
+                                )}>
                                     <Mail />
                                 </InputGroupAddon>
                             </InputGroup>
@@ -154,7 +153,7 @@ export default function LoginForm() {
                                     {...field}
                                     id={field.name}
                                     aria-invalid={fieldState.invalid}
-                                    autoComplete="off"
+                                    autoComplete="current-password"
                                     type={showPassword ? 'text' : 'password'}
                                     placeholder="**********"
                                 />

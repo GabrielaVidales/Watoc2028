@@ -1,7 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import React from 'react'
 import { Controller, useForm } from 'react-hook-form'
-import { contactSchemaForm, type ContactFormValues } from './contact-form-schema'
+import { contactSchemaForm, contactSubject, type ContactFormValues } from './contact-form-schema'
 import { Field, FieldContent, FieldError, FieldLabel, } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
@@ -16,6 +16,7 @@ import { isAxiosError } from 'axios'
 import { AnimatePresence, motion } from 'motion/react'
 import { InfoAlert } from '@/components/InfoAlert'
 import { Spinner } from '@/components/ui/spinner'
+import { toSnakeCase } from '@/lib/utils'
 
 
 function ContactForm() {
@@ -43,7 +44,7 @@ function ContactForm() {
     const onFormSubmit = handleSubmit(async (validData) => {
         if (isSubmitting || isSubmitSuccessful) return
         try {
-            const response = await axiosClient.post('/contact/', validData)
+            const response = await axiosClient.post('/contact/', toSnakeCase(validData))
             if (import.meta.env.DEV) {
                 console.log(response);
             }
@@ -300,6 +301,45 @@ function ContactForm() {
                         )}
                     />
                 </div>
+
+
+                <Controller
+                    name="subject"
+                    defaultValue=''
+                    control={form.control}
+                    render={({ field, fieldState }) => (
+                        <Field orientation="responsive" data-invalid={fieldState.invalid} className='relative col-span-full'>
+                            <FieldLabel htmlFor="presentationType">Presentation Format</FieldLabel>
+                            <Select
+                                name={field.name}
+                                value={field.value}
+                                onValueChange={field.onChange}
+                            >
+                                <SelectTrigger
+                                    id="presentationType"
+                                    aria-invalid={fieldState.invalid}
+                                    className="min-w-30 border-2"
+                                >
+                                    <SelectValue placeholder="Choose an option..." />
+                                </SelectTrigger>
+                                <SelectContent position="item-aligned">
+                                    {contactSubject.map(item => (
+                                        <SelectItem key={item.value} value={item.value}>
+                                            {item.label}
+                                        </SelectItem>
+                                    ))}
+
+                                </SelectContent>
+                            </Select>
+                            {fieldState.invalid && (
+                                <div className="absolute -bottom-7 left-0">
+                                    <FieldError errors={[fieldState.error]} />
+                                </div>
+                            )}
+                        </Field>
+                    )}
+                />
+
                 <Controller
                     name="message"
                     control={form.control}

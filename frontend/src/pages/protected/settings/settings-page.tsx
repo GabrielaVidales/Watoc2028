@@ -1,0 +1,155 @@
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { useAuth, type UserProfile } from '@/contexts/AuthContext'
+import React from 'react'
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Calendar, Mail, MapPin, UserRoundPen, House, Image, LockKeyhole, LogOut, Clock, FileText } from "lucide-react";
+import { formatDate } from '@/utils/formatDate';
+import { UserPictureForm } from '@/forms/UserPictureForm';
+import { NavLink } from 'react-router';
+import ChangePasswordForm from '@/forms/ChangePasswordForm';
+import EditUserForm from '@/forms/EditUserForm';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { urls } from '@/routes/routes';
+import { useProfiles } from '@/hooks/use-profiles';
+import { InfoAlert } from '@/components/InfoAlert';
+
+function SettingsPage() {
+    const { currentUser } = useAuth()
+    const { profile } = useProfiles()
+
+    return (
+        <div className='w-full max-w-4xl mx-auto bg-background border-2 p-3 rounded-lg shadow-lg flex flex-col gap-5'>
+            <Tabs defaultValue="home">
+                <TabsList variant='line' className='w-full justify-between overflow-x-auto overflow-y-hidden'>
+                    <TabsTrigger value="home" className="flex-1 gap-2">
+                        <House className="size-5" />
+                        <span className="hidden md:inline">Home</span>
+                    </TabsTrigger>
+
+                    <TabsTrigger value="account" className="flex-1 gap-2">
+                        <UserRoundPen className="size-5" />
+                        <span className="hidden md:inline">Edit Account</span>
+                    </TabsTrigger>
+
+                    <TabsTrigger value="picture" className="flex-1 gap-2">
+                        <Image className="size-5" />
+                        <span className="hidden md:inline">Change Photo</span>
+                    </TabsTrigger>
+
+                    <TabsTrigger value="password" className="flex-1 gap-2">
+                        <LockKeyhole className="size-5" />
+                        <span className="hidden md:inline">Change Password</span>
+                    </TabsTrigger>
+                </TabsList>
+                <TabsContent value='home' className='w-full p-9 space-y-8 px-5 sm:px-9'>
+                    <section className="space-y-2">
+                        <h2 className="text-2xl font-semibold">
+                            Welcome back
+                        </h2>
+                        <p className="text-muted-foreground text-sm">
+                            Manage your registration and abstract submissions for WATOC 2028.
+                        </p>
+                    </section>
+                    <div className="flex items-center justify-between rounded-lg border p-4">
+                        <div className="space-y-1">
+                            <p className="font-medium">Complete your registration</p>
+                            <p className="text-sm text-muted-foreground">
+                                Confirm your attendance and finish your payment.
+                            </p>
+                        </div>
+
+                        <Button asChild>
+                            <NavLink to={urls.users.confirmAssistance.start}>
+                                Start
+                            </NavLink>
+                        </Button>
+                    </div>
+
+
+                    <section className='space-y-4'>
+                        <h2 className='text-2xl font-semibold text-primary-main'>Registration</h2>
+                        <p>
+                            <b>Confirm your assistance to WATOC 2028:</b> complete your registration for the congress and finish your payment.
+                        </p>
+                        <Button className="w-full px-5 sm:w-auto font-bold rounded-full" asChild>
+                            <NavLink to={urls.users.confirmAssistance.start}>
+                                Start Registration
+                            </NavLink>
+                        </Button>
+                    </section>
+
+                    <section className="space-y-4">
+                        <h2 className='text-2xl font-semibold text-primary-main'>Abstract submission</h2>
+                        <p>
+                            <b>Submit an abstract</b>: start a new submission or continue working on an existing one.
+                        </p>
+                        <InfoAlert
+                            title="Abstract submission deadline: June 1, 2027"
+                            messages={[
+                                "Don't forget to review the submission guidelines before uploading",
+                                <NavLink to={urls.users.viewAbstracts}>
+                                    <Button variant="link" className="h-auto p-0 text-blue-600 font-semibold">
+                                        Read Guidelines
+                                    </Button>
+                                </NavLink>
+                            ]}
+                            icon={<Clock />}
+                        />
+
+                        <Button className="w-full px-5 sm:w-auto font-bold rounded-full" asChild>
+                            <NavLink to={urls.users.viewAbstracts}>
+                                View My Submissions
+                            </NavLink>
+                        </Button>
+                    </section>
+
+                </TabsContent>
+                <TabsContent value="account" className='w-full py-9 pt-4 space-y-5 px-5 sm:px-9'>
+                    <h2 className='text-2xl font-semibold text-primary-main'>Edit your profile data</h2>
+                    {profile?.participant && (
+                        <EditUserForm defaultValues={{
+                            ...currentUser,
+                            email: {
+                                value: '',
+                                confirm: ''
+                            },
+                            participant: {
+                                affiliation: profile.participant.affiliation,
+                                job_title: profile.participant.job_title,
+                                field_of_study: profile.participant.field_of_study
+                            }
+                        }} />
+                    )}
+                </TabsContent>
+                <TabsContent value="picture" className='w-full py-9 pt-4 space-y-5 px-5 sm:px-9'>
+                    <h2 className='text-2xl font-semibold text-primary-main'>Edit Profile Picture</h2>
+                    <InfoAlert
+                        title="Profile Picture Guidelines"
+                        messages={[
+                            'Resolution: Square, 400x400px or higher.',
+                            'Max file size: 1.00 MB.',
+                            'Format: Use solid backgrounds (no transparency).',
+                        ]}
+                    />
+                    <UserPictureForm />
+                </TabsContent>
+                <TabsContent value="password" className='w-full py-9 pt-4 space-y-5 px-5 sm:px-9'>
+                    <h2 className='text-2xl font-semibold text-primary-main'>Change password</h2>
+                    <InfoAlert
+                        title="Password Requirements"
+                        messages={[
+                            'Minimum 8 characters.',
+                            'Include at least one uppercase letter.',
+                            'Include at least one number.',
+                            'Include at least one special character (e.g., !@#$%).',
+                        ]}
+                    />
+                    <ChangePasswordForm />
+                </TabsContent>
+            </Tabs>
+        </div>
+    )
+}
+
+export default SettingsPage

@@ -16,21 +16,12 @@ type AbstractFormProps = {
 }
 
 function AbstractForm({ abstract }: AbstractFormProps) {
-    const mobile = useIsMobile()
-
-    console.log(abstract);
-
-
     const { reset, control, formState: { isSubmitting } } = useFormContext<AbstractSchema>()
 
     useEffect(() => {
         reset(abstract || {})
     }, [abstract])
 
-    // Esta función toma un input, separa las palabras en un Array de string
-    // Luego utiliza filter con la función Boolean(value) para eliminar
-    // strings vacíos "" que son evaluados como Boolean("") = false y cuenta
-    // las palabras reales
     const countWords = (input: string) => input?.split(/\s+/).filter(Boolean).length
 
     return (
@@ -42,32 +33,29 @@ function AbstractForm({ abstract }: AbstractFormProps) {
                     render={({ field, fieldState }) => (
                         <Field data-invalid={fieldState.invalid} className='w-full'>
                             <FieldLabel htmlFor={field.name}>Abstract title</FieldLabel>
-                            <InputGroup>
-                                <InputGroupInput
-                                    {...field}
-                                    id={field.name}
-                                    aria-invalid={fieldState.invalid}
-                                    maxLength={128}
-                                    spellCheck='false'
-                                    autoComplete="off"
-                                    className='h-12 text-xl! tracking-wide placeholder:font-normal'
-                                />
-                                <InputGroupAddon align={mobile ? 'block-end' : "inline-end"}>
-                                    <InputGroupText className={mobile ? 'ml-auto' : "tabular-nums"}>
+                            <RichTextEditor
+                                {...field}
+                                invalid={fieldState.invalid}
+                                id={field.name}
+                                autoComplete="off"
+                                autoCorrect="off"
+                                spellCheck="false"
+                                className="wrap-anywhere py-0 text-xl"
+                                maxLength={3500}
+                                footer={
+                                    <InputGroupText className={'ml-auto'}>
                                         <FieldLabel htmlFor={field.name} className={cn(
-                                            countWords(field.value || "") > 10 && 'text-destructive'
+                                            (fieldState.invalid || countWords(field.value || "") > 10) && 'text-destructive'
                                         )}>
                                             {countWords(field.value || "")}/10 words
                                         </FieldLabel>
                                     </InputGroupText>
-                                </InputGroupAddon>
-                            </InputGroup>
+                                }
+                            />
                             {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                         </Field>
                     )}
                 />
-
-
 
                 <Controller
                     name="presentation_type"
@@ -112,7 +100,6 @@ function AbstractForm({ abstract }: AbstractFormProps) {
                     render={({ field, fieldState }) => (
                         <Field data-invalid={fieldState.invalid}>
                             <FieldLabel htmlFor={field.name}>Abstract text</FieldLabel>
-                            {/* <InputGroup> */}
                             <RichTextEditor
                                 {...field}
                                 invalid={fieldState.invalid}
@@ -137,14 +124,7 @@ function AbstractForm({ abstract }: AbstractFormProps) {
                         </Field>
                     )}
                 />
-
-                <InfoAlert
-                    variant='warning'
-                    title='IMPORTANT'
-                    messages={'Total character count is 2,600 and includes spaces. Tables and images are not included, as only text is allowed. You will be able to see your character count below the text boxes.'}
-                    className='mx-auto'
-                />
-
+                
                 <Controller
                     name="references"
                     control={control}

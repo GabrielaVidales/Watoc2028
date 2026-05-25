@@ -22,12 +22,16 @@ class ContactRequestListCreateView(generics.ListCreateAPIView):
 
     @transaction.atomic
     def post(self, request):
+        self.get_queryset().delete()
+        
+        print(request.data)
         serializer = self.get_serializer(data=request.data)
         if serializer.is_valid():
             instance: ContactRequest = serializer.save()
             
+            
             # función lambda
-            transaction.on_commit(lambda: send_contact_request_email.delay(instance.pk))
+            # transaction.on_commit(lambda: send_contact_request_email.delay(instance.pk))
             
             return Response(serializer.data, status=status.HTTP_201_CREATED)
             

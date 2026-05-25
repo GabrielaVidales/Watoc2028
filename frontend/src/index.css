@@ -4,6 +4,17 @@
 
 @custom-variant dark (&:is(.dark *));
 
+@layer base {
+  body {
+    padding-right: 0px !important;
+    margin-right: 0px !important;
+  }
+}
+
+html {
+  scrollbar-gutter: stable;
+}
+
 :root {
   font-family: 'DM Sans', sans-serif !important;  line-height: 1.2;
   font-weight: 400;

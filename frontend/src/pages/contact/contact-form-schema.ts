@@ -1,5 +1,18 @@
 import z from "zod";
 
+type ContactSubject = {
+    value: string
+    label: string
+}
+
+export const contactSubject: ContactSubject[] = [
+    { value: '0', label: 'Posters' },
+    { value: '1', label: 'Talks' },
+    { value: '2', label: 'Visa letters' },
+    { value: '3', label: 'Payment' },
+    { value: '4', label: 'Other' },
+]
+
 export const contactSchema = z.object({
     salutation: z.string().max(50, "Too long").optional(),
     academicTitle: z.string().optional(),
@@ -12,6 +25,7 @@ export const contactSchema = z.object({
     zip: z.string().optional(),
     country: z.string().optional(),
     message: z.string().min(1, 'Message required').max(2048, "Message is too long").optional(),
+    subject: z.enum(contactSubject.map(i => i.value), 'Invalid option')
 });
 
 export const contactSchemaForm = contactSchema.extend({

@@ -18,3 +18,11 @@ export function scrollToElement(id: string, yOffset: number = 0) {
     });
   }
 }
+
+export const toSnakeCase = (obj: Record<string, any>): Record<string, any> => {
+  return Object.keys(obj).reduce((acc, key) => {
+    const snakeKey = key.replace(/[A-Z]/g, letter => `_${letter.toLowerCase()}`);
+    acc[snakeKey] = obj[key];
+    return acc;
+  }, {} as Record<string, any>);
+};

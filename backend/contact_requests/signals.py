@@ -18,7 +18,7 @@ def send_contact_email(sender, instance, created, **kwargs):
 
     if created:
         # Enviar correo al admin avisando del nuevo mensaje
-        subject = f"Solicitud de Contacto: {subjectText} - {instance.firstName} {instance.lastName}"
+        subject = f"Solicitud de Contacto: {subjectText} - {instance.first_name} {instance.last_name}"
 
         message = f"""
         Estimado administrador,
@@ -29,7 +29,7 @@ def send_contact_email(sender, instance, created, **kwargs):
         -------------------------------------------------------
         INFORMACIÓN DEL CONTACTO
         -------------------------------------------------------
-        • Nombre:   {instance.firstName} {instance.lastName}
+        • Nombre:   {instance.first_name} {instance.last_name}
         • Correo:   {instance.email}
         • Asunto:   {subjectText}
         -------------------------------------------------------

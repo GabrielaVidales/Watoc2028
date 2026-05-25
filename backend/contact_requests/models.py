@@ -9,8 +9,8 @@ class ContactRequest(models.Model):
         PAYMENTS = 3, "Payments"
         OTHERS = 4, "Others"
 
-    firstName = models.CharField(max_length=100)
-    lastName = models.CharField(max_length=100)
+    first_name = models.CharField(max_length=100)
+    last_name = models.CharField(max_length=100)
     email = models.EmailField()
     subject = models.PositiveSmallIntegerField(
         choices=ContactType.choices, default=ContactType.OTHERS
@@ -19,8 +19,10 @@ class ContactRequest(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
+        db_table = "contact_requests"
+        ordering = ["-created_at"]
         verbose_name = "Contact Request"
         verbose_name_plural = "Contact Requests"
 
     def __str__(self):
-        return f"{self.first_name} {self.last_name} - {self.type}"
+        return f"From: {self.first_name} {self.last_name} — Subject: {self.get_subject_display()}"

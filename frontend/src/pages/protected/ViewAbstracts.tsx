@@ -14,6 +14,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { Spinner } from '@/components/ui/spinner'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle, } from "@/components/ui/card"
 import { formatDate } from '@/utils/formatDate'
+import { renderHTMLString } from '@/utils/tsx_utils'
 
 function ViewAbstracts() {
     const navigate = useNavigate()
@@ -45,10 +46,6 @@ function ViewAbstracts() {
             }
         }
     }
-
-    console.log(typeof urls.users.previewAbstract.build);
-    
-
 
     type Author = {
         full_name: string
@@ -103,10 +100,10 @@ function ViewAbstracts() {
     }
 
     return (
-        <div className='w-full max-w-5xl gap-3 p-3 mx-auto'>
+        <div className='w-full mx-auto'>
             <div className='min-h-50 w-full flex gap-3 justify-center'>
-                <div className='w-full bg-background border-2 p-3 sm:p-5 md:p-7 rounded-lg shadow-lg flex flex-col gap-5'>
-                    <fieldset disabled={loading} className='w-full py-9 pt-4 space-y-5'>
+                <div className='w-full'>
+                    <fieldset disabled={loading} className='w-full space-y-5'>
                         <div className='flex flex-col justify-end items-center gap-3 md:flex-row md:justify-between'>
                             <h2 className='text-2xl font-semibold'>Abstract submission</h2>
                             <AlertDialog>
@@ -151,7 +148,7 @@ function ViewAbstracts() {
                                         {abstract.title ? (
                                             <Link to={urls.users.previewAbstract.build({ id: 22 })} className="block hover:underline">
                                                 <BookType className="inline-block mr-2 mb-1 shrink-0 size-5" />
-                                                {abstract.title}
+                                                {renderHTMLString(abstract.title)}
                                             </Link>
                                         ) : (
                                             <span className="flex items-center gap-2 text-destructive">

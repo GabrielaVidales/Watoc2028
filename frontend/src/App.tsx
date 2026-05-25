@@ -38,6 +38,7 @@ import ContactPage from './pages/contact/page'
 import DashboardLayout from './layouts/DashboardLayout'
 import SidebarsLayout from './layouts/SidebarsLayout'
 import VerifyPage from './pages/auth/verify/page'
+import SettingsPage from './pages/protected/settings/settings-page'
 
 function App() {
 	const { pathname } = useLocation()
@@ -83,7 +84,7 @@ function App() {
 						<Route element={<ProtectedRoute allowedRoles={['admin', 'participant']} />} >
 
 							<Route path={urls.users.profile} element={<UserProfile />} />
-							<Route path={urls.users.viewAbstracts} element={<ViewAbstracts />} />
+							{/* <Route path={urls.users.viewAbstracts} element={<ViewAbstracts />} /> */}
 							<Route path={urls.users.editAbstract.url} element={<EditAbstractPage />} />
 							<Route path={urls.users.submitAbstract} element={<CreateAbstractPage />} />
 							<Route path={urls.users.previewAbstract.url} element={<AbstractPreview />} />
@@ -95,13 +96,14 @@ function App() {
 							<Route path={urls.users.confirmAssistance.payment} element={<ConfirmPaymentPage />} />
 
 							{/* Confirmar pagos en stripe */}
-							<Route path={urls.payments.success} element={<PaymentSuccess />} />
+							{/* <Route path={urls.payments.success} element={<PaymentSuccess />} /> */}
 						</Route>
 					</Route>
 
 					<Route element={<ProtectedRoute allowedRoles={['admin', 'participant']} />} >
 						<Route element={<SidebarsLayout />}>
-							<Route path='/test' element={<UserProfile />} />
+							<Route path={urls.users.viewAbstracts} element={<ViewAbstracts />} />
+							<Route path={urls.users.settings} element={<SettingsPage />} />
 						</Route>
 					</Route>
 

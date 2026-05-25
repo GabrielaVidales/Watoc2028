@@ -5,6 +5,7 @@ import { declarationsLabels } from '@/schemas/abstract-declaration-schema'
 import { presentationTypes, type AbstractSchema } from '@/schemas/abstract-schemas'
 import { CircleCheckBig } from 'lucide-react'
 import { InfoAlert } from '@/components/InfoAlert'
+import { renderHTMLString } from '@/utils/tsx_utils'
 
 
 export type AbstractDataProps = {
@@ -58,7 +59,7 @@ export function AbstractData({ abstract, authors, declarations, errors }: Abstra
                     hasError={Boolean(abstractErrors?.title)}
                     errors={abstractErrors?.title?.errors}
                     name='Title'
-                    value={abstract?.title}
+                    value={renderHTMLString(abstract?.title || '')}
                 />
 
                 <ShowField
@@ -79,7 +80,7 @@ export function AbstractData({ abstract, authors, declarations, errors }: Abstra
                     hasError={Boolean(abstractErrors?.text)}
                     errors={abstractErrors?.text?.errors}
                     name='Text'
-                    value={abstract?.text}
+                    value={renderHTMLString(abstract?.text || '')}
                 />
 
                 <ShowField

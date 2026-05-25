@@ -124,7 +124,7 @@ export default function RichTextEditor({ value, invalid, placeholder, onBlur, fo
             <EditorContent editor={editor} className="tiptap max-h-full" />
 
             {footer && (
-                <div className="flex p-3 w-full">
+                <div className="flex py-1 px-3 w-full">
                     {footer}
                 </div>
             )}

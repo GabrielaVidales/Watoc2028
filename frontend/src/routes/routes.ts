@@ -72,6 +72,7 @@ export const urls = {
     }),
     users: createRouteGroup('/user', {
         profile: '/profile',
+        settings: '/settings',
         viewAbstracts: '/my-abstracts',
         editAbstract: withBuilder('/abstract/:id/edit'),
         previewAbstract: withBuilder('/abstract/:id/preview'),

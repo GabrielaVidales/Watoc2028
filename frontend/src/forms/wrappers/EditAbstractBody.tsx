@@ -12,6 +12,7 @@ import { AlertTriangle, ChevronLeft, ChevronRight, Save } from 'lucide-react'
 import { Separator } from '@/components/ui/separator'
 import type { EditAbstractCallbacks } from '@/pages/protected/EditAbstractPage'
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogMedia, AlertDialogTitle, AlertDialogTrigger, } from "@/components/ui/alert-dialog"
+import { InfoAlert } from '@/components/InfoAlert'
 
 
 function EditAbstractBody({ onStepBack, onStepForward }: EditAbstractCallbacks) {
@@ -43,7 +44,15 @@ function EditAbstractBody({ onStepBack, onStepForward }: EditAbstractCallbacks) 
 
     return (
         <div className='w-full space-y-5 p-5'>
-            <h2 className='text-2xl font-semibold'>Abstract Body</h2>
+            <h2 className='text-2xl font-semibold'>Abstract Content</h2>
+
+            <InfoAlert
+                variant='warning'
+                title='IMPORTANT'
+                messages={'Total character count is 2,600 and includes spaces. Tables and images are not included, as only text is allowed. You will be able to see your character count below the text boxes.'}
+                className='mx-auto'
+            />
+
             <FormProvider {...form}>
                 <form onSubmit={onFormSubmit} id='abstract-submission-form'>
                     <AbstractForm abstract={data} />
