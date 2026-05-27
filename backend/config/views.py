@@ -2,23 +2,15 @@ from django.shortcuts import render
 
 
 def preview_contact_email(request):
-
-    context = {
-        "first_name": "Eduardo",
-        "last_name": "Escalante",
-        "email": "eduardo@gmail.com",
-        "subject": "Solicitud de información",
-        "message": """
-Hola,
-
-Me interesa participar en WATOC 2028.
-
-Gracias.
-        """,
-    }
-
     return render(
         request,
-        "emails/verify_email.html",
-        context
+        "emails/change_password_email.html",
+        {
+            "first_name": "Juan",
+            "last_name": "Pérez",
+            "email": "juan@example.com",
+            "reset_password_url": "https://watoc2028.org/reset-password?token=lalsdhasd8sadasodasld",
+            "expiration_hours": 24,  # o 1, 2, etc.
+            "support_url": "https://watoc2028.org/support",
+        },
     )
