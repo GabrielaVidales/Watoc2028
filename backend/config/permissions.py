@@ -10,6 +10,7 @@ class HasCSRFToken(permissions.BasePermission):
 
     def has_permission(self, request, view):
         if request.method in ("POST", "PUT", "PATCH", "DELETE"):
+            # print(request.headers)
             # El middleware devuelve None si todo está OK, o un objeto HttpResponse si falla
             reason = CsrfViewMiddleware(lambda x: None).process_view(request, None, None, None)
             if reason:

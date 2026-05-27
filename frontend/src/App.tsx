@@ -39,6 +39,8 @@ import DashboardLayout from './layouts/DashboardLayout'
 import SidebarsLayout from './layouts/SidebarsLayout'
 import VerifyPage from './pages/auth/verify/page'
 import SettingsPage from './pages/protected/settings/settings-page'
+import ForgotPasswordPage from './pages/auth/reset_password/forgot-password-page'
+import CreatePasswordPage from './pages/auth/create_new_password/create-new-password'
 
 function App() {
 	const { pathname } = useLocation()
@@ -75,6 +77,8 @@ function App() {
 						<Route element={<AuthLayout />}>
 							<Route path={urls.auth.login} element={<LoginPage />} />
 							<Route path={urls.auth.register} element={<RegisterPage />} />
+							<Route path={urls.auth.forgotPassword} element={<ForgotPasswordPage />} />
+							<Route path={urls.auth.resetPassword} element={<CreatePasswordPage />} />
 						</Route>
 					</Route>
 

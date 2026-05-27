@@ -9,6 +9,7 @@ router.register(r"authors", views.AuthorsView, "authors")
 router.register(r"users", views.UserView, "users")
 router.register(r"abstract-declarations", views.AuthorDeclarationsView, "abstract_declarations")
 router.register(r"tours", views.TourView, "tours")
+router.register(r"password-reset", views.PasswordResetView, "password-reset")
 
 
 urlpatterns = [

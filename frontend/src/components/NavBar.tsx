@@ -80,7 +80,7 @@ export default function NavBar({
     const menus = [
         ...menuItems,
         currentUser ? {
-            label: 'My profile',
+            label: 'Profile',
             url: urls.users.profile,
             submenus: [],
         } : {

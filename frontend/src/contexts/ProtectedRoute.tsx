@@ -4,6 +4,7 @@ import LoadingPage from './LoadingPage';
 import { Navigate, Outlet } from 'react-router-dom';
 import type { UserRole } from '@/schemas/user-schemas';
 import { urls } from '@/routes/routes';
+import VerifyYourEmailPage from '@/pages/auth/not_verified/page';
 
 type ProtectedRouteProps = React.PropsWithChildren & {
     allowedRoles?: UserRole[]
@@ -39,13 +40,7 @@ export function ProtectedRoute({ allowedRoles }: ProtectedRouteProps) {
     }
 
     if (!currentUser.roles.includes('admin') && !currentUser.email_verified) {
-        return (
-            <div className='h-screen flex flex-col justify-center items-center'>
-                <h1 className='text-2xl font-semibold'>
-                    You must verify your email!
-                </h1>
-            </div>
-        )
+        return <VerifyYourEmailPage />
     }
 
     return <Outlet />;

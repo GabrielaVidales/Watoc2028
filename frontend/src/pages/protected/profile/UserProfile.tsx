@@ -35,7 +35,7 @@ export default function UserProfile() {
 									<h1 className="text-2xl font-bold text-foreground">
 										{currentUser.full_name}
 									</h1>
-									
+
 									{profile?.participant && (
 										<div className="flex flex-col text-sm leading-relaxed">
 											<span className="font-medium text-primary">
@@ -200,15 +200,15 @@ export default function UserProfile() {
 							</TabsContent>
 							<TabsContent value="password" className='w-full py-9 pt-4 space-y-5 px-5 sm:px-9'>
 								<h2 className='text-2xl font-semibold text-primary-main'>Change password</h2>
-								<InfoAlert
-									title="Password Requirements"
-									messages={[
-										'Minimum 8 characters.',
-										'Include at least one uppercase letter.',
-										'Include at least one number.',
-										'Include at least one special character (e.g., !@#$%).',
-									]}
-								/>
+								<div className="text-sm text-muted-foreground bg-muted/30 p-3 rounded-lg">
+									<p className="font-medium mb-1">Password requirements:</p>
+									<ul className="list-disc list-inside space-y-0.5">
+										<li>At least 8 characters long</li>
+										<li>Contains uppercase and lowercase letters</li>
+										<li>Contains at least one number</li>
+										<li>Contains at least one special character</li>
+									</ul>
+								</div>
 								<ChangePasswordForm />
 							</TabsContent>
 						</Tabs>

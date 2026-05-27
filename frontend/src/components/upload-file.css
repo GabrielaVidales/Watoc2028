@@ -1,0 +1,130 @@
+:root {
+    --dropzone-primary-color: rgb(66, 66, 66);
+    --dropzone-secondary-color: rgb(85, 85, 85);
+    --dropzone-extension-color: rgb(0, 94, 255);
+    --dropzone-height: 150px;
+    --dropzone-border-width: 5px;
+}
+
+.dropzone {
+    box-sizing: border-box;
+    cursor: pointer;
+
+    min-width: 250px;
+    min-height: calc(var(--dropzone-height));
+    color: var(--dropzone-primary-color);
+    background-color: rgb(255, 255, 255);
+    border-radius: 1.25em;
+    outline-color: var(--dropzone-primary-color);
+    outline-offset: -5px;
+    outline-style: dashed;
+    outline-width: 3px;
+    transition: all 0.3s ease, visibility 0s;
+
+    &:hover {
+        background-color: rgb(245, 245, 245);
+        transition: all 0.3s ease;
+    }
+}
+
+.drag {
+    box-shadow: inset 0 0 1.5rem rgba(0, 64, 255, 0.4);
+    outline-color: rgb(0, 64, 255);
+}
+
+.error {
+    box-shadow: inset 0 0 1.5rem rgba(255, 0, 0, 0.4);
+    outline-color: rgb(255, 0, 0);
+}
+
+.soft-translation {
+    display: inline-block;
+    will-change: transform; 
+    animation: translation 2s ease infinite;
+}
+
+@keyframes translation {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(5px);
+    }
+}
+
+.file-card {
+    padding: 0.5em;
+    background-color: white;
+    color: var(--dropzone-secondary-color);
+    border: 1px solid rgb(246, 246, 246);
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
+
+    font-size: 1em;
+    font-weight: 600;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5em;
+}
+
+.file-card-left {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 0.5em;
+    flex: 1;
+}
+
+.delete-button {
+    cursor: pointer;
+    padding: 1em;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 50%;
+    border: none;
+    background-color: transparent;
+    transition: background-color 0.3s ease;
+
+    &:hover {
+        transition: background-color 0.3s ease;
+        background-color: rgb(255, 189, 189);
+    }
+}
+
+.file-name {
+    width: 100px;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+    flex: 1;
+    max-width: fit-content;
+}
+
+.file-extension {
+    pointer-events: none;
+    user-select: none;
+    padding: 0.2em;
+    border: 2.5px solid var(--dropzone-extension-color);
+    border-radius: 5px;
+    color: var(--dropzone-extension-color);
+    font-weight: 700;
+}
+
+.delete-button:hover .normal {
+    opacity: 0;
+    transform: scale(0.8);
+}
+
+.delete-button:hover .hover {
+    opacity: 1;
+    transform: scale(1);
+    color: rgb(200, 0, 0);
+}
+
+.delete-button:active .hover {
+    opacity: 1;
+    transform: scale(1.2);
+    color: rgb(168, 0, 0);
+}

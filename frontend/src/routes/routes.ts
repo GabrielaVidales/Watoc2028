@@ -1,6 +1,6 @@
 type RouteTree<T> = {
     [K in keyof T]:
-    T[K] extends { build: (...args: any) => any } 
+    T[K] extends { build: (...args: any) => any }
     ? T[K]
     : T[K] extends string
     ? string
@@ -69,6 +69,8 @@ export const urls = {
         login: '/login',
         register: '/register',
         verify: '/verify',
+        forgotPassword: '/request-password-reset',
+        resetPassword: '/reset-password',
     }),
     users: createRouteGroup('/user', {
         profile: '/profile',

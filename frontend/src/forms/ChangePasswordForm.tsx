@@ -2,7 +2,7 @@ import axiosClient from '@/clients/axiosClient'
 import { InfoAlert } from '@/components/InfoAlert'
 import PasswordStrengthMeter from '@/components/PasswordStrengthMeter'
 import { Button } from '@/components/ui/button'
-import { Field, FieldDescription, FieldError, FieldLabel } from '@/components/ui/field'
+import { Field, FieldError, FieldLabel } from '@/components/ui/field'
 import { InputGroup, InputGroupAddon, InputGroupButton, InputGroupInput } from '@/components/ui/input-group'
 import { Spinner } from '@/components/ui/spinner'
 import { changePasswordSchema } from '@/schemas/user-schemas'
@@ -15,6 +15,7 @@ import { Controller, useForm } from 'react-hook-form'
 function ChangePasswordForm() {
     const { handleSubmit, reset, setError, control, formState } = useForm({
         resolver: zodResolver(changePasswordSchema),
+        mode: 'onChange',
         defaultValues: {
             oldPassword: '',
             password: {
@@ -55,7 +56,7 @@ function ChangePasswordForm() {
 
     return (
         <form onSubmit={onFormSubmit}>
-            <fieldset className='space-y-5' disabled={isSubmitting}>
+            <fieldset className='space-y-3 grid grid-cols-2 gap-4' disabled={isSubmitting}>
                 {isSubmitSuccessful && (
                     <InfoAlert
                         title='Success'
@@ -69,8 +70,8 @@ function ChangePasswordForm() {
                     name="oldPassword"
                     control={control}
                     render={({ field, fieldState }) => (
-                        <Field data-invalid={fieldState.invalid}>
-                            <FieldLabel htmlFor={field.name}>Old password</FieldLabel>
+                        <Field data-invalid={fieldState.invalid} className='col-span-full'>
+                            <FieldLabel htmlFor={field.name}>Current password</FieldLabel>
                             <InputGroup>
                                 <InputGroupInput
                                     {...field}
@@ -119,9 +120,7 @@ function ChangePasswordForm() {
                                     </InputGroupButton>
                                 </InputGroupAddon>
                             </InputGroup>
-                            <FieldDescription></FieldDescription>
                             {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-                            <PasswordStrengthMeter control={control} />
                         </Field>
                     )}
                 />
@@ -161,14 +160,16 @@ function ChangePasswordForm() {
                     )}
                 />
 
-                <div className='flex justify-end'>
-                    <Button type='submit' className='p-5 w-60 uppercase' disabled={!isValid}>
+                <PasswordStrengthMeter control={control} className='col-span-full px-5' />
+
+                <div className='col-span-full flex justify-end'>
+                    <Button type='submit' className='px-10!' disabled={!isValid}>
                         {isSubmitting ? (
                             <Spinner data-icon="inline-start" />
                         ) : (
                             <Save data-icon="inline-start" />
                         )}
-                        Change password
+                        Save changes
                     </Button>
                 </div>
             </fieldset>

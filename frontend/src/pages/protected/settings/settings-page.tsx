@@ -1,32 +1,50 @@
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import { useAuth, type UserProfile } from '@/contexts/AuthContext'
+import { useAuth } from '@/contexts/AuthContext'
 import React from 'react'
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { Calendar, Mail, MapPin, UserRoundPen, House, Image, LockKeyhole, LogOut, Clock, FileText } from "lucide-react";
-import { formatDate } from '@/utils/formatDate';
+import { UserRoundPen, House, Image, LockKeyhole, LogOut, Clock, FileText } from "lucide-react";
 import { UserPictureForm } from '@/forms/UserPictureForm';
-import { NavLink } from 'react-router';
 import ChangePasswordForm from '@/forms/ChangePasswordForm';
 import EditUserForm from '@/forms/EditUserForm';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { urls } from '@/routes/routes';
 import { useProfiles } from '@/hooks/use-profiles';
 import { InfoAlert } from '@/components/InfoAlert';
+import {
+    Card,
+    CardAction,
+    CardContent,
+    CardDescription,
+    CardFooter,
+    CardHeader,
+    CardTitle,
+} from "@/components/ui/card"
+import ImageUpload from '@/components/upload-file';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { changePhotoSchema } from '@/schemas/update-profile-photo-schema';
+import { ChangePhotoForm, ProfilePictureForm } from './change-photo-form';
+import { Separator } from '@/components/ui/separator';
 
 function SettingsPage() {
     const { currentUser } = useAuth()
     const { profile } = useProfiles()
 
-    return (
-        <div className='w-full max-w-4xl mx-auto bg-background border-2 p-3 rounded-lg shadow-lg flex flex-col gap-5'>
-            <Tabs defaultValue="home">
-                <TabsList variant='line' className='w-full justify-between overflow-x-auto overflow-y-hidden'>
-                    <TabsTrigger value="home" className="flex-1 gap-2">
-                        <House className="size-5" />
-                        <span className="hidden md:inline">Home</span>
-                    </TabsTrigger>
+    if (!profile) {
+        return (
+            <div>
+                Loading...
+            </div>
+        )
+    }
 
+    return (
+        <div className='w-full max-w-4xl flex flex-col gap-5'>
+
+            <div className='space-y-3'>
+                <h1 className='text-2xl font-medium'>Account Settings</h1>
+                <p>Actualiza tu foto y tus datos personales aquí</p>
+            </div>
+
+            <Tabs defaultValue="account">
+                <TabsList variant='line' className='w-full justify-between overflow-x-auto overflow-y-hidden'>
                     <TabsTrigger value="account" className="flex-1 gap-2">
                         <UserRoundPen className="size-5" />
                         <span className="hidden md:inline">Edit Account</span>
@@ -42,85 +60,61 @@ function SettingsPage() {
                         <span className="hidden md:inline">Change Password</span>
                     </TabsTrigger>
                 </TabsList>
-                <TabsContent value='home' className='w-full p-9 space-y-8 px-5 sm:px-9'>
-                    <section className="space-y-2">
-                        <h2 className="text-2xl font-semibold">
-                            Welcome back
-                        </h2>
-                        <p className="text-muted-foreground text-sm">
-                            Manage your registration and abstract submissions for WATOC 2028.
-                        </p>
-                    </section>
-                    <div className="flex items-center justify-between rounded-lg border p-4">
-                        <div className="space-y-1">
-                            <p className="font-medium">Complete your registration</p>
-                            <p className="text-sm text-muted-foreground">
-                                Confirm your attendance and finish your payment.
-                            </p>
-                        </div>
+                <TabsContent value="account" className='w-full '>
 
-                        <Button asChild>
-                            <NavLink to={urls.users.confirmAssistance.start}>
-                                Start
-                            </NavLink>
-                        </Button>
-                    </div>
+                    <Card className='pt-0'>
+                        <CardHeader className='py-5 border-b'>
+                            <CardTitle className='text-xl font-medium'>Edit your profile data</CardTitle>
+                            <CardDescription>Update your personal details here</CardDescription>
+                        </CardHeader>
 
+                        <CardContent className='px-10'>
+                            {profile.participant && (
+                                <EditUserForm defaultValues={{
+                                    ...currentUser,
+                                    email: {
+                                        value: '',
+                                        confirm: ''
+                                    },
+                                    participant: {
+                                        affiliation: profile.participant.affiliation,
+                                        job_title: profile.participant.job_title,
+                                        field_of_study: profile.participant.field_of_study
+                                    }
+                                }} />
+                            )}
 
-                    <section className='space-y-4'>
-                        <h2 className='text-2xl font-semibold text-primary-main'>Registration</h2>
-                        <p>
-                            <b>Confirm your assistance to WATOC 2028:</b> complete your registration for the congress and finish your payment.
-                        </p>
-                        <Button className="w-full px-5 sm:w-auto font-bold rounded-full" asChild>
-                            <NavLink to={urls.users.confirmAssistance.start}>
-                                Start Registration
-                            </NavLink>
-                        </Button>
-                    </section>
+                        </CardContent>
+                    </Card>
 
-                    <section className="space-y-4">
-                        <h2 className='text-2xl font-semibold text-primary-main'>Abstract submission</h2>
-                        <p>
-                            <b>Submit an abstract</b>: start a new submission or continue working on an existing one.
-                        </p>
-                        <InfoAlert
-                            title="Abstract submission deadline: June 1, 2027"
-                            messages={[
-                                "Don't forget to review the submission guidelines before uploading",
-                                <NavLink to={urls.users.viewAbstracts}>
-                                    <Button variant="link" className="h-auto p-0 text-blue-600 font-semibold">
-                                        Read Guidelines
-                                    </Button>
-                                </NavLink>
-                            ]}
-                            icon={<Clock />}
-                        />
+                    <Card className='pt-0'>
+                        <CardHeader className='py-5 border-b'>
+                            <CardTitle className='text-xl font-medium'>Change your profile picture</CardTitle>
+                            <CardDescription>Upload a new image file</CardDescription>
+                        </CardHeader>
 
-                        <Button className="w-full px-5 sm:w-auto font-bold rounded-full" asChild>
-                            <NavLink to={urls.users.viewAbstracts}>
-                                View My Submissions
-                            </NavLink>
-                        </Button>
-                    </section>
+                        <CardContent className='flex flex-row items-center px-10'>
+                            <ChangePhotoForm
+                                data={{
+                                    profilePictureDeleted: false,
+                                    profilePicture: null,
+                                    profilePictureUrl: currentUser.photo as string
+                                }}
+                            />
+                        </CardContent>
+                    </Card>
 
-                </TabsContent>
-                <TabsContent value="account" className='w-full py-9 pt-4 space-y-5 px-5 sm:px-9'>
-                    <h2 className='text-2xl font-semibold text-primary-main'>Edit your profile data</h2>
-                    {profile?.participant && (
-                        <EditUserForm defaultValues={{
-                            ...currentUser,
-                            email: {
-                                value: '',
-                                confirm: ''
-                            },
-                            participant: {
-                                affiliation: profile.participant.affiliation,
-                                job_title: profile.participant.job_title,
-                                field_of_study: profile.participant.field_of_study
-                            }
-                        }} />
-                    )}
+                    <Card className='pt-0'>
+                        <CardHeader className='py-5 border-b'>
+                            <CardTitle className='text-xl font-medium'>Security</CardTitle>
+                            <CardDescription>Manage your password and account security</CardDescription>
+                        </CardHeader>
+
+                        <CardContent className='flex flex-col px-10'>
+                            <ChangePasswordForm />
+                        </CardContent>
+                    </Card>
+
                 </TabsContent>
                 <TabsContent value="picture" className='w-full py-9 pt-4 space-y-5 px-5 sm:px-9'>
                     <h2 className='text-2xl font-semibold text-primary-main'>Edit Profile Picture</h2>
@@ -135,17 +129,25 @@ function SettingsPage() {
                     <UserPictureForm />
                 </TabsContent>
                 <TabsContent value="password" className='w-full py-9 pt-4 space-y-5 px-5 sm:px-9'>
-                    <h2 className='text-2xl font-semibold text-primary-main'>Change password</h2>
-                    <InfoAlert
-                        title="Password Requirements"
-                        messages={[
-                            'Minimum 8 characters.',
-                            'Include at least one uppercase letter.',
-                            'Include at least one number.',
-                            'Include at least one special character (e.g., !@#$%).',
-                        ]}
-                    />
-                    <ChangePasswordForm />
+                    <Card className='pt-0'>
+                        <CardHeader className='py-5 border-b'>
+                            <CardTitle className='text-xl font-medium'>Change password</CardTitle>
+                        </CardHeader>
+
+                        <CardContent>
+                            <div className="text-sm text-muted-foreground bg-muted/30 px-3 pb-3 rounded-lg">
+                                <p className="font-medium mb-1">Password requirements:</p>
+                                <ul className="list-disc list-inside space-y-0.5">
+                                    <li>At least 8 characters long</li>
+                                    <li>Contains uppercase and lowercase letters</li>
+                                    <li>Contains at least one number</li>
+                                    <li>Contains at least one special character</li>
+                                </ul>
+                            </div>
+                            <Separator className='my-4' />
+                            <ChangePasswordForm />
+                        </CardContent>
+                    </Card>
                 </TabsContent>
             </Tabs>
         </div>
@@ -153,3 +155,5 @@ function SettingsPage() {
 }
 
 export default SettingsPage
+
+

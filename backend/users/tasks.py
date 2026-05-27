@@ -7,13 +7,13 @@ from django.core.mail import EmailMultiAlternatives
 
 serializer = URLSafeTimedSerializer(settings.SECRET_KEY)
 
-@shared_task(
-    autoretry_for=(Exception,),
-    retry_backoff=True,
-    retry_kwargs={"max_retries": 3},
-)
+
+@shared_task(autoretry_for=(Exception,), retry_backoff=True, retry_kwargs={"max_retries": 3})
 def send_email_confirmation_email(user_id):
-    user = User.objects.get(id=user_id)
+    try: user = User.objects.get(id=user_id)
+    except User.DoesNotExist:
+        return "User not found"
+    
     token = serializer.dumps(
         {
             "user_id": user.id,
@@ -52,5 +52,39 @@ If you did not create this account, you can safely ignore this email.
     )
     email.attach_alternative(html_content, "text/html")
     email.send()
-    return f"Correo de verificación enviado para User #{user_id}"
+    return f"Correo de verificación enviado a {user.email}"
 
+
+@shared_task(autoretry_for=(Exception,), retry_backoff=True, retry_kwargs={"max_retries": 3})
+def send_reset_password_email(user_email, signature):
+    try: user = User.objects.get(email=user_email)
+    except User.DoesNotExist:
+        return "User not found"
+    
+    token = serializer.dumps(
+        {
+            "user_id": user.id,
+            "email": user_email,
+            'password_signature':signature
+        },
+        salt="password-reset",
+    )
+    verification_url = f"https://watoc2028.org/auth/reset-password?token={token}"
+    text_content = f"""To reset your password, please open the following link in your browser:
+
+{ verification_url }
+
+If you did not create this account, you can safely ignore this email.
+
+© 2025 WATOC 2028
+"""
+    email = EmailMultiAlternatives(
+        subject="<no-reply> — Please verify your email",
+        body=text_content,
+        to=[user.email],
+        from_email=settings.DEFAULT_FROM_EMAIL,
+    )
+    email.send()
+    return f"Correo de verificación enviado a {user.email}"
+    
+    

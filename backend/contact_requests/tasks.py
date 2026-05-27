@@ -14,13 +14,13 @@ from django.core.mail import EmailMultiAlternatives
 )
 def send_contact_request_email(self, instance_id):
     instnc = ContactRequest.objects.get(pk=instance_id)
-    subject = f"Solicitud de Contacto: {instnc.subject} - {instnc.firstName} {instnc.lastName}"
+    subject = f"Solicitud de Contacto: {instnc.subject} - {instnc.first_name} {instnc.last_name}"
     text_content = f"""
 Estimado administrador,
 
 Se ha recibido una nueva solicitud de contacto a través del sitio web.
 
-Nombre: {instnc.firstName} {instnc.lastName}
+Nombre: {instnc.first_name} {instnc.last_name}
 Correo: {instnc.email}
 Asunto: {instnc.subject}
 
@@ -30,8 +30,8 @@ Mensaje:
     html_content = render_to_string(
         "emails/new_contact.html",
         {
-            "first_name": instnc.firstName,
-            "last_name": instnc.lastName,
+            "first_name": instnc.first_name,
+            "last_name": instnc.last_name,
             "email": instnc.email,
             "subject": subject,
             "message": instnc.message,

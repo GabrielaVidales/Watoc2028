@@ -1,19 +1,29 @@
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from "@/components/ui/card"
-import { Link } from 'react-router'
+import { Link, useLocation } from 'react-router'
 import { ClipboardSignature, CheckCircle2, SquareUserRound } from 'lucide-react'
 import { useHeader } from '@/contexts/HeaderContext'
 import { useEffect } from 'react'
 import { urls } from '@/routes/routes'
 import LoginForm from '@/pages/auth/login/LoginForm'
+import { AnimatePresence, motion } from 'motion/react';
+import { InfoAlert } from '@/components/InfoAlert'
 
 
 export default function LoginPage() {
+	const location = useLocation()
+
 	const { setTitle } = useHeader()
 
 	useEffect(() => {
 		setTitle('Sign Up to Attend WATOC 2028')
 	}, [setTitle])
+
+	useEffect(() => {
+		if (location.state) {
+			window.scrollTo(0, 0);
+		}
+	}, [location.state]);
 
 	return (
 		<section className='md:p-9 bg-fixed space-y-5'>
@@ -29,6 +39,25 @@ export default function LoginPage() {
 									<h2 className='text-2xl font-semibold'>Welcome back</h2>
 									<div className='h-1 w-12 mx-auto bg-primary-main rounded-full' />
 								</div>
+								<AnimatePresence>
+									{location.state?.code == 'account-created' && (
+										<motion.div
+											key='success'
+											initial={{ opacity: 0, y: -10, height: 0 }}
+											animate={{ opacity: 1, y: 0, height: 'auto' }}
+											exit={{ opacity: 0, y: -10, height: 0 }}
+											className="mb-4"
+										>
+											<InfoAlert
+												variant='success'
+												title={location.state.title}
+												messages={[
+													location.state.description
+												]}
+											/>
+										</motion.div>
+									)}
+								</AnimatePresence>
 								<LoginForm />
 							</div>
 						</section>

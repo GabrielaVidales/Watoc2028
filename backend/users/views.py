@@ -2,7 +2,7 @@ from rest_framework import permissions, status
 from rest_framework.decorators import action
 from rest_framework.filters import SearchFilter
 from rest_framework.views import APIView
-from rest_framework.viewsets import ModelViewSet
+from rest_framework.viewsets import ModelViewSet, ViewSet
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
@@ -12,9 +12,11 @@ from rest_framework_simplejwt.exceptions import TokenError
 from rest_framework.exceptions import AuthenticationFailed
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.utils.decorators import method_decorator
+
 from django.contrib.auth.models import update_last_login
-from django.contrib.auth import get_user_model
+from django.contrib.auth import get_user_model, password_validation
 from django.conf import settings
+from django.core import exceptions
 from .serializers import (
     UserSerializer,
     AbstractSerializer,
@@ -30,15 +32,18 @@ from .models import Abstract, AbstactStatus, Author, AuthorAffiliation, Abstract
 from django.http import HttpResponse
 from django.template.loader import render_to_string
 from config.permissions import HasCSRFToken
-from .tasks import send_email_confirmation_email
-import os
+from .tasks import send_email_confirmation_email, send_reset_password_email
 from itsdangerous import BadSignature
 from itsdangerous import SignatureExpired
 from itsdangerous import URLSafeTimedSerializer
+from utils.lib import get_password_signature
+import os, logging
 
 serializer = URLSafeTimedSerializer(settings.SECRET_KEY)
 
 User = get_user_model()
+
+logger = logging.getLogger("users")
 
 
 class UserView(ModelViewSet):
@@ -68,10 +73,19 @@ class UserView(ModelViewSet):
             return Response(data)
         return Response(data, status=status.HTTP_401_UNAUTHORIZED)
 
-    @action(detail=False, methods=["post"], url_path="send-verification-email")
+    @action(detail=False, methods=["post"], url_path="resend-verification-email")
     def send_verification_email(self, request):
+        user = request.user
+        if user.email_verified or not user.is_active:
+            return Response({"detail": "Email already verified!"}, status=status.HTTP_400_BAD_REQUEST)
 
-        return Response()
+        send_email_confirmation_email.delay(user.id)
+        print(f"Confirmation email sended to {user.email}")
+        return Response(
+            {
+                "message": f"We've sent a new verification link to your email address. Please check your inbox and spam folder. {user.email}"
+            },
+        )
 
     @action(detail=False, methods=["get"], url_path="profile")
     def profiles(self, request):
@@ -290,12 +304,192 @@ class EmailVeriricationView(APIView):
         if user.email_verified:
             return Response({"detail": "Email already verified!"}, status=status.HTTP_400_BAD_REQUEST)
 
+        print(f"Verified: {user}")
         user.email_verified = True
         user.is_active = True
         user.save()
         user.save(update_fields=["email_verified", "is_active"])
 
         return Response({"detail": "Email verificado"})
+
+
+class PasswordResetView(ViewSet):
+    """
+    1. Usuario solicita reset
+    └→ Genera token con firma HMAC de password actual
+    └→ Envía email con token
+
+    2. Usuario hace clic en link
+    └→ Frontend verifica token (opcional)
+    └→ Muestra formulario si es válido
+
+    3. Usuario envía nueva password
+    └→ Backend verifica token
+    └→ Compara firma HMAC del token con password actual
+    └→ Si son iguales → la password NO ha cambiado → permitir
+    └→ Si son diferentes → token ya fue usado → rechazar
+    └→ Cambia password
+    └→ El token nunca más podrá usarse (la firma ya no coincide)
+    """
+
+    permission_classes = [permissions.AllowAny]
+
+    @action(detail=False, methods=["post"])
+    def request(self, request):
+        email = request.data.get("email", "")
+
+        if not email:
+            logger.warning("[PasswordResetView] — Solicitud de restablecimiento sin proporcionar email")
+            return Response(
+                {"errors": {"root": ["Please make sure you've entered a valid email address and try again."]}},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        logger.info(f"[PasswordResetView] — Solicitud de restablecimiento de contraseña - Email: {email}")
+
+        try:
+            user = User.objects.get(email=email)
+        except User.DoesNotExist:
+            logger.warning(f"[PasswordResetView] — Intento de restablecimiento para email inexistente - Email: {email}")
+            return Response(
+                {"errors": {"root": ["Please make sure you've entered a valid email address and try again."]}},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        if not user.is_active:
+            logger.warning(
+                f"[PasswordResetView] — Intento de restablecimiento para cuenta inactiva - ID: {user.id}, Email: {email}"
+            )
+            return Response(
+                {"errors": {"root": ["Please make sure you've entered a valid email address and try again."]}},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        signature = get_password_signature(user)
+        
+        send_reset_password_email.delay(user.email, signature)
+        
+        logger.info(f"[PasswordResetView] — Email de restablecimiento encolado - ID: {user.id}, Email: {email}")
+
+        return Response(
+            {"detail": "If an account exists with this email address, you will receive a password reset link."},
+            status=status.HTTP_200_OK,
+        )
+
+    @action(detail=False, methods=["post"])
+    def verify(self, request):
+        token = request.data.get("token")
+
+        logger.info(f"[PasswordResetView] — Intento de verificación: {token[:14]}...")
+
+        try:  # verificar si el token es válido y tiene menos de 1 día
+            data = serializer.loads(token, max_age=60 * 60 * 24, salt="password-reset")
+            logger.info(f"[PasswordResetView] — Token verificado - User ID: {data['user_id']}")
+        except SignatureExpired:
+            logger.warning(f"[PasswordResetView] — Token expirado - Token: {token[:20]}...")
+            return Response({"detail": "Your token has expired!"}, status=status.HTTP_400_BAD_REQUEST)
+        except BadSignature:
+            logger.error(f"[PasswordResetView] — Firma de token inválida - Token: {token[:20]}...")
+            return Response({"detail": "Invalid token"}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            user = User.objects.get(id=data["user_id"])
+        except User.DoesNotExist:
+            logger.error(
+                f"[PasswordResetView] — Usuario no encontrado para el token - ID de usuario: {data['user_id']}"
+            )
+            return Response({"detail": "User does not exist."}, status=status.HTTP_400_BAD_REQUEST)
+
+        user = User.objects.get(id=data["user_id"])
+
+        if not user.email_verified or not user.is_active:
+            logger.warning(
+                f"[PasswordResetView] — Usuario inactivo o no verificado intentó resetear - ID: {user.id}, Email: {user.email}"
+            )
+            return Response({"detail": "This action is invalid!"}, status=status.HTTP_400_BAD_REQUEST)
+
+        logger.info(
+            f"[PasswordResetView] — Verificación de token completada exitosamente - ID de usuario: {user.id}, Email: {user.email}"
+        )
+        return Response({"detail": "verified"})
+
+    @action(detail=False, methods=["post"])
+    def confirm(self, request):
+        token = request.data.get("token")
+        password = request.data.get("password")
+        confirm_password = request.data.get("confirm_password")
+
+        # Confirmar que estén presentes los argumentos
+        if not password or not confirm_password:
+            return Response(
+                {"detail": "Password and confirm password are required"}, status=status.HTTP_400_BAD_REQUEST
+            )
+
+        # Validar que las contraseñas son idénticas
+        if password != confirm_password:
+            return Response(
+                {"errors": {"root": ["Passwords do not match."]}},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        try:
+            data = serializer.loads(token, max_age=60 * 60 * 24, salt="password-reset")
+        except SignatureExpired:
+            return Response(
+                {"errors": {"root": ["Token has expired."]}},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        except BadSignature:
+            return Response(
+                {"errors": {"root": ["Invalid token."]}},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        try:
+            user = User.objects.get(id=data["user_id"])
+        except User.DoesNotExist:
+            return Response(
+                {"errors": {"root": ["User account does not exist."]}},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        if not user.email_verified or not user.is_active:
+            return Response(
+                {"errors": {"root": ["Something went wrong."]}},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        if user.check_password(password):
+            return Response(
+                {"errors": {"root": ["New password cannot be the same as your current password."]}},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        # Validar password, esto toma en cuenta lo que hay en validators.py y en SETTINGS
+        try:
+            password_validation.validate_password(password)
+        except exceptions.ValidationError as e:
+            raise exceptions.ValidationError(list(e.messages))
+
+        # Comparar firmas de la contraseña actual
+        # con la firma del token cuando fue creado
+        # así se sabe si ya se usó o es falsificado
+        signature = get_password_signature(user)
+        token_signature = data["password_signature"]
+        if signature != token_signature:
+            return Response(
+                {"errors": {"root": ["This reset link is no longer valid."]}},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        logger.info(f"[PasswordResetView] — Reseteo de contraseña exitoso - ID: {user.id}, Email: {user.email}")
+        user.set_password(password)
+        user.save(update_fields=["password"])
+
+        return Response(
+            {"detail": "Your password has been reset successfully. You can now log in with your new password."},
+            status=status.HTTP_200_OK,
+        )
 
 
 class AbstractView(ModelViewSet):

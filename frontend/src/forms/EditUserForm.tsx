@@ -21,13 +21,13 @@ type P = {
 }
 
 function EditUserForm({ defaultValues }: P) {
-    const { currentUser, fetchUser } = useAuth()
+    const { fetchUser } = useAuth()
     const { profile, fetchProfile } = useProfiles()
 
     const { handleSubmit, reset, control, formState } = useForm({
         resolver: zodResolver(editUserFormSchema),
         defaultValues: {
-            ...currentUser,
+            ...defaultValues,
             email: {
                 value: '',
                 confirm: ''
@@ -44,9 +44,9 @@ function EditUserForm({ defaultValues }: P) {
     const { isSubmitting, isValid, isDirty } = formState
 
     useEffect(() => {
-        if (currentUser) {
+        if (defaultValues) {
             reset({
-                ...currentUser,
+                ...defaultValues,
                 email: {
                     value: '',
                     confirm: ''
@@ -58,7 +58,7 @@ function EditUserForm({ defaultValues }: P) {
                 }
             })
         }
-    }, [currentUser, profile])
+    }, [defaultValues, profile])
 
     const onFormSubmit = handleSubmit(async (data) => {
         try {
@@ -80,10 +80,9 @@ function EditUserForm({ defaultValues }: P) {
     return (
         <form onSubmit={onFormSubmit}>
             <fieldset disabled={isSubmitting} className='space-y-5'>
-                <h2 className='text-xl font-semibold'>Personal information</h2>
+                {/* <h2 className='text-xl font-semibold'>Personal information</h2> */}
 
-                {/* <div className='grid grid-cols-1 sm:grid-cols-3 gap-5 justify-start items-start'> */}
-                <div className='grid grid-cols-2 sm:grid-cols-3 gap-3'>
+                <div className='grid grid-cols-1 sm:grid-cols-2 gap-5'>
                     <Controller
                         name="prefix"
                         control={control}
@@ -152,7 +151,7 @@ function EditUserForm({ defaultValues }: P) {
                     />
                 </div>
 
-                <div className='grid grid-cols-1 sm:grid-cols-2 gap-3 justify-start items-start'>
+                <div className='grid grid-cols-1 sm:grid-cols-2 gap-5 justify-start items-start'>
                     <Controller
                         name="nationality"
                         control={control}
@@ -217,6 +216,63 @@ function EditUserForm({ defaultValues }: P) {
 
                 <Separator />
 
+                {/* <h2 className='text-xl font-semibold'>Professional Affiliation</h2> */}
+                <div className='grid grid-cols-1 sm:grid-cols-2 gap-5 justify-start items-start'>
+                    <Controller
+                        name="participant.affiliation"
+                        control={control}
+                        render={({ field, fieldState }) => (
+                            <Field data-invalid={fieldState.invalid}>
+                                <FieldLabel htmlFor={field.name}>Affiliation</FieldLabel>
+                                <Input
+                                    {...field}
+                                    id={field.name}
+                                    aria-invalid={fieldState.invalid}
+                                    autoComplete="off"
+                                />
+                                <FieldDescription>Name of institution, company, etc.</FieldDescription>
+                                {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                            </Field>
+                        )}
+                    />
+                    <Controller
+                        name="participant.job_title"
+                        control={control}
+                        render={({ field, fieldState }) => (
+                            <Field data-invalid={fieldState.invalid}>
+                                <FieldLabel htmlFor={field.name}>Job title</FieldLabel>
+                                <Input
+                                    {...field}
+                                    id={field.name}
+                                    aria-invalid={fieldState.invalid}
+                                    autoComplete="off"
+                                />
+                                <FieldDescription>Your current position or role</FieldDescription>
+                                {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                            </Field>
+                        )}
+                    />
+                    <Controller
+                        name="participant.field_of_study"
+                        control={control}
+                        render={({ field, fieldState }) => (
+                            <Field data-invalid={fieldState.invalid}>
+                                <FieldLabel htmlFor={field.name}>Field of study</FieldLabel>
+                                <Input
+                                    {...field}
+                                    id={field.name}
+                                    aria-invalid={fieldState.invalid}
+                                    autoComplete="off"
+                                />
+                                <FieldDescription>The major or primary area of your degree.</FieldDescription>
+                                {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                            </Field>
+                        )}
+                    />
+                </div>
+
+                <Separator />
+
                 <h2 className='text-xl font-semibold'>Change your email</h2>
                 <InfoAlert
                     className='col-span-full'
@@ -266,61 +322,6 @@ function EditUserForm({ defaultValues }: P) {
                         )}
                     />
                 </div>
-
-                <Separator />
-
-                <h2 className='text-xl font-semibold'>Professional Affiliation</h2>
-                <Controller
-                    name="participant.affiliation"
-                    control={control}
-                    render={({ field, fieldState }) => (
-                        <Field data-invalid={fieldState.invalid}>
-                            <FieldLabel htmlFor={field.name}>Affiliation</FieldLabel>
-                            <Input
-                                {...field}
-                                id={field.name}
-                                aria-invalid={fieldState.invalid}
-                                autoComplete="off"
-                            />
-                            <FieldDescription>Name of institution, company, etc.</FieldDescription>
-                            {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-                        </Field>
-                    )}
-                />
-                <Controller
-                    name="participant.job_title"
-                    control={control}
-                    render={({ field, fieldState }) => (
-                        <Field data-invalid={fieldState.invalid}>
-                            <FieldLabel htmlFor={field.name}>Job title</FieldLabel>
-                            <Input
-                                {...field}
-                                id={field.name}
-                                aria-invalid={fieldState.invalid}
-                                autoComplete="off"
-                            />
-                            <FieldDescription>Your current position or role</FieldDescription>
-                            {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-                        </Field>
-                    )}
-                />
-                <Controller
-                    name="participant.field_of_study"
-                    control={control}
-                    render={({ field, fieldState }) => (
-                        <Field data-invalid={fieldState.invalid}>
-                            <FieldLabel htmlFor={field.name}>Field of study</FieldLabel>
-                            <Input
-                                {...field}
-                                id={field.name}
-                                aria-invalid={fieldState.invalid}
-                                autoComplete="off"
-                            />
-                            <FieldDescription>The major or primary area of your degree.</FieldDescription>
-                            {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-                        </Field>
-                    )}
-                />
 
                 <div className='flex justify-end'>
                     <Button type='submit' className='p-5 w-60 uppercase' disabled={!isValid || !isDirty}>

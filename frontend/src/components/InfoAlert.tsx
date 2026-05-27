@@ -1,4 +1,4 @@
-import type { HTMLAttributes, ReactNode } from "react";
+import { Fragment, type HTMLAttributes, type ReactNode } from "react";
 import { Alert, AlertDescription, AlertTitle } from "./ui/alert";
 import { cn } from "@/lib/utils";
 import { AlertCircleIcon } from "lucide-react";
@@ -30,7 +30,7 @@ export function InfoAlert({ title, messages, className, variant = 'info', icon: 
             <AlertTitle className='tracking-wider'>{title}</AlertTitle>
             <AlertDescription className='text-foreground'>
                 {Array.isArray(messages) ? (messages as string[]).map((m, i) => (
-                    <span key={i}>{m}</span>
+                    <Fragment key={i}>{m}</Fragment>
                 )) : messages}
             </AlertDescription>
         </Alert>

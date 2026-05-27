@@ -198,8 +198,8 @@ function ViewAbstracts() {
                                 </CardContent>
                                 <CardFooter className="flex flex-wrap items-center justify-between gap-4 pt-0">
                                     <div className="text-xs text-muted-foreground space-y-1">
-                                        <p>Updated: {formatDate(abstract.last_update)}</p>
                                         <p>Created: {formatDate(abstract.created_at)}</p>
+                                        <p>Last update: {formatDate(abstract.last_update)}</p>
                                     </div>
 
                                     <div className="flex items-center ml-auto gap-2">

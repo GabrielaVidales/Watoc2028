@@ -1,7 +1,7 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { Controller, useForm } from 'react-hook-form'
 import { Mail, Lock, Eye, EyeOff, LogIn } from 'lucide-react';
-import { Link, useLocation, useNavigate } from 'react-router';
+import { Link, useNavigate } from 'react-router';
 import { useAuth } from '../../../contexts/AuthContext';
 import { Field, FieldError, FieldLabel } from '@/components/ui/field';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -13,9 +13,9 @@ import { isAxiosError } from 'axios';
 import { InfoAlert } from '@/components/InfoAlert';
 import { cn } from '@/lib/utils';
 import { AnimatePresence, motion } from 'motion/react';
+import { urls } from '@/routes/routes';
 
 export default function LoginForm() {
-    const location = useLocation()
     const navigate = useNavigate()
     const { handleLogin } = useAuth()
 
@@ -61,40 +61,12 @@ export default function LoginForm() {
         }
     })
 
-
-    useEffect(() => {
-        if (location.state) {
-            window.scrollTo(0, 0);
-        }
-    }, [location.state]);
-
-
     const [showPassword, setShowPassword] = React.useState(false);
     const toggleVisibility = () => setShowPassword((show) => !show);
 
     return (
         <form onSubmit={onFormSubmit} onInput={() => clearErrors('root')}>
             <AnimatePresence>
-                {location.state?.message && (
-                    <motion.div
-                        key='success'
-                        initial={{ opacity: 0, y: -10, height: 0 }}
-                        animate={{ opacity: 1, y: 0, height: 'auto' }}
-                        exit={{ opacity: 0, y: -10, height: 0 }}
-                        className="mb-4"
-                    >
-                        <InfoAlert
-                            variant='success'
-                            messages={[
-                                <span className='text-emerald-950'>
-                                    {location.state.message}
-                                </span>
-                            ]}
-                            title={location.state.title}
-                        />
-                    </motion.div>
-                )}
-
                 {errors.root && (
                     <motion.div
                         key='error'
@@ -179,7 +151,7 @@ export default function LoginForm() {
                 />
 
                 <div className='flex justify-end'>
-                    <Link to='#' className='w-fit text-primary-main hover:text-primary-light active:text-primary-dark'>
+                    <Link to={urls.auth.forgotPassword} className='w-fit text-primary-main hover:text-primary-light active:text-primary-dark'>
                         Forgot password?
                     </Link>
                 </div>

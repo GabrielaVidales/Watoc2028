@@ -65,8 +65,11 @@ export default function RegisterForm() {
             navigate(urls.auth.login, {
                 replace: true,
                 state: {
-                    title: "Registration Successful",
-                    message: "Your account has been created. Please log in."
+                    code: 'account-created',
+                    title: 'Verify your email address',
+                    email: data.email,
+                    description:
+                        "We've sent a new verification link to your email address. Please check your inbox and spam folder."
                 }
             })
 
@@ -98,6 +101,9 @@ export default function RegisterForm() {
                     message: 'Connection failed. Please try again later.',
                     type: "custom",
                 })
+                if (import.meta.env.DEV) {
+                    console.log(error);
+                }
             }
         }
     })
