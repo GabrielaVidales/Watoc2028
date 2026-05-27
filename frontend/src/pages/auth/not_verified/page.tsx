@@ -63,7 +63,7 @@ function VerifyYourEmailPage() {
                 <h1 className="text-2xl font-bold">Verify your email address</h1>
 
                 <p className="text-muted-foreground max-w-sm mx-auto">
-                    We've sent a verification link to your email. Please click the link
+                    We've sent a verification link to your email <b>{email}</b>. Please click the link
                     to confirm your account and get started.
                 </p>
 
