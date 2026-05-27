@@ -64,6 +64,7 @@ export const urls = {
         watoc: '/watoc',
         youngWatoc: '/young-watoc',
         contact: '/contact',
+        abstractSubmission: '/abstract-submission'
     },
     auth: createRouteGroup('/auth', {
         login: '/login',

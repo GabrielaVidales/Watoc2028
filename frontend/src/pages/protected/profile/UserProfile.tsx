@@ -3,10 +3,10 @@ import { useAuth, type UserProfile } from '@/contexts/AuthContext'
 import React from 'react'
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Calendar, Mail, MapPin, UserRoundPen, House, Image, LockKeyhole, LogOut, Clock, FileText } from "lucide-react";
+import { Calendar, Mail, MapPin, UserRoundPen, House, Image, LockKeyhole, LogOut, Clock, FileText, ArrowRight } from "lucide-react";
 import { formatDate } from '@/utils/formatDate';
 import { UserPictureForm } from '@/forms/UserPictureForm';
-import { NavLink } from 'react-router';
+import { Link, NavLink } from 'react-router';
 import ChangePasswordForm from '@/forms/ChangePasswordForm';
 import EditUserForm from '@/forms/EditUserForm';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -115,23 +115,8 @@ export default function UserProfile() {
 										Manage your registration and abstract submissions for WATOC 2028.
 									</p>
 								</section>
-								<div className="flex items-center justify-between rounded-lg border p-4">
-									<div className="space-y-1">
-										<p className="font-medium">Complete your registration</p>
-										<p className="text-sm text-muted-foreground">
-											Confirm your attendance and finish your payment.
-										</p>
-									</div>
 
-									<Button asChild>
-										<NavLink to={urls.users.confirmAssistance.start}>
-											Start
-										</NavLink>
-									</Button>
-								</div>
-
-
-								<section className='space-y-4'>
+								{/* <section className='space-y-4'>
 									<h2 className='text-2xl font-semibold text-primary-main'>Registration</h2>
 									<p>
 										<b>Confirm your assistance to WATOC 2028:</b> complete your registration for the congress and finish your payment.
@@ -141,24 +126,31 @@ export default function UserProfile() {
 											Start Registration
 										</NavLink>
 									</Button>
-								</section>
+								</section> */}
 
 								<section className="space-y-4">
 									<h2 className='text-2xl font-semibold text-primary-main'>Abstract submission</h2>
 									<p>
 										<b>Submit an abstract</b>: start a new submission or continue working on an existing one.
 									</p>
+									
 									<InfoAlert
-										title="Abstract submission deadline: June 1, 2027"
+										title="Abstract submission deadline: To be announced"
 										messages={[
-											"Don't forget to review the submission guidelines before uploading",
-											<NavLink to={urls.users.viewAbstracts}>
-												<Button variant="link" className="h-auto p-0 text-blue-600 font-semibold">
-													Read Guidelines
-												</Button>
-											</NavLink>
+											<p key="guideline-text">
+												Please review our{" "}
+												<Link to={urls.home.abstractSubmission} className="inline-flex items-center gap-1 font-medium hover:underline focus:underline focus:outline-none">
+													Abstract Submission Guideline
+												</Link>{" "}
+												before submitting.
+											</p>,
+											<div key="guideline-link" className="mt-1">
+												<Link to={urls.home.abstractSubmission} className="inline-flex items-center gap-2 text-sm font-medium text-primary hover:underline focus:underline focus:outline-none">
+													<ArrowRight className="size-4" />
+													View full guideline
+												</Link>
+											</div>,
 										]}
-										icon={<Clock />}
 									/>
 
 									<Button className="w-full px-5 sm:w-auto font-bold rounded-full" asChild>

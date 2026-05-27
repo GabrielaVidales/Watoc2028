@@ -88,7 +88,11 @@ function App() {
 						<Route element={<ProtectedRoute allowedRoles={['admin', 'participant']} />} >
 
 							<Route path={urls.users.profile} element={<UserProfile />} />
-							{/* <Route path={urls.users.viewAbstracts} element={<ViewAbstracts />} /> */}
+							<Route path={urls.users.viewAbstracts} element={(
+								<div className='max-w-4xl mx-auto py-10'>
+									<ViewAbstracts/>
+								</div>
+							)} />
 							<Route path={urls.users.editAbstract.url} element={<EditAbstractPage />} />
 							<Route path={urls.users.submitAbstract} element={<CreateAbstractPage />} />
 							<Route path={urls.users.previewAbstract.url} element={<AbstractPreview />} />
@@ -106,7 +110,7 @@ function App() {
 
 					<Route element={<ProtectedRoute allowedRoles={['admin', 'participant']} />} >
 						<Route element={<SidebarsLayout />}>
-							<Route path={urls.users.viewAbstracts} element={<ViewAbstracts />} />
+							{/* <Route path={urls.users.viewAbstracts} element={<ViewAbstracts />} /> */}
 							<Route path={urls.users.settings} element={<SettingsPage />} />
 						</Route>
 					</Route>

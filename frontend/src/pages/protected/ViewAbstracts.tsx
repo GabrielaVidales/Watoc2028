@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import axiosClient from '@/clients/axiosClient'
 import { Button } from '@/components/ui/button'
-import { BookType, CircleAlert, Inbox, Pencil, Plus, Search, Send, Trash2, TriangleAlert } from 'lucide-react'
+import { ArrowRight, BookType, CircleAlert, ExternalLink, Inbox, Pencil, Plus, Search, Send, Trash2, TriangleAlert } from 'lucide-react'
 import { Link, useNavigate } from 'react-router'
 import { urls } from '@/routes/routes'
 import { useProfiles } from '@/hooks/use-profiles'
@@ -135,9 +135,21 @@ function ViewAbstracts() {
                         </div>
 
                         <InfoAlert
-                            title="Abstract submission deadline: June 10, 2026"
+                            title="Abstract submission deadline: To be announced"
                             messages={[
-                                'Read our Abstract Submission Guideline',
+                                <p key="guideline-text">
+                                    Please review our{" "}
+                                    <Link to={urls.home.abstractSubmission} className="inline-flex items-center gap-1 font-medium hover:underline focus:underline focus:outline-none">
+                                        Abstract Submission Guideline
+                                    </Link>{" "}
+                                    before submitting.
+                                </p>,
+                                <div key="guideline-link" className="mt-1">
+                                    <Link to={urls.home.abstractSubmission} className="inline-flex items-center gap-2 text-sm font-medium text-primary hover:underline focus:underline focus:outline-none">
+                                        <ArrowRight className="size-4" />
+                                        View full guideline
+                                    </Link>
+                                </div>,
                             ]}
                         />
 

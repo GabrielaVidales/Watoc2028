@@ -278,8 +278,8 @@ function EditUserForm({ defaultValues }: P) {
                     className='col-span-full'
                     title="IMPORTANT"
                     messages={[
-                        'Updating your email address will require you to use the new address for all future logins. Please ensure you have access to the new email before saving your changes.',
-                        "Leave it blank if you don't want to change it",
+                        <p>Leave it blank if you don't want to change it.</p>,
+                        <p className='text-xs'>Please ensure you have access to the new email before saving your changes.</p>,
                     ]}
                 />
 
