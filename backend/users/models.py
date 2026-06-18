@@ -107,10 +107,9 @@ class Dinner(models.Model):
 
 
 class Abstract(models.Model):
-    title = models.CharField(
+    title = models.TextField(
         db_column="title",
         verbose_name="Título",
-        max_length=128,
         blank=True,
     )
     text = models.TextField(

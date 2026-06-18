@@ -3,9 +3,7 @@ import { Field, FieldDescription, FieldError, FieldLabel } from '@/components/ui
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { presentationTypes, type AbstractSchema } from '@/schemas/abstract-schemas'
 import { Controller, useFormContext } from 'react-hook-form'
-import { InfoAlert } from '@/components/InfoAlert'
-import { InputGroup, InputGroupAddon, InputGroupInput, InputGroupText, InputGroupTextarea } from '@/components/ui/input-group'
-import { useIsMobile } from '@/hooks/use-mobile'
+import { InputGroup, InputGroupAddon,  InputGroupText, InputGroupTextarea } from '@/components/ui/input-group'
 import { cn } from '@/lib/utils'
 import RichTextEditor from '@/components/EnrichedTextArea'
 
@@ -37,10 +35,11 @@ function AbstractForm({ abstract }: AbstractFormProps) {
                                 {...field}
                                 invalid={fieldState.invalid}
                                 id={field.name}
+                                multiline={false}
                                 autoComplete="off"
                                 autoCorrect="off"
                                 spellCheck="false"
-                                className="wrap-anywhere py-0 text-xl"
+                                className="wrap-anywhere text-xl"
                                 maxLength={3500}
                                 footer={
                                     <InputGroupText className={'ml-auto'}>
@@ -90,9 +89,6 @@ function AbstractForm({ abstract }: AbstractFormProps) {
                         </Field>
                     )}
                 />
-
-                {/* <RichTextEditor /> */}
-
 
                 <Controller
                     name="text"

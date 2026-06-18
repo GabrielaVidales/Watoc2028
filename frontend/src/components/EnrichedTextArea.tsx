@@ -1,8 +1,14 @@
 import { useEditor, EditorContent } from "@tiptap/react"
-import StarterKit from "@tiptap/starter-kit"
 import Placeholder from "@tiptap/extension-placeholder"
+import Paragraph from "@tiptap/extension-paragraph"
+import Text from "@tiptap/extension-text"
+import ExtensionBold from "@tiptap/extension-bold"
+import ExtensionItalic from "@tiptap/extension-italic"
+import Underline from "@tiptap/extension-underline"
 import Subscript from "@tiptap/extension-subscript"
 import Superscript from "@tiptap/extension-superscript"
+import Document from '@tiptap/extension-document'
+
 import { Bold, Italic, UnderlineIcon } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
@@ -11,15 +17,49 @@ import { useEffect, type ReactNode } from "react"
 
 type RichTextEditorProps = {
     value?: string
-    onChange?: (value: string) => void
     invalid?: boolean,
-    onBlur?: () => void
     footer?: ReactNode
+    multiline?: boolean
+    onChange?: (value: string) => void
+    onBlur?: () => void
 } & React.ComponentProps<"textarea">
 
-export default function RichTextEditor({ value, invalid, placeholder, onBlur, footer, disabled, className, onChange, maxLength, autoComplete, autoCorrect, spellCheck, name, id }: RichTextEditorProps) {
+export default function RichTextEditor({ value, invalid, multiline = true, placeholder, onBlur, footer, disabled, className, onChange, maxLength, autoComplete, autoCorrect, spellCheck, name, id }: RichTextEditorProps) {
     const editor = useEditor({
         editorProps: {
+            handleKeyDown(view, event) {
+                if (!multiline && event.key === "Enter") {
+                    event.preventDefault()
+                    return true
+                }
+
+                return false
+            },
+            handlePaste(view, event) {
+                if (!multiline) {
+                    event.preventDefault()
+
+                    const html =
+                        event.clipboardData?.getData("text/html") ||
+                        event.clipboardData?.getData("text/plain") ||
+                        ""
+
+                    console.log(html);
+
+                    const sanitized = html
+                        .replace(/<br\s*\/?>/gi, " ")
+                        .replace(/<\/p>\s*<p>/gi, " ")
+                        .replace(/\r?\n/g, " ")
+
+                    console.log(sanitized)
+
+                    editor?.commands.insertContent(sanitized)
+
+                    return true
+                }
+
+                return false
+            },
             attributes: {
                 id,
                 name,
@@ -40,7 +80,13 @@ export default function RichTextEditor({ value, invalid, placeholder, onBlur, fo
             },
         },
         extensions: [
-            StarterKit,
+            Document.extend({
+                content: multiline ? "block+" : "inline*",
+            }),
+            ...(multiline ? [Paragraph] : []),
+            Text,
+            ExtensionBold,
+            ExtensionItalic,
             Subscript,
             Superscript,
             Placeholder.configure({
@@ -52,6 +98,8 @@ export default function RichTextEditor({ value, invalid, placeholder, onBlur, fo
         content: value || "",
         editable: !disabled,
         onUpdate({ editor }) {
+            console.log(editor.getHTML());
+
             onChange?.(editor.getHTML())
         },
         onBlur() {

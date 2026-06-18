@@ -37,7 +37,7 @@ import LoginPage from './pages/auth/login/page'
 import ContactPage from './pages/contact/page'
 import DashboardLayout from './layouts/DashboardLayout'
 import SidebarsLayout from './layouts/SidebarsLayout'
-import VerifyPage from './pages/auth/verify/page'
+import VerifyEmailPage from './pages/auth/verify/page'
 import SettingsPage from './pages/protected/settings/settings-page'
 import ForgotPasswordPage from './pages/auth/reset_password/forgot-password-page'
 import CreatePasswordPage from './pages/auth/create_new_password/create-new-password'
@@ -115,7 +115,7 @@ function App() {
 						</Route>
 					</Route>
 
-					<Route path={urls.auth.verify} element={<VerifyPage />} />
+					<Route path={urls.auth.verify} element={<VerifyEmailPage />} />
 
 					{/* Para rutas diferentes */}
 					<Route path='*' element={<NotFound />} />

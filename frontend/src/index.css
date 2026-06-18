@@ -11,12 +11,29 @@
   }
 }
 
+
+@font-face {
+    font-family: 'Roboto';
+    src: url('/fonts/Roboto-VariableFont_wdth,wght.ttf') format('truetype');
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Roboto';
+    src: url('/fonts/Roboto-Italic-VariableFont_wdth,wght.ttf') format('truetype');
+    font-style: italic;
+}
+
+body {
+    font-family: 'Roboto', sans-serif;
+}
+
+
 html {
   scrollbar-gutter: stable;
 }
 
 :root {
-  font-family: 'DM Sans', sans-serif !important;  line-height: 1.2;
   font-weight: 400;
   color-scheme: light dark;
   color: rgba(255, 255, 255, 0.87);

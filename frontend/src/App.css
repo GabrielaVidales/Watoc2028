@@ -17,7 +17,6 @@
 }
 
 .ProseMirror {
-font-family: "Inter", system-ui, sans-serif;
   font-variant-numeric: lining-nums tabular-nums;
   letter-spacing: -0.011em;
 }

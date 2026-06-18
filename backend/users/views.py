@@ -283,34 +283,58 @@ class EmailVeriricationView(APIView):
 
     def post(self, request: Request):
         token = request.data.get("token")
+        if not token:
+            return Response(
+                {"code": "missing_token", "detail": ("Verification token is required.")},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
         try:
             data = serializer.loads(token, max_age=60 * 60 * 24, salt="email-verification")
         except SignatureExpired:
-            return Response({"detail": "Your token has expired!"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                {
+                    "code": "token_expired",
+                    "detail": ("This verification link has expired. Please request a new verification email."),
+                },
+                status=status.HTTP_400_BAD_REQUEST,
+            )
         except BadSignature as e:
-            print(e)
-            return Response({"detail": "Invalid token"}, status=status.HTTP_400_BAD_REQUEST)
+            logger.error(e.message)
+            return Response(
+                {"code": "invalid_token", "detail": ("This verification link is invalid.")},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
 
         try:
             user = User.objects.get(id=data["user_id"])
         except User.DoesNotExist:
-            return Response({"detail": "User does not exist."}, status=status.HTTP_400_BAD_REQUEST)
-
-        user = User.objects.get(id=data["user_id"])
+            return Response(
+                {
+                    "code": "user_not_found",
+                    "detail": "We could not find an account associated with this verification link.",
+                },
+                status=status.HTTP_400_BAD_REQUEST,
+            )
 
         if user.email != data["email"]:
-            return Response({"detail": "Token has invalid data!"}, status=status.HTTP_400_BAD_REQUEST)
-
+            return Response(
+                {"code": "invalid_token_data", "detail": ("This verification link is invalid.")},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
         if user.email_verified:
-            return Response({"detail": "Email already verified!"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                {"code": "already_verified", "detail": ("Your email address has already been verified.")},
+                status=status.HTTP_200_OK,
+            )
 
-        print(f"Verified: {user}")
         user.email_verified = True
-        user.is_active = True
-        user.save()
         user.save(update_fields=["email_verified", "is_active"])
-
-        return Response({"detail": "Email verificado"})
+        logger.info(f"Email verified -> {user.email}")
+        return Response(
+            {"code": "verification_success", "detail": ("Your email has been verified successfully.")},
+            status=status.HTTP_200_OK,
+        )
 
 
 class PasswordResetView(ViewSet):
@@ -366,9 +390,9 @@ class PasswordResetView(ViewSet):
             )
 
         signature = get_password_signature(user)
-        
+
         send_reset_password_email.delay(user.email, signature)
-        
+
         logger.info(f"[PasswordResetView] — Email de restablecimiento encolado - ID: {user.id}, Email: {email}")
 
         return Response(
