@@ -1,39 +1,71 @@
-import { Button } from "@/components/ui/button"
-import { ChevronDown, ChevronsLeft, ClipboardList, FileText, Frame, IdCard, LogIn, LogOut, PieChart, SquareUserRound, Map, type LucideIcon } from "lucide-react"
 import React from 'react'
-import { Link, NavLink, Outlet, useNavigate } from "react-router"
-import logo from '@/assets/WatocPNGLogo.png';
+import { ChevronsLeft, ClipboardList, FileText, IdCard, LogIn, type LucideIcon, FileBadge, FileType2, PackageCheck, ChevronDown, Bell } from "lucide-react"
+import { Link, Outlet, } from "react-router"
 import { urls } from "@/routes/routes"
 import { useAuth } from "@/contexts/AuthContext"
-import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar"
+import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar"
 import { AppSidebar } from "@/components/app-sidebar"
+import {
+    BadgeCheckIcon,
+    BellIcon,
+    CreditCardIcon,
+    LogOutIcon,
+} from "lucide-react"
+
+import {
+    Avatar,
+    AvatarFallback,
+    AvatarImage,
+} from "@/components/ui/avatar"
+import { Button } from "@/components/ui/button"
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuGroup,
+    DropdownMenuItem,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+
+export function DropdownMenuAvatar() {
+    const { currentUser } = useAuth()
+    return (
+        <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+                <Button variant="ghost" className="rounded-full">
+                    <Avatar className="h-8 w-8 rounded-full border border-primary">
+                        <AvatarImage src={currentUser.photo as string || null} alt={`${currentUser.full_name} Profile Picture`} />
+                        <AvatarFallback>LR</AvatarFallback>
+                    </Avatar>
+                    <ChevronDown />
+                </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+                <DropdownMenuGroup>
+                    <DropdownMenuItem>
+                        <BadgeCheckIcon />
+                        Account
+                    </DropdownMenuItem>
+                    <DropdownMenuItem>
+                        <CreditCardIcon />
+                        Billing
+                    </DropdownMenuItem>
+                    <DropdownMenuItem>
+                        <BellIcon />
+                        Notifications
+                    </DropdownMenuItem>
+                </DropdownMenuGroup>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem>
+                    <LogOutIcon />
+                    Sign Out
+                </DropdownMenuItem>
+            </DropdownMenuContent>
+        </DropdownMenu>
+    )
+}
 
 
-const guessRoutes = [
-    {
-        url: urls.auth.login,
-        label: 'Login',
-        icon: <LogIn className="size-5" />,
-    },
-    {
-        url: urls.auth.register,
-        label: 'Registration',
-        icon: <ClipboardList className="size-5" />,
-    },
-]
-
-const authRoutes = [
-    {
-        url: urls.users.profile,
-        label: 'My Profile',
-        icon: <IdCard className="size-5" />,
-    },
-    {
-        url: urls.users.viewAbstracts,
-        label: 'My Submissions',
-        icon: <FileText className="size-5" />,
-    },
-]
 
 const projects: {
     name: string
@@ -41,79 +73,57 @@ const projects: {
     icon: LucideIcon
 }[] = [
         {
-            name: "My Profile",
+            name: "Abstract Submissions",
             url: "#",
-            icon: Frame,
+            icon: FileType2,
         },
         {
-            name: "Abstract Submission",
+            name: "Congress Registration",
             url: "#",
-            icon: PieChart,
+            icon: PackageCheck,
         },
         {
-            name: "Registration",
+            name: "Certificate of Attendance",
             url: "#",
-            icon: Map,
-        },
-        {
-            name: "Registration",
-            url: "#",
-            icon: Map,
+            icon: FileBadge,
         },
     ]
 
 function DashboardLayout() {
-    const { handleLogout, currentUser } = useAuth()
+    return (
+        <SidebarProvider className='bg-amber-300'>
 
-    const onLogout = async () => {
-        await handleLogout()
-    }
+            <AppSidebar
+                projects={projects}
+            />
 
-    return (<>
-        <SidebarProvider>
-            <div className="flex w-full h-screen">
+            <SidebarInset className="h-screen overflow-y-auto bg-slate-50">
 
-                <AppSidebar
-                    projects={projects}
-                />
+                <header className="sticky top-0 z-50 border-b bg-background shrink-0">
+                    <div className='my-2 px-3 mx-auto flex flex-row justify-between items-center gap-6'>
 
-                <div className="flex flex-col flex-1">
-                    <header className='border-b-2 z-10 sticky top-0 bg-background'>
-                        <div className=' min-h-14 my-2 px-3 mx-auto flex flex-col sm:flex-row justify-between items-center gap-6'>
+                        <div className='flex flex-row items-center sm:items-start gap-3 max-w-sm shrink-0'>
+                            <SidebarTrigger />
 
-                            <div className='flex flex-row items-center sm:items-start gap-3 max-w-sm shrink-0'>
-                                <SidebarTrigger />
-                             
-                            </div>
-
-                            <div className='flex flex-col sm:flex-row items-center'>
-                                <Link to={urls.home.index} className="sm:flex">
-                                    <Button variant='ghost' className='flex items-center gap-2 text-foreground sm:text-base lg:text-lg transition-all font-medium px-4'>
-                                        <ChevronsLeft className="size-6" />
-                                        <span>Home</span>
-                                    </Button>
-                                </Link>
-
-                                {(currentUser ? authRoutes : guessRoutes).map(routes => (
-                                    <Link to={routes.url} key={routes.url} className="sm:flex">
-                                        <Button variant='ghost' className='flex items-center gap-2 text-foreground sm:text-base lg:text-lg transition-all font-medium px-4'>
-                                            {routes.icon}
-                                            <span>{routes.label}</span>
-                                        </Button>
-                                    </Link>
-                                ))}
-                            </div>
                         </div>
-                    </header>
 
-                    <main className="bg-muted">
-                        <Outlet />
-                    </main>
+                        <div className='flex flex-row items-center'>
+                            <Button variant='ghost' size='icon' className='rounded-full'>
+                                <Bell />
+                            </Button>
+
+                            <DropdownMenuAvatar />
+                        </div>
+                    </div>
+                </header>
+
+                <div className='p-3 lg:p-5 xl:p-8'>
+                    <Outlet />
                 </div>
+            </SidebarInset>
 
-            </div>
         </SidebarProvider>
-    </>)
+    )
 }
 
 export default DashboardLayout

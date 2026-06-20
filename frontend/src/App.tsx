@@ -41,6 +41,7 @@ import VerifyEmailPage from './pages/auth/verify/page'
 import SettingsPage from './pages/protected/settings/settings-page'
 import ForgotPasswordPage from './pages/auth/reset_password/forgot-password-page'
 import CreatePasswordPage from './pages/auth/create_new_password/create-new-password'
+import AbstractSubmissionsPage from './pages/protected/abstract-submissions/page'
 
 function App() {
 	const { pathname } = useLocation()
@@ -88,11 +89,11 @@ function App() {
 						<Route element={<ProtectedRoute allowedRoles={['admin', 'participant']} />} >
 
 							<Route path={urls.users.profile} element={<UserProfile />} />
-							<Route path={urls.users.viewAbstracts} element={(
+							{/* <Route path={urls.users.viewAbstracts} element={(
 								<div className='max-w-4xl mx-auto py-10'>
 									<ViewAbstracts/>
 								</div>
-							)} />
+							)} /> */}
 							<Route path={urls.users.editAbstract.url} element={<EditAbstractPage />} />
 							<Route path={urls.users.submitAbstract} element={<CreateAbstractPage />} />
 							<Route path={urls.users.previewAbstract.url} element={<AbstractPreview />} />
@@ -109,9 +110,9 @@ function App() {
 					</Route>
 
 					<Route element={<ProtectedRoute allowedRoles={['admin', 'participant']} />} >
-						<Route element={<SidebarsLayout />}>
-							{/* <Route path={urls.users.viewAbstracts} element={<ViewAbstracts />} /> */}
+						<Route element={<DashboardLayout />}>
 							<Route path={urls.users.settings} element={<SettingsPage />} />
+							<Route path={urls.users.viewAbstracts} element={<AbstractSubmissionsPage />} />
 						</Route>
 					</Route>
 

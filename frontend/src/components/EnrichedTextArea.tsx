@@ -5,6 +5,7 @@ import Text from "@tiptap/extension-text"
 import ExtensionBold from "@tiptap/extension-bold"
 import ExtensionItalic from "@tiptap/extension-italic"
 import Underline from "@tiptap/extension-underline"
+import History from "@tiptap/extension-history"
 import Subscript from "@tiptap/extension-subscript"
 import Superscript from "@tiptap/extension-superscript"
 import Document from '@tiptap/extension-document'
@@ -80,6 +81,7 @@ export default function RichTextEditor({ value, invalid, multiline = true, place
             },
         },
         extensions: [
+            History,
             Document.extend({
                 content: multiline ? "block+" : "inline*",
             }),
@@ -87,6 +89,7 @@ export default function RichTextEditor({ value, invalid, multiline = true, place
             Text,
             ExtensionBold,
             ExtensionItalic,
+            Underline,
             Subscript,
             Superscript,
             Placeholder.configure({

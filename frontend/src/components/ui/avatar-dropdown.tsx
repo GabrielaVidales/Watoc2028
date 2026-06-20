@@ -22,7 +22,7 @@ export function AvatarDropdown() {
                 <Button variant="ghost" className="flex items-center gap-2 rounded-full px-2" >
                     <Avatar className="size-8">
                         <AvatarImage
-                            src={user.photo as string || ''}
+                            src={user.photo as string}
                             alt="shadcn"
                         />
                         <AvatarFallback>

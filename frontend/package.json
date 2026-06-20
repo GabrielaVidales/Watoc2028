@@ -21,6 +21,7 @@
     "@tanstack/react-table": "^8.21.3",
     "@tiptap/extension-bold": "^3.23.6",
     "@tiptap/extension-document": "^3.23.6",
+    "@tiptap/extension-history": "^3.27.1",
     "@tiptap/extension-italic": "^3.23.6",
     "@tiptap/extension-paragraph": "^3.23.6",
     "@tiptap/extension-placeholder": "^3.23.5",

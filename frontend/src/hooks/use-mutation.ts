@@ -26,7 +26,6 @@ export const useMutation = () => {
                 }
             }
             setError(err)
-            throw err
         } finally {
             setLoading(false)
         }

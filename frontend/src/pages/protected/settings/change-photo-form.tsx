@@ -10,12 +10,16 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { PhotoCropDialog } from "./photo-crop-dialog"
 import { Save, Trash2 } from "lucide-react"
 import { Spinner } from "@/components/ui/spinner";
+import axiosClient from "@/clients/axiosClient";
+import { useAuth } from "@/contexts/AuthContext";
 
 type Props = {
     data?: ChangePhotoFormValues
 }
 
 export function ChangePhotoForm({ data }: Props) {
+    const { fetchUser } = useAuth()
+
     const form = useForm<ChangePhotoFormValues>({
         resolver: zodResolver(changePhotoSchema),
         defaultValues: {
@@ -31,11 +35,21 @@ export function ChangePhotoForm({ data }: Props) {
         console.log(data);
         if (data.profilePictureDeleted) {
             console.log('Borrando foto');
+            await axiosClient.delete('/users/change-profile-pic/')
+            await fetchUser()
+            reset()
+
+
         } else if (data.profilePicture) {
             console.log('Guardando foto');
+            await axiosClient.post('/users/change-profile-pic/', data, {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                }
+            })
+            await fetchUser()
+            reset()
         }
-
-
     })
 
     useEffect(() => {
@@ -56,7 +70,7 @@ export function ChangePhotoForm({ data }: Props) {
 
 export function ProfilePictureForm() {
     const form = useFormContext<ChangePhotoFormValues>()
-    const { control, handleSubmit, clearErrors, setError, setValue, formState: { isDirty, isSubmitting } } = form
+    const { control, clearErrors, setError, setValue, formState: { isDirty, isSubmitting } } = form
 
     const imageUploadRef = useRef<ImageUploadRef>(null);
     const [open, setOpen] = useState(false)

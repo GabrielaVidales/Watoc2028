@@ -50,7 +50,7 @@ class User(AbstractUser):
 
     @property
     def full_name(self):
-        return f"{self.prefix} {self.first_name} {self.middle_name} {self.last_name}".strip() or self.email
+        return f"{self.first_name} {self.middle_name} {self.last_name}".strip() or self.email
 
     @property
     def roles(self):

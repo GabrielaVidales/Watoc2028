@@ -95,16 +95,24 @@ class UserView(ModelViewSet):
             profiles["participant"] = ParticipantSerializer(request.user.participant).data
         return Response(profiles, status=200)
 
-    @action(detail=False, methods=["post"], url_path="change-profile-pic")
+    @action(detail=False, methods=["post", "delete"], url_path="change-profile-pic")
     def change_profile_pic(self, request):
         user = self.request.user
-        file = request.data.get("photo", None)
-        if file is not None and user.is_authenticated:
-            if user.photo:
-                user.photo.delete()
-            user.photo = file
-            user.save()
-            return Response(status=status.HTTP_200_OK)
+        
+        if request.method == "POST":
+            file = request.data.get("profilePicture", None)
+            if file is not None and user.is_authenticated:
+                if user.photo:
+                    user.photo.delete()
+                user.photo = file
+                user.save()
+                return Response({"detail": "Profile picture was succesfully updated"})
+
+        elif request.method == "DELETE":
+            profile_picture = user.photo
+            if profile_picture:
+                profile_picture.delete(save=True)
+            return Response({"detail": "Profile picture was succesfully deleted"})
 
         return Response(status=status.HTTP_400_BAD_REQUEST)
 

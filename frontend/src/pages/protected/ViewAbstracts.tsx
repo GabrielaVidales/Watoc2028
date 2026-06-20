@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import axiosClient from '@/clients/axiosClient'
 import { Button } from '@/components/ui/button'
-import { ArrowRight, BookType, CircleAlert, ExternalLink, Inbox, Pencil, Plus, Search, Send, Trash2, TriangleAlert } from 'lucide-react'
+import { ArrowRight, CircleAlert, Inbox, Pencil, Plus, Search, Send, Trash2, TriangleAlert } from 'lucide-react'
 import { Link, useNavigate } from 'react-router'
 import { urls } from '@/routes/routes'
 import { useProfiles } from '@/hooks/use-profiles'
@@ -155,11 +155,10 @@ function ViewAbstracts() {
 
                         {profile?.participant?.abstracts.map((abstract) => (
                             <Card key={abstract.id} className="group hover:shadow-lg transition-shadow">
-                                <CardHeader className="flex flex-col-reverse items-stretch  sm:flex-row sm:items-start sm:justify-between   gap-4">
+                                <CardHeader className="flex flex-col items-stretch  sm:flex-row sm:items-start sm:justify-between gap-4">
                                     <CardTitle className="text-lg font-semibold leading-tight">
                                         {abstract.title ? (
-                                            <Link to={urls.users.previewAbstract.build({ id: 22 })} className="block hover:underline">
-                                                <BookType className="inline-block mr-2 mb-1 shrink-0 size-5" />
+                                            <Link to={urls.users.previewAbstract.build({ id: 22 })} className="hover:underline">
                                                 {renderHTMLString(abstract.title)}
                                             </Link>
                                         ) : (
