@@ -5,7 +5,7 @@ import { presentationTypes, type AbstractSchema } from '@/schemas/abstract-schem
 import { Controller, useFormContext } from 'react-hook-form'
 import { InputGroup, InputGroupAddon,  InputGroupText, InputGroupTextarea } from '@/components/ui/input-group'
 import { cn } from '@/lib/utils'
-import RichTextEditor from '@/components/EnrichedTextArea'
+import RichTextEditor, { countWordsFromHTML } from '@/components/EnrichedTextArea'
 
 
 type AbstractFormProps = {
@@ -30,9 +30,9 @@ function AbstractForm({ abstract }: AbstractFormProps) {
                     control={control}
                     render={({ field, fieldState }) => (
                         <Field data-invalid={fieldState.invalid} className='w-full'>
-                            <FieldLabel htmlFor={field.name}>Abstract title</FieldLabel>
                             <RichTextEditor
                                 {...field}
+                                title='Abstract title'
                                 invalid={fieldState.invalid}
                                 id={field.name}
                                 multiline={false}
@@ -44,9 +44,9 @@ function AbstractForm({ abstract }: AbstractFormProps) {
                                 footer={
                                     <InputGroupText className={'ml-auto'}>
                                         <FieldLabel htmlFor={field.name} className={cn(
-                                            (fieldState.invalid || countWords(field.value || "") > 10) && 'text-destructive'
+                                            (fieldState.invalid || countWordsFromHTML(field.value || "") > 10) && 'text-destructive'
                                         )}>
-                                            {countWords(field.value || "")}/10 words
+                                            {countWordsFromHTML(field.value || "")}/10 words
                                         </FieldLabel>
                                     </InputGroupText>
                                 }
@@ -95,9 +95,9 @@ function AbstractForm({ abstract }: AbstractFormProps) {
                     control={control}
                     render={({ field, fieldState }) => (
                         <Field data-invalid={fieldState.invalid}>
-                            <FieldLabel htmlFor={field.name}>Abstract text</FieldLabel>
                             <RichTextEditor
                                 {...field}
+                                title='Abstract text'
                                 invalid={fieldState.invalid}
                                 id={field.name}
                                 autoComplete="off"
@@ -109,9 +109,9 @@ function AbstractForm({ abstract }: AbstractFormProps) {
                                 footer={
                                     <InputGroupText className={'ml-auto'}>
                                         <FieldLabel htmlFor={field.name} className={cn(
-                                            (fieldState.invalid || countWords(field.value || "") > 350) && 'text-destructive'
+                                            (fieldState.invalid || countWordsFromHTML(field.value || "") > 350) && 'text-destructive'
                                         )}>
-                                            {countWords(field.value || "")}/350 words
+                                            {countWordsFromHTML(field.value || "")}/350 words
                                         </FieldLabel>
                                     </InputGroupText>
                                 }
@@ -126,29 +126,27 @@ function AbstractForm({ abstract }: AbstractFormProps) {
                     control={control}
                     render={({ field, fieldState }) => (
                         <Field data-invalid={fieldState.invalid}>
-                            <FieldLabel htmlFor={field.name}>References</FieldLabel>
-                            <InputGroup>
-                                <InputGroupTextarea
-                                    {...field}
-                                    id={field.name}
-                                    aria-invalid={fieldState.invalid}
-                                    autoComplete="off"
-                                    autoCorrect="off"
-                                    spellCheck="false"
-                                    placeholder="Provide a concise summary of your work (max. 350 words)..."
-                                    className="min-h-20 wrap-anywhere max-h-70"
-                                    maxLength={1500}
-                                />
-                                <InputGroupAddon align={"block-end"}>
+                            <RichTextEditor
+                                {...field}
+                                title='References'
+                                invalid={fieldState.invalid}
+                                id={field.name}
+                                autoComplete="off"
+                                autoCorrect="off"
+                                spellCheck="false"
+                                placeholder="Provide the references of your work (max. 350 words)..."
+                                className="min-h-20 wrap-anywhere max-h-80"
+                                maxLength={2000}
+                                footer={
                                     <InputGroupText className={'ml-auto'}>
                                         <FieldLabel htmlFor={field.name} className={cn(
-                                            countWords(field.value || "") > 150 && 'text-destructive'
+                                            (fieldState.invalid || countWordsFromHTML(field.value || "") > 150) && 'text-destructive'
                                         )}>
-                                            {countWords(field.value || "")}/150 words
+                                            {countWordsFromHTML(field.value || "")}/150 words
                                         </FieldLabel>
                                     </InputGroupText>
-                                </InputGroupAddon>
-                            </InputGroup>
+                                }
+                            />
                             {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                         </Field>
                     )}

@@ -1,6 +1,70 @@
 import { cn } from "@/lib/utils"
+import { Check, CircleCheckBig, CircleEllipsis } from "lucide-react"
 import { Progress } from "./progress"
-import { CircleCheckBig, CircleEllipsis } from "lucide-react"
+import { Button } from "./button"
+
+interface Step {
+    label: string
+}
+
+type StepperProps = React.ComponentProps<'div'> & {
+    steps: Step[]
+    activeStep: number
+    setActiveStep: (n: number) => void
+}
+
+function Stepper({ steps, activeStep, setActiveStep, className }: StepperProps) {
+    const progress = Math.min(((activeStep / (steps.length)) + ((1 / steps.length) / 2)) * 100, 100)
+
+    return (
+        <div className={cn("w-full", className)}>
+            <Progress value={progress} className="h-1" />
+
+            <div className="flex items-start">
+                {steps.map((step, index) => {
+                    const completed = index < activeStep;
+                    const active = index === activeStep;
+
+                    return (
+                        <Button
+                            key={step.label}
+                            variant="ghost"
+                            className="flex flex-1 h-auto w-fit flex-col items-center p-2"
+                            onClick={() => setActiveStep(steps.indexOf(step))}
+                        >
+                            <div className="flex flex-col items-center w-full">
+                                <div
+                                    className={cn(
+                                        "flex size-6 sm:size-7 shrink-0 items-center justify-center rounded-full border-2 transition-all duration-300",
+                                        completed && "border-primary bg-primary text-primary-foreground",
+                                        active && "border-background shadow-md bg-muted text-primary outline-3 outline-primary-main",
+                                        !completed && !active && "border-muted-foreground bg-background text-muted-foreground"
+                                    )}
+                                >
+                                    {completed ? (
+                                        <Check className="size-3 sm:size-4" />
+                                    ) : (
+                                        index + 1
+                                    )}
+                                </div>
+
+                                <span
+                                    className={cn(
+                                        "mt-2 text-center text-xs transition-colors duration-500 text-wrap",
+                                        active ? "font-semibold text-foreground" : "text-muted-foreground"
+                                    )}
+                                >
+                                    {step.label}
+                                </span>
+                            </div>
+                        </Button>
+                    );
+                })}
+            </div>
+        </div>
+    );
+}
+
 
 type StepperLabelProps = React.ComponentProps<'div'> & {
     completed: boolean
@@ -50,4 +114,4 @@ function StepperLabel({
     )
 }
 
-export { StepperLabel }
+export { StepperLabel, Stepper }

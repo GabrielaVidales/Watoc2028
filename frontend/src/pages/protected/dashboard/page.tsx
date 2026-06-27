@@ -1,0 +1,249 @@
+import React from 'react'
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { Badge } from "@/components/ui/badge"
+import { PlusCircle, User, Calendar, FileText, ChevronUp, Mail, MapPin, Shield, Edit2, Building } from "lucide-react"
+import { useAuth } from '@/contexts/AuthContext'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { formatDate } from '@/utils/formatDate'
+import { useProfiles } from '@/hooks/use-profiles'
+import { Spinner } from '@/components/ui/spinner'
+import { renderHTMLString } from '@/utils/tsx_utils'
+
+function UserDashboardPage() {
+    const { currentUser } = useAuth()
+
+    const { profile } = useProfiles()
+
+    const abstracts = profile?.participant?.abstracts || []
+
+    return (
+        <section className="antialiased">
+            <header className="mb-8 flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
+                <div>
+                    <h1 className="text-3xl font-bold tracking-tight text-foreground">Panel de Control</h1>
+                    <p className="text-sm text-muted-foreground">Bienvenido, {currentUser.full_name}</p>
+                </div>
+                <Button size="lg" className="gap-2 shadow-sm">
+                    <PlusCircle className="h-4 w-4" />
+                    Registrar Nueva Ponencia
+                </Button>
+            </header>
+
+            <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+                <div className="lg:col-span-2 space-y-6">
+                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                        <Card>
+                            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                                <CardTitle className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+                                    Ponencias Registradas
+                                </CardTitle>
+                            </CardHeader>
+                            <CardContent>
+                                <div className="text-3xl font-bold">
+                                    {abstracts.length}
+                                </div>
+                            </CardContent>
+                        </Card>
+
+                        <Card>
+                            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                                <CardTitle className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+                                    Estado del Perfil
+                                </CardTitle>
+                            </CardHeader>
+                            <CardContent>
+                                <Badge variant="outline" className="bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20 text-sm font-semibold">
+                                    Completado
+                                </Badge>
+                            </CardContent>
+                        </Card>
+                    </div>
+
+                    <Card>
+                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
+                            <div>
+                                <CardTitle className="text-lg font-semibold">Mis Ponencias</CardTitle>
+                                <CardDescription>Gestión de resúmenes y estado de aprobaciones.</CardDescription>
+                            </div>
+                        </CardHeader>
+                        <CardContent>
+                            <div className="rounded-md border bg-background overflow-hidden">
+                                <Table>
+                                    <TableHeader className="bg-muted/50">
+                                        <TableRow>
+                                            <TableHead className="font-semibold">Título</TableHead>
+                                            <TableHead className="font-semibold">Tipo</TableHead>
+                                            <TableHead className="font-semibold">Última Modificación</TableHead>
+                                            <TableHead className="font-semibold">Estado</TableHead>
+                                            <TableHead className="text-right font-semibold">Acciones</TableHead>
+                                        </TableRow>
+                                    </TableHeader>
+                                    <TableBody>
+                                        {abstracts && abstracts.length > 0 ? (
+                                            abstracts.map((abstract) => (
+                                                <TableRow key={abstract.id}>
+                                                    <TableCell className="font-medium max-w-80">
+                                                        <div className="truncate font-semibold text-foreground" title={abstract.title} >
+                                                            {renderHTMLString(abstract.title)}
+                                                        </div>
+                                                    </TableCell>
+
+                                                    <TableCell className="capitalize text-xs">
+                                                        {abstract.presentation_type?.replace('_', ' ')}
+                                                    </TableCell>
+
+                                                    <TableCell className="text-xs text-muted-foreground">
+                                                        {abstract.last_update ? formatDate(abstract.last_update) : '—'}
+                                                    </TableCell>
+
+                                                    <TableCell>
+                                                        {(() => {
+                                                            const statusConfig = {
+                                                                draft: { label: "Borrador", className: "bg-gray-500/10 text-gray-600 dark:text-gray-400 border-gray-500/20" },
+                                                                submitted: { label: "Enviado", className: "bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/20" },
+                                                                accepted: { label: "Aceptado", className: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20" },
+                                                                rejected: { label: "Rechazado", className: "bg-destructive/10 text-destructive border-destructive/20" },
+                                                                corrections: { label: "Correcciones", className: "bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20" },
+                                                                deleted: { label: "Eliminado", className: "bg-red-500/10 text-red-600 line-through border-red-500/20" }
+                                                            };
+                                                            const config = statusConfig[abstract.status || "draft"];
+                                                            return (
+                                                                <Badge variant="outline" className={`font-medium ${config.className}`}>
+                                                                    {config.label}
+                                                                </Badge>
+                                                            );
+                                                        })()}
+                                                    </TableCell>
+
+                                                    <TableCell className="text-right space-x-1">
+                                                        <Button variant="link" size="sm" className="px-1.5 text-blue-600">
+                                                            Ver
+                                                        </Button>
+                                                        {abstract.status === "draft" || abstract.status === "corrections" ? (
+                                                            <Button variant="link" size="sm" className="px-1.5 text-foreground">
+                                                                Editar
+                                                            </Button>
+                                                        ) : null}
+                                                    </TableCell>
+                                                </TableRow>
+                                            ))
+                                        ) : (
+                                            <TableRow>
+                                                <TableCell colSpan={6} className="h-24 text-center text-sm text-muted-foreground">
+                                                    No tienes ninguna ponencia registrada en este sistema.
+                                                </TableCell>
+                                            </TableRow>
+                                        )}
+                                    </TableBody>
+                                </Table>
+                            </div>
+                        </CardContent>
+                    </Card>
+                </div>
+
+                <div className="space-y-6">
+
+                    <Card className="w-full">
+                        <CardHeader className="flex flex-row items-start space-x-2.5 space-y-0 pb-4 border-b">
+                            <User className="h-5 w-5 text-primary-main" />
+                            <div className="flex flex-col">
+                                <CardTitle className="text-base font-bold leading-none">
+                                    {currentUser.prefix} {currentUser.first_name} {currentUser.last_name}
+                                </CardTitle>
+                                {profile?.participant && (
+                                    <span className="text-xs text-muted-foreground mt-1">
+                                        {profile.participant.job_title} • {profile.participant.field_of_study}
+                                    </span>
+                                )}
+
+                                {currentUser.pronouns && (
+                                    <span className="text-xs text-muted-foreground mt-1">
+                                        ({currentUser.pronouns})
+                                    </span>
+                                )}
+                            </div>
+                        </CardHeader>
+
+                        <CardContent className="space-y-3.5">
+                            <div className="flex items-center text-sm text-foreground/90 gap-2.5">
+                                <Mail className="h-4 w-4 text-primary-main shrink-0" />
+                                <span className="truncate">{currentUser.email}</span>
+                            </div>
+
+                            {profile?.participant && (
+                                <div className="flex items-center text-sm text-foreground/90 gap-2.5">
+                                    <Building className="h-4 w-4 text-primary-main shrink-0" />
+                                    <span className="truncate">{profile.participant.affiliation}</span>
+                                </div>
+                            )}
+
+                            <div className="flex items-center text-sm text-foreground/90 gap-2.5">
+                                <MapPin className="h-4 w-4 text-primary-main shrink-0" />
+                                <span>{currentUser.city}, {currentUser.nationality}</span>
+                            </div>
+
+                            <div className="flex items-start text-sm text-foreground/90 gap-2.5 pt-0.5">
+                                <Shield className="h-4 w-4 text-primary-main shrink-0 mt-0.5" />
+                                <div className="flex flex-wrap gap-1">
+                                    {currentUser.roles.map((role) => (
+                                        <span key={role} className="inline-flex items-center rounded-md bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground border">
+                                            {role}
+                                        </span>
+                                    ))}
+                                </div>
+                            </div>
+
+                            <div className="border-t pt-3 mt-2 space-y-2 text-xs text-muted-foreground">
+                                <div className="flex justify-between">
+                                    <span>Fecha de registro:</span>
+                                    <span className="font-medium text-foreground">
+                                        {currentUser.date_joined ? formatDate(currentUser.date_joined) : '—'}
+                                    </span>
+                                </div>
+                                <div className="flex justify-between">
+                                    <span>Último acceso:</span>
+
+                                    <span className="font-medium text-foreground">
+                                        {currentUser.last_login ? formatDate(currentUser.last_login) : '—'}
+
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div className="pt-2">
+                                <Button variant="outline" className="w-full text-sm font-medium">
+                                    <Edit2 />
+                                    Editar Perfil
+                                </Button>
+                            </div>
+                        </CardContent>
+                    </Card>
+
+                    <Card>
+                        <CardHeader className="flex flex-row items-center space-x-2 space-y-0 pb-3">
+                            <Calendar className="h-4 w-4 text-muted-foreground" />
+                            <CardTitle className="text-base font-semibold">Fechas Importantes</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            <div className="space-y-4 text-sm">
+                                <div className="flex items-center justify-between border-b pb-2">
+                                    <span className="text-muted-foreground">Cierre de Resúmenes</span>
+                                    <span className="font-semibold text-foreground">[DD/MM/AAAA]</span>
+                                </div>
+                                <div className="flex items-center justify-between">
+                                    <span className="text-muted-foreground">Notificación de Resultados</span>
+                                    <span className="font-semibold text-foreground">[DD/MM/AAAA]</span>
+                                </div>
+                            </div>
+                        </CardContent>
+                    </Card>
+
+                </div>
+            </div>
+        </section>
+    )
+}
+
+export default UserDashboardPage

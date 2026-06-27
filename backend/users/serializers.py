@@ -1,6 +1,5 @@
 from django.contrib.auth import password_validation
 from django.core import exceptions
-from django.contrib.auth.models import Group
 from django.contrib.auth import get_user_model
 from django.db import transaction
 from rest_framework import serializers
@@ -269,16 +268,25 @@ def normalize_author_order(abstract):
 
 
 class AbstractSerializer(serializers.ModelSerializer):
+    authors = serializers.SerializerMethodField()
+
     class Meta:
         model = models.Abstract
         fields = "__all__"
         read_only_fields = ["created_at", "last_update", "needs_review"]
+        
+    def get_authors(self, instance):
+        return AuthorSerializer(instance.authors.all(), many=True).data
         
     def validate_title(self, value):
         sanitized_value = bleach.clean(value, [], {})
         return sanitized_value
 
     def validate_text(self, value):
+        sanitized_value = bleach.clean(value, [], {})
+        return sanitized_value
+    
+    def validate_references(self, value):
         sanitized_value = bleach.clean(value, [], {})
         return sanitized_value
 

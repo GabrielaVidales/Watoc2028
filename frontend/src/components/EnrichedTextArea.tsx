@@ -17,6 +17,7 @@ import { useEffect, type ReactNode } from "react"
 
 
 type RichTextEditorProps = {
+    title?: string
     value?: string
     invalid?: boolean,
     footer?: ReactNode
@@ -25,10 +26,10 @@ type RichTextEditorProps = {
     onBlur?: () => void
 } & React.ComponentProps<"textarea">
 
-export default function RichTextEditor({ value, invalid, multiline = true, placeholder, onBlur, footer, disabled, className, onChange, maxLength, autoComplete, autoCorrect, spellCheck, name, id }: RichTextEditorProps) {
+export default function RichTextEditor({ title, value, invalid, multiline = true, placeholder, onBlur, footer, disabled, className, onChange, maxLength, autoComplete, autoCorrect, spellCheck, name, id }: RichTextEditorProps) {
     const editor = useEditor({
         editorProps: {
-            handleKeyDown(view, event) {
+            handleKeyDown({ }, event) {
                 if (!multiline && event.key === "Enter") {
                     event.preventDefault()
                     return true
@@ -36,7 +37,7 @@ export default function RichTextEditor({ value, invalid, multiline = true, place
 
                 return false
             },
-            handlePaste(view, event) {
+            handlePaste({ }, event) {
                 if (!multiline) {
                     event.preventDefault()
 
@@ -45,7 +46,7 @@ export default function RichTextEditor({ value, invalid, multiline = true, place
                         event.clipboardData?.getData("text/plain") ||
                         ""
 
-                    console.log(html);
+                    // console.log(html);
 
                     const sanitized = html
                         .replace(/<br\s*\/?>/gi, " ")
@@ -70,6 +71,7 @@ export default function RichTextEditor({ value, invalid, multiline = true, place
                 maxlength: maxLength?.toString(),
                 class: cn(
                     "ProseMirror min-h-0 w-full bg-background p-3 text-sm outline-none max-w-none",
+                    "break-all",
                     "[&_p]:wrap-anywhere",
                     "[&_li]:wrap-anywhere",
                     "[&_p]:my-2 [&_h1]:text-3xl [&_h1]:font-bold [&_h2]:text-2xl [&_h2]:font-bold",
@@ -101,8 +103,6 @@ export default function RichTextEditor({ value, invalid, multiline = true, place
         content: value || "",
         editable: !disabled,
         onUpdate({ editor }) {
-            console.log(editor.getHTML());
-
             onChange?.(editor.getHTML())
         },
         onBlur() {
@@ -139,6 +139,15 @@ export default function RichTextEditor({ value, invalid, multiline = true, place
             )}
         >
             <div className={cn("flex items-center gap-2 border-b bg-muted/40 p-2")}>
+                {title && (
+                    <label
+                        htmlFor={id}
+                        onClick={() => editor.commands.focus()}
+                        className="px-2 mr-auto font-medium cursor-text"
+                    >
+                        {title}
+                    </label>
+                )}
 
                 <ToolbarButton
                     onClick={() => editor.chain().focus().toggleBold().run()}
@@ -169,13 +178,12 @@ export default function RichTextEditor({ value, invalid, multiline = true, place
                 >
                     X²
                 </ToolbarButton>
-
             </div>
 
             <EditorContent editor={editor} className="tiptap max-h-full" />
 
             {footer && (
-                <div className="flex py-1 px-3 w-full">
+                <div className="flex py-1 px-3 w-full border-t">
                     {footer}
                 </div>
             )}
@@ -202,8 +210,19 @@ function ToolbarButton({ onClick, children, }: ToolbarButtonProps) {
     )
 }
 
-function decodeHtml(html: string) {
+export function decodeHtml(html: string) {
     const txt = document.createElement("textarea")
     txt.innerHTML = html
     return txt.value
 }
+
+export function countWordsFromHTML(html: string) {
+    const div = document.createElement("div")
+    div.innerHTML = html
+    return div.textContent
+        ?.trim()
+        .split(/\s+/)
+        .filter(Boolean)
+        .length ?? 0
+}
+

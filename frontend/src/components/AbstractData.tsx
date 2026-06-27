@@ -6,6 +6,7 @@ import { presentationTypes, type AbstractSchema } from '@/schemas/abstract-schem
 import { CircleCheckBig } from 'lucide-react'
 import { InfoAlert } from '@/components/InfoAlert'
 import { renderHTMLString } from '@/utils/tsx_utils'
+import { Badge } from './ui/badge'
 
 
 export type AbstractDataProps = {
@@ -20,116 +21,144 @@ export type AbstractDataProps = {
 }
 
 export function AbstractData({ abstract, authors, declarations, errors }: AbstractDataProps) {
-
     const abstractErrors = errors?.abstract;
     const authorErrors = errors?.authors;
     const declarationsErrors = errors?.declarations;
     const hasErrors = !!(abstractErrors || authorErrors || declarationsErrors);
 
-    const referencesEmpty = abstract?.references?.trim()?.length === 0
-    const referencesList = referencesEmpty ? null : abstract?.references?.split('\n') || []
-
     return (
         <div className='space-y-6'>
             {errors && (
-                !hasErrors ? (
-                    <InfoAlert
-                        icon={<CircleCheckBig />}
-                        title='You are almost done!'
-                        messages={["The information is valid and ready to be saved."]}
-                        variant='success'
-                    />
-                ) : (
-                    <InfoAlert
-                        title='Please review the highlighted section(s).'
-                        variant='destructive'
-                        messages={[
-                            abstractErrors && "Check abstract details (title, text, or references).",
-                            authorErrors && "Check the authors list.",
-                            declarationsErrors && "Check the required declarations.",
-                        ].filter(Boolean) as string[]}
-                    />
-                )
+                <div className="animate-in fade-in-50 duration-200">
+                    {!hasErrors ? (
+                        <InfoAlert
+                            icon={<CircleCheckBig className="size-4" />}
+                            title='You are almost done!'
+                            messages={["The information is valid and ready to be saved."]}
+                            variant='success'
+                        />
+                    ) : (
+                        <InfoAlert
+                            title='Please review the highlighted section(s).'
+                            variant='destructive'
+                            messages={[
+                                abstractErrors && "Check abstract details (title, text, or references).",
+                                authorErrors && "Check the authors list.",
+                                declarationsErrors && "Check the required declarations.",
+                            ].filter(Boolean) as string[]}
+                        />
+                    )}
+                </div>
             )}
 
-            <section className="space-y-3">
-                <h2 className='font-semibold pb-1 border-b-2 border-b-input'>Abstract Content</h2>
+            <div className="space-y-5">
 
                 <ShowField
                     hasError={Boolean(abstractErrors?.title)}
                     errors={abstractErrors?.title?.errors}
-                    name='Title'
-                    value={renderHTMLString(abstract?.title || '')}
-                />
-
-                <ShowField
-                    hasError={Boolean(abstractErrors?.presentation_type)}
-                    errors={abstractErrors?.presentation_type?.errors}
-                    name='Presentation type'
-                    value={presentationTypes.find(t => t.value === abstract?.presentation_type)?.label}
+                    name=''
+                    value={
+                        <h1 className='text-lg font-bold text-foreground leading-snug border-l-3 mr-2 border-primary pl-3 py-0'>
+                            {renderHTMLString(abstract?.title || 'Untitled Abstract')}
+                        </h1>
+                    }
                 />
 
                 <ShowField
                     hasError={Boolean(authorErrors)}
                     errors={Array.isArray(authorErrors) ? authorErrors : authorErrors?.errors}
-                    name='Authors'
-                    value={authors?.length > 0 ? <AuthorsPreview authors={authors} /> : null}
+                    name='Authors & Affiliations'
+                    value={
+                        <div className='p-3.5 py-2'>
+                            {authors?.length > 0 ? <AuthorsPreview authors={authors} /> : 'No authors included'}
+                        </div>
+                    }
+                />
+
+                <ShowField
+                    hasError={Boolean(abstractErrors?.presentation_type)}
+                    errors={abstractErrors?.presentation_type?.errors}
+                    name='Presentation Method'
+                    value={
+                        <div className='px-3.5 pt-2'>
+                            {
+                                abstract?.presentation_type ? (
+                                    <Badge variant="outline" className="capitalize bg-background font-medium px-2.5 py-0.5 text-xs text-muted-foreground border-muted-foreground/30">
+                                        {presentationTypes.find(t => t.value === abstract?.presentation_type)?.label}
+                                    </Badge>
+                                ) : 'Not set'
+                            }
+                        </div>
+                    }
                 />
 
                 <ShowField
                     hasError={Boolean(abstractErrors?.text)}
                     errors={abstractErrors?.text?.errors}
-                    name='Text'
-                    value={renderHTMLString(abstract?.text || '')}
-                />
-
-                <ShowField
-                    hasError={Boolean(abstractErrors?.references)}
-                    errors={abstractErrors?.references?.errors}
-                    name='References'
-                    value={referencesList?.length === 0 ? null : referencesList?.map((p: string, i: number) => (
-                        <p key={i} className='mb-2 text-sm'>{p}</p>
-                    ))}
-                />
-            </section>
-
-            <section className="space-y-3">
-                <h2 className='font-semibold pb-1 border-b-2 border-b-input'>Declarations</h2>
-                {declarations && Object.keys(declarations).map(field => (
-                    <div key={field} className={cn(
-                        'grid grid-cols-1 sm:grid-cols-[1fr_10rem] px-3 py-2 border-b border-border/40 last:border-0',
-                        Boolean(declarationsErrors?.[field]) ? "bg-destructive/10 rounded-md" : ""
-                    )}>
-                        <FieldContent>
-                            <FieldTitle className="text-sm font-medium">
-                                {declarationsLabels?.[field]?.title}
-                            </FieldTitle>
-                            <FieldDescription className='text-xs'>
-                                {declarationsLabels?.[field]?.description}
-                            </FieldDescription>
-                            {Boolean(declarationsErrors?.[field]) && (
-                                <FieldError errors={[declarationsErrors?.[field]?.error]} />
-                            )}
-                        </FieldContent>
-
-                        <div className="flex items-center justify-end">
-                            <span className={cn(
-                                "text-sm font-bold px-3 py-1 border-input border-2 rounded-full uppercase tracking-tighter",
-                                declarations?.[field] ? "bg-green-100 text-green-700" : "bg-muted text-muted-foreground"
-                            )}>
-                                {declarations?.[field] ? 'Yes' : 'No'}
-                            </span>
+                    name='Abstract Body'
+                    value={
+                        <div className="prose prose-sm dark:prose-invert max-w-none text-sm text-foreground/90 leading-relaxed tracking-normal bg-muted/10 p-3.5 rounded-xl border border-muted/50">
+                            {renderHTMLString(abstract?.text || 'Not set')}
                         </div>
-                    </div>
-                ))}
-            </section>
+                    }
+                />
+
+                {abstract?.references && (
+                    <ShowField
+                        hasError={Boolean(abstractErrors?.references)}
+                        errors={abstractErrors?.references?.errors}
+                        name='References'
+                        value={
+                            <div className="prose prose-sm dark:prose-invert max-w-none text-sm text-foreground/90 leading-relaxed tracking-normal bg-muted/10 p-3.5 rounded-xl border border-muted/50">
+                                {renderHTMLString(abstract.references)}
+                            </div>
+                        }
+                    />
+                )}
+            </div>
+
+            <div className="space-y-3 pt-2">
+                <h3 className='text-sm font-semibold tracking-wider uppercase text-muted-foreground pb-1.5 border-b'>
+                    Required Declarations
+                </h3>
+
+                <div className="divide-y divide-border/60 border rounded-xl overflow-hidden bg-background">
+                    {declarations && Object.keys(declarations).map(field => (
+                        <div key={field} className={cn(
+                            'flex flex-col sm:flex-row sm:items-center justify-between p-4 gap-4 transition-colors',
+                            Boolean(declarationsErrors?.[field]) ? "bg-destructive/5" : "hover:bg-muted/30"
+                        )}>
+                            <FieldContent className="space-y-1">
+                                <FieldTitle className="text-sm font-semibold tracking-tight text-foreground">
+                                    {declarationsLabels?.[field]?.title}
+                                </FieldTitle>
+                                <FieldDescription className='text-xs text-muted-foreground max-w-xl leading-normal'>
+                                    {declarationsLabels?.[field]?.description}
+                                </FieldDescription>
+                                {Boolean(declarationsErrors?.[field]) && (
+                                    <FieldError errors={[declarationsErrors?.[field]?.error]} className="text-xs mt-1" />
+                                )}
+                            </FieldContent>
+
+                            <div className="flex items-center shrink-0 sm:ml-auto">
+                                <span className={cn(
+                                    "text-xs font-bold px-3 py-1.5 rounded-full border tracking-wide shadow-sm min-w-18 text-center",
+                                    declarations?.[field]
+                                        ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/20"
+                                        : "bg-muted text-muted-foreground border-transparent"
+                                )}>
+                                    {declarations?.[field] ? 'Accepted' : 'No'}
+                                </span>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            </div>
         </div>
     )
 }
 
 
-
-// #region
 type ShowFieldProps = {
     hasError: boolean
     errors: string[]
@@ -138,19 +167,17 @@ type ShowFieldProps = {
 }
 
 const ShowField = ({ hasError, errors, name, value }: ShowFieldProps) => {
-
     return (
-        <div className={cn(
-            'grid grid-cols-1 sm:grid-cols-[10rem_1fr] px-3 py-2',
-            hasError ? "bg-destructive/10 rounded-md" : ""
-        )}>
-            <label className="text-sm font-semibold leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-                {name}
-            </label>
+        <div className={cn(hasError ? "bg-destructive/10 rounded-md" : "")}>
+            {name && (
+                <label className="text-sm font-semibold leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                    {name}
+                </label>
+            )}
 
-            <div className="flex flex-col gap-2">
+            <div className="flex flex-col gap-2 font-serif">
                 <div className={cn(
-                    "text-balance text-sm leading-snug wrap-anywhere",
+                    "text-sm leading-snug wrap-anywhere",
                     hasError ? "text-destructive italic" : "text-foreground"
                 )}>
                     {value || "Not set"}
@@ -211,7 +238,7 @@ const AuthorsPreview = ({ authors }) => {
                 {uniqueAffiliations.map((aff, idx) => (
                     <span key={aff.id} className="text-xs mt-1 italic leading-tight">
                         <sup className="font-bold mr-1 not-italic">{idx + 1}</sup>
-                        {[aff.institute, aff.department, aff.city, aff.nationality]
+                        {[aff.institute, aff.city, aff.nationality]
                             .filter(Boolean)
                             .join(", ")}
                     </span>
@@ -220,4 +247,3 @@ const AuthorsPreview = ({ authors }) => {
         </div>
     );
 };
-// #endregion

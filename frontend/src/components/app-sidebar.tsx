@@ -1,60 +1,14 @@
-import {
-    Sidebar,
-    SidebarContent,
-    SidebarFooter,
-    SidebarGroup,
-    SidebarGroupAction,
-    SidebarGroupContent,
-    SidebarGroupLabel,
-    SidebarHeader,
-    SidebarMenu,
-    SidebarMenuAction,
-    SidebarMenuButton,
-    SidebarMenuItem,
-    SidebarRail,
-    useSidebar,
-} from "@/components/ui/sidebar"
-import { Link, NavLink, Outlet, useNavigate } from "react-router"
-import logo from '@/assets/WatocPNGLogo.png';
+import { Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarHeader, SidebarMenu, SidebarMenuAction, SidebarMenuButton, SidebarMenuItem, useSidebar, } from "@/components/ui/sidebar"
+import { Link, NavLink, } from "react-router"
 import { urls } from "@/routes/routes";
-import {
-    ArrowLeftFromLine,
-    BadgeCheck,
-    Bell,
-    ChevronDown,
-    ChevronLeftSquare,
-    ChevronsUpDown,
-    ChevronUp,
-    CreditCard,
-    Folder,
-    Forward,
-    Home,
-    Info,
-    LayoutDashboard,
-    LogOut,
-    MoreHorizontal,
-    Plus,
-    Settings,
-    Settings2,
-    Sparkles,
-    Trash2,
-    User2,
-    type LucideIcon,
-} from "lucide-react"
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuGroup,
-    DropdownMenuItem,
-    DropdownMenuLabel,
-    DropdownMenuSeparator,
-    DropdownMenuShortcut,
-    DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+import { ArrowLeftFromLine, BadgeCheckIcon, Bell, ChevronDown, ChevronUp, Folder, Forward, LayoutDashboard, LogOut, MoreHorizontal, Settings2, Trash2, type LucideIcon, } from "lucide-react"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger, } from "@/components/ui/dropdown-menu"
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useAuth } from "@/contexts/AuthContext";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
+import miniLogo from '@/assets/logo_img.png'
 import React from "react";
+
 
 export function AppSidebar({
     projects,
@@ -65,9 +19,8 @@ export function AppSidebar({
         icon: LucideIcon
     }[]
 }) {
-    const isMobile = useIsMobile()
-
     const { currentUser } = useAuth()
+    const isMobile = useIsMobile()
 
     return (
         <Sidebar>
@@ -83,7 +36,7 @@ export function AppSidebar({
                     <SidebarGroupContent>
                         <SidebarMenuItem>
                             <SidebarMenuButton asChild>
-                                <NavLink to={'#'} className="hover:translate-x-1 transition-transform duration-300">
+                                <NavLink to={urls.users.profile} className="hover:translate-x-1 transition-transform duration-300">
                                     <LayoutDashboard />
                                     <span>Dashboard</span>
                                 </NavLink>
@@ -136,9 +89,7 @@ export function AppSidebar({
                         ))}
                     </SidebarGroupContent>
 
-
                 </SidebarGroup>
-
 
                 <SidebarGroup>
                     <SidebarGroupLabel>
@@ -147,7 +98,7 @@ export function AppSidebar({
                     <SidebarGroupContent>
                         <SidebarMenuItem>
                             <SidebarMenuButton asChild>
-                                <NavLink to={'#'} className="hover:translate-x-1 transition-transform duration-300">
+                                <NavLink to={urls.users.settings} className="hover:translate-x-1 transition-transform duration-300">
                                     <Settings2 />
                                     <span>Settings</span>
                                 </NavLink>
@@ -180,6 +131,7 @@ export function NavUser({
     }
 }) {
     const { isMobile } = useSidebar()
+    const { handleLogout } = useAuth()
 
     return (
         <SidebarMenu>
@@ -223,30 +175,29 @@ export function NavUser({
                         </DropdownMenuLabel>
                         <DropdownMenuSeparator />
                         <DropdownMenuGroup>
-                            <DropdownMenuItem>
-                                <Sparkles />
-                                Upgrade to Pro
+                            <DropdownMenuItem asChild>
+                                <Link to={urls.users.profile}>
+                                    <BadgeCheckIcon />
+                                    Account
+                                </Link>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem asChild>
+                                <Link to={urls.users.settings}>
+                                    <Settings2 />
+                                    Settings
+                                </Link>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem asChild>
+                                <Link to={urls.users.notifications}>
+                                    <Bell />
+                                    Notifications
+                                </Link>
                             </DropdownMenuItem>
                         </DropdownMenuGroup>
                         <DropdownMenuSeparator />
-                        <DropdownMenuGroup>
-                            <DropdownMenuItem>
-                                <BadgeCheck />
-                                Account
-                            </DropdownMenuItem>
-                            <DropdownMenuItem>
-                                <CreditCard />
-                                Billing
-                            </DropdownMenuItem>
-                            <DropdownMenuItem>
-                                <Bell />
-                                Notifications
-                            </DropdownMenuItem>
-                        </DropdownMenuGroup>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem>
+                        <DropdownMenuItem onClick={async () => await handleLogout()}>
                             <LogOut />
-                            Log out
+                            Sign Out
                         </DropdownMenuItem>
                     </DropdownMenuContent>
                 </DropdownMenu>
@@ -256,21 +207,17 @@ export function NavUser({
 }
 
 
-import miniLogo from '@/assets/logo_img.png'
-
 export function TeamSwitcher() {
-
     const { isMobile } = useSidebar()
 
     return (
         <SidebarMenu>
             <SidebarMenuItem>
                 <DropdownMenu>
-
                     <DropdownMenuTrigger asChild>
                         <SidebarMenuButton
                             size="lg"
-                            className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
+                            className="cursor-pointer data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
                         >
                             <div className="flex aspect-square size-16 items-center justify-center rounded-lg text-sidebar-primary-foreground">
                                 <img src={miniLogo} className="" />

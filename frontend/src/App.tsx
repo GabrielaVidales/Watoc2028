@@ -23,12 +23,9 @@ import VisaRequirements from '@/pages/visa/VisaRequirements'
 import AuthLayout from './layouts/AuthLayout'
 import CreateAbstractPage from './pages/protected/CreateAbstractPage'
 import { urls } from './routes/routes'
-import UserProfile from './pages/protected/profile/UserProfile'
-import ViewAbstracts from './pages/protected/ViewAbstracts'
 import EditAbstractPage from './pages/protected/EditAbstractPage'
 import AbstractPreview from './pages/protected/AbstractPreview'
 import ConfirmationPage from './pages/protected/confirmation-assistance/page'
-import PaymentSuccess from './pages/protected/success/payment-success'
 import { SelectFeePage } from './pages/protected/confirmation-assistance/fee/page'
 import { SelectTourPage } from './pages/protected/confirmation-assistance/tour/page'
 import { DinnerPage } from './pages/protected/confirmation-assistance/dinner/page'
@@ -36,14 +33,18 @@ import ConfirmPaymentPage from './pages/protected/confirmation-assistance/paymen
 import LoginPage from './pages/auth/login/page'
 import ContactPage from './pages/contact/page'
 import DashboardLayout from './layouts/DashboardLayout'
-import SidebarsLayout from './layouts/SidebarsLayout'
 import VerifyEmailPage from './pages/auth/verify/page'
 import SettingsPage from './pages/protected/settings/settings-page'
 import ForgotPasswordPage from './pages/auth/reset_password/forgot-password-page'
 import CreatePasswordPage from './pages/auth/create_new_password/create-new-password'
 import AbstractSubmissionsPage from './pages/protected/abstract-submissions/page'
+import UserDashboardPage from './pages/protected/dashboard/page'
+import TestPage from './pages/test'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 function App() {
+	const queryClient = new QueryClient()
+
 	const { pathname } = useLocation()
 
 	useEffect(() => {
@@ -55,7 +56,7 @@ function App() {
 	}, [pathname])
 
 	return (
-		<>
+		<QueryClientProvider client={queryClient}>
 			<ThemeProvider theme={globalTheme}>
 				<CssBaseline />
 				<Routes>
@@ -88,13 +89,13 @@ function App() {
 
 						<Route element={<ProtectedRoute allowedRoles={['admin', 'participant']} />} >
 
-							<Route path={urls.users.profile} element={<UserProfile />} />
+							{/* <Route path={urls.users.profile} element={<UserProfile />} /> */}
 							{/* <Route path={urls.users.viewAbstracts} element={(
 								<div className='max-w-4xl mx-auto py-10'>
 									<ViewAbstracts/>
 								</div>
 							)} /> */}
-							<Route path={urls.users.editAbstract.url} element={<EditAbstractPage />} />
+							{/* <Route path={urls.users.editAbstract.url} element={<EditAbstractPage />} /> */}
 							<Route path={urls.users.submitAbstract} element={<CreateAbstractPage />} />
 							<Route path={urls.users.previewAbstract.url} element={<AbstractPreview />} />
 
@@ -111,18 +112,21 @@ function App() {
 
 					<Route element={<ProtectedRoute allowedRoles={['admin', 'participant']} />} >
 						<Route element={<DashboardLayout />}>
+							<Route path={urls.users.profile} element={<UserDashboardPage />} />
 							<Route path={urls.users.settings} element={<SettingsPage />} />
 							<Route path={urls.users.viewAbstracts} element={<AbstractSubmissionsPage />} />
+							<Route path={urls.users.editAbstract.url} element={<EditAbstractPage />} />
 						</Route>
 					</Route>
 
 					<Route path={urls.auth.verify} element={<VerifyEmailPage />} />
+					<Route path={'/test'} element={<TestPage />} />
 
 					{/* Para rutas diferentes */}
 					<Route path='*' element={<NotFound />} />
 				</Routes>
 			</ThemeProvider>
-		</>
+		</QueryClientProvider>
 	)
 }
 

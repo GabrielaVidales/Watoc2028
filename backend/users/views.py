@@ -37,7 +37,7 @@ from itsdangerous import BadSignature
 from itsdangerous import SignatureExpired
 from itsdangerous import URLSafeTimedSerializer
 from utils.lib import get_password_signature
-import os, logging
+import os, logging, html
 
 serializer = URLSafeTimedSerializer(settings.SECRET_KEY)
 
@@ -82,9 +82,7 @@ class UserView(ModelViewSet):
         send_email_confirmation_email.delay(user.id)
         print(f"Confirmation email sended to {user.email}")
         return Response(
-            {
-                "message": f"We've sent a new verification link to your email address. Please check your inbox and spam folder. {user.email}"
-            },
+            {"message": f"We've sent a new verification link to your email address. Please check your inbox and spam folder. {user.email}"},
         )
 
     @action(detail=False, methods=["get"], url_path="profile")
@@ -98,7 +96,7 @@ class UserView(ModelViewSet):
     @action(detail=False, methods=["post", "delete"], url_path="change-profile-pic")
     def change_profile_pic(self, request):
         user = self.request.user
-        
+
         if request.method == "POST":
             file = request.data.get("profilePicture", None)
             if file is not None and user.is_authenticated:
@@ -389,9 +387,7 @@ class PasswordResetView(ViewSet):
             )
 
         if not user.is_active:
-            logger.warning(
-                f"[PasswordResetView] — Intento de restablecimiento para cuenta inactiva - ID: {user.id}, Email: {email}"
-            )
+            logger.warning(f"[PasswordResetView] — Intento de restablecimiento para cuenta inactiva - ID: {user.id}, Email: {email}")
             return Response(
                 {"errors": {"root": ["Please make sure you've entered a valid email address and try again."]}},
                 status=status.HTTP_400_BAD_REQUEST,
@@ -427,22 +423,16 @@ class PasswordResetView(ViewSet):
         try:
             user = User.objects.get(id=data["user_id"])
         except User.DoesNotExist:
-            logger.error(
-                f"[PasswordResetView] — Usuario no encontrado para el token - ID de usuario: {data['user_id']}"
-            )
+            logger.error(f"[PasswordResetView] — Usuario no encontrado para el token - ID de usuario: {data['user_id']}")
             return Response({"detail": "User does not exist."}, status=status.HTTP_400_BAD_REQUEST)
 
         user = User.objects.get(id=data["user_id"])
 
         if not user.email_verified or not user.is_active:
-            logger.warning(
-                f"[PasswordResetView] — Usuario inactivo o no verificado intentó resetear - ID: {user.id}, Email: {user.email}"
-            )
+            logger.warning(f"[PasswordResetView] — Usuario inactivo o no verificado intentó resetear - ID: {user.id}, Email: {user.email}")
             return Response({"detail": "This action is invalid!"}, status=status.HTTP_400_BAD_REQUEST)
 
-        logger.info(
-            f"[PasswordResetView] — Verificación de token completada exitosamente - ID de usuario: {user.id}, Email: {user.email}"
-        )
+        logger.info(f"[PasswordResetView] — Verificación de token completada exitosamente - ID de usuario: {user.id}, Email: {user.email}")
         return Response({"detail": "verified"})
 
     @action(detail=False, methods=["post"])
@@ -453,9 +443,7 @@ class PasswordResetView(ViewSet):
 
         # Confirmar que estén presentes los argumentos
         if not password or not confirm_password:
-            return Response(
-                {"detail": "Password and confirm password are required"}, status=status.HTTP_400_BAD_REQUEST
-            )
+            return Response({"detail": "Password and confirm password are required"}, status=status.HTTP_400_BAD_REQUEST)
 
         # Validar que las contraseñas son idénticas
         if password != confirm_password:
@@ -592,21 +580,20 @@ class AbstractView(ModelViewSet):
         html_string = render_to_string("abstract_template.html", context)
         path_to_css = os.path.join(settings.BASE_DIR, "static", "css", "abstract_styles.css")
         path_to_static = os.path.join(settings.BASE_DIR, "static")
-        html = HTML(string=html_string, base_url=path_to_static)
+        html_file = HTML(string=html_string, base_url=path_to_static)
 
-        pdf_file = html.write_pdf(
+        pdf_file = html_file.write_pdf(
             stylesheets=[CSS(filename=path_to_css)],
         )
 
         response = HttpResponse(pdf_file, content_type="application/pdf")
-        response["Content-Disposition"] = f'attachment; filename="{abstract.title or f'abstract_{abstract}'}.pdf"'
+        response["Content-Disposition"] = f'attachment; filename="{abstract.get_plain_title()}.pdf"'
         return response
 
     @action(detail=True, methods=["get"], url_path="authors-preview")
     def get_abstract_author_context(self, request, pk=None):
         abstract = Abstract.objects.prefetch_related("authors__affiliation").get(id=pk)
         context = self.get_abstract_context(abstract)
-        print(context)
         return Response(
             {
                 "authors_list": context["authors_list"],
@@ -625,7 +612,7 @@ class AbstractView(ModelViewSet):
         abstract.save()
         return Response()
 
-    def get_abstract_context(self, abstract):
+    def get_abstract_context(self, abstract: Abstract):
         authors_data = []
         affiliations_set = {}
         unique_affiliations = []
@@ -639,7 +626,7 @@ class AbstractView(ModelViewSet):
                 unique_affiliations.append(
                     {
                         "index": counter,
-                        "text": f"{aff.institute}, {aff.department}, {aff.city}, {aff.get_nationality_display()}",
+                        "text": f"{aff.institute}, {aff.city}, {aff.get_nationality_display()}",
                     }
                 )
                 counter += 1
@@ -649,7 +636,13 @@ class AbstractView(ModelViewSet):
                     "aff_index": affiliations_set.get(aff_id),
                 }
             )
+
+        abstract.title = html.unescape(abstract.title)
+        abstract.text = html.unescape(abstract.text)
+        abstract.references = html.unescape(abstract.references)
+
         return {
+            "file_title": abstract.get_plain_title(),
             "abstract": abstract,
             "authors_list": authors_data,
             "affiliations_list": unique_affiliations,
@@ -663,12 +656,7 @@ class AbstractView(ModelViewSet):
         queryset_base = Abstract.objects.all()
 
         # encadena varios filtros pero sin ejecutar
-        pending_posters = (
-            queryset_base.filter(status=AbstactStatus.SUBMITTED)
-            .filter(presentation_type=AbstractPresentation.POSTER)
-            .filter(user__email_verified=True)
-            .order_by("-last_update")
-        )
+        pending_posters = queryset_base.filter(status=AbstactStatus.SUBMITTED).filter(presentation_type=AbstractPresentation.POSTER).filter(user__email_verified=True).order_by("-last_update")
 
         # aquí es donde realmente ejecuta la consulta, al momento de leer
         serializer = self.get_serializer(pending_posters, many=True)

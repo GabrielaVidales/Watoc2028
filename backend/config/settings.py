@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     "rest_framework_simplejwt",
     "rest_framework_simplejwt.token_blacklist",
     "users",
+    "abstracts",
     "contact_requests",
     "admin_honeypot",
     "payments",

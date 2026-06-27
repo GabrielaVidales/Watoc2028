@@ -7,7 +7,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="{% static 'css/abstract_styles.css' %}">
-    <title>{{ abstract.title }}</title>
+    <title>{{ abstract.file_title }}</title>
 </head>
 
 <body>
@@ -35,7 +35,7 @@
         </div>
     </footer>
 
-    <h1 class="title">{{ abstract.title|default:'Not set' }}</h1>
+    <h1 class="title">{{ abstract.title|default:'Not set'|safe }}</h1>
 
     <div style="font-weight: bold; text-align: center;">
         {% for author in authors_list %}
@@ -58,10 +58,10 @@
     </div>
 
     <h2 class="subtitle">Abstract</h2>
-    <p class="text">{{ abstract.text|default:'Not set' }}</p>
+    <p class="text">{{ abstract.text|default:'Not set'|safe }}</p>
 
     <h2 class="subtitle">References</h2>
-    <p class="references">{{ abstract.references|default:'Not set'|linebreaksbr }}</p>
+    <p class="references">{{ abstract.references|default:'Not set'|safe|linebreaksbr }}</p>
 </body>
 
 </html>

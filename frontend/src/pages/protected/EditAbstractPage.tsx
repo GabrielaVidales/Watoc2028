@@ -1,17 +1,29 @@
 import React, { useCallback, useEffect, useState } from 'react'
 import AbstractDeclarations from '@/forms/AbstractDeclarationsForm'
-import { StepperLabel } from '@/components/ui/stepper'
+import { Stepper, StepperLabel } from '@/components/ui/stepper'
 import BeforeSubmitPage from './BeforeSubmitPage'
 import EditAuthorsPage from './EditAuthorsPage'
 import EditAbstractBody from '@/forms/wrappers/EditAbstractBody'
 import { useNavigate, useParams, useSearchParams } from 'react-router'
 import { urls } from '@/routes/routes'
 import { Button } from '@/components/ui/button'
-import { ChevronsLeft, ChevronsRight } from 'lucide-react'
+import { ChevronsLeft, ChevronsRight, Gavel, MessageSquareCode } from 'lucide-react'
 import { useFetch } from '@/hooks/use-fetch'
 import type { AbstractSchema } from '@/schemas/abstract-schemas'
 import { Spinner } from '@/components/ui/spinner'
 import { useHeader } from '@/contexts/HeaderContext'
+
+import {
+    Card,
+    CardAction,
+    CardContent,
+    CardDescription,
+    CardFooter,
+    CardHeader,
+    CardTitle,
+} from "@/components/ui/card"
+import { Badge } from '@/components/ui/badge'
+import { Separator } from '@/components/ui/separator'
 
 export type EditAbstractCallbacks = {
     onStepBack?: () => void
@@ -57,85 +69,98 @@ function EditAbstractPage() {
                 return (<EditAuthorsPage onStepBack={previousStep} onStepForward={nextStep} />)
             case 2:
                 return (
-                    <div className='w-full space-y-5 p-5'>
-                        <h2 className='text-2xl font-semibold'>Abstract Declarations</h2>
+                    <div className='w-full space-y-5'>
+                        <div className="flex gap-3 items-center">
+                            <Gavel className='text-primary-main' />
+                            <h2 className='text-xl font-semibold'>Abstract Declarations</h2>
+                        </div>
+                        <Separator />
                         <AbstractDeclarations onStepBack={previousStep} onStepForward={nextStep} />
                     </div>
                 )
             case 3:
-                return (<>
+                return (
                     <div className='w-full space-y-5 p-5'>
-                        <h2 className='text-2xl font-semibold'>Abstract Preview</h2>
-
+                        <div className="flex gap-3 items-center">
+                            <MessageSquareCode className='text-primary-main' />
+                            <h2 className='text-xl font-semibold'>Abstract Preview</h2>
+                        </div>
+                        <Separator />
                         <BeforeSubmitPage onStepBack={previousStep} onStepForward={nextStep} />
                     </div>
-                </>)
+                )
             default:
                 return null
         }
     }, [currStep])
 
 
-    const stepData = [
-        {
-            step: 0,
-            label: '1. Abstract Content',
-        },
-        {
-            step: 1,
-            label: '2. Authors',
-        },
-        {
-            step: 2,
-            label: '3. Declarations',
-        },
-        {
-            step: 3,
-            label: 'Submit',
-        },
-    ]
+    const [c, setC] = useState(0)
+    useEffect(() => {
+        const timeout = setTimeout(() => {
+            setC(p => {
+                console.log(p);
+                if (p + 1 > 4)
+                    return 0
+                return p + 1
+            })
+        }, 700)
+
+        return () => clearTimeout(timeout)
+    }, [c])
 
     return (
-        <div className='w-full max-w-5xl mx-auto space-y-6 p-4'>
-            {data && data.status !== 'submitted' ? (<>
-                <div className='w-full flex justify-center'>
-                    <div className='w-full bg-background border-2 rounded-lg shadow-sm p-4 border-t-10 border-primary-main'>
-                        <div className='flex flex-col sm:flex-row w-full gap-1'>
-                            <Button
-                                variant="ghost"
-                                size="icon-lg"
-                                onClick={previousStep}
-                                disabled={currStep === 0}
-                            >
-                                <ChevronsLeft />
-                            </Button>
-                            {stepData.map(step => (
-                                <StepperLabel
-                                    key={step.step}
-                                    completed={currStep >= step.step}
-                                    label={step.label}
-                                    className='cursor-pointer'
-                                    onClick={() => setCurrState(step.step)}
-                                />
-                            ))}
-                            <Button
-                                variant="ghost"
-                                size="icon-lg"
-                                onClick={nextStep}
-                                disabled={currStep === 3}
-                            >
-                                <ChevronsRight />
-                            </Button>
-                        </div>
-                    </div>
-                </div>
+        <div className='max-w-6xl mx-auto'>
+            <div className='pl-8 mb-4'>
+                <p>Abstract Submission Portal</p>
+                <h1 className='text-3xl font-medium'>Edit your Abstract</h1>
+            </div>
 
-                <div className='w-full flex justify-center'>
-                    <div className='w-full bg-background border-2 rounded-xl shadow-sm p-6 min-h-80 flex flex-col'>
+            <Card className="mx-auto w-full gap-y-3 px-5 my-3 pb-2">
+                <Stepper activeStep={currStep} setActiveStep={setCurrState} steps={[
+                    { label: 'Content' },
+                    { label: 'Authors' },
+                    { label: 'Declarations' },
+                    { label: 'Review' },
+                ]} />
+            </Card>
+
+            <div className='w-full flex flex-col lg:flex-row gap-5 mx-auto space-y-6 items-start'>
+                {data && data.status !== 'submitted' ? (<>
+
+                    <div className='flex-2 w-full'>
                         {renderStep(currStep)}
                     </div>
-                </div>
-            </>) : <Spinner />}
+
+                    <div className='flex-1 w-full flex justify-center'>
+                        <div className='flex flex-col sm:flex-row w-full gap-1'>
+                            <Card className="mx-auto w-full gap-y-3">
+                                <CardHeader>
+                                    <CardTitle className='uppercase'>
+                                        Submission Status
+                                    </CardTitle>
+                                    <CardAction>
+                                        <Badge>
+                                            {data.status.toUpperCase()}
+                                        </Badge>
+                                    </CardAction>
+                                </CardHeader>
+                                <CardContent className="text-sm text-muted-foreground">
+                                    Your abstract is currently in draft. Once you click "Submit", it will move to the <strong>Review Process</strong>.
+                                </CardContent>
+                                <CardFooter className="justify-end gap-2">
+                                    <Button variant="outline">Decline</Button>
+                                    <Button>Accept</Button>
+                                </CardFooter>
+                            </Card>
+                        </div>
+                    </div>
+
+
+                </>) : <Spinner />}
+            </div>
+
+
         </div>
     )
 }

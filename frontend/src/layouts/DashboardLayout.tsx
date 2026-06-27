@@ -1,34 +1,18 @@
 import React from 'react'
-import { ChevronsLeft, ClipboardList, FileText, IdCard, LogIn, type LucideIcon, FileBadge, FileType2, PackageCheck, ChevronDown, Bell } from "lucide-react"
+import { type LucideIcon, FileBadge, FileType2, PackageCheck, ChevronDown, Bell, Settings2 } from "lucide-react"
 import { Link, Outlet, } from "react-router"
 import { urls } from "@/routes/routes"
 import { useAuth } from "@/contexts/AuthContext"
 import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar"
 import { AppSidebar } from "@/components/app-sidebar"
-import {
-    BadgeCheckIcon,
-    BellIcon,
-    CreditCardIcon,
-    LogOutIcon,
-} from "lucide-react"
-
-import {
-    Avatar,
-    AvatarFallback,
-    AvatarImage,
-} from "@/components/ui/avatar"
+import { BadgeCheckIcon, BellIcon, CreditCardIcon, LogOutIcon, } from "lucide-react"
+import { Avatar, AvatarFallback, AvatarImage, } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuGroup,
-    DropdownMenuItem,
-    DropdownMenuSeparator,
-    DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger, } from "@/components/ui/dropdown-menu"
+
 
 export function DropdownMenuAvatar() {
-    const { currentUser } = useAuth()
+    const { currentUser, handleLogout } = useAuth()
     return (
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -42,21 +26,21 @@ export function DropdownMenuAvatar() {
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
                 <DropdownMenuGroup>
-                    <DropdownMenuItem>
-                        <BadgeCheckIcon />
-                        Account
+                    <DropdownMenuItem asChild>
+                        <Link to={urls.users.profile}>
+                            <BadgeCheckIcon />
+                            Account
+                        </Link>
                     </DropdownMenuItem>
-                    <DropdownMenuItem>
-                        <CreditCardIcon />
-                        Billing
-                    </DropdownMenuItem>
-                    <DropdownMenuItem>
-                        <BellIcon />
-                        Notifications
+                    <DropdownMenuItem asChild>
+                        <Link to={urls.users.settings}>
+                            <Settings2 />
+                            Settings
+                        </Link>
                     </DropdownMenuItem>
                 </DropdownMenuGroup>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem>
+                <DropdownMenuItem onClick={async () => await handleLogout()}>
                     <LogOutIcon />
                     Sign Out
                 </DropdownMenuItem>
@@ -66,7 +50,6 @@ export function DropdownMenuAvatar() {
 }
 
 
-
 const projects: {
     name: string
     url: string
@@ -74,24 +57,24 @@ const projects: {
 }[] = [
         {
             name: "Abstract Submissions",
-            url: "#",
+            url: urls.users.viewAbstracts,
             icon: FileType2,
         },
         {
             name: "Congress Registration",
-            url: "#",
+            url: urls.users.confirmAssistance.start,
             icon: PackageCheck,
         },
         {
             name: "Certificate of Attendance",
-            url: "#",
+            url: urls.users.profile,
             icon: FileBadge,
         },
     ]
 
 function DashboardLayout() {
     return (
-        <SidebarProvider className='bg-amber-300'>
+        <SidebarProvider>
 
             <AppSidebar
                 projects={projects}

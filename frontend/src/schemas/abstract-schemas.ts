@@ -1,5 +1,6 @@
 import z from "zod";
 import countries from '@/data/countries-list.json'
+import { countWordsFromHTML } from "@/components/EnrichedTextArea";
 
 
 const countriesArray = countries.map(country => country.code)
@@ -70,15 +71,15 @@ export const abstractSchema = z.object({
 
     title: z.string()
         .min(1, "Please enter the abstract title")
-        .refine((val) => countWords(val, 10), "The abstract title must not exceed 10 words.")
+        .refine((val) => countWordsFromHTML(val) <= 10, "The abstract title must not exceed 10 words.")
         .default(''),
 
     presentation_type: z.enum(presentationTypes.map(v => v.value), 'Opción no válida')
         .default(''),
 
     text: z.string()
-        .refine((val) => countWords(val, 350), "Abstract must be at most 350 words")
-        .refine((val) => !countWords(val, 99), "Abstract must be at least 100 words")
+        .refine((val) => countWordsFromHTML(val) <= 350, "Abstract must be at most 350 words")
+        .refine((val) => countWordsFromHTML(val) > 99, "Abstract must be at least 100 words")
         .default(''),
 
     authors: z.array(authorSchema)
@@ -97,7 +98,7 @@ export const abstractSchema = z.object({
 
     references: z.string()
         .min(1, "Please provide the references")
-        .refine((val) => countWords(val, 150), "References must be at most 150 words")
+        .refine((val) => countWordsFromHTML(val) <= 150, "References must be at most 150 words")
         .default(''),
 
     status: z.enum(ABSTRACT_STATUS).optional(),

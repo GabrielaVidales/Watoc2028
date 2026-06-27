@@ -8,11 +8,11 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import axiosClient from '@/clients/axiosClient'
 import { Button } from '@/components/ui/button'
 import { Spinner } from '@/components/ui/spinner'
-import { AlertTriangle, ChevronLeft, ChevronRight, Save } from 'lucide-react'
+import { AlertTriangle, ChevronLeft, ChevronRight, Save, TextQuote } from 'lucide-react'
 import { Separator } from '@/components/ui/separator'
 import type { EditAbstractCallbacks } from '@/pages/protected/EditAbstractPage'
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogMedia, AlertDialogTitle, AlertDialogTrigger, } from "@/components/ui/alert-dialog"
-import { InfoAlert } from '@/components/InfoAlert'
+import { Card, CardAction, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 
 
 function EditAbstractBody({ onStepBack, onStepForward }: EditAbstractCallbacks) {
@@ -43,50 +43,69 @@ function EditAbstractBody({ onStepBack, onStepForward }: EditAbstractCallbacks) 
     }
 
     return (
-        <div className='w-full space-y-5 p-5'>
-            <h2 className='text-2xl font-semibold'>Abstract Content</h2>
-
-            <InfoAlert
-                variant='warning'
-                title='IMPORTANT'
-                messages={'Total character count is 2,600 and includes spaces. Tables and images are not included, as only text is allowed. You will be able to see your character count below the text boxes.'}
-                className='mx-auto'
-            />
-
-            <FormProvider {...form}>
-                <form onSubmit={onFormSubmit} id='abstract-submission-form'>
-                    <AbstractForm abstract={data} />
-                </form>
-            </FormProvider>
-
-            <Separator />
-
-            <fieldset disabled={isSubmitting} className='flex justify-between items-start gap-2 w-full'>
-                <Button type='button' onClick={onStepBack}>
-                    <ChevronLeft /> Back
-                </Button>
-
-                <div className='flex flex-col'>
+        <Card className='max-w-full'>
+            <CardHeader>
+                <CardTitle className="flex gap-3 items-center">
+                    <TextQuote className='text-primary-main' />
+                    <h2 className='text-xl font-semibold'>Abstract Content</h2>
+                </CardTitle>
+                <CardAction className='space-x-3'>
+                    <Button variant='outline' size='icon-lg'>
+                        <ChevronLeft />
+                    </Button>
                     <Button
                         type='submit'
                         form='abstract-submission-form'
                         disabled={!isValid || !isDirty}
+                        variant='main'
                     >
                         {isSubmitting ? <Spinner /> : <Save />}
                         Save Changes
                     </Button>
+                    <Button variant='outline' size='icon-lg'>
+                        <ChevronRight />
+                    </Button>
+                </CardAction>
+            </CardHeader>
+            <Separator />
+            <CardContent>
+                <FormProvider {...form}>
+                    <form onSubmit={onFormSubmit} id='abstract-submission-form'>
+                        <AbstractForm abstract={data} />
+                    </form>
+                </FormProvider>
+            </CardContent>
+            <Separator />
+            <CardFooter>
+                <fieldset disabled={isSubmitting} className='flex justify-between items-start gap-2 w-full'>
+                    <Button type='button' onClick={onStepBack}>
+                        <ChevronLeft /> Back
+                    </Button>
 
-                    {!isDirty && !isSubmitting && (
-                        <p className="text-xs text-muted-foreground animate-in fade-in slide-in-from-top-1">
-                            No changes were made.
-                        </p>
-                    )}
-                </div>
+                    <div className='flex flex-col'>
+                        <Button
+                            type='submit'
+                            form='abstract-submission-form'
+                            disabled={!isValid || !isDirty}
+                        >
+                            {isSubmitting ? <Spinner /> : <Save />}
+                            Save Changes
+                        </Button>
 
-                <Button type='button' onClick={onValidate}>
-                    Next <ChevronRight />
-                </Button>
-            </fieldset>
+                        {!isDirty && !isSubmitting && (
+                            <p className="text-xs text-muted-foreground animate-in fade-in slide-in-from-top-1">
+                                No changes were made.
+                            </p>
+                        )}
+                    </div>
+
+                    <Button type='button' onClick={onValidate}>
+                        Next <ChevronRight />
+                    </Button>
+                </fieldset>
+            </CardFooter>
+
+
             <AlertDialog open={open} onOpenChange={setOpen}>
                 <AlertDialogContent size="sm">
                     <AlertDialogHeader>
@@ -116,7 +135,7 @@ function EditAbstractBody({ onStepBack, onStepForward }: EditAbstractCallbacks) 
                     </AlertDialogFooter>
                 </AlertDialogContent>
             </AlertDialog>
-        </div>
+        </Card>
 
     )
 }

@@ -34,12 +34,12 @@ function AuthorForm() {
 
 
                 <div className='space-y-3 col-span-3'>
-                    <div className='space-y-3 grid grid-cols-1 sm:grid-cols-7 gap-x-0 sm:gap-x-5 gap-y-0'>
+                    <div className='space-y-3 grid grid-cols-1 sm:grid-cols-2 gap-x-0 sm:gap-x-5 gap-y-0'>
                         <Controller
                             name={`first_name`}
                             control={control}
                             render={({ field, fieldState }) => (
-                                <Field data-invalid={fieldState.invalid} className='col-span-full sm:col-span-2'>
+                                <Field data-invalid={fieldState.invalid}>
                                     <FieldLabel htmlFor={field.name}>First Name</FieldLabel>
                                     <Input
                                         {...field}
@@ -56,7 +56,7 @@ function AuthorForm() {
                             name={`last_name`}
                             control={control}
                             render={({ field, fieldState }) => (
-                                <Field data-invalid={fieldState.invalid} className='col-span-full sm:col-span-2'>
+                                <Field data-invalid={fieldState.invalid}>
                                     <FieldLabel htmlFor={field.name}>Last Name</FieldLabel>
                                     <Input
                                         {...field}
@@ -73,7 +73,7 @@ function AuthorForm() {
                             name={`email`}
                             control={control}
                             render={({ field, fieldState }) => (
-                                <Field data-invalid={fieldState.invalid} className='col-span-full sm:col-span-3'>
+                                <Field data-invalid={fieldState.invalid}>
                                     <FieldLabel htmlFor={field.name}>Email</FieldLabel>
                                     <Input
                                         {...field}

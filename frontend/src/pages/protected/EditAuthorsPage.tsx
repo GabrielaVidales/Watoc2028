@@ -3,7 +3,7 @@ import { type AuthorSchema } from '@/schemas/abstract-schemas'
 import React, { useEffect, useState } from 'react'
 import { useParams } from 'react-router'
 import { Button } from '@/components/ui/button'
-import { AlertTriangle, ChevronLeft, ChevronRight, Hand, Menu, PencilLine, Plus, Save, Trash, TriangleAlert, User2 } from 'lucide-react'
+import { AlertTriangle, ChevronLeft, ChevronRight, Edit, Hand, Menu, PencilLine, Plus, Save, Trash, Trash2, TriangleAlert, User2, UserPlus } from 'lucide-react'
 import { Reorder } from 'motion/react'
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogMedia, AlertDialogTitle, } from "@/components/ui/alert-dialog"
 import { isAxiosError } from 'axios'
@@ -92,8 +92,12 @@ function EditAuthorsPage({ onStepBack, onStepForward }: EditAbstractCallbacks) {
     }
 
     return (
-        <div className='w-full space-y-5 p-5'>
-            <h2 className='text-2xl font-semibold'>Authors List</h2>
+        <div className='w-full space-y-5'>
+            <div className="flex gap-3 items-center">
+                <UserPlus className='text-primary-main' />
+                <h2 className='text-xl font-semibold'>Authors List</h2>
+            </div>
+            <Separator />
 
             <div className='space-y-5'>
                 <InfoAlert
@@ -104,15 +108,11 @@ function EditAuthorsPage({ onStepBack, onStepForward }: EditAbstractCallbacks) {
 
                 <Reorder.Group axis="y" values={authors} onReorder={onReorder} style={{ pointerEvents: loading ? 'none' : 'auto', opacity: loading ? 0.7 : 1 }}>
                     <div className="flex flex-col items-center justify-center rounded-xl border-2 border-dashed p-3 overflow-auto">
-                        {authors?.map((item, index) => (
+                        {authors?.map((item) => (
                             <Reorder.Item key={item.id} value={item} className='w-full'>
-                                <div className='cursor-grab border-2 bg-background rounded-sm flex justify-between items-start p-3 mb-2 gap-3'>
+                                <div className='cursor-grab border-2 bg-background rounded-sm flex justify-between items-center p-3 mb-2 gap-3'>
                                     <div className=' flex justify-center items-center'>
                                         <Menu className='stroke-3 size-5' />
-                                    </div>
-
-                                    <div className='font-semibold'>
-                                        {index + 1}.
                                     </div>
 
                                     <div className='w-full grid grid-cols-1 sm:grid-cols-2 gap-3'>
@@ -139,17 +139,17 @@ function EditAuthorsPage({ onStepBack, onStepForward }: EditAbstractCallbacks) {
                                     </div>
 
                                     <fieldset disabled={loading} className='flex flex-col sm:flex-row gap-3'>
-                                        <Button variant='ghost' className='size-8 border-2 border-primary-main' onClick={() => {
+                                        <Button variant='ghost' size='icon-sm' onClick={() => {
                                             setOpen(true)
                                             setAuthorIdToEdit(item.id)
                                         }}>
-                                            <PencilLine className='shrink-0 size-5 stroke-primary-main' />
+                                            <Edit className='shrink-0 size-5 stroke-primary-main' />
                                         </Button>
-                                        <Button variant='ghost' className='size-8 border-2 border-destructive' onClick={() => {
+                                        <Button variant='ghost' size='icon-sm' onClick={() => {
                                             setOpenDeleteAuthor(true)
                                             setAuthorIdToDelete(item.id)
                                         }}>
-                                            <Trash className='shrink-0 size-5 stroke-destructive' />
+                                            <Trash2 className='shrink-0 size-5 stroke-destructive' />
                                         </Button>
                                     </fieldset>
                                 </div>

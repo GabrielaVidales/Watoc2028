@@ -9,6 +9,7 @@ from .text_choices import (
     DietaryRestrictionsList,
     FoodAllergiesList,
 )
+import html, bleach
 
 
 class User(AbstractUser):
@@ -31,7 +32,7 @@ class User(AbstractUser):
             "invalid": "That email format looks wrong.",
         },
     )
-    
+
     # region Otros atributos...
     middle_name = models.CharField(max_length=100, blank=True, default="")
 
@@ -44,7 +45,7 @@ class User(AbstractUser):
     photo = models.ImageField(upload_to="users/photos/", blank=True, null=True)
 
     objects = CustomUserManager()
-    
+
     email_verified = models.BooleanField(default=False)
     # endregion
 
@@ -64,7 +65,7 @@ class User(AbstractUser):
 class Participant(models.Model):
     class Meta:
         db_table = "participant"
-        
+
     user = models.OneToOneField(
         User,
         primary_key=True,
@@ -165,15 +166,20 @@ class Abstract(models.Model):
         ordering = ["-created_at"]
         get_latest_by = "last_update"
 
+    def get_plain_title(self):
+        unescaped_title = html.unescape(self.title)
+        clean_title = bleach.clean(unescaped_title, [], strip=True)
+        return clean_title
+
     def __str__(self):
-        truncated_title = (self.title[:47] + "...") if len(self.title) > 50 else self.title
+        title = self.get_plain_title()
+        truncated_title = (title[:47] + "...") if len(title) > 50 else title
         username = self.user.email if self.user else "Sin Autor"
         return f"{truncated_title} | {username}"
 
 
 class AuthorAffiliation(models.Model):
     institute = models.CharField(max_length=100, blank=True)
-    department = models.CharField(max_length=100, blank=True)
     nationality = models.CharField(max_length=5, choices=Nationality.choices, default=Nationality.MEXICO)
     city = models.CharField(max_length=30, blank=False, default="")
 
