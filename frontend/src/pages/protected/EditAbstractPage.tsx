@@ -4,20 +4,25 @@ import { Stepper, StepperLabel } from '@/components/ui/stepper'
 import BeforeSubmitPage from './BeforeSubmitPage'
 import EditAuthorsPage from './EditAuthorsPage'
 import EditAbstractBody from '@/forms/wrappers/EditAbstractBody'
-import { useNavigate, useParams, useSearchParams } from 'react-router'
+import { Link, useNavigate, useParams, useSearchParams } from 'react-router'
 import { urls } from '@/routes/routes'
 import { Button } from '@/components/ui/button'
-import { ChevronsLeft, ChevronsRight, Gavel, MessageSquareCode } from 'lucide-react'
+import { Gavel, MessageSquareCode } from 'lucide-react'
 import { useFetch } from '@/hooks/use-fetch'
 import type { AbstractSchema } from '@/schemas/abstract-schemas'
 import { Spinner } from '@/components/ui/spinner'
-import { useHeader } from '@/contexts/HeaderContext'
-
+import {
+    Breadcrumb,
+    BreadcrumbItem,
+    BreadcrumbLink,
+    BreadcrumbList,
+    BreadcrumbPage,
+    BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb"
 import {
     Card,
     CardAction,
     CardContent,
-    CardDescription,
     CardFooter,
     CardHeader,
     CardTitle,
@@ -55,6 +60,8 @@ function EditAbstractPage() {
 
     const [searchParams] = useSearchParams()
     useEffect(() => {
+        console.log(Object.fromEntries(searchParams.entries()));
+
         const action = searchParams.get('action')
         if (action === 'submit') {
             setCurrState(3)
@@ -95,23 +102,34 @@ function EditAbstractPage() {
     }, [currStep])
 
 
-    const [c, setC] = useState(0)
-    useEffect(() => {
-        const timeout = setTimeout(() => {
-            setC(p => {
-                console.log(p);
-                if (p + 1 > 4)
-                    return 0
-                return p + 1
-            })
-        }, 700)
-
-        return () => clearTimeout(timeout)
-    }, [c])
 
     return (
-        <div className='max-w-6xl mx-auto'>
-            <div className='pl-8 mb-4'>
+        <div className='w-full max-w-5xl mx-auto'>
+            <Breadcrumb className='mb-8'>
+                <BreadcrumbList>
+                    <BreadcrumbItem>
+                        <BreadcrumbLink asChild>
+                            <Link to={urls.users.profile}>
+                                Dashboard
+                            </Link>
+                        </BreadcrumbLink>
+                    </BreadcrumbItem>
+                    <BreadcrumbSeparator />
+                    <BreadcrumbItem>
+                        <BreadcrumbLink asChild>
+                            <Link to={urls.users.viewAbstracts}>
+                                Abstract Submissions
+                            </Link>
+                        </BreadcrumbLink>
+                    </BreadcrumbItem>
+                    <BreadcrumbSeparator />
+                    <BreadcrumbItem>
+                        <BreadcrumbPage>Edit</BreadcrumbPage>
+                    </BreadcrumbItem>
+                </BreadcrumbList>
+            </Breadcrumb>
+
+            <div className='mb-4'>
                 <p>Abstract Submission Portal</p>
                 <h1 className='text-3xl font-medium'>Edit your Abstract</h1>
             </div>
@@ -159,8 +177,6 @@ function EditAbstractPage() {
 
                 </>) : <Spinner />}
             </div>
-
-
         </div>
     )
 }

@@ -13,24 +13,23 @@ import { Spinner } from '@/components/ui/spinner';
 import { cn } from '@/lib/utils';
 import axiosClient from '@/clients/axiosClient';
 import { Save, Trash2 } from 'lucide-react';
-
+import { GalleryUpload } from '@/components/ui/file-upload';
+import { AvatarUpload } from '@/components/ui/upload-avatar';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
+import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
+import { Badge } from '@/components/ui/badge';
+import { Mail, MapPin, Briefcase, GraduationCap, Calendar, ShieldCheck } from 'lucide-react';
+import { formatDate } from '@/utils/formatDate';
 
 export function UserPictureForm() {
-    const { fetchUser } = useAuth()
+    const { fetchUser, currentUser: user } = useAuth()
 
-    const { handleSubmit, clearErrors, setError, reset, control, formState: { isValid, isSubmitting } } = useForm({
+    const { handleSubmit, reset, control, formState: { isValid, isSubmitting } } = useForm({
         resolver: zodResolver(profilePicSchema),
         defaultValues: {
             photo: null,
         }
     })
-
-    const [open, setOpen] = useState(false)
-
-    const [imgSrc, setImgSrc] = useState('');
-    const [crop, setCrop] = useState<Crop>();
-    const [completedCrop, setCompletedCrop] = useState<PixelCrop>();
-    const imgRef = useRef<HTMLImageElement>(null);
 
     const onFormSubmit = handleSubmit(async (data) => {
         await axiosClient.post('/users/change-profile-pic/', data, {
@@ -45,6 +44,118 @@ export function UserPictureForm() {
     return (
         <form onSubmit={onFormSubmit}>
             <fieldset className='space-y-5' disabled={isSubmitting}>
+
+                <Controller
+                    name='photo'
+                    control={control}
+                    render={({ field, fieldState }) => (
+                        <Field data-invalid={fieldState.invalid}>
+                            <FieldTitle>Upload or change your profile photo</FieldTitle>
+                            <FieldContent></FieldContent>
+                            <AvatarUpload
+                                onFileChange={(files) => {
+                                    field.onChange(files?.file || null)
+                                }}
+                            />
+                            {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                        </Field>
+                    )}
+                />
+
+
+                <Card className="w-full max-w-md mx-auto overflow-hidden border border-zinc-200 bg-white shadow-xl dark:border-zinc-800 dark:bg-zinc-950 rounded-2xl">
+                    {/* Header/Banner Minimalista */}
+                    <div className="h-24 bg-linear-to-r from-indigo-500 via-purple-500 to-pink-500" />
+
+                    <CardHeader className="relative pb-4 pt-0 px-6">
+                        {/* Avatar flotante */}
+                        <div className="absolute -top-12 left-6">
+                            <Avatar className="h-24 w-24 border-4 border-white shadow-md dark:border-zinc-950">
+                                <AvatarImage src={user.photo as string} alt={user.full_name} className="object-cover" />
+                                <AvatarFallback className="bg-zinc-100 font-bold text-zinc-800 text-xl">
+                                    {user.first_name?.[0]}
+                                    {user.last_name?.[0]}
+                                </AvatarFallback>
+                            </Avatar>
+                        </div>
+
+                        {/* Roles / Badges */}
+                        <div className="flex justify-end gap-1.5 pt-4">
+                            {user.roles.map((role) => (
+                                <Badge
+                                    key={role}
+                                    variant={role === 'admin' ? 'destructive' : 'secondary'}
+                                    className="text-xs uppercase tracking-wider font-semibold px-2.5 py-0.5 rounded-full"
+                                >
+                                    {role}
+                                </Badge>
+                            ))}
+                        </div>
+                    </CardHeader>
+
+                    <CardContent className="px-6 pb-6 space-y-6">
+                        {/* Información Principal */}
+                        <div className="space-y-1">
+                            <div className="flex items-center gap-2">
+                                <h2 className="text-2xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">
+                                    {user.prefix && <span className="text-zinc-400 font-medium mr-1">{user.prefix}</span>}
+                                    {user.full_name}
+                                </h2>
+                                {user.email_verified && (
+                                    <ShieldCheck className="h-5 w-5 text-emerald-500 fill-emerald-500/10" />
+                                )}
+                            </div>
+                            <p className="text-sm font-medium text-indigo-600 dark:text-indigo-400">
+                                {user.participant?.job_title || 'User'}
+                            </p>
+                        </div>
+
+                        <hr className="border-zinc-100 dark:border-zinc-800" />
+
+                        {/* Detalles del Perfil */}
+                        <div className="space-y-3.5 text-sm text-zinc-600 dark:text-zinc-400">
+                            <div className="flex items-center gap-3">
+                                <Mail className="h-4 w-4 text-zinc-400" />
+                                <span className="truncate">{user.email}</span>
+                            </div>
+
+                            <div className="flex items-center gap-3">
+                                <MapPin className="h-4 w-4 text-zinc-400" />
+                                <span>
+                                    {user.city}, {user.nationality}
+                                </span>
+                            </div>
+
+                            {user.participant?.affiliation && (
+                                <div className="flex items-center gap-3">
+                                    <Briefcase className="h-4 w-4 text-zinc-400" />
+                                    <span>{user.participant.affiliation}</span>
+                                </div>
+                            )}
+
+                            {user.participant?.field_of_study && (
+                                <div className="flex items-center gap-3">
+                                    <GraduationCap className="h-4 w-4 text-zinc-400" />
+                                    <span className="font-mono text-xs bg-zinc-50 dark:bg-zinc-900 px-2 py-1 rounded border border-zinc-100 dark:border-zinc-800">
+                                        {user.participant.field_of_study}
+                                    </span>
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Footer / Info de Registro */}
+                        <div className="flex items-center justify-between pt-2 text-xs text-zinc-400 border-t border-zinc-100 dark:border-zinc-800">
+                            <div className="flex items-center gap-1">
+                                <Calendar className="h-3 w-3" />
+                                <span>Joined {formatDate(user.date_joined)}</span>
+                            </div>
+                        </div>
+                    </CardContent>
+                </Card>
+
+
+
+                {/* 
                 <Controller
                     name='photo'
                     control={control}
@@ -159,7 +270,9 @@ export function UserPictureForm() {
                             </Dialog>
                         </Field>
                     )}
-                />
+                /> */}
+
+
                 <div className='flex justify-end'>
                     <Button type='submit' className='p-5 w-60 uppercase' disabled={!isValid}>
                         {isSubmitting ? (

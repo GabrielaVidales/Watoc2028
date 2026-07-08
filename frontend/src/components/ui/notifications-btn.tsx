@@ -1,199 +1,273 @@
-// import {
-//     ArrowUpIcon,
-//     GlobeIcon,
-//     ImageIcon,
-//     MessageCircleDashedIcon,
-//     PaperclipIcon,
-//     PlusIcon,
-//     RotateCwIcon,
-//     TelescopeIcon,
-// } from "lucide-react"
-// import { Button } from "@/components/ui/button"
-// import {
-//     Card,
-//     CardAction,
-//     CardContent,
-//     CardDescription,
-//     CardFooter,
-//     CardHeader,
-//     CardTitle,
-// } from "@/components/ui/card"
-// import {
-//     DropdownMenu,
-//     DropdownMenuContent,
-//     DropdownMenuItem,
-//     DropdownMenuSeparator,
-//     DropdownMenuTrigger,
-// } from "@/components/ui/dropdown-menu"
-// import {
-//     Empty,
-//     EmptyDescription,
-//     EmptyHeader,
-//     EmptyMedia,
-//     EmptyTitle,
-// } from "@/components/ui/empty"
-// import {
-//     InputGroup,
-//     InputGroupAddon,
-//     InputGroupButton,
-// } from "@/components/ui/input-group"
-// import {
-//     MessageScroller,
-//     MessageScrollerButton,
-//     MessageScrollerContent,
-//     MessageScrollerProvider,
-//     MessageScrollerViewport,
-// } from "@/components/ui/message-scroller"
-// import {
-//     Tooltip,
-//     TooltipContent,
-//     TooltipTrigger,
-// } from "@/components/ui/tooltip"
+import type { NotificationResponse } from "@/domain/notifications"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Popover, PopoverContent, PopoverTrigger, } from "@/components/ui/popover"
+import { ArrowRight, Bell, BellOff, CheckCheck, MessageCircleCheck, MessageCircleReply, MoreHorizontal, RotateCw, RotateCwIcon, Settings, Trash2, } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger, } from "@/components/ui/dropdown-menu"
+import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle, } from "@/components/ui/empty"
+import { cn } from "@/lib/utils"
+import { ScrollArea } from "./scroll-area"
+import { Link, useNavigate } from "react-router"
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
+import axiosClient from "@/clients/axiosClient"
+import { Fragment } from "react"
 
-// export function MessageScrollerDemo() {
 
-//     const isBusy = status === "submitted" || status === "streaming"
+export function NotificationsBell() {
+    const navigate = useNavigate()
 
-//     return (
-//         <MessageScrollerProvider>
-//             <div className="relative flex flex-col gap-4">
-//                 <Card className="mx-auto h-140 w-full max-w-sm gap-0">
-//                     <CardHeader className="gap-1 border-b">
-//                         <CardTitle>New Chat</CardTitle>
-//                         <CardDescription>How can I help you today?</CardDescription>
-//                         <CardAction>
-//                             <Tooltip>
-//                                 <TooltipTrigger asChild>
-//                                     <Button
-//                                         variant="outline"
-//                                         size="icon"
-//                                         aria-label="Reset conversation"
-//                                         disabled={isBusy}
-//                                     >
-//                                         <RotateCwIcon />
-//                                     </Button>
-//                                 </TooltipTrigger>
-//                                 <TooltipContent>
-//                                     <p>Reset</p>
-//                                 </TooltipContent>
-//                             </Tooltip>
-//                         </CardAction>
-//                     </CardHeader>
-//                     <CardContent className="flex-1 overflow-hidden p-0">
-//                         {messages.length === 0 ? (
-//                             <Empty className="h-full">
-//                                 <EmptyHeader>
-//                                     <EmptyMedia variant="icon">
-//                                         <MessageCircleDashedIcon />
-//                                     </EmptyMedia>
-//                                     <EmptyTitle>Morning, shadcn!</EmptyTitle>
-//                                     <EmptyDescription>
-//                                         What are we working on today? Press send to start a new
-//                                         conversation
-//                                     </EmptyDescription>
-//                                 </EmptyHeader>
-//                             </Empty>
-//                         ) : (
-//                             <MessageScroller>
-//                                 <MessageScrollerViewport>
-//                                     <MessageScrollerContent
-//                                         aria-busy={isBusy}
-//                                         className="p-(--card-spacing)"
-//                                     >
-//                                         {messages.map((message) => (
-//                                             <MessageAnimated
-//                                                 key={message.id}
-//                                                 message={message}
-//                                                 scrollAnchor={message.role === "user"}
-//                                             />
-//                                         ))}
-//                                     </MessageScrollerContent>
-//                                 </MessageScrollerViewport>
-//                                 <MessageScrollerButton />
-//                             </MessageScroller>
-//                         )}
-//                     </CardContent>
-//                     <CardFooter className="flex-col gap-2">
-//                         <form
-//                             onSubmit={(e) => {
-//                                 e.preventDefault()
-//                                 if (!nextMessage || isBusy) {
-//                                     return
-//                                 }
-//                                 void sendMessage(nextMessage)
-//                             }}
-//                             className="w-full"
-//                         >
-//                             <InputGroup>
-//                                 <div className="h-14 w-full px-3 py-2.5">
-//                                     <span
-//                                         className="line-clamp-2 opacity-60 data-[status=ready]:opacity-100"
-//                                         data-status={status}
-//                                     >
-//                                         {nextMessage ? (
-//                                             getMessageText(nextMessage)
-//                                         ) : (
-//                                             <span className="text-muted-foreground">
-//                                                 No messages queued. Reset the conversation.
-//                                             </span>
-//                                         )}
-//                                     </span>
-//                                 </div>
-//                                 <InputGroupAddon align="block-end" className="pt-1">
-//                                     <DropdownMenu>
-//                                         <DropdownMenuTrigger asChild>
-//                                             <InputGroupButton
-//                                                 aria-label="Add files"
-//                                                 type="button"
-//                                                 size="icon-sm"
-//                                                 variant="outline"
-//                                             >
-//                                                 <PlusIcon />
-//                                             </InputGroupButton>
-//                                         </DropdownMenuTrigger>
-//                                         <DropdownMenuContent
-//                                             align="start"
-//                                             side="top"
-//                                             className="w-44"
-//                                         >
-//                                             <DropdownMenuItem>
-//                                                 <PaperclipIcon />
-//                                                 Add Photos & Files
-//                                             </DropdownMenuItem>
-//                                             <DropdownMenuSeparator />
-//                                             <DropdownMenuItem>
-//                                                 <ImageIcon />
-//                                                 Create Image
-//                                             </DropdownMenuItem>
-//                                             <DropdownMenuItem>
-//                                                 <TelescopeIcon />
-//                                                 Deep Research
-//                                             </DropdownMenuItem>
-//                                             <DropdownMenuItem>
-//                                                 <GlobeIcon />
-//                                                 Web Search
-//                                             </DropdownMenuItem>
-//                                         </DropdownMenuContent>
-//                                     </DropdownMenu>
-//                                     <InputGroupButton
-//                                         type="submit"
-//                                         variant="default"
-//                                         size="icon-sm"
-//                                         disabled={!nextMessage || isBusy}
-//                                         className="ml-auto"
-//                                     >
-//                                         <ArrowUpIcon />
-//                                         <span className="sr-only">Send</span>
-//                                     </InputGroupButton>
-//                                 </InputGroupAddon>
-//                             </InputGroup>
-//                         </form>
-//                     </CardFooter>
-//                 </Card>
-//                 <div className="px-0.5 text-center text-xs text-muted-foreground">
-//                     Demo is read only. Press send to send messages.
-//                 </div>
-//             </div>
-//         </MessageScrollerProvider>
-//     )
-// }
+    const queryClient = useQueryClient()
+
+    const { data, isLoading, refetch } = useQuery<NotificationResponse>({
+        queryKey: ['notifications'],
+        queryFn: async () => {
+            const { data } = await axiosClient.get(`/notifications/for-user/`);
+            return data
+        },
+    })
+
+    const notifications = data?.notifications || []
+
+    const unreadCount = data?.unread_count || 0
+
+    const mutation = useMutation({
+        mutationFn: async (ctx: { id?: number, is_read?: boolean, mark_all_read?: boolean }) => {
+            if (ctx.mark_all_read) {
+                const { data } = await axiosClient.patch(`/notifications/toggle-all-read/`);
+                return data;
+            }
+
+            const { data } = await axiosClient.patch(`/notifications/${ctx.id}/toggle-is-read/`, { is_read: ctx.is_read });
+            return data;
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['notifications'], refetchType: 'all' });
+            refetch()
+        },
+    })
+
+    const deleteMut = useMutation({
+        mutationFn: async (id: number) => {
+            const { data } = await axiosClient.delete(`/notifications/${id}/`);
+            return data;
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['notifications'], refetchType: 'all' });
+            refetch()
+        },
+    })
+
+    return (
+        <Popover>
+            <PopoverTrigger asChild>
+                <Button variant="ghost" size="icon" className="relative rounded-full">
+                    <Bell className="size-5" />
+                    {unreadCount > 0 && (
+                        <span
+                            className={cn(
+                                "absolute right-0 top-0",
+                                "flex h-4 min-w-4 items-center justify-center",
+                                "rounded-full px-1 text-white!",
+                                "bg-destructive text-destructive-foreground",
+                                "text-[10px] font-semibold leading-none",
+                                unreadCount > 99 && "min-w-7"
+                            )}
+                        >
+                            {unreadCount > 99 ? "99+" : unreadCount}
+                        </span>
+                    )}
+                </Button>
+            </PopoverTrigger>
+            <PopoverContent align="end" className="max-w-xs sm:max-w-sm md:max-w-md w-full md:w-100 max-sm:px-1">
+                <div className="flex flex-col sm:flex-row gap-2 items-center justify-between border-b px-0 pb-3">
+                    <div>
+                        <h4 className="font-semibold">Notifications</h4>
+                        <p className="text-xs text-muted-foreground">
+                            Stay up to date.
+                        </p>
+                    </div>
+
+                    <div className="flex gap-2">
+                        <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={async () => await mutation.mutateAsync({ mark_all_read: true })}
+                            className="text-xs sm:text-sm"
+                        >
+                            <CheckCheck />
+                            Mark all as read
+                        </Button>
+
+                        <Button
+                            size="icon-sm"
+                            variant="outline"
+                            onClick={async () => { await refetch() }}
+                            className={cn(
+                                isLoading && "animate-spin"
+                            )}
+                        >
+                            <RotateCw />
+                        </Button>
+                    </div>
+                </div>
+
+                <div className="flex h-80 items-center justify-center my-3">
+                    <ScrollArea className="w-full h-80 -mr-3 pr-3">
+                        {(!notifications || notifications.length === 0) && (
+                            <Empty>
+                                <EmptyHeader>
+                                    <EmptyMedia variant="icon">
+                                        <BellOff className="size-6" />
+                                    </EmptyMedia>
+
+                                    <EmptyTitle>
+                                        You're all caught up
+                                    </EmptyTitle>
+
+                                    <EmptyDescription>
+                                        New notifications will appear here.
+                                    </EmptyDescription>
+                                </EmptyHeader>
+                            </Empty>
+                        )}
+
+                        <div className="space-y-1">
+                            {notifications?.map((notification) => {
+                                const actorName = notification.actor
+                                    ? `${notification.actor.first_name} ${notification.actor.last_name}`
+                                    : "[System] —";
+
+                                return (
+                                    <fieldset
+                                        disabled={isLoading || mutation.isPending || deleteMut.isPending}
+                                        key={notification.id}
+                                        className={cn(
+                                            "group relative cursor-pointer p-3 border-2 border-border rounded-md transition-colors duration-300",
+                                            "hover:border-primary-light hover:shadow-sm",
+                                            "flex flex-col items-start md:flex-row md:items-center justify-between gap-3",
+                                            notification.is_read && "bg-muted-foreground/13"
+                                        )}
+                                    >
+                                        <div
+                                            onClick={async () => {
+                                                if (!notification.is_read) {
+                                                    await mutation.mutateAsync({
+                                                        id: notification.id,
+                                                        is_read: true,
+                                                    })
+                                                }
+                                                if (notification.target_url) {
+                                                    navigate(notification.target_url || "#")
+                                                }
+                                            }}
+                                            className="flex flex-1 items-center gap-3 min-w-0 pr-12 md:pr-0"
+                                        >
+                                            <div className="relative shrink-0">
+                                                <Avatar className="size-11 border shadow-sm">
+                                                    <AvatarImage src={notification.actor?.photo as string ?? null} />
+                                                    <AvatarFallback>
+                                                        {notification.actor ? (
+                                                            actorName
+                                                                .split(" ")
+                                                                .map((x) => x[0])
+                                                                .join("")
+                                                                .slice(0, 2)
+                                                        ) : (
+                                                            <Settings className="size-4" />
+                                                        )}
+                                                    </AvatarFallback>
+                                                </Avatar>
+
+                                                {!notification.is_read && (
+                                                    <span className="absolute -right-1 -top-1 size-3 rounded-full bg-destructive ring-2 ring-background" />
+                                                )}
+                                            </div>
+
+                                            <div className="min-w-0 flex-1 text-xs sm:text-sm">
+                                                <p className="leading-relaxed">
+                                                    <span className="font-semibold">
+                                                        {actorName}
+                                                    </span>{" "}
+                                                    <span className="text-muted-foreground">
+                                                        {notification.verb}
+                                                    </span>
+                                                </p>
+
+                                                <p className="mt-1 text-muted-foreground">
+                                                    {new Date(notification.created_at).toLocaleString()}
+                                                </p>
+                                            </div>
+                                        </div>
+
+                                        <DropdownMenu>
+                                            <DropdownMenuTrigger asChild>
+                                                <Button variant="ghost" size="icon"
+                                                //  className="shrink-0 opacity-0 transition-opacity group-hover:opacity-100"
+                                                  className={cn(
+            "absolute top-2 right-2 shrink-0 transition-opacity",
+            "opacity-100",
+            "md:opacity-0 md:group-hover:opacity-100"
+        )}
+                                                 >
+                                                    <MoreHorizontal className="size-4" />
+                                                </Button>
+                                            </DropdownMenuTrigger>
+
+                                            <DropdownMenuContent className="w-40" align="end">
+                                                <DropdownMenuGroup>
+                                                    <DropdownMenuLabel className="text-xs text-muted-foreground">
+                                                        Actions
+                                                    </DropdownMenuLabel>
+
+                                                    <DropdownMenuItem
+                                                        onClick={() => {
+                                                            mutation.mutate({
+                                                                id: notification.id,
+                                                                is_read: !notification.is_read,
+                                                            })
+                                                        }}
+                                                    >
+                                                        {notification.is_read ? (
+                                                            <Fragment>
+                                                                <MessageCircleReply />
+                                                                <span>Mark as unread</span>
+                                                            </Fragment>
+                                                        ) : (
+                                                            <Fragment>
+                                                                <MessageCircleCheck />
+                                                                <span>Mark as read</span>
+                                                            </Fragment>
+                                                        )}
+                                                    </DropdownMenuItem>
+
+                                                    <DropdownMenuItem
+                                                        variant="destructive"
+                                                        onClick={() => {
+                                                            deleteMut.mutate(notification.id)
+                                                        }}
+                                                    >
+                                                        <Trash2 />
+                                                        <span>Delete</span>
+                                                    </DropdownMenuItem>
+                                                </DropdownMenuGroup>
+                                            </DropdownMenuContent>
+                                        </DropdownMenu>
+                                    </fieldset>
+                                );
+                            })}
+                        </div>
+                    </ScrollArea>
+                </div>
+
+                <div className="border-t">
+                    <Button variant="ghost" className="w-full justify-center text-xs" asChild>
+                        <Link to="/notifications">
+                            View all notifications
+                            <ArrowRight className="ml-2 size-4" />
+                        </Link>
+                    </Button>
+                </div>
+            </PopoverContent>
+        </Popover>
+    )
+}

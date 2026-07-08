@@ -12,6 +12,7 @@ export const useProfiles = () => {
 
     const fetchProfile = async () => {
         try {
+            await new Promise(r=>setTimeout(r, 2000))
             const profiles = await getProfile();
             setProfile(profiles);
         } catch (error) {

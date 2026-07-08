@@ -98,7 +98,7 @@ class UserView(ModelViewSet):
         user = self.request.user
 
         if request.method == "POST":
-            file = request.data.get("profilePicture", None)
+            file = request.data.get("photo", None)
             if file is not None and user.is_authenticated:
                 if user.photo:
                     user.photo.delete()

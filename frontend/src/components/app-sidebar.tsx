@@ -1,26 +1,72 @@
-import { Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarHeader, SidebarMenu, SidebarMenuAction, SidebarMenuButton, SidebarMenuItem, useSidebar, } from "@/components/ui/sidebar"
-import { Link, NavLink, } from "react-router"
+import { Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarHeader, SidebarMenu, SidebarMenuAction, SidebarMenuButton, SidebarMenuItem, SidebarMenuSub, SidebarMenuSubButton, SidebarMenuSubItem, useSidebar, } from "@/components/ui/sidebar"
+import { Link, NavLink, useNavigate, } from "react-router"
 import { urls } from "@/routes/routes";
-import { ArrowLeftFromLine, BadgeCheckIcon, Bell, ChevronDown, ChevronUp, Folder, Forward, LayoutDashboard, LogOut, MoreHorizontal, Settings2, Trash2, type LucideIcon, } from "lucide-react"
+import { ArrowLeftFromLine, BadgeCheckIcon, Bell, Bot, ChevronDown, ChevronRight, ChevronUp, FileBadge, FileType2, Folder, Forward, LayoutDashboard, LayoutList, LogOut, MessageSquareDot, MoreHorizontal, PackageCheck, Settings2, Trash2, Users, type LucideIcon, } from "lucide-react"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger, } from "@/components/ui/dropdown-menu"
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useAuth } from "@/contexts/AuthContext";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import miniLogo from '@/assets/logo_img.png'
 import React from "react";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "./ui/collapsible";
 
 
-export function AppSidebar({
-    projects,
-}: {
-    projects: {
-        name: string
-        url: string
-        icon: LucideIcon
-    }[]
-}) {
+type NavItem = {
+    name: string
+    url: string
+    icon?: LucideIcon
+}
+
+type NavCollapsible = {
+    title: string
+    icon?: LucideIcon
+    isActive?: boolean
+    items?: NavItem[]
+}
+
+
+const projects: NavItem[] = [
+    {
+        name: "Abstract Submissions",
+        url: urls.users.viewAbstracts,
+        icon: FileType2,
+    },
+    {
+        name: "Congress Registration",
+        url: urls.users.confirmAssistance.start,
+        icon: PackageCheck,
+    },
+    {
+        name: "Certificate of Attendance",
+        url: urls.users.profile,
+        icon: FileBadge,
+    },
+]
+
+const adminModules: NavCollapsible[] = [
+    {
+        title: 'Administration',
+        icon: Bot,
+        isActive: true,
+        items: [
+            {
+                name: "Manage Users",
+                url: urls.users.administration.manageUsers,
+                icon: Users,
+            },
+            {
+                name: "Abstract Reviews",
+                url: urls.users.administration.manageReviewers,
+                icon: LayoutList,
+            },
+        ]
+    }
+]
+
+
+
+export function AppSidebar() {
     const { currentUser } = useAuth()
-    const isMobile = useIsMobile()
 
     return (
         <Sidebar>
@@ -42,12 +88,58 @@ export function AppSidebar({
                                 </NavLink>
                             </SidebarMenuButton>
                         </SidebarMenuItem>
+
+                        <SidebarMenuItem>
+                            <SidebarMenuButton asChild>
+                                <NavLink to={urls.users.notifications} className="hover:translate-x-1 transition-transform duration-300">
+                                    <MessageSquareDot />
+                                    <span>Notifications</span>
+                                </NavLink>
+                            </SidebarMenuButton>
+                        </SidebarMenuItem>
+                        {currentUser.roles.includes('admin') && (
+                            <SidebarMenu>
+                                {adminModules.map((item) => (
+                                    <Collapsible
+                                        key={item.title}
+                                        asChild
+                                        defaultOpen={item.isActive}
+                                        className="group/collapsible"
+                                    >
+                                        <SidebarMenuItem>
+                                            <CollapsibleTrigger asChild>
+                                                <SidebarMenuButton tooltip={item.title} className="hover:translate-x-1 transition-transform duration-300">
+                                                    {item.icon && <item.icon />}
+                                                    <span>{item.title}</span>
+                                                    <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
+                                                </SidebarMenuButton>
+                                            </CollapsibleTrigger>
+                                            <CollapsibleContent>
+                                                <SidebarMenuSub>
+                                                    {item.items?.map((subItem) => (
+                                                        <SidebarMenuSubItem key={subItem.name}>
+                                                            <SidebarMenuSubButton asChild>
+                                                                <NavLink to={subItem.url} className="hover:translate-x-1 transition-transform duration-300">
+                                                                    {subItem.icon && <subItem.icon />}
+                                                                    <span>{subItem.name}</span>
+                                                                </NavLink>
+                                                            </SidebarMenuSubButton>
+                                                        </SidebarMenuSubItem>
+                                                    ))}
+                                                </SidebarMenuSub>
+                                            </CollapsibleContent>
+                                        </SidebarMenuItem>
+                                    </Collapsible>
+                                ))}
+                            </SidebarMenu>
+                        )}
                     </SidebarGroupContent>
                 </SidebarGroup>
 
+
                 <SidebarGroup>
                     <SidebarGroupLabel>
-                        MANAGEMENT
+                        CONGRESS
                     </SidebarGroupLabel>
                     <SidebarGroupContent>
                         {projects.map((item, i) => (
@@ -58,33 +150,6 @@ export function AppSidebar({
                                         <span>{item.name}</span>
                                     </NavLink>
                                 </SidebarMenuButton>
-                                <DropdownMenu>
-                                    <DropdownMenuTrigger asChild>
-                                        <SidebarMenuAction showOnHover>
-                                            <MoreHorizontal />
-                                            <span className="sr-only">More</span>
-                                        </SidebarMenuAction>
-                                    </DropdownMenuTrigger>
-                                    <DropdownMenuContent
-                                        className="w-48 rounded-lg"
-                                        side={isMobile ? "bottom" : "right"}
-                                        align={isMobile ? "end" : "start"}
-                                    >
-                                        <DropdownMenuItem>
-                                            <Folder className="text-muted-foreground" />
-                                            <span>View Project</span>
-                                        </DropdownMenuItem>
-                                        <DropdownMenuItem>
-                                            <Forward className="text-muted-foreground" />
-                                            <span>Share Project</span>
-                                        </DropdownMenuItem>
-                                        <DropdownMenuSeparator />
-                                        <DropdownMenuItem>
-                                            <Trash2 className="text-muted-foreground" />
-                                            <span>Delete Project</span>
-                                        </DropdownMenuItem>
-                                    </DropdownMenuContent>
-                                </DropdownMenu>
                             </SidebarMenuItem>
                         ))}
                     </SidebarGroupContent>
@@ -208,6 +273,7 @@ export function NavUser({
 
 
 export function TeamSwitcher() {
+    const navigate = useNavigate()
     const { isMobile } = useSidebar()
 
     return (
@@ -240,7 +306,7 @@ export function TeamSwitcher() {
                             Action
                         </DropdownMenuLabel>
                         <DropdownMenuItem
-                            onClick={() => console.log('JAJAJAJA')}
+                            onClick={() => navigate(urls.home.index)}
                             className="gap-2 p-2 cursor-pointer"
                         >
                             <div className="flex size-6 items-center justify-center rounded-md border">

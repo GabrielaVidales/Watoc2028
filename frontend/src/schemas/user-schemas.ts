@@ -233,7 +233,7 @@ export const editUserFormSchema = userSchema
     .omit({
         last_login: true,
         date_joined: true,
-        photo: true,
+        // photo: true,
         roles: true,
         full_name: true,
     })

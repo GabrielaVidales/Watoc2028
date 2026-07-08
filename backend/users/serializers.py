@@ -14,7 +14,6 @@ class ParticipantSerializer(serializers.ModelSerializer):
     abstracts = serializers.SerializerMethodField()
 
     class Meta:
-        db_table = "participants"
         model = models.Participant
         fields = (
             "affiliation",

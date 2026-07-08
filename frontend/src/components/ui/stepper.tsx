@@ -42,7 +42,7 @@ function Stepper({ steps, activeStep, setActiveStep, className }: StepperProps) 
                                     )}
                                 >
                                     {completed ? (
-                                        <Check className="size-3 sm:size-4" />
+                                        <Check className="size-3 sm:size-4 stroke-3" />
                                     ) : (
                                         index + 1
                                     )}

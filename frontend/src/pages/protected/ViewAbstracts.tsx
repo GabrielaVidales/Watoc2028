@@ -23,7 +23,14 @@ import { useFetch } from '@/hooks/use-fetch'
 import type { AbstractDeclarationValues } from '@/schemas/abstract-declaration-schema'
 import { AbstractData } from '@/components/AbstractData'
 import { Separator } from '@/components/ui/separator'
-
+import {
+    Breadcrumb,
+    BreadcrumbItem,
+    BreadcrumbLink,
+    BreadcrumbList,
+    BreadcrumbPage,
+    BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb"
 
 function ViewAbstracts() {
     const navigate = useNavigate()
@@ -72,7 +79,23 @@ function ViewAbstracts() {
     const [activeAbstract, setActiveAbstract] = useState<AbstractSchema | null>()
 
     return (
-        <div className='w-full space-y-6'>
+        <div className='w-full max-w-5xl mx-auto'>
+            <Breadcrumb className='mb-8'>
+                <BreadcrumbList>
+                    <BreadcrumbItem>
+                        <BreadcrumbLink asChild>
+                            <Link to={urls.users.profile}>
+                                Dashboard
+                            </Link>
+                        </BreadcrumbLink>
+                    </BreadcrumbItem>
+                    <BreadcrumbSeparator />
+                    <BreadcrumbItem>
+                        <BreadcrumbPage>Abstract Submissions</BreadcrumbPage>
+                    </BreadcrumbItem>
+                </BreadcrumbList>
+            </Breadcrumb>
+
             <fieldset disabled={loading} className='w-full space-y-5'>
                 <div className='flex flex-col justify-end items-center gap-3 md:flex-row md:justify-between'>
                     <h2 className='text-2xl font-semibold'>Abstract submission</h2>

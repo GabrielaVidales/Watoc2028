@@ -1,17 +1,21 @@
 import React from 'react'
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { PlusCircle, User, Calendar, Mail, MapPin, Shield, Edit2, Building, CheckCircle2, MessageSquareWarning, MessageCircleWarning, Eye, Edit, Download, Smartphone } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
-import { PlusCircle, User, Calendar, FileText, ChevronUp, Mail, MapPin, Shield, Edit2, Building } from "lucide-react"
+import { Button } from "@/components/ui/button"
 import { useAuth } from '@/contexts/AuthContext'
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { formatDate } from '@/utils/formatDate'
 import { useProfiles } from '@/hooks/use-profiles'
-import { Spinner } from '@/components/ui/spinner'
 import { renderHTMLString } from '@/utils/tsx_utils'
+import { useNavigate } from 'react-router'
+import { urls } from '@/routes/routes'
+import { cn } from '@/lib/utils'
+import { AppStoreButton, PlayStoreButton } from '@/components/ui/play-store-button'
 
 function UserDashboardPage() {
+    const navigate = useNavigate()
+
     const { currentUser } = useAuth()
 
     const { profile } = useProfiles()
@@ -22,8 +26,8 @@ function UserDashboardPage() {
         <section className="antialiased">
             <header className="mb-8 flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
                 <div>
-                    <h1 className="text-3xl font-bold tracking-tight text-foreground">Panel de Control</h1>
-                    <p className="text-sm text-muted-foreground">Bienvenido, {currentUser.full_name}</p>
+                    <h1 className="text-3xl font-bold tracking-tight text-foreground">Control Panel</h1>
+                    <p className="text-sm text-muted-foreground">Welcome back, {currentUser.full_name}</p>
                 </div>
                 <Button size="lg" className="gap-2 shadow-sm">
                     <PlusCircle className="h-4 w-4" />
@@ -34,37 +38,38 @@ function UserDashboardPage() {
             <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
                 <div className="lg:col-span-2 space-y-6">
                     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                        <Card>
-                            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                        <Card className='outline-2 outline-transparent hover:outline-primary-main transition-colors duration-200'>
+                            <CardHeader>
                                 <CardTitle className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                                    Ponencias Registradas
+                                    Abstract Submissions
                                 </CardTitle>
+                                <CardDescription>
+                                    <div className="text-3xl font-bold">
+                                        {abstracts.length}
+                                    </div>
+                                </CardDescription>
                             </CardHeader>
-                            <CardContent>
-                                <div className="text-3xl font-bold">
-                                    {abstracts.length}
-                                </div>
-                            </CardContent>
                         </Card>
 
-                        <Card>
-                            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                        <Card className='outline-2 outline-transparent hover:outline-primary-main transition-colors duration-200'>
+                            <CardHeader>
                                 <CardTitle className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                                    Estado del Perfil
+                                    Email verification status
                                 </CardTitle>
+                                <CardDescription>
+                                    <Badge variant="outline" className="bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20 text-sm font-semibold">
+                                        <CheckCircle2 />
+                                        Verified
+                                    </Badge>
+                                </CardDescription>
                             </CardHeader>
-                            <CardContent>
-                                <Badge variant="outline" className="bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20 text-sm font-semibold">
-                                    Completado
-                                </Badge>
-                            </CardContent>
                         </Card>
                     </div>
 
                     <Card>
                         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
                             <div>
-                                <CardTitle className="text-lg font-semibold">Mis Ponencias</CardTitle>
+                                <CardTitle className="text-lg font-semibold">Abstract Submissions</CardTitle>
                                 <CardDescription>Gestión de resúmenes y estado de aprobaciones.</CardDescription>
                             </div>
                         </CardHeader>
@@ -73,11 +78,11 @@ function UserDashboardPage() {
                                 <Table>
                                     <TableHeader className="bg-muted/50">
                                         <TableRow>
-                                            <TableHead className="font-semibold">Título</TableHead>
-                                            <TableHead className="font-semibold">Tipo</TableHead>
-                                            <TableHead className="font-semibold">Última Modificación</TableHead>
-                                            <TableHead className="font-semibold">Estado</TableHead>
-                                            <TableHead className="text-right font-semibold">Acciones</TableHead>
+                                            <TableHead className="font-semibold">Title</TableHead>
+                                            <TableHead className="font-semibold">Presentation</TableHead>
+                                            <TableHead className="font-semibold">Modified</TableHead>
+                                            <TableHead className="font-semibold">Status</TableHead>
+                                            <TableHead className="text-right font-semibold">Actions</TableHead>
                                         </TableRow>
                                     </TableHeader>
                                     <TableBody>
@@ -85,9 +90,16 @@ function UserDashboardPage() {
                                             abstracts.map((abstract) => (
                                                 <TableRow key={abstract.id}>
                                                     <TableCell className="font-medium max-w-80">
-                                                        <div className="truncate font-semibold text-foreground" title={abstract.title} >
-                                                            {renderHTMLString(abstract.title)}
-                                                        </div>
+                                                        {abstract.title ? (
+                                                            <div className="truncate font-semibold text-foreground" title={abstract.title} >
+                                                                {renderHTMLString(abstract.title)}
+                                                            </div>
+                                                        ) : (
+                                                            <div className="inline-flex items-center gap-1 font-normal text-destructive" title={abstract.title} >
+                                                                <MessageCircleWarning className='size-4 -scale-x-100' />
+                                                                Untitled abstract
+                                                            </div>
+                                                        )}
                                                     </TableCell>
 
                                                     <TableCell className="capitalize text-xs">
@@ -101,12 +113,12 @@ function UserDashboardPage() {
                                                     <TableCell>
                                                         {(() => {
                                                             const statusConfig = {
-                                                                draft: { label: "Borrador", className: "bg-gray-500/10 text-gray-600 dark:text-gray-400 border-gray-500/20" },
-                                                                submitted: { label: "Enviado", className: "bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/20" },
-                                                                accepted: { label: "Aceptado", className: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20" },
-                                                                rejected: { label: "Rechazado", className: "bg-destructive/10 text-destructive border-destructive/20" },
-                                                                corrections: { label: "Correcciones", className: "bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20" },
-                                                                deleted: { label: "Eliminado", className: "bg-red-500/10 text-red-600 line-through border-red-500/20" }
+                                                                draft: { label: "Draft", className: "bg-gray-500/10 text-gray-600 dark:text-gray-400 border-gray-500/20" },
+                                                                submitted: { label: "Sent", className: "bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/20" },
+                                                                accepted: { label: "Accepted", className: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20" },
+                                                                rejected: { label: "Rejected", className: "bg-destructive/10 text-destructive border-destructive/20" },
+                                                                corrections: { label: "Corrections", className: "bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20" },
+                                                                deleted: { label: "Deleted", className: "bg-red-500/10 text-red-600 line-through border-red-500/20" }
                                                             };
                                                             const config = statusConfig[abstract.status || "draft"];
                                                             return (
@@ -119,11 +131,11 @@ function UserDashboardPage() {
 
                                                     <TableCell className="text-right space-x-1">
                                                         <Button variant="link" size="sm" className="px-1.5 text-blue-600">
-                                                            Ver
+                                                            <Eye />
                                                         </Button>
                                                         {abstract.status === "draft" || abstract.status === "corrections" ? (
                                                             <Button variant="link" size="sm" className="px-1.5 text-foreground">
-                                                                Editar
+                                                                <Edit />
                                                             </Button>
                                                         ) : null}
                                                     </TableCell>
@@ -187,23 +199,33 @@ function UserDashboardPage() {
                             <div className="flex items-start text-sm text-foreground/90 gap-2.5 pt-0.5">
                                 <Shield className="h-4 w-4 text-primary-main shrink-0 mt-0.5" />
                                 <div className="flex flex-wrap gap-1">
-                                    {currentUser.roles.map((role) => (
-                                        <span key={role} className="inline-flex items-center rounded-md bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground border">
-                                            {role}
-                                        </span>
-                                    ))}
+                                    {currentUser.roles.map((role) => {
+
+                                        const className =
+                                            role === "admin"
+                                                ? "border-red-200 bg-red-100 text-red-800 dark:border-red-800 dark:bg-red-950 dark:text-red-300"
+                                                : role === "reviewer"
+                                                    ? "border-blue-200 bg-blue-100 text-blue-800 dark:border-blue-800 dark:bg-blue-950 dark:text-blue-300"
+                                                    : "border-green-200 bg-green-100 text-green-800 dark:border-green-800 dark:bg-green-950 dark:text-green-300";
+
+                                        return (
+                                            <span key={role} className={cn('inline-flex items-center rounded-md px-2 py-0.5 text-xs font-medium border', className)}>
+                                                {role}
+                                            </span>
+                                        )
+                                    })}
                                 </div>
                             </div>
 
                             <div className="border-t pt-3 mt-2 space-y-2 text-xs text-muted-foreground">
                                 <div className="flex justify-between">
-                                    <span>Fecha de registro:</span>
+                                    <span>Joined:</span>
                                     <span className="font-medium text-foreground">
                                         {currentUser.date_joined ? formatDate(currentUser.date_joined) : '—'}
                                     </span>
                                 </div>
                                 <div className="flex justify-between">
-                                    <span>Último acceso:</span>
+                                    <span>Last login:</span>
 
                                     <span className="font-medium text-foreground">
                                         {currentUser.last_login ? formatDate(currentUser.last_login) : '—'}
@@ -213,33 +235,33 @@ function UserDashboardPage() {
                             </div>
 
                             <div className="pt-2">
-                                <Button variant="outline" className="w-full text-sm font-medium">
+                                <Button variant="outline" className="w-full text-sm font-medium" onClick={() => navigate(urls.users.settings)}>
                                     <Edit2 />
-                                    Editar Perfil
+                                    Edit profile
                                 </Button>
                             </div>
                         </CardContent>
                     </Card>
 
-                    <Card>
-                        <CardHeader className="flex flex-row items-center space-x-2 space-y-0 pb-3">
-                            <Calendar className="h-4 w-4 text-muted-foreground" />
-                            <CardTitle className="text-base font-semibold">Fechas Importantes</CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                            <div className="space-y-4 text-sm">
-                                <div className="flex items-center justify-between border-b pb-2">
-                                    <span className="text-muted-foreground">Cierre de Resúmenes</span>
-                                    <span className="font-semibold text-foreground">[DD/MM/AAAA]</span>
-                                </div>
-                                <div className="flex items-center justify-between">
-                                    <span className="text-muted-foreground">Notificación de Resultados</span>
-                                    <span className="font-semibold text-foreground">[DD/MM/AAAA]</span>
-                                </div>
-                            </div>
-                        </CardContent>
-                    </Card>
+                    <Card className="relative overflow-hidden border border-slate-200 bg-white shadow-sm transition-all hover:shadow-md dark:border-slate-800 dark:bg-slate-950">
+                        <div className="absolute -right-12 -top-12 h-32 w-32 rounded-full bg-blue-50/50 blur-2xl dark:bg-blue-950/20 pointer-events-none" />
 
+                        <CardContent>
+                            <CardTitle className="text-xl tracking-tighter text-slate-900 dark:text-slate-50">
+                                Get WATOC 2028 in your pocket
+                            </CardTitle>
+                            <CardDescription className="text-sm text-slate-500 max-w-sm dark:text-slate-400">
+                                Access your personalized schedule, receive real-time room alerts, and connect with fellow researchers instantly.
+                            </CardDescription>
+                        </CardContent>
+
+                        <CardFooter>
+                            <div className="flex flex-row gap-3  justify-start shrink-0 z-10">
+                                <AppStoreButton className="hover:scale-105 transition-transform duration-300 dynamic-layering" />
+                                <PlayStoreButton className="hover:scale-105 transition-transform duration-300 dynamic-layering" />
+                            </div>
+                        </CardFooter>
+                    </Card>
                 </div>
             </div>
         </section>

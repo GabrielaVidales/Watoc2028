@@ -56,7 +56,7 @@ function ChangePasswordForm() {
 
     return (
         <form onSubmit={onFormSubmit}>
-            <fieldset className='space-y-3 grid grid-cols-2 gap-4' disabled={isSubmitting}>
+            <fieldset className='space-y-3 flex flex-col gap-3' disabled={isSubmitting}>
                 {isSubmitSuccessful && (
                     <InfoAlert
                         title='Success'
@@ -160,7 +160,7 @@ function ChangePasswordForm() {
                     )}
                 />
 
-                <PasswordStrengthMeter control={control} className='col-span-full px-5' />
+                <PasswordStrengthMeter control={control} className='col-span-full' />
 
                 <div className='col-span-full flex justify-end'>
                     <Button type='submit' className='px-10!' disabled={!isValid}>

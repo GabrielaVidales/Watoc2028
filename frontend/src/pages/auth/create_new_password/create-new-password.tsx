@@ -299,7 +299,7 @@ export function CreatePasswordForm() {
                         <p className="font-medium mb-1">Password requirements:</p>
                         <ul className="list-disc list-inside space-y-0.5">
                             <li>At least 8 characters long</li>
-                            <li>Contains uppercase and lowercase letters</li>
+                            <li>Contains uppercase and lowercase characters</li>
                             <li>Contains at least one number</li>
                             <li>Contains at least one special character</li>
                         </ul>

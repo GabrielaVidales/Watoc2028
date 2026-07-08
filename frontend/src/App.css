@@ -32,3 +32,29 @@
 .ProseMirror u {
   text-decoration: underline;
 }
+
+/* Para Firefox */
+.tiptap.ProseMirror {
+  scrollbar-width: 0;
+  scrollbar-color: hsl(var(--muted-foreground) / 0.1) transparent;
+}
+
+/* Para Chrome, Safari y Edge */
+.tiptap.ProseMirror::-webkit-scrollbar {
+  width: 0;
+}
+
+.tiptap.ProseMirror::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* AQUÍ ESTABAN LOS DOS PUNTOS QUE TE PEDÍA */
+.tiptap.ProseMirror::-webkit-scrollbar-thumb {
+  background-color: hsl(var(--muted-foreground) / 0.1);
+  border-radius: 9999px;
+}
+
+.tiptap.ProseMirror::-webkit-scrollbar-thumb:hover {
+  background-color: hsl(var(--muted-foreground) / 0.1);
+}
+

@@ -15,13 +15,15 @@ import {
     DialogTitle,
     DialogTrigger,
 } from "@/components/ui/dialog"
+import Sockets from './socket'
 
 function TestPage() {
     const [data, setData] = React.useState<Affiliation | null>(null)
     const [open, setOpen] = React.useState<boolean>(false)
 
     return (
-        <div className='flex w-full bg-destructive gap-4 p-4'>
+        <div className='flex w-full gap-4 p-4'>
+            <Sockets/>
 
             <Dialog open={open} onOpenChange={() => { setOpen(false); setData(null); }}>
                 <DialogContent className='max-w-md w-full'>

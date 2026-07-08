@@ -74,6 +74,10 @@ export const urls = {
         resetPassword: '/reset-password',
     }),
     users: createRouteGroup('/user', {
+        administration: createRouteGroup('/administration', {
+            manageUsers: '/manage-users',
+            manageReviewers: '/manage-reviewers',
+        }),
         profile: '/profile',
         settings: '/settings',
         notifications: '/notifications',

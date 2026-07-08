@@ -36,7 +36,7 @@ export function ProtectedRoute({ allowedRoles }: ProtectedRouteProps) {
     )
 
     if (!authorized) {
-        return <Navigate to={urls.auth.login} replace />
+        return <Navigate to={urls.users.profile} replace />
     }
 
     if (!currentUser.roles.includes('admin') && !currentUser.email_verified) {

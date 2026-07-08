@@ -1,18 +1,20 @@
 import axiosClient from '@/clients/axiosClient'
 import { InfoAlert } from '@/components/InfoAlert'
 import { Button } from '@/components/ui/button'
+import { CardTitle } from '@/components/ui/card'
 import { Field, FieldContent, FieldDescription, FieldError, FieldLabel, FieldTitle } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Separator } from '@/components/ui/separator'
 import { Spinner } from '@/components/ui/spinner'
+import { AvatarUpload } from '@/components/ui/upload-avatar'
 import { useAuth } from '@/contexts/AuthContext'
 import { useProfiles } from '@/hooks/use-profiles'
 import { editUserFormSchema, prefixes, type EditUserFormValues } from '@/schemas/user-schemas'
 import { countries } from '@/utils/countriesInfo'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { isAxiosError } from 'axios'
-import { Save } from 'lucide-react'
+import { Building2, IdCard, Mail, Save, SquareUserRound, TextQuote } from 'lucide-react'
 import React, { useEffect } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 
@@ -80,9 +82,37 @@ function EditUserForm({ defaultValues }: P) {
     return (
         <form onSubmit={onFormSubmit}>
             <fieldset disabled={isSubmitting} className='space-y-5'>
-                {/* <h2 className='text-xl font-semibold'>Personal information</h2> */}
+                <CardTitle className="flex gap-3 items-center">
+                    <SquareUserRound className='text-primary-main' />
+                    <h2 className='text-xl font-semibold'>Profile Picture</h2>
+                </CardTitle>
 
-                <div className='grid grid-cols-1 sm:grid-cols-2 gap-5'>
+                <Controller
+                    name='photo'
+                    control={control}
+                    render={({ field, fieldState }) => (
+                        <Field data-invalid={fieldState.invalid}>
+                            <AvatarUpload
+                                accept=".png,.jpg,.jpeg,.webp"
+                                onFileChange={(files) => {
+                                    queueMicrotask(() => {
+                                        field.onChange(files?.file || null)
+                                    })
+                                }}
+                            />
+                            {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                        </Field>
+                    )}
+                />
+
+                <Separator />
+
+                <CardTitle className="flex gap-3 items-center">
+                    <IdCard className='text-primary-main' />
+                    <h2 className='text-xl font-semibold'>Personal Information</h2>
+                </CardTitle>
+
+                <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5'>
                     <Controller
                         name="prefix"
                         control={control}
@@ -151,7 +181,7 @@ function EditUserForm({ defaultValues }: P) {
                     />
                 </div>
 
-                <div className='grid grid-cols-1 sm:grid-cols-2 gap-5 justify-start items-start'>
+                <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5 justify-start items-start'>
                     <Controller
                         name="nationality"
                         control={control}
@@ -216,14 +246,18 @@ function EditUserForm({ defaultValues }: P) {
 
                 <Separator />
 
-                {/* <h2 className='text-xl font-semibold'>Professional Affiliation</h2> */}
-                <div className='grid grid-cols-1 sm:grid-cols-2 gap-5 justify-start items-start'>
+                <CardTitle className="flex gap-3 items-center">
+                    <Building2 className='text-primary-main' />
+                    <h2 className='text-xl font-semibold'>Professional Affiliation</h2>
+                </CardTitle>
+
+                <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5 justify-start items-start'>
                     <Controller
                         name="participant.affiliation"
                         control={control}
                         render={({ field, fieldState }) => (
                             <Field data-invalid={fieldState.invalid}>
-                                <FieldLabel htmlFor={field.name}>Affiliation</FieldLabel>
+                                <FieldLabel htmlFor={field.name}>Institution</FieldLabel>
                                 <Input
                                     {...field}
                                     id={field.name}
@@ -273,9 +307,14 @@ function EditUserForm({ defaultValues }: P) {
 
                 <Separator />
 
-                <h2 className='text-xl font-semibold'>Change your email</h2>
+                <CardTitle className="flex gap-3 items-center">
+                    <Mail className='text-primary-main' />
+                    <h2 className='text-xl font-semibold'>Change your email</h2>
+                </CardTitle>
+
                 <InfoAlert
                     className='col-span-full'
+                    variant='warning'
                     title="IMPORTANT"
                     messages={[
                         <p>Leave it blank if you don't want to change it.</p>,
@@ -283,14 +322,13 @@ function EditUserForm({ defaultValues }: P) {
                     ]}
                 />
 
-                <div className='grid grid-cols-1 sm:grid-cols-2 gap-3'>
+                <div className='grid grid-cols-1 sm:grid-cols-2 gap-5'>
                     <Controller
                         name="email.value"
                         control={control}
                         render={({ field, fieldState }) => (
                             <Field data-invalid={fieldState.invalid}>
                                 <FieldLabel htmlFor={field.name}>New Email <address></address></FieldLabel>
-                                <FieldDescription>This will be your login email</FieldDescription>
                                 <Input
                                     {...field}
                                     id={field.name}
@@ -299,6 +337,7 @@ function EditUserForm({ defaultValues }: P) {
                                     type='email'
                                     placeholder="name@example.com"
                                 />
+                                <FieldDescription>This will be your login email</FieldDescription>
                                 {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                             </Field>
                         )}
@@ -309,7 +348,6 @@ function EditUserForm({ defaultValues }: P) {
                         render={({ field, fieldState }) => (
                             <Field data-invalid={fieldState.invalid}>
                                 <FieldLabel htmlFor={field.name}>Confirm New email</FieldLabel>
-                                <FieldDescription>Please re-enter your email</FieldDescription>
                                 <Input
                                     {...field}
                                     id={field.name}
@@ -317,6 +355,7 @@ function EditUserForm({ defaultValues }: P) {
                                     autoComplete="off"
                                     placeholder="Re-type your email"
                                 />
+                                <FieldDescription>Please re-enter your email</FieldDescription>
                                 {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                             </Field>
                         )}

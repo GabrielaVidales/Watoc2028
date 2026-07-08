@@ -14,6 +14,8 @@ urlpatterns = [
     path('api/', include('contact_requests.urls')),
     path('api/authors-info/', include('abstracts.urls')),
     
+    path('api/notifications/', include('notifications.urls')),
+    
     path('api/payments/', include('payments.urls')),
     
     path('preview/', views.preview_contact_email)

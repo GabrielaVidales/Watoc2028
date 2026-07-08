@@ -1,67 +1,67 @@
-import { useAuth } from '@/contexts/AuthContext'
 import React from 'react'
-import { UserRoundPen, House, Image, LockKeyhole, LogOut, Clock, FileText } from "lucide-react";
-import { UserPictureForm } from '@/forms/UserPictureForm';
 import ChangePasswordForm from '@/forms/ChangePasswordForm';
 import EditUserForm from '@/forms/EditUserForm';
+import { useAuth } from '@/contexts/AuthContext'
+import { UserRoundPen, Image, LockKeyhole, ShieldAlert } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle, } from "@/components/ui/card"
+import { ChangePhotoForm, } from './change-photo-form';
 import { useProfiles } from '@/hooks/use-profiles';
 import { InfoAlert } from '@/components/InfoAlert';
-import {
-    Card,
-    CardAction,
-    CardContent,
-    CardDescription,
-    CardFooter,
-    CardHeader,
-    CardTitle,
-} from "@/components/ui/card"
-import ImageUpload from '@/components/upload-file';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { changePhotoSchema } from '@/schemas/update-profile-photo-schema';
-import { ChangePhotoForm, ProfilePictureForm } from './change-photo-form';
-import { Separator } from '@/components/ui/separator';
+import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator, } from "@/components/ui/breadcrumb"
+import { Link } from 'react-router';
+import { urls } from '@/routes/routes';
+import { Spinner } from '@/components/ui/spinner';
+import { GalleryUpload } from '@/components/ui/file-upload';
+import { UserPictureForm } from '@/forms/UserPictureForm';
+import { NotificationSettings } from './components/notifications-settings-component';
 
 function SettingsPage() {
     const { currentUser } = useAuth()
     const { profile } = useProfiles()
 
-    if (!profile) {
-        return (
-            <div>
-                Loading...
-            </div>
-        )
-    }
-
     return (
-        <div className='w-full max-w-4xl flex flex-col gap-5'>
+        <div className='mx-auto w-full max-w-5xl flex flex-col gap-5'>
+            <Breadcrumb>
+                <BreadcrumbList>
+                    <BreadcrumbItem>
+                        <BreadcrumbLink asChild>
+                            <Link to={urls.users.profile}>
+                                Dashboard
+                            </Link>
+                        </BreadcrumbLink>
+                    </BreadcrumbItem>
+                    <BreadcrumbSeparator />
+                    <BreadcrumbItem>
+                        <BreadcrumbPage>Settings</BreadcrumbPage>
+                    </BreadcrumbItem>
+                </BreadcrumbList>
+            </Breadcrumb>
 
             <div className='space-y-3'>
                 <h1 className='text-2xl font-medium'>Account Settings</h1>
-                <p>Actualiza tu foto y tus datos personales aquí</p>
             </div>
 
-            <Tabs defaultValue="account">
-                <TabsList variant='line' className='w-full justify-between overflow-x-auto overflow-y-hidden'>
-                    <TabsTrigger value="account" className="flex-1 gap-2">
-                        <UserRoundPen className="size-5" />
-                        <span className="hidden md:inline">Edit Account</span>
-                    </TabsTrigger>
+            <Tabs defaultValue="account" className='space-y-5'>
+                <Card className='py-0'>
+                    <TabsList className='w-full justify-between overflow-x-auto overflow-y-hidden'>
+                        <TabsTrigger value="account" className="flex-1 gap-2">
+                            <UserRoundPen className="size-5" />
+                            <span className="hidden md:inline">Edit Account</span>
+                        </TabsTrigger>
 
-                    <TabsTrigger value="picture" className="flex-1 gap-2">
-                        <Image className="size-5" />
-                        <span className="hidden md:inline">Change Photo</span>
-                    </TabsTrigger>
+                        <TabsTrigger value="picture" className="flex-1 gap-2">
+                            <Image className="size-5" />
+                            <span className="hidden md:inline">Change Photo</span>
+                        </TabsTrigger>
 
-                    <TabsTrigger value="password" className="flex-1 gap-2">
-                        <LockKeyhole className="size-5" />
-                        <span className="hidden md:inline">Change Password</span>
-                    </TabsTrigger>
-                </TabsList>
-                <TabsContent value="account" className='w-full '>
-
+                        <TabsTrigger value="password" className="flex-1 gap-2">
+                            <LockKeyhole className="size-5" />
+                            <span className="hidden md:inline">Change Password</span>
+                        </TabsTrigger>
+                    </TabsList>
+                </Card>
+                <TabsContent value="account" className='w-full space-y-5'>
                     <Card className='pt-0'>
                         <CardHeader className='py-5 border-b'>
                             <CardTitle className='text-xl font-medium'>Edit your profile data</CardTitle>
@@ -69,7 +69,7 @@ function SettingsPage() {
                         </CardHeader>
 
                         <CardContent className='px-10'>
-                            {profile.participant && (
+                            {profile ? (
                                 <EditUserForm defaultValues={{
                                     ...currentUser,
                                     email: {
@@ -82,70 +82,55 @@ function SettingsPage() {
                                         field_of_study: profile.participant.field_of_study
                                     }
                                 }} />
+                            ) : (
+                                <div className='w-full mx-auto text-center text-muted-foreground/50 p-5'>
+                                    <Spinner className='mx-auto size-10' />
+                                    <span>Loading...</span>
+                                </div>
                             )}
-
                         </CardContent>
                     </Card>
+                </TabsContent>
 
+                <TabsContent value="picture" className='w-full space-y-5'>
                     <Card className='pt-0'>
                         <CardHeader className='py-5 border-b'>
-                            <CardTitle className='text-xl font-medium'>Change your profile picture</CardTitle>
-                            <CardDescription>Upload a new image file</CardDescription>
+                            <CardTitle className='text-xl font-medium'>Notification Settings</CardTitle>
+                            <CardDescription>Manage your notifications</CardDescription>
                         </CardHeader>
 
-                        <CardContent className='flex flex-row items-center px-10'>
-                            <ChangePhotoForm
-                                data={{
-                                    profilePictureDeleted: false,
-                                    profilePicture: null,
-                                    profilePictureUrl: currentUser.photo as string
-                                }}
-                            />
+                        <CardContent>
+                            <NotificationSettings />
                         </CardContent>
                     </Card>
-
-                    <Card className='pt-0'>
-                        <CardHeader className='py-5 border-b'>
-                            <CardTitle className='text-xl font-medium'>Security</CardTitle>
-                            <CardDescription>Manage your password and account security</CardDescription>
-                        </CardHeader>
-
-                        <CardContent className='flex flex-col px-10'>
-                            <ChangePasswordForm />
-                        </CardContent>
-                    </Card>
-
                 </TabsContent>
-                <TabsContent value="picture" className='w-full py-9 pt-4 space-y-5 px-5 sm:px-9'>
-                    <h2 className='text-2xl font-semibold text-primary-main'>Edit Profile Picture</h2>
-                    <InfoAlert
-                        title="Profile Picture Guidelines"
-                        messages={[
-                            'Resolution: Square, 400x400px or higher.',
-                            'Max file size: 1.00 MB.',
-                            'Format: Use solid backgrounds (no transparency).',
-                        ]}
-                    />
-                    <UserPictureForm />
-                </TabsContent>
-                <TabsContent value="password" className='w-full py-9 pt-4 space-y-5 px-5 sm:px-9'>
+
+                <TabsContent value="password" className='w-full space-y-5'>
                     <Card className='pt-0'>
                         <CardHeader className='py-5 border-b'>
                             <CardTitle className='text-xl font-medium'>Change password</CardTitle>
                         </CardHeader>
 
                         <CardContent>
-                            <div className="text-sm text-muted-foreground bg-muted/30 px-3 pb-3 rounded-lg">
-                                <p className="font-medium mb-1">Password requirements:</p>
-                                <ul className="list-disc list-inside space-y-0.5">
-                                    <li>At least 8 characters long</li>
-                                    <li>Contains uppercase and lowercase letters</li>
-                                    <li>Contains at least one number</li>
-                                    <li>Contains at least one special character</li>
-                                </ul>
+                            <div className='grid grid-cols-1 md:grid-cols-2 gap-5'>
+                                <ChangePasswordForm />
+                                <div>
+                                    <InfoAlert
+                                        className='shrink'
+                                        title='Password requirements'
+                                        messages={[
+                                            <ul className="relative list-disc list-inside space-y-0.5 w-full">
+                                                <li>At least 8 characters long</li>
+                                                <li>Contains uppercase and lowercase characters</li>
+                                                <li>Contains at least one number</li>
+                                                <li>Contains at least one special character</li>
+                                                <ShieldAlert className='absolute right-0 -top-4 text-primary-main size-25 opacity-20 mx-auto' />
+                                            </ul>
+                                        ]}
+
+                                    />
+                                </div>
                             </div>
-                            <Separator className='my-4' />
-                            <ChangePasswordForm />
                         </CardContent>
                     </Card>
                 </TabsContent>

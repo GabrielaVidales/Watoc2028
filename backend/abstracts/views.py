@@ -14,3 +14,11 @@ logger = logging.getLogger("users")
 class AffiliationViewSet(ModelViewSet):
     queryset = Affiliation.objects.all()
     serializer_class = AffiliationSerializer
+
+
+class AuthorViewSet(ModelViewSet):
+    pass
+
+
+
+
