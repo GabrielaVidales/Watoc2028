@@ -50,7 +50,7 @@ function AffiliationForm({ defaults, onSubmitSuccess, id }: Props & React.HTMLPr
     const queryClient = useQueryClient()
 
     const createMutation = useMutation({
-        mutationFn: async (data: Affiliation) => await axiosClient.post('authors-info/affiliations/', data),
+        mutationFn: async (data: Affiliation) => await axiosClient.post('/abstracts/affiliations/', data),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['affiliations'] });
         },
@@ -60,7 +60,7 @@ function AffiliationForm({ defaults, onSubmitSuccess, id }: Props & React.HTMLPr
     const editMutation = useMutation({
         mutationFn: async (data: Affiliation) => {
             const { id, ...values } = data
-            await axiosClient.patch(`/authors-info/affiliations/${id}/`, values)
+            await axiosClient.patch(`/abstracts/affiliations/${id}/`, values)
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['affiliations'] });

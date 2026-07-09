@@ -39,7 +39,7 @@ function VerifyPage() {
 
                 await new Promise(resolve => setTimeout(resolve, 1000));
 
-                const response = await axiosClient.post<VerifyResponse>("/verify-email/", { token });
+                const response = await axiosClient.post<VerifyResponse>("/auth/verify-email/", { token });
 
                 const { code, detail } = response.data;
                 switch (code) {

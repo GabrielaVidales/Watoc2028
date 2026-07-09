@@ -59,7 +59,7 @@ axiosClient.interceptors.response.use(
 
         try {
             const originalRequest = error.config as AxiosRequestConfig
-            await axiosGuestInstance.post('/token/refresh/');
+            await axiosGuestInstance.post('/auth/token/refresh/');
             if (import.meta.env.DEV) {
                 console.log("Refreshing access token...!");
             }

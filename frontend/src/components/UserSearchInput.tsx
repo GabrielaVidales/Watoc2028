@@ -62,7 +62,7 @@ export function UserSearchInput({
                 Search registered user
             </Button>
             <CommandDialog open={open} onOpenChange={setOpen}>
-                <Command shouldFilter={false} className="border">
+                <Command shouldFilter={false}>
                     <CommandInput
                         placeholder="Search..."
                         value={input}

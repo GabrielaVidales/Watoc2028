@@ -164,7 +164,7 @@ def normalize_author_order(abstract):
             author.save(update_fields=["order"])
 
 
-class AbstractDeclarationsSerializer(serializers.ModelSerializer):
+class AbstractDeclarationSerializer(serializers.ModelSerializer):
     abstract_id = serializers.PrimaryKeyRelatedField(
         queryset=models.Abstract.objects.all(),
         source="abstract",
@@ -172,7 +172,7 @@ class AbstractDeclarationsSerializer(serializers.ModelSerializer):
     )
 
     class Meta:
-        model = models.AbstractDeclarations
+        model = models.AbstractDeclaration
         # fields = '__all__'
         exclude = ["abstract"]
 
@@ -196,7 +196,7 @@ class AbstractSerializer(serializers.ModelSerializer):
         exists = hasattr(instance, "declarations")
         if not exists:
             return {}
-        return AbstractDeclarationsSerializer(instance.declarations).data
+        return AbstractDeclarationSerializer(instance.declarations).data
 
     def validate_title(self, value):
         sanitized_value = bleach.clean(value, ALLOWED_TAGS, {}, strip=True)

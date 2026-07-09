@@ -19,7 +19,7 @@ function ShowAffiliations({ onAffiliationClicked }: Props) {
     const { data: affiliations, isLoading, isError, isFetching, error, refetch } = useQuery<Affiliation[]>({
         queryKey: ['affiliations'],
         queryFn: async () => {
-            const { data } = await axiosClient.get('/authors-info/affiliations');
+            const { data } = await axiosClient.get('/abstracts/affiliations');
             return data
         },
     })
@@ -28,7 +28,7 @@ function ShowAffiliations({ onAffiliationClicked }: Props) {
 
     const deleteMutation = useMutation({
         mutationFn: async (id: number | string) => {
-            const { data } = await axiosClient.delete(`/authors-info/affiliations/${id}/`);
+            const { data } = await axiosClient.delete(`/abstracts/affiliations/${id}/`);
             return data;
         },
         onSuccess: () => {

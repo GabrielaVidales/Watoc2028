@@ -5,13 +5,11 @@ from django.conf.urls.static import static
 from . import views
 
 urlpatterns = [
-    # URL trampa para que los bots boteen
     path('admin/', include('admin_honeypot.urls', namespace='admin_honeypot')),
-    # URL secreta, la verdadera
     path('admin-watoc/', admin.site.urls),
 
     path('api/', include('users.urls')),
-    
+    path('api/auth/', include('auth.urls')),
     path('api/contact/', include('contact_requests.urls')),
     path('api/abstracts/', include('abstracts.urls')),
     path('api/notifications/', include('notifications.urls')),

@@ -49,12 +49,12 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
     }
 
     async function handleLogin(email: string, password: string) {
-        await axiosGuestInstance.post('/login/', { email, password })
+        await axiosGuestInstance.post('/auth/login/', { email, password })
         await fetchUser()
     }
 
     async function handleLogout() {
-        await axiosClient.post('/logout/')
+        await axiosClient.post('/auth/logout/')
         setCurrentUser(null)
     }
 

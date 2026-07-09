@@ -32,7 +32,7 @@ function CreatePasswordPage() {
             }
 
             try {
-                const res = await axiosClient.post("/password-reset/verify/", { token });
+                const res = await axiosClient.post("/auth/password-reset/verify/", { token });
                 console.log(res);
 
                 setState("success");
@@ -105,7 +105,7 @@ export function CreatePasswordForm() {
             confirm_password: data.confirmPassword
         }
         try {
-            const res = await axiosClient.post('/password-reset/confirm/', payload)
+            const res = await axiosClient.post('/auth/password-reset/confirm/', payload)
             if (res.data.detail) {
                 setMessage(res.data.detail)
                 setTimeout(()=>{

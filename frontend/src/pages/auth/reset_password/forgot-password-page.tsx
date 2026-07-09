@@ -28,7 +28,7 @@ function ForgotPasswordPage() {
     const onFormSubmit = handleSubmit(async (data) => {
         console.log(data);
         try {
-            const res = await axiosClient.post('/password-reset/request/', data)
+            const res = await axiosClient.post('/auth/password-reset/request/', data)
             if (res.data.detail) {
                 setMessage(res.data.detail)
             }

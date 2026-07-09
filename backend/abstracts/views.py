@@ -7,8 +7,8 @@ from django.template.loader import render_to_string
 from rest_framework.decorators import action
 from django.conf import settings
 from django.http import HttpResponse
-from .models import Affiliation, Abstract, Author, AbstactStatus, AbstractDeclarations, AbstractPresentation
-from .serializers import AffiliationSerializer, AbstractSerializer, AuthorSerializer, AbstractDeclarationsSerializer, AbstractSubmitSerializer
+from .models import Affiliation, Abstract, Author, AbstactStatus, AbstractDeclaration, AbstractPresentation
+from .serializers import AffiliationSerializer, AbstractSerializer, AuthorSerializer, AbstractDeclarationSerializer, AbstractSubmitSerializer
 import os, logging, html
 
 User = get_user_model()
@@ -57,12 +57,12 @@ class AbstractView(ModelViewSet):
     def update_declarations(self, request, pk=None):
         instance = self.get_object()
         if request.method == "GET":
-            declarations, _ = AbstractDeclarations.objects.get_or_create(abstract=instance)
-            serializer = AbstractDeclarationsSerializer(declarations)
+            declarations, _ = AbstractDeclaration.objects.get_or_create(abstract=instance)
+            serializer = AbstractDeclarationSerializer(declarations)
             return Response(serializer.data)
 
         if request.method == "PATCH":
-            declarations, _ = AbstractDeclarations.objects.update_or_create(
+            declarations, _ = AbstractDeclaration.objects.update_or_create(
                 abstract=instance,
                 defaults={
                     "confirm_accuracy": request.data.get("confirm_accuracy", False),
@@ -74,7 +74,7 @@ class AbstractView(ModelViewSet):
                 },
             )
             declarations.save()
-            serializer = AbstractDeclarationsSerializer(declarations)
+            serializer = AbstractDeclarationSerializer(declarations)
             return Response(serializer.data)
 
         return Response(status=status.HTTP_400_BAD_REQUEST)
@@ -208,9 +208,9 @@ class AffiliationsView(ModelViewSet):
     """
 
 
-class AuthorDeclarationsView(ModelViewSet):
-    queryset = AbstractDeclarations.objects.all()
-    serializer_class = AbstractDeclarationsSerializer
+class AuthorDeclarationView(ModelViewSet):
+    queryset = AbstractDeclaration.objects.all()
+    serializer_class = AbstractDeclarationSerializer
     permission_classes = [permissions.IsAuthenticated]
     """
     {

@@ -154,7 +154,7 @@ class Author(models.Model):
         return f"{self.first_name} {self.last_name} ({self.email})"
 
 
-class AbstractDeclarations(models.Model):
+class AbstractDeclaration(models.Model):
     class Meta:
         db_table = "abstract_declarations"
 
