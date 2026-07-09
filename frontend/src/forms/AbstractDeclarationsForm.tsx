@@ -31,11 +31,11 @@ function AbstractDeclarations({ onStepBack, onStepForward }: EditAbstractCallbac
         }
     })
 
-    const { data: declarationsData, fetchData: fetchDeclarations } = useFetch<AbstractDeclarationValues>(`/abstracts/${id}/declarations/`)
+    const { data: declarationsData, fetchData: fetchDeclarations } = useFetch<AbstractDeclarationValues>(`/abstracts/submissions/${id}/declarations/`)
 
     const onFormSubmit = handleSubmit(async (data) => {
         try {
-            const res = await axiosClient.patch(`/abstracts/${id}/declarations/`, {
+            const res = await axiosClient.patch(`/abstracts/submissions/${id}/declarations/`, {
                 ...data, abstract_id: id
             })
             if (import.meta.env.DEV) {

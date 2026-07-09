@@ -11,13 +11,11 @@ urlpatterns = [
     path('admin-watoc/', admin.site.urls),
 
     path('api/', include('users.urls')),
-    path('api/', include('contact_requests.urls')),
-    path('api/authors-info/', include('abstracts.urls')),
     
+    path('api/contact/', include('contact_requests.urls')),
+    path('api/abstracts/', include('abstracts.urls')),
     path('api/notifications/', include('notifications.urls')),
-    
     path('api/payments/', include('payments.urls')),
-    
     path('preview/', views.preview_contact_email)
 ]
 

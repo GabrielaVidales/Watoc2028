@@ -1,3 +1,5 @@
+'deprecar'
+
 import { Box, Typography, Button, Container, Paper, Stack } from '@mui/material';
 import { useNavigate } from 'react-router';
 import fieldPng from '../../assets/field.png'

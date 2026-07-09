@@ -1,5 +1,7 @@
 from django.contrib import admin
-from .models import Affiliation
+from . import models
 
-# Register your models here.
-admin.site.register(Affiliation)
+admin.site.register(models.Affiliation)
+admin.site.register(models.Abstract)
+admin.site.register(models.Author)
+admin.site.register(models.AbstractDeclarations)

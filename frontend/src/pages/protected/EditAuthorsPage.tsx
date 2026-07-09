@@ -3,17 +3,16 @@ import { type AuthorSchema } from '@/schemas/abstract-schemas'
 import React, { useEffect, useState } from 'react'
 import { useParams } from 'react-router'
 import { Button } from '@/components/ui/button'
-import { AlertTriangle, ChevronLeft, ChevronRight, Edit, Hand, Menu, PencilLine, Plus, Save, Trash, Trash2, TriangleAlert, User2, UserPlus } from 'lucide-react'
+import { AlertTriangle, ChevronLeft, ChevronRight, Edit, Hand, Menu, Plus, Save, Trash2, TriangleAlert, User2, UserPlus } from 'lucide-react'
 import { Reorder } from 'motion/react'
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogMedia, AlertDialogTitle, } from "@/components/ui/alert-dialog"
 import { isAxiosError } from 'axios'
 import { Spinner } from '@/components/ui/spinner'
-import AddOrEditAuthorDialog from '@/forms/wrappers/AddOrEditAuthorDialog'
 import { useMutation } from '@/hooks/use-mutation'
 import { InfoAlert } from '@/components/InfoAlert'
-import type { EditAbstractCallbacks } from './EditAbstractPage'
 import { Separator } from '@/components/ui/separator'
-import { useHeader } from '@/contexts/HeaderContext'
+import AddOrEditAuthorDialog from '@/forms/wrappers/AddOrEditAuthorDialog'
+import type { EditAbstractCallbacks } from './EditAbstractPage'
 
 
 function EditAuthorsPage({ onStepBack, onStepForward }: EditAbstractCallbacks) {
@@ -23,7 +22,7 @@ function EditAuthorsPage({ onStepBack, onStepForward }: EditAbstractCallbacks) {
         data: authors,
         setData: setAuthors,
         fetchData: fetchAuthors,
-    } = useFetch<AuthorSchema[]>(`/abstracts/${id}/authors/`)
+    } = useFetch<AuthorSchema[]>(`/abstracts/submissions/${id}/authors/`)
 
     const onReorder = (data: AuthorSchema[]) => {
         setAuthors(data.map((item, i) => ({ ...item, order: i + 1 })))
@@ -44,7 +43,7 @@ function EditAuthorsPage({ onStepBack, onStepForward }: EditAbstractCallbacks) {
     const [authorIdToDelete, setAuthorIdToDelete] = useState(0)
     const onDeleteAuthor = async () => {
         try {
-            await mutate('delete', `/authors/${authorIdToDelete}/`)
+            await mutate('delete', `/abstracts/authors/${authorIdToDelete}/`)
             await fetchAuthors()
             setOpenDeleteAuthor(false)
             setAuthorIdToDelete(0)
@@ -65,7 +64,7 @@ function EditAuthorsPage({ onStepBack, onStepForward }: EditAbstractCallbacks) {
     const [authorIdToEdit, setAuthorIdToEdit] = useState(0)
     const onSaveAuthors = async () => {
         try {
-            await mutate('patch', `/abstracts/${id}/authors/`, {
+            await mutate('patch', `/abstracts/submissions/${id}/authors/`, {
                 authors: authors.map(item => ({ ...item, abstract_id: parseInt(id) }))
             })
             await fetchAuthors()

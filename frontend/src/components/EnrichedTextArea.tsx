@@ -38,27 +38,27 @@ export default function RichTextEditor({ title, value, invalid, multiline = true
                 return false
             },
             handlePaste({ }, event) {
-                if (!multiline) {
-                    event.preventDefault()
+                // if (!multiline) {
+                //     event.preventDefault()
 
-                    const html =
-                        event.clipboardData?.getData("text/html") ||
-                        event.clipboardData?.getData("text/plain") ||
-                        ""
+                //     const html =
+                //         event.clipboardData?.getData("text/html") ||
+                //         event.clipboardData?.getData("text/plain") ||
+                //         ""
 
-                    // console.log(html);
+                //     // console.log(html);
 
-                    const sanitized = html
-                        .replace(/<br\s*\/?>/gi, " ")
-                        .replace(/<\/p>\s*<p>/gi, " ")
-                        .replace(/\r?\n/g, " ")
+                //     const sanitized = html
+                //         .replace(/<br\s*\/?>/gi, " ")
+                //         .replace(/<\/p>\s*<p>/gi, " ")
+                //         .replace(/\r?\n/g, " ")
 
-                    console.log(sanitized)
+                //     console.log(sanitized)
 
-                    editor?.commands.insertContent(sanitized)
+                //     editor?.commands.insertContent(sanitized)
 
-                    return true
-                }
+                //     return true
+                // }
 
                 return false
             },
@@ -85,9 +85,11 @@ export default function RichTextEditor({ title, value, invalid, multiline = true
         extensions: [
             History,
             Document.extend({
+                // content: 'block+'
                 content: multiline ? "block+" : "inline*",
             }),
             ...(multiline ? [Paragraph] : []),
+            // Paragraph,
             Text,
             ExtensionBold,
             ExtensionItalic,

@@ -4,11 +4,13 @@ from django.contrib.auth import get_user_model
 from django.db import transaction
 from rest_framework import serializers
 from datetime import datetime
-from . import models, text_choices, validators
+from . import models, validators
 import bleach
 
 User = get_user_model()
 
+
+from abstracts.serializers import AbstractSerializer
 
 class ParticipantSerializer(serializers.ModelSerializer):
     abstracts = serializers.SerializerMethodField()
@@ -97,7 +99,7 @@ class UserSerializer(serializers.ModelSerializer):
     def validate_email(self, email):
         try:
             user_id = self.instance.id if self.instance else None
-            valid_email=validators.validate_email(email, user_id)
+            valid_email = validators.validate_email(email, user_id)
         except exceptions.ValidationError as e:
             raise exceptions.ValidationError(list(e.messages))
         return valid_email
@@ -136,247 +138,6 @@ class UserSerializer(serializers.ModelSerializer):
             p_instance = participant_serializer.save(user=user)
 
         return user
-
-
-""""""
-
-
-class AuthorAffiliationSerializer(serializers.ModelSerializer):
-    id = serializers.IntegerField(required=False)
-
-    class Meta:
-        model = models.AuthorAffiliation
-        fields = "__all__"
-
-    def validate(self, attrs=None):
-        instance: models.AuthorAffiliation = self.instance
-        if not instance:
-            return attrs
-
-        if not instance.institute:
-            raise serializers.ValidationError("Institute required")
-        if not instance.department:
-            raise serializers.ValidationError("Department required")
-        if not instance.nationality in text_choices.Nationality.values:
-            raise serializers.ValidationError("Invalid nationality")
-        if not instance.city:
-            raise serializers.ValidationError("City required")
-        return attrs
-
-
-class AuthorSerializer(serializers.ModelSerializer):
-    affiliation = AuthorAffiliationSerializer(allow_null=True, required=False)
-    abstract_id = serializers.PrimaryKeyRelatedField(
-        queryset=models.Abstract.objects.all(), source="abstract", write_only=True
-    )
-
-    class Meta:
-        model = models.Author
-        exclude = ["abstract"]
-        extra_kwargs = {
-            "order": {
-                "required": False,
-                "read_only": True,
-            },
-        }
-
-    @transaction.atomic
-    def create(self, validated_data):
-        abstract = validated_data.get("abstract")
-        validated_data["order"] = abstract.authors.count() + 1
-
-        email_duplicated = models.Author.objects.filter(
-            abstract=abstract,
-            email=validated_data.get("email"),
-        ).exists()
-
-        if email_duplicated:
-            raise serializers.ValidationError(
-                {
-                    "root": ["The submission could not be completed. Please review the errors below."],
-                    "email": [
-                        "Another author in this abstract already uses this email.",
-                    ],
-                }
-            )
-
-        affiliation_data = validated_data.pop("affiliation")
-        if affiliation_data is not None:
-            affiliation, _ = models.AuthorAffiliation.objects.get_or_create(
-                institute=affiliation_data.get("institute", None),
-                department=affiliation_data.get("department", None),
-                nationality=affiliation_data.get("nationality", None),
-                city=affiliation_data.get("city", None),
-                abstract=abstract,
-            )
-            validated_data["affiliation"] = affiliation
-
-        instance = super().create(validated_data)
-        normalize_author_order(instance.abstract)
-        # transaction.set_rollback(True)
-        return instance
-
-    @transaction.atomic
-    def update(self, instance, validated_data):
-        instance = self.instance
-        email = validated_data.get("email", instance.email)
-        email_duplicated = (
-            models.Author.objects.exclude(pk=instance.pk)
-            .filter(
-                abstract=instance.abstract,
-                email=email,
-            )
-            .exists()
-        )
-        if email_duplicated:
-            raise serializers.ValidationError(
-                {
-                    "root": ["The submission could not be completed. Please review the errors below."],
-                    "email": [
-                        "Another author in this abstract already uses this email.",
-                    ],
-                }
-            )
-
-        affiliation_data = validated_data.pop("affiliation")
-        if affiliation_data is not None:
-            affiliation, _ = models.AuthorAffiliation.objects.update_or_create(
-                institute=affiliation_data.get("institute", None),
-                department=affiliation_data.get("department", None),
-                nationality=affiliation_data.get("nationality", None),
-                city=affiliation_data.get("city", None),
-                abstract=instance.abstract,
-            )
-            validated_data["affiliation"] = affiliation
-
-        instance = super().update(instance, validated_data)
-        normalize_author_order(instance.abstract)
-        # transaction.set_rollback(True)
-        return instance
-
-
-def normalize_author_order(abstract):
-    if abstract is None:
-        return
-
-    authors = abstract.authors.order_by("order")
-    for index, author in enumerate(authors, start=1):
-        if author.order != index:
-            author.order = index
-            author.save(update_fields=["order"])
-
-
-class AbstractSerializer(serializers.ModelSerializer):
-    authors = serializers.SerializerMethodField()
-
-    class Meta:
-        model = models.Abstract
-        fields = "__all__"
-        read_only_fields = ["created_at", "last_update", "needs_review"]
-        
-    def get_authors(self, instance):
-        return AuthorSerializer(instance.authors.all(), many=True).data
-        
-    def validate_title(self, value):
-        sanitized_value = bleach.clean(value, [], {})
-        return sanitized_value
-
-    def validate_text(self, value):
-        sanitized_value = bleach.clean(value, [], {})
-        return sanitized_value
-    
-    def validate_references(self, value):
-        sanitized_value = bleach.clean(value, [], {})
-        return sanitized_value
-
-    @transaction.atomic
-    def create(self, validated_data):
-        instance = models.Abstract(**validated_data)
-        request = self.context.get("request", None)
-        instance.user = request.user
-        instance.save()
-        # transaction.on_commit(lambda: signals.on_abstract_created(instance))
-        return instance
-
-    @transaction.atomic
-    def update(self, instance: models.Abstract, validated_data):
-        extra_kwargs = {"previous_status": instance.status}
-        for attr, value in validated_data.items():
-            setattr(instance, attr, value)
-        instance.extra_kwargs = extra_kwargs
-        instance.save()
-        # transaction.on_commit(lambda: signals.on_abstract_updated(instance))
-        return instance
-
-
-class AbstractDeclarationsSerializer(serializers.ModelSerializer):
-    abstract_id = serializers.PrimaryKeyRelatedField(
-        queryset=models.Abstract.objects.all(), source="abstract", write_only=True
-    )
-
-    class Meta:
-        model = models.AbstractDeclarations
-        exclude = ["abstract"]
-
-
-"""RUN VALIDATIONS"""
-
-
-class AbstractSubmitSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = models.Abstract
-        fields = "__all__"
-        read_only_fields = ["created_at", "last_update", "needs_review"]
-
-    def validate(self, attrs=None):
-        instance: models.Abstract = self.instance
-        if not instance.title.strip():
-            raise serializers.ValidationError("Title required")
-        if not instance.text.strip():
-            raise serializers.ValidationError("Text required")
-        if instance.authors.count() == 0:
-            raise serializers.ValidationError("At least one author required")
-
-        orders = sorted(instance.authors.values_list("order", flat=True))
-        supposed = list(range(1, len(orders) + 1))
-        if orders != supposed:
-            raise serializers.ValidationError("Author's order must be continuous")
-
-        for author in instance.authors.all():
-            if isinstance(author, models.Author):
-                if not author.first_name:
-                    raise serializers.ValidationError("First required")
-                if not author.last_name:
-                    raise serializers.ValidationError("Last required")
-                if not author.email:
-                    raise serializers.ValidationError("Email required")
-
-                serializer = AuthorAffiliationSerializer(author.affiliation)
-                serializer.validate()
-
-        if not instance.references.strip():
-            raise serializers.ValidationError("References required")
-        if instance.status == models.AbstactStatus.SUBMITTED:
-            raise serializers.ValidationError("Abstract already submitted")
-        return attrs
-
-
-class AuthorSubmitSerializer(serializers.ListSerializer):
-    class Meta:
-        model = models.Author
-        exclude = ["abstract"]
-        extra_kwargs = {
-            "order": {
-                "required": False,
-                "read_only": True,
-            },
-        }
-
-    def validate(self, attrs=None):
-        instance: models.Author = self.instance
-        if not instance.abstract.authors.filter(pk=instance.pk).exist():
-            raise serializers.ValidationError("Unrelated abstract data")
-        return attrs
 
 
 """TOURS DATA"""

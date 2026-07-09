@@ -16,13 +16,13 @@ type Props = {}
 function AbstractPreview({ }: Props) {
     const { id } = useParams()
 
-    const { data: abstract } = useFetch<AbstractSchema>(`/abstracts/${id}/`)
-    const { data: authors } = useFetch<AuthorSchema[]>(`/abstracts/${id}/authors/`)
-    const { data: declarations } = useFetch<AbstractDeclarationValues>(`/abstracts/${id}/declarations/`)
+    const { data: abstract } = useFetch<AbstractSchema>(`/abstracts/submissions/${id}/`)
+    const { data: authors } = useFetch<AuthorSchema[]>(`/abstracts/submissions/${id}/authors/`)
+    const { data: declarations } = useFetch<AbstractDeclarationValues>(`/abstracts/submissions/${id}/declarations/`)
 
     const handlePreview = async (id: number | string, name: string = 'abstract') => {
         try {
-            const response = await axiosClient.get<Blob>(`/abstracts/${id}/preview`, {
+            const response = await axiosClient.get<Blob>(`/abstracts/submissions/${id}/preview`, {
                 responseType: 'blob',
             })
             const href = URL.createObjectURL(response.data);

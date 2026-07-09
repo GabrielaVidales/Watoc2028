@@ -1,6 +1,5 @@
 from django.db import models
 from django.contrib.auth import get_user_model
-from users.models import Abstract
 from .text_choices import (
     Nationality,
     AbstractPresentation,
@@ -108,7 +107,6 @@ class Affiliation(models.Model):
         db_column="created_by",
         null=True,
     )
-    related_user = models.ForeignKey(User, on_delete=models.SET_NULL, related_name="related_user", null=True)
 
 
 class Author(models.Model):
@@ -126,6 +124,12 @@ class Author(models.Model):
         related_name="authors",
         null=True,
     )
+    related_user = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        related_name="related_user",
+        null=True,
+    )
     first_name = models.CharField(
         null=False,
         blank=True,
@@ -141,6 +145,7 @@ class Author(models.Model):
         null=False,
     )
     email = models.EmailField(blank=True)
+    is_corresponding_author = models.BooleanField(default=False)
 
     class Meta:
         ordering = ["order"]
@@ -150,10 +155,14 @@ class Author(models.Model):
 
 
 class AbstractDeclarations(models.Model):
+    class Meta:
+        db_table = "abstract_declarations"
+
     abstract = models.OneToOneField(
         Abstract,
         primary_key=True,
         on_delete=models.CASCADE,
+        related_name='declarations',
         default=None,
     )
     confirm_accuracy = models.BooleanField(

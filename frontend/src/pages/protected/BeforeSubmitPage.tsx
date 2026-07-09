@@ -19,9 +19,9 @@ function BeforeSubmitPage({ onStepBack, onStepForward }: EditAbstractCallbacks) 
     const { id } = useParams()
     const navigate = useNavigate()
 
-    const { data: abstract, fetchData: fetchAbstract } = useFetch<AbstractSchema>(`/abstracts/${id}/`)
-    const { data: authors } = useFetch<AuthorSchema[]>(`/abstracts/${id}/authors/`)
-    const { data: declarations } = useFetch<AbstractDeclarationValues>(`/abstracts/${id}/declarations/`)
+    const { data: abstract, fetchData: fetchAbstract } = useFetch<AbstractSchema>(`/abstracts/submissions/${id}/`)
+    const { data: authors } = useFetch<AuthorSchema[]>(`/abstracts/submissions/${id}/authors/`)
+    const { data: declarations } = useFetch<AbstractDeclarationValues>(`/abstracts/submissions/${id}/declarations/`)
 
     const abstractErrors = useMemo(() => {
         if (!abstract) return [];
@@ -49,7 +49,7 @@ function BeforeSubmitPage({ onStepBack, onStepForward }: EditAbstractCallbacks) 
 
     const sendSubmission = async () => {
         try {
-            const res = await mutate<any>('post', `/abstracts/${id}/submit/`)
+            const res = await mutate<any>('post', `/abstracts/submissions/${id}/submit/`)
             await fetchAbstract()
             navigate(urls.users.viewAbstracts)
             if (import.meta.env.DEV) {

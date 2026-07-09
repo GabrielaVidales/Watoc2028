@@ -85,7 +85,7 @@ function AddOrEditAuthorDialog({ author, open, setOpen, onSubmit, onClose }: Add
     const {
         data: previousAffiliations,
         fetchData: fetchAffiliations
-    } = useFetch<AuthorAffiliationSchema[]>(`/abstracts/${id}/affiliations/`)
+    } = useFetch<AuthorAffiliationSchema[]>(`/abstracts/submissions/${id}/affiliations/`)
 
     useEffect(() => {
         if (open) { fetchAffiliations() }

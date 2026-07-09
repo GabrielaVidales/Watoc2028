@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import axiosClient from '@/clients/axiosClient'
 import { Button } from '@/components/ui/button'
-import { ArrowRight, ChevronsLeft, CircleAlert, Download, Eye, FileText, Inbox, Pencil, Plus, PlusCircle, Search, Send, Trash2, TriangleAlert } from 'lucide-react'
+import { ArrowRight, CircleAlert, Download, Eye, FileText, Inbox, Pencil, Plus, Send, Trash2, TriangleAlert } from 'lucide-react'
 import { Link, useNavigate } from 'react-router'
 import { urls } from '@/routes/routes'
 import { useProfiles } from '@/hooks/use-profiles'
@@ -12,25 +12,14 @@ import { InfoAlert } from '@/components/InfoAlert'
 import { useMutation } from '@/hooks/use-mutation'
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger, } from "@/components/ui/alert-dialog"
 import { Spinner } from '@/components/ui/spinner'
-import { Card, CardAction, CardContent, CardDescription, CardFooter, CardHeader, CardTitle, } from "@/components/ui/card"
+import { Card, CardAction, CardDescription, CardFooter, CardHeader, CardTitle, } from "@/components/ui/card"
 import { formatDate } from '@/utils/formatDate'
 import { renderHTMLString } from '@/utils/tsx_utils'
-import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger, } from "@/components/ui/dialog"
-import { Field, FieldGroup } from "@/components/ui/field"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
+import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, } from "@/components/ui/dialog"
 import { useFetch } from '@/hooks/use-fetch'
 import type { AbstractDeclarationValues } from '@/schemas/abstract-declaration-schema'
 import { AbstractData } from '@/components/AbstractData'
-import { Separator } from '@/components/ui/separator'
-import {
-    Breadcrumb,
-    BreadcrumbItem,
-    BreadcrumbLink,
-    BreadcrumbList,
-    BreadcrumbPage,
-    BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb"
+import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator, } from "@/components/ui/breadcrumb"
 
 function ViewAbstracts() {
     const navigate = useNavigate()
@@ -39,7 +28,7 @@ function ViewAbstracts() {
 
     const handleDelete = async (id: number) => {
         try {
-            await mutate<never>('delete', `/abstracts/${id}/`)
+            await mutate<never>('delete', `/abstracts/submissions/${id}/`)
             await fetchProfile()
         } catch (error) {
             if (import.meta.env.DEV) {
@@ -53,7 +42,7 @@ function ViewAbstracts() {
 
     const handlePreview = async (id: number | string, name: string = 'abstract') => {
         try {
-            const response = await axiosClient.get<Blob>(`/abstracts/${id}/preview`, {
+            const response = await axiosClient.get<Blob>(`/abstracts/submissions/${id}/preview`, {
                 responseType: 'blob',
             })
             const href = URL.createObjectURL(response.data);
@@ -285,9 +274,11 @@ function ViewAbstracts() {
 export function CreateAbstractDialog() {
     const navigate = useNavigate()
 
-    const handleCreate = async () => {
+    const handleCreate = async (e: React.MouseEvent<HTMLButtonElement>) => {
+        e.preventDefault()
+        e.stopPropagation()
         try {
-            const response = await axiosClient.post<AbstractSchema>('abstracts/')
+            const response = await axiosClient.post<AbstractSchema>('abstracts/submissions/')
             navigate(urls.users.editAbstract.build({ id: response.data.id }))
         } catch (error) {
             if (import.meta.env.DEV) {
@@ -337,7 +328,7 @@ export function DeleteAbstractDialog({ id }: { id: string | number }) {
 
     const handleDelete = async () => {
         try {
-            await mutate<never>('delete', `/abstracts/${id}/`)
+            await mutate<never>('delete', `/abstracts/submissions/${id}/`)
             await fetchProfile()
         } catch (error) {
             if (import.meta.env.DEV) {
@@ -384,9 +375,9 @@ export function DeleteAbstractDialog({ id }: { id: string | number }) {
 
 export function PreviewAbstractDialog({ id }: { id: string | number }) {
 
-    const { data: abstract } = useFetch<AbstractSchema>(`/abstracts/${id}/`)
-    const { data: authors } = useFetch<AuthorSchema[]>(`/abstracts/${id}/authors/`)
-    const { data: declarations } = useFetch<AbstractDeclarationValues>(`/abstracts/${id}/declarations/`)
+    const { data: abstract } = useFetch<AbstractSchema>(`/abstracts/submissions/${id}/`)
+    const { data: authors } = useFetch<AuthorSchema[]>(`/abstracts/submissions/${id}/authors/`)
+    const { data: declarations } = useFetch<AbstractDeclarationValues>(`/abstracts/submissions/${id}/declarations/`)
 
     return (
         <div className='w-full'>

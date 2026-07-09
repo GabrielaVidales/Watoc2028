@@ -17,27 +17,22 @@ from django.contrib.auth.models import update_last_login
 from django.contrib.auth import get_user_model, password_validation
 from django.conf import settings
 from django.core import exceptions
+
 from .serializers import (
     UserSerializer,
-    AbstractSerializer,
     ParticipantSerializer,
-    AuthorSerializer,
-    AuthorAffiliationSerializer,
-    AbstractDeclarationsSerializer,
-    AbstractSubmitSerializer,
     TourSerializer,
 )
-from .text_choices import AbstractPresentation
-from .models import Abstract, AbstactStatus, Author, AuthorAffiliation, AbstractDeclarations, Tour
-from django.http import HttpResponse
-from django.template.loader import render_to_string
+
+from .models import  Tour
+
 from config.permissions import HasCSRFToken
 from .tasks import send_email_confirmation_email, send_reset_password_email
 from itsdangerous import BadSignature
 from itsdangerous import SignatureExpired
 from itsdangerous import URLSafeTimedSerializer
 from utils.lib import get_password_signature
-import os, logging, html
+import logging
 
 serializer = URLSafeTimedSerializer(settings.SECRET_KEY)
 
@@ -510,175 +505,6 @@ class PasswordResetView(ViewSet):
             {"detail": "Your password has been reset successfully. You can now log in with your new password."},
             status=status.HTTP_200_OK,
         )
-
-
-class AbstractView(ModelViewSet):
-    queryset = Abstract.objects.all()
-    serializer_class = AbstractSerializer
-    permission_classes = [permissions.AllowAny]
-
-    # region otras vistas
-    @action(detail=True, methods=["get"], url_path="affiliations")
-    def get_affiliations(self, request, pk=None):
-        abstract = self.get_object()
-        data = AuthorAffiliationSerializer(abstract.affiliations.all(), many=True)
-        return Response(data.data)
-
-    @action(detail=True, methods=["get", "patch"], url_path="authors")
-    def get_authors(self, request, pk=None):
-        abstract = self.get_object()
-        if request.method == "PATCH":
-            author_data = request.data.get("authors")
-            for index, author in enumerate(author_data, start=1):
-                instance = Author.objects.get(
-                    id=author.get("id"),
-                    abstract=abstract,
-                )
-                instance.order = index
-                instance.save()
-
-            serializer = AuthorSerializer(abstract.authors, data=author_data, many=True)
-            if serializer.is_valid(raise_exception=True):
-                return Response(serializer.data)
-
-        serializer = AuthorSerializer(abstract.authors, many=True)
-        return Response(serializer.data)
-
-    @action(detail=True, methods=["get", "patch"], url_path="declarations")
-    def update_declarations(self, request, pk=None):
-        instance = self.get_object()
-        if request.method == "GET":
-            declarations, _ = AbstractDeclarations.objects.get_or_create(abstract=instance)
-            serializer = AbstractDeclarationsSerializer(declarations)
-            return Response(serializer.data)
-
-        if request.method == "PATCH":
-            declarations, _ = AbstractDeclarations.objects.update_or_create(
-                abstract=instance,
-                defaults={
-                    "confirm_accuracy": request.data.get("confirm_accuracy", False),
-                    "consent_publication": request.data.get("consent_publication", False),
-                    "submit_on_behalf": request.data.get("submit_on_behalf", False),
-                    "commitment_attendance": request.data.get("commitment_attendance", False),
-                    "not_previously_published": request.data.get("not_previously_published", False),
-                    "no_ai_used": request.data.get("no_ai_used", False),
-                },
-            )
-            declarations.save()
-            serializer = AbstractDeclarationsSerializer(declarations)
-            return Response(serializer.data)
-
-        return Response(status=status.HTTP_400_BAD_REQUEST)
-
-    @action(detail=True, methods=["get"], url_path="preview")
-    def generate_pdf(self, request: Request, pk=None):
-        abstract = Abstract.objects.prefetch_related("authors__affiliation").get(id=pk)
-        context = self.get_abstract_context(abstract)
-
-        from weasyprint import HTML, CSS
-
-        html_string = render_to_string("abstract_template.html", context)
-        path_to_css = os.path.join(settings.BASE_DIR, "static", "css", "abstract_styles.css")
-        path_to_static = os.path.join(settings.BASE_DIR, "static")
-        html_file = HTML(string=html_string, base_url=path_to_static)
-
-        pdf_file = html_file.write_pdf(
-            stylesheets=[CSS(filename=path_to_css)],
-        )
-
-        response = HttpResponse(pdf_file, content_type="application/pdf")
-        response["Content-Disposition"] = f'attachment; filename="{abstract.get_plain_title()}.pdf"'
-        return response
-
-    @action(detail=True, methods=["get"], url_path="authors-preview")
-    def get_abstract_author_context(self, request, pk=None):
-        abstract = Abstract.objects.prefetch_related("authors__affiliation").get(id=pk)
-        context = self.get_abstract_context(abstract)
-        return Response(
-            {
-                "authors_list": context["authors_list"],
-                "affiliations_list": context["affiliations_list"],
-            }
-        )
-
-    @action(detail=True, methods=["post"], url_path="submit")
-    def subtmit_abstract(self, request, pk=None):
-        abstract = self.get_object()
-
-        validator = AbstractSubmitSerializer(abstract)
-        validator.validate()
-
-        abstract.status = AbstactStatus.SUBMITTED
-        abstract.save()
-        return Response()
-
-    def get_abstract_context(self, abstract: Abstract):
-        authors_data = []
-        affiliations_set = {}
-        unique_affiliations = []
-
-        counter = 1
-        for author in abstract.authors.all():
-            aff = author.affiliation
-            aff_id = aff.id if aff else None
-            if aff_id and aff_id not in affiliations_set:
-                affiliations_set[aff_id] = counter
-                unique_affiliations.append(
-                    {
-                        "index": counter,
-                        "text": f"{aff.institute}, {aff.city}, {aff.get_nationality_display()}",
-                    }
-                )
-                counter += 1
-            authors_data.append(
-                {
-                    "full_name": f"{author.first_name[0]}. {author.last_name}",
-                    "aff_index": affiliations_set.get(aff_id),
-                }
-            )
-
-        abstract.title = html.unescape(abstract.title)
-        abstract.text = html.unescape(abstract.text)
-        abstract.references = html.unescape(abstract.references)
-
-        return {
-            "file_title": abstract.get_plain_title(),
-            "abstract": abstract,
-            "authors_list": authors_data,
-            "affiliations_list": unique_affiliations,
-        }
-
-    # endregion
-
-    @action(detail=False, methods=["get"], url_path="pending-posters")
-    def get_pending_posters(self, request):
-        # Empieza con todos los abstracts
-        queryset_base = Abstract.objects.all()
-
-        # encadena varios filtros pero sin ejecutar
-        pending_posters = queryset_base.filter(status=AbstactStatus.SUBMITTED).filter(presentation_type=AbstractPresentation.POSTER).filter(user__email_verified=True).order_by("-last_update")
-
-        # aquí es donde realmente ejecuta la consulta, al momento de leer
-        serializer = self.get_serializer(pending_posters, many=True)
-        return Response(serializer.data)
-
-
-class AuthorsView(ModelViewSet):
-    queryset = Author.objects.all()
-    serializer_class = AuthorSerializer
-    permission_classes = [permissions.IsAuthenticated]
-
-
-class AuthorAffiliationsView(ModelViewSet):
-    queryset = AuthorAffiliation.objects.all()
-    serializer_class = AuthorAffiliationSerializer
-    permission_classes = [permissions.IsAuthenticated]
-
-
-class AuthorDeclarationsView(ModelViewSet):
-    queryset = AbstractDeclarations.objects.all()
-    serializer_class = AbstractDeclarationsSerializer
-    permission_classes = [permissions.IsAuthenticated]
 
 
 class TourView(ModelViewSet):

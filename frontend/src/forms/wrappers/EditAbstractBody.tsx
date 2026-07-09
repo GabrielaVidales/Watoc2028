@@ -17,7 +17,7 @@ import { Card, CardAction, CardContent, CardFooter, CardHeader, CardTitle } from
 
 function EditAbstractBody({ onStepBack, onStepForward }: EditAbstractCallbacks) {
     const { id } = useParams()
-    const { data, fetchData } = useFetch<AbstractSchema>(`/abstracts/${id}/`)
+    const { data, fetchData } = useFetch<AbstractSchema>(`/abstracts/submissions/${id}/`)
 
     const form = useForm({
         resolver: zodResolver(abstractSchema),
@@ -28,7 +28,7 @@ function EditAbstractBody({ onStepBack, onStepForward }: EditAbstractCallbacks) 
     const { isValid, isSubmitting, isDirty } = form.formState
 
     const onFormSubmit = form.handleSubmit(async (data) => {
-        await axiosClient.patch<AbstractSchema>(`/abstracts/${id}/`, data)
+        await axiosClient.patch<AbstractSchema>(`/abstracts/submissions/${id}/`, data)
         await fetchData()
     })
 
