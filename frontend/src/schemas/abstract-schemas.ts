@@ -1,9 +1,9 @@
 import z from "zod";
-import countries from '@/data/countries-list.json'
 import { countWordsFromHTML } from "@/components/EnrichedTextArea";
+import { countries } from "@/utils/countriesInfo";
 
 
-const countriesArray = countries.map(country => country.code)
+const countriesArray = countries.map(country => country.value)
 
 export const presentationTypes = [
     {

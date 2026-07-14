@@ -31,7 +31,6 @@ class ParticipantSerializer(serializers.ModelSerializer):
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
-        db_table = "users"
         model = models.User
         fields = [
             "id",

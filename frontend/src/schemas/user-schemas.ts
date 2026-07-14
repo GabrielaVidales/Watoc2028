@@ -1,9 +1,9 @@
 import z from "zod";
-import countries from '@/data/countries-list.json'
 import { abstractSchema } from "./abstract-schemas";
+import { countries } from "@/utils/countriesInfo";
 
 
-const countriesArray = countries.map(country => country.code)
+const countriesArray = countries.map(country => country.value)
 
 export const prefixes = [
     { value: "Miss", label: "Miss" },
@@ -49,50 +49,39 @@ export const reviewerSchema = z.object({
 
 export const userSchema = z.object({
     id: z.number()
-        .optional()
-        .default(-1),
+        .optional(),
     first_name: z.string().trim()
         .min(1, "Please enter your first name")
-        .max(100, "Input too long")
-        .default(''),
+        .max(100, "Input too long"),
     middle_name: z.string().trim()
         .max(100, "Input too long")
-        .default('')
         .optional(),
     full_name: z.string().trim()
         .max(310, "Input too long")
-        .default('')
         .optional(),
     last_name: z.string().trim()
         .min(1, "Please enter your last name")
-        .max(100, "Input too long")
-        .default(''),
+        .max(100, "Input too long"),
     email: z.email('Please provide a valid email address')
-        .max(100, 'Input too long')
-        .default(''),
+        .max(100, 'Input too long'),
 
     is_active: z.boolean()
         .optional(),
     email_verified: z.boolean()
         .optional(),
 
-    prefix: z.enum(prefixes.map(p => p.value), 'Choose a valid option')
-        .default('Prof.'),
+    prefix: z.enum(prefixes.map(p => p.value), 'Choose a valid option'),
     pronouns: z.string().trim()
         .max(50, 'Too long')
-        .optional()
-        .default(''),
-    nationality: z.enum(countriesArray, 'Choose a valid option')
-        .default(''),
+        .optional(),
+    nationality: z.enum(countriesArray, 'Choose a valid option'),
     city: z.string().trim()
         .min(1, "Please enter your city")
-        .max(30, 'Input too long')
-        .default(''),
+        .max(30, 'Input too long'),
     photo: z.union([z.instanceof(File), z.string()])
         .nullable()
         .optional(),
-    roles: z.array(z.enum(UserRole))
-        .default([]),
+    roles: z.array(z.enum(UserRole)),
     date_joined: z.coerce.date()
         .optional(),
     last_login: z.coerce.date()

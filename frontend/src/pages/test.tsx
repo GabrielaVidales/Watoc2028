@@ -13,62 +13,49 @@ import {
     DialogFooter,
     DialogHeader,
     DialogTitle,
-    DialogTrigger,
 } from "@/components/ui/dialog"
 import Sockets from './socket'
+import { ScrollArea } from '@/components/ui/scroll-area'
+import { AuthorForm, AuthorFormContent } from '@/forms/AbstractAuthorForm'
+import ShowAuthorsComponent from '@/components/ShowAuthors'
+import type { AuthorSchema } from '@/schemas/author-schema'
 
 function TestPage() {
-    const [data, setData] = React.useState<Affiliation | null>(null)
-    const [open, setOpen] = React.useState<boolean>(false)
 
     return (
-        <div className='flex w-full gap-4 p-4'>
-            <Sockets/>
+        <>
+            <div className='grid grid-cols-1 lg:grid-cols-[1fr_2fr] w-full gap-4 p-2'>
+                <Card className='w-full mx-auto'>
+                    <CardHeader>
+                        <CardTitle>Manage Affiliations</CardTitle>
+                        <CardDescription>
+                            View, create, edit, or remove affiliation records for your organization.
+                        </CardDescription>
+                    </CardHeader>
+                    <CardContent className='pr-2 border-y'>
+                        <ScrollArea className="h-100 space-y-4 py-4 text-sm leading-relaxed">
+                            <ShowAffiliations />
+                        </ScrollArea>
+                    </CardContent>
+                </Card>
 
-            <Dialog open={open} onOpenChange={() => { setOpen(false); setData(null); }}>
-                <DialogContent className='max-w-md w-full'>
-                    <DialogHeader>
-                        <DialogTitle>{data !== null ? 'Edit Affiliation' : 'New Affiliation'}</DialogTitle>
-                        <DialogDescription>
-                            {data !== null
-                                ? 'Update the necessary fields below and save your changes.'
-                                : 'Fill out the form below to add a new affiliation to the list.'}
-                        </DialogDescription>
-                    </DialogHeader>
-                    <AffiliationForm
-                        id='affiliation-form'
-                        defaults={data}
-                        onSubmitSuccess={() => { setOpen(false); setData(null); }}
-                    />
-                    <DialogFooter>
-                        <DialogClose asChild>
-                            <Button variant="outline">Cancel</Button>
-                        </DialogClose>
-                        <Button type="submit" form='affiliation-form'>Save changes</Button>
-                    </DialogFooter>
-                </DialogContent>
-            </Dialog>
+                <Card className='w-full mx-auto'>
+                    <CardHeader>
+                        <CardTitle>Manage Authors</CardTitle>
+                        <CardDescription>
+                            View, create, edit, or remove author records for your submission.
+                        </CardDescription>
+                    </CardHeader>
+                    <CardContent className='border-y p-0'>
+                        <ScrollArea className="h-100 space-y-4 p-1 sm:p-3 md:p-5 text-sm leading-relaxed">
+                            <ShowAuthorsComponent />
+                        </ScrollArea>
+                    </CardContent>
+                </Card>
 
-            <Card className='max-w-sm w-full mx-auto'>
-                <CardHeader>
-                    <CardTitle>Manage Affiliations</CardTitle>
-                    <CardDescription>
-                        View, create, edit, or remove affiliation records for your organization.
-                    </CardDescription>
-                    <CardAction>
-                        <Button onClick={() => { setData(null); setOpen(true) }}>
-                            <Plus />
-                            New
-                        </Button>
-                    </CardAction>
-                </CardHeader>
-                <CardContent className='pr-2 border-y'>
-                    <div className="h-100 space-y-4 overflow-y-scroll py-4 text-sm leading-relaxed">
-                        <ShowAffiliations onAffiliationClicked={a => { setData(a); setOpen(a !== null) }} />
-                    </div>
-                </CardContent>
-            </Card>
-        </div>
+                <Sockets />
+            </div>
+        </>
     )
 }
 

@@ -120,10 +120,10 @@ function App() {
 						<Route path={urls.users.editAbstract.url} element={<EditAbstractPage />} />
 						<Route path={urls.users.notifications} element={<NotificationsPage />} />
 					</Route>
+					<Route path={'/test'} element={<TestPage />} />
 				</Route>
 
 				<Route path={urls.auth.verify} element={<VerifyEmailPage />} />
-				<Route path={'/test'} element={<TestPage />} />
 
 				{/* Para rutas diferentes */}
 				<Route path='*' element={<NotFound />} />

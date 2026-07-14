@@ -33,3 +33,5 @@ export function ScrollTop({ ref }) {
         </Fade>
     );
 }
+
+import { useEffect, useState } from "react";

@@ -151,22 +151,20 @@ function SidebarsLayout() {
                         </div>
                     </aside>
 
-                    <main className="p-5 md:p-10">
-                        <section>
-                            <div className="flex flex-col gap-10 md:flex-[1.3]">
-                                <AnimatePresence mode="popLayout">
-                                    <motion.div
-                                        initial={{ opacity: 0, x: 20 }}
-                                        animate={{ opacity: 1, x: 0 }}
-                                        exit={{ opacity: 0, x: -20 }}
-                                        transition={{ duration: 0.2 }}
-                                        className="w-full"
-                                    >
-                                        <Outlet />
-                                    </motion.div>
-                                </AnimatePresence>
-                            </div>
-                        </section>
+                    <main className='bg-destructive'>
+                        <div className="flex flex-col gap-10 md:flex-[1.3]">
+                            <AnimatePresence mode="popLayout">
+                                <motion.div
+                                    initial={{ opacity: 0, x: 20 }}
+                                    animate={{ opacity: 1, x: 0 }}
+                                    exit={{ opacity: 0, x: -20 }}
+                                    transition={{ duration: 0.2 }}
+                                    className="w-full"
+                                >
+                                    <Outlet />
+                                </motion.div>
+                            </AnimatePresence>
+                        </div>
                     </main>
                 </div>
             </div>

@@ -2,13 +2,15 @@ import { Field, FieldContent, FieldDescription, FieldError, FieldLabel } from '@
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { affiliationSchema, type Affiliation } from '@/schemas/affiliation-schema'
-import { countries } from '@/utils/countriesInfo'
+import { countries, getCountryImage } from '@/utils/countriesInfo'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Controller, useForm } from 'react-hook-form'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { cn } from '@/lib/utils'
 import React from 'react'
 import axiosClient from '@/clients/axiosClient'
+import { isAxiosError } from 'axios'
+import { useAuth } from '@/contexts/AuthContext'
 
 type Props = {
     defaults?: Affiliation
@@ -16,11 +18,13 @@ type Props = {
 }
 
 function AffiliationForm({ defaults, onSubmitSuccess, id }: Props & React.HTMLProps<HTMLFormElement>) {
+    const { currentUser: { id: userId } } = useAuth()
 
     const { control, handleSubmit, reset, resetField, formState: { isDirty, isSubmitting } } = useForm({
         resolver: zodResolver(affiliationSchema),
         mode: 'onChange',
         defaultValues: {
+            id: null,
             institution: '',
             city: '',
             country: '',
@@ -50,10 +54,16 @@ function AffiliationForm({ defaults, onSubmitSuccess, id }: Props & React.HTMLPr
     const queryClient = useQueryClient()
 
     const createMutation = useMutation({
-        mutationFn: async (data: Affiliation) => await axiosClient.post('/abstracts/affiliations/', data),
+        mutationFn: async (data: Affiliation) => await axiosClient.post('/abstracts/affiliations/', { ...data, user_id: userId }),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['affiliations'] });
         },
+        onError: (error) => {
+            if (isAxiosError(error)) {
+                if (import.meta.env.DEV)
+                    console.error(error.response.data);
+            }
+        }
     })
 
 
@@ -65,21 +75,24 @@ function AffiliationForm({ defaults, onSubmitSuccess, id }: Props & React.HTMLPr
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['affiliations'] });
         },
+        onError: (error) => {
+            if (isAxiosError(error)) {
+                if (import.meta.env.DEV)
+                    console.error(error.response.data);
+            }
+        }
     })
 
 
     return (
         <form id={id} onSubmit={onFormSubmit}>
-            <fieldset disabled={isSubmitting} className='space-y-3'>
+            <fieldset disabled={isSubmitting} className='px-1 space-y-3'>
                 <Controller
                     name={'institution'}
                     control={control}
                     render={({ field, fieldState }) => (
                         <Field data-invalid={fieldState.invalid}>
                             <FieldLabel htmlFor={field.name}>Institution</FieldLabel>
-                            <FieldDescription>
-                                Enter the name of the institution or organization.
-                            </FieldDescription>
                             <Input
                                 {...field}
                                 id={field.name}
@@ -87,18 +100,13 @@ function AffiliationForm({ defaults, onSubmitSuccess, id }: Props & React.HTMLPr
                                 autoComplete="off"
                                 maxLength={100}
                             />
-
                             <div
                                 className={cn(
-                                    "overflow-hidden transition-all duration-300 ease-in-out",
-                                    fieldState.invalid
-                                        ? "h-8 opacity-100"
-                                        : "h-0 opacity-0"
+                                    "overflow-hidden transition-all h-6 duration-200 ease-in-out",
+                                    fieldState.invalid ? " opacity-100" : " opacity-0"
                                 )}
                             >
-                                {fieldState.invalid &&
-                                    <FieldError errors={[fieldState.error]} />
-                                }
+                                <FieldError errors={[fieldState.error]} />
                             </div>
                         </Field>
                     )}
@@ -129,13 +137,7 @@ function AffiliationForm({ defaults, onSubmitSuccess, id }: Props & React.HTMLPr
                                 <SelectContent position="item-aligned">
                                     {countries.map(c => (
                                         <SelectItem value={c.value as string} key={c.value}>
-                                            <img
-                                                loading="lazy"
-                                                width="20"
-                                                srcSet={`https://flagcdn.com/w40/${c.value.toString().toLowerCase()}.png 2x`}
-                                                src={`https://flagcdn.com/w20/${c.value.toString().toLowerCase()}.png`}
-                                                alt=""
-                                            />
+                                            {getCountryImage(c.label)}
                                             {c.label}
                                         </SelectItem>
                                     ))}
@@ -143,15 +145,11 @@ function AffiliationForm({ defaults, onSubmitSuccess, id }: Props & React.HTMLPr
                             </Select>
                             <div
                                 className={cn(
-                                    "overflow-hidden transition-all duration-300 ease-in-out",
-                                    fieldState.invalid
-                                        ? "h-8 opacity-100"
-                                        : "h-0 opacity-0"
+                                    "overflow-hidden transition-all h-6 duration-200 ease-in-out",
+                                    fieldState.invalid ? " opacity-100" : " opacity-0"
                                 )}
                             >
-                                {fieldState.invalid &&
-                                    <FieldError errors={[fieldState.error]} />
-                                }
+                                <FieldError errors={[fieldState.error]} />
                             </div>
                         </Field>
                     )}
@@ -172,15 +170,11 @@ function AffiliationForm({ defaults, onSubmitSuccess, id }: Props & React.HTMLPr
                             />
                             <div
                                 className={cn(
-                                    "overflow-hidden transition-all duration-300 ease-in-out",
-                                    fieldState.invalid
-                                        ? "h-8 opacity-100"
-                                        : "h-0 opacity-0"
+                                    "overflow-hidden transition-all h-6 duration-200 ease-in-out",
+                                    fieldState.invalid ? " opacity-100" : " opacity-0"
                                 )}
                             >
-                                {fieldState.invalid &&
-                                    <FieldError errors={[fieldState.error]} />
-                                }
+                                <FieldError errors={[fieldState.error]} />
                             </div>
                         </Field>
                     )}

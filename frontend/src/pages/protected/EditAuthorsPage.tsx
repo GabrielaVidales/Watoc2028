@@ -92,11 +92,6 @@ function EditAuthorsPage({ onStepBack, onStepForward }: EditAbstractCallbacks) {
 
     return (
         <div className='w-full space-y-5'>
-            <div className="flex gap-3 items-center">
-                <UserPlus className='text-primary-main' />
-                <h2 className='text-xl font-semibold'>Authors List</h2>
-            </div>
-            <Separator />
 
             <div className='space-y-5'>
                 <InfoAlert

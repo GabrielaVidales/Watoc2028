@@ -430,7 +430,10 @@ function StepperPanel({ children, className }: React.ComponentProps<"div">) {
     <div
       data-slot="stepper-panel"
       data-state={activeStep}
-      className={cn("w-full", className)}
+      className={cn(
+        "flex min-h-0 w-full flex-col overflow-hidden",
+        className
+      )}
     >
       {children}
     </div>

@@ -2,6 +2,7 @@ from django.db import transaction
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
 from . import models, text_choices
+from datetime import datetime
 import bleach
 
 User = get_user_model()
@@ -39,12 +40,44 @@ class AffiliationSerializer(serializers.ModelSerializer):
         return attrs
 
 
+class RelatedUserSerializer(serializers.ModelSerializer):
+    photo = serializers.SerializerMethodField()
+
+    class Meta:
+        model = User
+        fields = [
+            "id",
+            "email",
+            "is_active",
+            "first_name",
+            "middle_name",
+            "last_name",
+            "prefix",
+            "pronouns",
+            "photo",
+            "full_name",
+        ]
+        
+    def get_photo(self, obj):
+        if not obj.photo:
+            return None
+        try:
+            photo_url = obj.photo.url
+            timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
+            request = self.context.get("request")
+
+            if request is not None:
+                photo_url = request.build_absolute_uri(photo_url)
+
+            return f"{photo_url}?t={timestamp}"
+        except Exception:
+            return None
+
 class AuthorSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField(required=False)
     abstract_id = serializers.PrimaryKeyRelatedField(
         queryset=models.Abstract.objects.all(),
         source="abstract",
-        write_only=True,  # solo para crear
     )
     affiliation = AffiliationSerializer(read_only=True, required=False)
     affiliation_id = serializers.PrimaryKeyRelatedField(
@@ -54,6 +87,22 @@ class AuthorSerializer(serializers.ModelSerializer):
         allow_null=True,
         required=False,
     )
+    institution = serializers.CharField(
+        write_only=True,
+        allow_null=True,
+        required=False,
+    )
+    country = serializers.CharField(
+        write_only=True,
+        allow_null=True,
+        required=False,
+    )
+    city = serializers.CharField(
+        write_only=True,
+        allow_null=True,
+        required=False,
+    )
+    related_user = RelatedUserSerializer(read_only=True, required=False)
     related_user_id = serializers.PrimaryKeyRelatedField(
         queryset=User.objects.all(),
         source="related_user",
@@ -64,7 +113,22 @@ class AuthorSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = models.Author
-        exclude = ["abstract"]
+        fields = [
+            "id",
+            "abstract_id",
+            "affiliation_id",
+            "related_user_id",
+            "first_name",
+            "last_name",
+            "order",
+            "email",
+            "is_corresponding_author",
+            "affiliation",
+            "related_user",
+            "institution",
+            "country",
+            "city",
+        ]
         extra_kwargs = {
             "order": {
                 "required": False,
@@ -74,81 +138,107 @@ class AuthorSerializer(serializers.ModelSerializer):
 
     def validate(self, attrs=None):
         errors = {}
-
-        if not attrs.get("affiliation"):
-            errors["affiliation"] = ["Affiliation is required"]
-
+        
         if not attrs.get("first_name"):
             errors["first_name"] = ["First name is required"]
 
         if not attrs.get("last_name"):
             errors["last_name"] = ["Last name is required"]
 
-        if not attrs.get("email"):
+        email = attrs.get("email")
+        if not email:
             errors["email"] = ["Email is required"]
+
+        abstract = attrs.get("abstract")
+        if not abstract:
+            errors["abstract"] = ["An abstract instance is required"]
+        else:
+            queryset = models.Author.objects.exclude(pk=attrs['id']) if attrs.get('id', None) else models.Author.objects
+            email_duplicated = queryset.filter(abstract=abstract, email=email).exists()
+            if email_duplicated:
+                print(email)
+                errors["email"] = ["Another author in this abstract already uses this email."]
+
+        if attrs.get("affiliation"):
+            attrs.pop('institution', None)
+            attrs.pop('country', None)
+            attrs.pop('city', None)
+        else:
+            if not attrs.get("institution"):
+                errors["institution"] = ["Institution is required, since no existing affiliation was provided"]
+            if not attrs.get("country"):
+                errors["country"] = ["Country is required, since no existing affiliation was provided"]
+            if not attrs.get("city"):
+                errors["city"] = ["City is required, since no existing affiliation was provided"]
 
         if errors:
             raise serializers.ValidationError(errors)
         return attrs
 
     @transaction.atomic
-    def create(self, validated_data):
+    def create(self, validated_data):        
+        related_user = validated_data.get("related_user", None)
+        if related_user:
+            validated_data['first_name'] = related_user.first_name
+            validated_data['last_name'] = related_user.last_name
+            validated_data['email'] = related_user.email
+        
+        affiliation = validated_data.get("affiliation", None)
+        if not affiliation:
+            institution = validated_data.pop("institution")
+            city = validated_data.pop("city")
+            country = validated_data.pop("country")
+
+            affiliation, created = models.Affiliation.objects.get_or_create(
+                institution=institution,
+                country=country,
+                city=city,
+            )
+
+            print("New affiliation instance was created" if created else "Existing affiliation instance was used")
+            validated_data["affiliation"] = affiliation
+
         abstract = validated_data.get("abstract")
         validated_data["order"] = abstract.authors.count() + 1
 
-        email_duplicated = models.Author.objects.filter(
-            abstract=abstract,
-            email=validated_data.get("email"),
-        ).exists()
-
-        if email_duplicated:
-            raise serializers.ValidationError(
-                {
-                    "root": ["The submission could not be completed. Please review the errors below."],
-                    "email": ["Another author in this abstract already uses this email."],
-                }
-            )
-
         instance = super().create(validated_data)
         normalize_author_order(instance.abstract)
+
         # transaction.set_rollback(True)
         return instance
 
     @transaction.atomic
     def update(self, instance, validated_data):
         instance = self.instance
-        email = validated_data.get("email", instance.email)
-        email_duplicated = (
-            models.Author.objects.exclude(pk=instance.pk)
-            .filter(
-                abstract=instance.abstract,
-                email=email,
-            )
-            .exists()
-        )
-        if email_duplicated:
-            raise serializers.ValidationError(
-                {
-                    "root": ["The submission could not be completed. Please review the errors below."],
-                    "email": [
-                        "Another author in this abstract already uses this email.",
-                    ],
-                }
-            )
+        
+        related_user = validated_data.get("related_user", None)
+        if related_user:
+            validated_data['first_name'] = related_user.first_name
+            validated_data['last_name'] = related_user.last_name
+            validated_data['email'] = related_user.email
 
-        affiliation_data = validated_data.pop("affiliation")
+
+        affiliation_data:models.Affiliation = validated_data.pop("affiliation")
         if affiliation_data is not None:
-            affiliation, _ = models.AuthorAffiliation.objects.update_or_create(
-                institute=affiliation_data.get("institute", None),
-                department=affiliation_data.get("department", None),
-                nationality=affiliation_data.get("nationality", None),
-                city=affiliation_data.get("city", None),
-                abstract=instance.abstract,
+            affiliation, _ = models.Affiliation.objects.update_or_create(
+                institution=affiliation_data.institution,
+                country=affiliation_data.country,
+                city=affiliation_data.city,
+                user=instance.abstract.user,
             )
-            validated_data["affiliation"] = affiliation
+        else:
+            affiliation, _ = models.Affiliation.objects.update_or_create(
+                institution=validated_data['institution'],
+                country=validated_data['country'],
+                city=validated_data['city'],
+                user=instance.abstract.user,
+            )
+        validated_data["affiliation"] = affiliation
+            
 
         instance = super().update(instance, validated_data)
         normalize_author_order(instance.abstract)
+        
         # transaction.set_rollback(True)
         return instance
 
@@ -190,7 +280,7 @@ class AbstractSerializer(serializers.ModelSerializer):
         read_only_fields = ["created_at", "last_update", "needs_review"]
 
     def get_authors(self, instance):
-        return AuthorSerializer(instance.authors.all(), many=True).data
+        return AuthorSerializer(instance.authors.all(), many=True, context=self.context).data
 
     def get_declarations(self, instance):
         exists = hasattr(instance, "declarations")
@@ -279,7 +369,7 @@ class AbstractSerializer(serializers.ModelSerializer):
         return instance
 
 
-"""RUN VALIDATIONS"""
+"""RUN VALIDATIONS (PARECE QUE SE PUEDEN BORRAR)"""
 
 
 class AbstractSubmitSerializer(serializers.ModelSerializer):

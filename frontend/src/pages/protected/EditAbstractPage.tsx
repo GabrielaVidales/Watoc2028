@@ -1,50 +1,27 @@
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { act, useCallback, useEffect, useRef, useState } from 'react'
 import AbstractDeclarations from '@/forms/AbstractDeclarationsForm'
-// import { Stepper, StepperLabel } from '@/components/ui/stepper'
 import BeforeSubmitPage from './BeforeSubmitPage'
 import EditAuthorsPage from './EditAuthorsPage'
 import EditAbstractBody from '@/forms/wrappers/EditAbstractBody'
-import { Link, useNavigate, useParams, useSearchParams } from 'react-router'
+import { Link, useNavigate, useParams } from 'react-router'
 import { urls } from '@/routes/routes'
 import { Button } from '@/components/ui/button'
-import { Gavel, MessageSquareCode } from 'lucide-react'
-import { useFetch } from '@/hooks/use-fetch'
+import { Gavel, MessageSquareCode, TextQuote, UserPlus } from 'lucide-react'
 import type { AbstractSchema } from '@/schemas/abstract-schemas'
 import { Spinner } from '@/components/ui/spinner'
-import {
-    Breadcrumb,
-    BreadcrumbItem,
-    BreadcrumbLink,
-    BreadcrumbList,
-    BreadcrumbPage,
-    BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb"
-import {
-    Card,
-    CardAction,
-    CardContent,
-    CardDescription,
-    CardFooter,
-    CardHeader,
-    CardTitle,
-} from "@/components/ui/card"
-import {
-    Stepper,
-    StepperContent,
-    StepperDescription,
-    StepperIndicator,
-    StepperItem,
-    StepperNav,
-    StepperPanel,
-    StepperSeparator,
-    StepperTitle,
-    StepperTrigger,
-} from "@/components/reui/stepper"
+import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator, } from "@/components/ui/breadcrumb"
+import { Card, CardAction, CardContent, CardDescription, CardFooter, CardHeader, CardTitle, } from "@/components/ui/card"
+import { Stepper, StepperDescription, StepperIndicator, StepperItem, StepperNav, StepperSeparator, StepperTitle, StepperTrigger, } from "@/components/reui/stepper"
 import { CheckIcon, LoaderCircleIcon } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
-import { Separator } from '@/components/ui/separator'
 import { useQuery } from '@tanstack/react-query'
 import axiosClient from '@/clients/axiosClient'
+import { scrollToElement } from '@/lib/utils'
+import { useScrollSpy } from '@/hooks/useScrollSpy'
+import { ScrollToTop } from '@/components/ScrollToTop'
+import { Separator } from '@/components/ui/separator'
+import ShowAuthorsComponent from '@/components/ShowAuthors'
+import ShowAffiliations from '@/components/ShowAffiliations'
 
 export type EditAbstractCallbacks = {
     onStepBack?: () => void
@@ -53,9 +30,11 @@ export type EditAbstractCallbacks = {
 
 function EditAbstractPage() {
     const navigate = useNavigate()
+    const parentRef = useRef<HTMLDivElement | null>(null)
+
 
     const { id } = useParams()
-    const { data, isLoading } = useQuery<AbstractSchema>({
+    const { data } = useQuery<AbstractSchema>({
         queryKey: ['abstract', 'edit'],
         queryFn: async () => {
             await new Promise(r => setTimeout(r, 1000))
@@ -72,186 +51,269 @@ function EditAbstractPage() {
 
     const [currStep, setCurrState] = useState(1)
     const nextStep = () => {
-        if (currStep < 3) {
+        console.log('Puta madre');
+
+        if (currStep < 4) {
             setCurrState(prev => prev + 1)
         }
     }
     const previousStep = () => {
-        if (currStep > 0) {
+        console.log('Puta madre');
+
+        if (currStep > 1) {
             setCurrState(prev => prev - 1)
         }
     }
 
-    const [searchParams] = useSearchParams()
-    useEffect(() => {
-        console.log(Object.fromEntries(searchParams.entries()));
-
-        const action = searchParams.get('action')
-        if (action === 'submit') {
-            setCurrState(3)
-        }
-    }, [searchParams])
-
-    const renderStep = useCallback((step: number) => {
-        switch (step) {
-            case 1:
-                return (<EditAbstractBody onStepBack={() => navigate(urls.users.viewAbstracts)} onStepForward={nextStep} />)
-            case 2:
-                return (<EditAuthorsPage onStepBack={previousStep} onStepForward={nextStep} />)
-            case 3:
-                return (
-                    <div className='w-full space-y-5'>
-                        <div className="flex gap-3 items-center">
-                            <Gavel className='text-primary-main' />
-                            <h2 className='text-xl font-semibold'>Abstract Declarations</h2>
-                        </div>
-                        <Separator />
-                        <AbstractDeclarations onStepBack={previousStep} onStepForward={nextStep} />
-                    </div>
-                )
-            case 4:
-                return (
-                    <div className='w-full space-y-5 p-5'>
-                        <div className="flex gap-3 items-center">
-                            <MessageSquareCode className='text-primary-main' />
-                            <h2 className='text-xl font-semibold'>Abstract Preview</h2>
-                        </div>
-                        <Separator />
-                        <BeforeSubmitPage onStepBack={previousStep} onStepForward={nextStep} />
-                    </div>
-                )
-            default:
-                return null
-        }
-    }, [currStep])
+    // const renderStep = useCallback((step: number) => {
+    //     switch (step) {
+    //         case 1:
+    //             return (<EditAbstractBody onStepBack={() => navigate(urls.users.viewAbstracts)} onStepForward={nextStep} />)
+    //         case 2:
+    //             return (<EditAuthorsPage onStepBack={previousStep} onStepForward={nextStep} />)
+    //         case 3:
+    //             return (
+    //                 <div className='w-full space-y-5'>
+    //                     <div className="flex gap-3 items-center">
+    //                         <Gavel className='text-primary-main' />
+    //                         <h2 className='text-xl font-semibold'>Abstract Declarations</h2>
+    //                     </div>
+    //                     <Separator />
+    //                     <AbstractDeclarations onStepBack={previousStep} onStepForward={nextStep} />
+    //                 </div>
+    //             )
+    //         case 4:
+    //             return (
+    //                 <div className='w-full space-y-5 p-5'>
+    //                     <div className="flex gap-3 items-center">
+    //                         <MessageSquareCode className='text-primary-main' />
+    //                         <h2 className='text-xl font-semibold'>Abstract Preview</h2>
+    //                     </div>
+    //                     <Separator />
+    //                     <BeforeSubmitPage onStepBack={previousStep} onStepForward={nextStep} />
+    //                 </div>
+    //             )
+    //         default:
+    //             return null
+    //     }
+    // }, [currStep])
 
 
     const steps = [
         {
+            id: 'abstract-content',
             title: 'Content',
             label: 'Enter your abstract title, body, and references.',
         },
         {
+            id: 'abstract-authors',
             title: 'Authors',
             label: 'Add authors and their affiliations.',
         },
         {
+            id: 'abstract-declarations',
             title: 'Declarations',
             label: 'Review and accept the required declarations.',
         },
         {
+            id: 'abstract-review',
             title: 'Review',
             label: 'Review your submission and submit your abstract.',
         },
     ]
 
-    return (
-        <div className='w-full max-w-6xl mx-auto'>
-            <Breadcrumb className='mb-8'>
-                <BreadcrumbList>
-                    <BreadcrumbItem>
-                        <BreadcrumbLink asChild>
-                            <Link to={urls.users.profile}>
-                                Dashboard
-                            </Link>
-                        </BreadcrumbLink>
-                    </BreadcrumbItem>
-                    <BreadcrumbSeparator />
-                    <BreadcrumbItem>
-                        <BreadcrumbLink asChild>
-                            <Link to={urls.users.viewAbstracts}>
-                                Abstract Submissions
-                            </Link>
-                        </BreadcrumbLink>
-                    </BreadcrumbItem>
-                    <BreadcrumbSeparator />
-                    <BreadcrumbItem>
-                        <BreadcrumbPage>Edit</BreadcrumbPage>
-                    </BreadcrumbItem>
-                </BreadcrumbList>
-            </Breadcrumb>
 
-            <div className='w-full flex flex-col lg:flex-row gap-5 mx-auto space-y-6 items-start'>
-                {data && data.status !== 'submitted' ? (
-                    <Stepper
-                        onValueChange={v => {
-                            if (v > 4) {
-                                setCurrState(4)
-                            } else if (v < 1) {
-                                setCurrState(1)
-                            } else {
-                                setCurrState(v)
-                            }
-                        }}
-                        value={currStep}
-                        defaultValue={1}
-                        className="w-full flex flex-col lg:flex-row gap-5 mx-auto space-y-6 items-start"
-                        orientation="vertical"
-                        indicators={{
-                            completed: (
-                                <CheckIcon className="size-3.5" />
-                            ),
-                            loading: (
-                                <LoaderCircleIcon className="size-3.5 animate-spin" />
-                            ),
-                        }}
-                    >
-                        <StepperPanel className="flex-2 w-full">
-                            <div className='mb-4'>
-                                <p>Abstract Submission Portal</p>
-                                <h1 className='text-3xl font-medium'>Edit your Abstract</h1>
-                            </div>
-                            {renderStep(currStep)}
-                        </StepperPanel>
-                        <Card className='flex-1 w-full'>
-                            <CardHeader>
-                                <CardTitle className=''>
-                                    Status
-                                </CardTitle>
-                                <CardDescription>
-                                    Your submission status
-                                </CardDescription>
-                                <CardAction>
-                                    <Badge>
-                                        {data.status.toUpperCase()}
-                                    </Badge>
-                                </CardAction>
-                            </CardHeader>
-                            <CardContent>
-                                <StepperNav>
-                                    {steps.map((step, index) => (
-                                        <StepperItem
-                                            key={index}
-                                            step={index + 1}
-                                            className="relative items-start not-last:flex-1"
-                                        >
-                                            <StepperTrigger className="items-start gap-2.5 pb-12 last:pb-0">
-                                                <StepperIndicator>
-                                                    {index + 1}
-                                                </StepperIndicator>
-                                                <div className="mt-0.5 text-left">
-                                                    <StepperTitle>{step.title}</StepperTitle>
-                                                    <StepperDescription>{step.label}</StepperDescription>
-                                                </div>
-                                            </StepperTrigger>
-                                            {index < steps.length - 1 && (
-                                                <StepperSeparator className="group-data-[state=completed]/step:bg-primary absolute inset-y-0 top-7 left-3 -order-1 m-0 -translate-x-1/2 group-data-[orientation=vertical]/stepper-nav:h-[calc(100%-2rem)]" />
-                                            )}
-                                        </StepperItem>
-                                    ))}
-                                </StepperNav>
-                            </CardContent>
-                            <CardContent className="text-sm text-muted-foreground">
-                                Your abstract is currently in draft. Once you click "Submit", it will move to the <strong>Review Process</strong>.
-                            </CardContent>
-                            <CardFooter className="justify-end gap-2">
-                                <Button variant="outline">Decline</Button>
-                                <Button>Accept</Button>
-                            </CardFooter>
-                        </Card>
-                    </Stepper>
-                ) : <Spinner />}
-            </div>
+    const activeId = useScrollSpy(steps.map(s => s.id));
+
+    useEffect(() => {
+        const getActiveId = steps.findIndex(i => i.id === activeId) + 1
+        setCurrState(getActiveId)
+    }, [activeId])
+
+    if (!data) {
+        return (
+            <Spinner />
+        )
+    }
+
+    return (
+        <div className="h-full w-full grid grid-cols-1 lg:grid-cols-[1fr_400px] items-start">
+            <main id='main-container' className='bg-slate-200 relative h-full w-full overflow-y-auto no-scrollbar p-5' ref={parentRef}>
+                <Card>
+                    <CardHeader>
+                        <Breadcrumb>
+                            <BreadcrumbList>
+                                <BreadcrumbItem>
+                                    <BreadcrumbLink asChild>
+                                        <Link to={urls.users.profile}>
+                                            Dashboard
+                                        </Link>
+                                    </BreadcrumbLink>
+                                </BreadcrumbItem>
+                                <BreadcrumbSeparator />
+                                <BreadcrumbItem>
+                                    <BreadcrumbLink asChild>
+                                        <Link to={urls.users.viewAbstracts}>
+                                            Abstract Submissions
+                                        </Link>
+                                    </BreadcrumbLink>
+                                </BreadcrumbItem>
+                                <BreadcrumbSeparator />
+                                <BreadcrumbItem>
+                                    <BreadcrumbPage>Edit</BreadcrumbPage>
+                                </BreadcrumbItem>
+                            </BreadcrumbList>
+                        </Breadcrumb>
+                        <CardTitle className='text-2xl'>
+                            Edit Abstract Submission
+                        </CardTitle>
+                        <CardDescription>
+                            asdsadsa
+                        </CardDescription>
+                    </CardHeader>
+
+                    <Separator />
+
+                    <CardContent>
+                        <div id='abstract-content' />
+                        <div className="flex gap-3 items-center">
+                            <TextQuote className='text-primary-main' />
+                            <h2 className='text-xl font-semibold'>Abstract Content</h2>
+                        </div>
+
+                        <EditAbstractBody />
+                    </CardContent>
+
+                    <Separator />
+
+                    <CardContent>
+                        <div id='abstract-authors' />
+                        <div className="flex gap-3 items-center">
+                            <UserPlus className='text-primary-main' />
+                            <h2 className='text-xl font-semibold'>Authors List</h2>
+                        </div>
+
+                        <ShowAuthorsComponent />
+
+                        <ShowAffiliations />
+                    </CardContent>
+
+                    <Separator />
+
+                    <CardContent>
+                        <div id='abstract-declarations' />
+                        <div className="flex gap-3 items-center">
+                            <Gavel className='text-primary-main' />
+                            <h2 className='text-xl font-semibold'>Authors Declarations</h2>
+                        </div>
+
+                        <AbstractDeclarations onStepBack={previousStep} onStepForward={nextStep} />
+                    </CardContent>
+
+                    <Separator />
+
+                    <CardContent>
+                        <div id='abstract-review' />
+                        <div className="flex gap-3 items-center">
+                            <MessageSquareCode className='text-primary-main' />
+                            <h2 className='text-xl font-semibold'>Submission Review</h2>
+                        </div>
+
+                        <div className='sticky top-48'>
+                            <BeforeSubmitPage onStepBack={previousStep} onStepForward={nextStep} />
+                        </div>
+                    </CardContent>
+
+                </Card>
+            </main>
+
+            <aside className="flex-1 h-full w-full border-l bg-background">
+                <div className="sticky top-0 py-8">
+                    <CardHeader>
+                        <CardTitle className=''>
+                            Status
+                        </CardTitle>
+                        <CardDescription>
+                            Your submission status
+                        </CardDescription>
+                        <CardAction>
+                            <Badge>
+                                {data.status.toUpperCase()}
+                            </Badge>
+                        </CardAction>
+                    </CardHeader>
+                    <CardContent>
+                        <Stepper
+                            onValueChange={v => {
+                                // if (v > 4) {
+                                //     setCurrState(4)
+                                // } else if (v < 1) {
+                                //     setCurrState(1)
+                                // } else {
+                                //     setCurrState(v)
+                                // }
+
+                                const id = steps[v - 1].id
+                                const element = document.getElementById(id)
+                                if (element && parentRef.current) {
+                                    const parent = parentRef.current;
+
+                                    // Calculamos la posición del elemento relativa al contenedor main
+                                    const targetOffsetTop = element.offsetTop;
+
+                                    // Restamos unos 16-20px si quieres dejar un pequeño margen de cortesía arriba
+                                    parent.scrollTo({
+                                        top: targetOffsetTop,
+                                        behavior: 'smooth'
+                                    });
+                                }
+                            }}
+                            value={currStep}
+                            defaultValue={2}
+                            className="h-full w-full py-6"
+                            orientation="vertical"
+                            indicators={{
+                                completed: (
+                                    <CheckIcon className="size-3.5" />
+                                ),
+                                loading: (
+                                    <LoaderCircleIcon className="size-3.5 animate-spin" />
+                                ),
+                            }}
+                        >
+                            <StepperNav>
+                                {steps.map((step, index) => (
+                                    <StepperItem
+                                        key={index}
+                                        step={index + 1}
+                                        className="relative items-start not-last:flex-1"
+                                    >
+                                        <StepperTrigger className="items-start gap-2.5 pb-14 last:pb-0">
+                                            <StepperIndicator>
+                                                {index + 1}
+                                            </StepperIndicator>
+                                            <div className="mt-0.5 text-left">
+                                                <StepperTitle className='text-base'>{step.title}</StepperTitle>
+                                                <StepperDescription className='text-sm'>{step.label}</StepperDescription>
+                                            </div>
+                                        </StepperTrigger>
+                                        {index < steps.length - 1 && (
+                                            <StepperSeparator className="group-data-[state=completed]/step:bg-primary absolute inset-y-0 top-7 left-3 -order-1 m-0 -translate-x-1/2 group-data-[orientation=vertical]/stepper-nav:h-[calc(100%-2rem)]" />
+                                        )}
+                                    </StepperItem>
+                                ))}
+                            </StepperNav>
+                        </Stepper>
+                    </CardContent>
+                    <CardContent className="text-sm text-muted-foreground">
+                        Your abstract is currently in draft. Once you click "Submit", it will move to the <strong>Review Process</strong>.
+                    </CardContent>
+                    <CardFooter className="justify-end gap-2">
+                        <Button variant="outline" onClick={previousStep}>Decline</Button>
+                        <Button onClick={nextStep}>Accept</Button>
+                    </CardFooter>
+                </div>
+            </aside>
         </div>
     )
 }

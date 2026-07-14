@@ -1,4 +1,4 @@
-import {type BaseOption } from "../forms/components/ControlledInputs";
+// import {type BaseOption } from "../forms/components/ControlledInputs";
 
 export function getCountryImage(country: string) {
     const target = countries.find((item: Country) => item.label === country || item.value === country)
@@ -13,7 +13,8 @@ export function getCountryImage(country: string) {
     return null
 }
 
-export interface Country extends BaseOption {
+export interface Country  {
+    value: string,
     label: string,
     phone: string,
     suggested?: boolean

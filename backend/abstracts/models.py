@@ -84,7 +84,7 @@ class Abstract(models.Model):
 class Affiliation(models.Model):
     class Meta:
         db_table = "affiliations"
-        ordering = ["institution"]
+        ordering = ["-updated_at"]
 
     institution = models.CharField(
         max_length=100,
@@ -108,10 +108,17 @@ class Affiliation(models.Model):
         null=True,
     )
 
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"{self.institution}, {self.city}, {self.country})"
+
 
 class Author(models.Model):
     class Meta:
         db_table = "authors"
+        ordering = ["order"]
 
     abstract = models.ForeignKey(
         Abstract,
@@ -147,8 +154,8 @@ class Author(models.Model):
     email = models.EmailField(blank=True)
     is_corresponding_author = models.BooleanField(default=False)
 
-    class Meta:
-        ordering = ["order"]
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return f"{self.first_name} {self.last_name} ({self.email})"
@@ -162,7 +169,7 @@ class AbstractDeclaration(models.Model):
         Abstract,
         primary_key=True,
         on_delete=models.CASCADE,
-        related_name='declarations',
+        related_name="declarations",
         default=None,
     )
     confirm_accuracy = models.BooleanField(

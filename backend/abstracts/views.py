@@ -1,12 +1,15 @@
 from rest_framework import permissions, status
 from rest_framework.viewsets import ModelViewSet
+from rest_framework.filters import SearchFilter
 from rest_framework.request import Request
 from rest_framework.response import Response
+from rest_framework.exceptions import ValidationError
 from django.contrib.auth import get_user_model
 from django.template.loader import render_to_string
 from rest_framework.decorators import action
 from django.conf import settings
 from django.http import HttpResponse
+from django.db.models import Sum, Count, Q
 from .models import Affiliation, Abstract, Author, AbstactStatus, AbstractDeclaration, AbstractPresentation
 from .serializers import AffiliationSerializer, AbstractSerializer, AuthorSerializer, AbstractDeclarationSerializer, AbstractSubmitSerializer
 import os, logging, html
@@ -17,14 +20,25 @@ logger = logging.getLogger("users")
 
 
 class AffiliationViewSet(ModelViewSet):
-    queryset = Affiliation.objects.all()
     serializer_class = AffiliationSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    search_fields = ["institution", "city", "country"]
+    filter_backends = [SearchFilter]
+
+    def get_queryset(self):
+        queryset = Affiliation.objects.all()
+
+        user = self.request.user
+        if not user.is_staff:
+            queryset = queryset.filter(user__id=user.id)
+
+        return queryset
 
 
 class AbstractView(ModelViewSet):
     queryset = Abstract.objects.all()
     serializer_class = AbstractSerializer
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [permissions.IsAuthenticated]
 
     # region otras vistas
     @action(detail=True, methods=["get"], url_path="affiliations")
@@ -34,23 +48,58 @@ class AbstractView(ModelViewSet):
         return Response(data.data)
 
     @action(detail=True, methods=["get", "patch"], url_path="authors")
-    def get_authors(self, request, pk=None):
+    def get_set_authors(self, request, pk=None):
+        """
+        Esta vista devuelve los autores de un abstract dado (GET)
+        o los actualiza (PATCH)
+        """
+
         abstract = self.get_object()
         if request.method == "PATCH":
             author_data = request.data.get("authors")
-            for index, author in enumerate(author_data, start=1):
-                instance = Author.objects.get(
-                    id=author.get("id"),
-                    abstract=abstract,
+
+            ids = [a["id"] for a in author_data]
+            queryset = Author.objects.filter(id__in=ids)
+
+            # Convertir a lista para facilitar recálculo del orden
+            authors = list(queryset)
+            authors_by_id = {author.id: author for author in authors}
+
+            for i, data in enumerate(author_data, start=1):
+                author = authors_by_id[data["id"]]
+                author.order = i
+                author.is_corresponding_author = data.get(
+                    "is_corresponding_author",
+                    author.is_corresponding_author,
                 )
-                instance.order = index
-                instance.save()
 
-            serializer = AuthorSerializer(abstract.authors, data=author_data, many=True)
-            if serializer.is_valid(raise_exception=True):
-                return Response(serializer.data)
+            corresponding_authors = [author for author in authors if author.is_corresponding_author]
+            corresponding_authors_count = len(corresponding_authors)
+            if corresponding_authors_count == 0:
+                raise ValidationError({"errors": {"root": ["At least one corresponding author is required."]}})
+            if corresponding_authors_count > 1:
+                raise ValidationError(
+                    {
+                        "errors": {
+                            "root": ["There must be exactly one corresponding author."],
+                            "authors": [author.id for author in corresponding_authors if author.is_corresponding_author is True],
+                        }
+                    }
+                )
 
-        serializer = AuthorSerializer(abstract.authors, many=True)
+            rows_affected = Author.objects.bulk_update(authors, ["order", "is_corresponding_author"])
+            print(f"Rows affected: {rows_affected}")
+
+            authors.sort(key=lambda x: x.order)
+
+            serializer = AuthorSerializer(authors, many=True, context={"request": request})
+            return Response(serializer.data)
+
+        serializer = AuthorSerializer(
+            abstract.authors,
+            many=True,
+            context={"request": request},
+        )
         return Response(serializer.data)
 
     @action(detail=True, methods=["get", "patch"], url_path="declarations")
@@ -113,7 +162,7 @@ class AbstractView(ModelViewSet):
     @action(detail=True, methods=["patch"], url_path="submit")
     def submit(self, request, pk=None):
         abstract = self.get_object()
-        
+
         serializer = self.get_serializer(
             abstract,
             data={},
@@ -167,10 +216,8 @@ class AbstractView(ModelViewSet):
     def get_pending_posters(self, request):
         # Empieza con todos los abstracts
         queryset_base = Abstract.objects.all()
-
         # encadena varios filtros pero sin ejecutar
         pending_posters = queryset_base.filter(status=AbstactStatus.SUBMITTED).filter(presentation_type=AbstractPresentation.POSTER).filter(user__email_verified=True).order_by("-last_update")
-
         # aquí es donde realmente ejecuta la consulta, al momento de leer
         serializer = self.get_serializer(pending_posters, many=True)
         return Response(serializer.data)
@@ -191,7 +238,6 @@ class AuthorsView(ModelViewSet):
         is_corresponding_author: boolean
     }
     """
-
 
 class AffiliationsView(ModelViewSet):
     queryset = Affiliation.objects.all()

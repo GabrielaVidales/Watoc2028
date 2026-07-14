@@ -79,7 +79,7 @@ function UserDashboardPage() {
                                     <TableHeader className="bg-muted/50">
                                         <TableRow>
                                             <TableHead className="font-semibold">Title</TableHead>
-                                            <TableHead className="font-semibold">Presentation</TableHead>
+                                            {/* <TableHead className="font-semibold">Presentation</TableHead> */}
                                             <TableHead className="font-semibold">Modified</TableHead>
                                             <TableHead className="font-semibold">Status</TableHead>
                                             <TableHead className="text-right font-semibold">Actions</TableHead>
@@ -89,7 +89,7 @@ function UserDashboardPage() {
                                         {abstracts && abstracts.length > 0 ? (
                                             abstracts.map((abstract) => (
                                                 <TableRow key={abstract.id}>
-                                                    <TableCell className="font-medium max-w-80">
+                                                    <TableCell className="font-medium max-w-80 min-w-40">
                                                         {abstract.title ? (
                                                             <div className="truncate font-semibold text-foreground" title={abstract.title} >
                                                                 {renderHTMLString(abstract.title)}
@@ -102,9 +102,9 @@ function UserDashboardPage() {
                                                         )}
                                                     </TableCell>
 
-                                                    <TableCell className="capitalize text-xs">
+                                                    {/* <TableCell className="capitalize text-xs">
                                                         {abstract.presentation_type?.replace('_', ' ')}
-                                                    </TableCell>
+                                                    </TableCell> */}
 
                                                     <TableCell className="text-xs text-muted-foreground">
                                                         {abstract.last_update ? formatDate(abstract.last_update) : '—'}
@@ -130,12 +130,9 @@ function UserDashboardPage() {
                                                     </TableCell>
 
                                                     <TableCell className="text-right space-x-1">
-                                                        <Button variant="link" size="sm" className="px-1.5 text-blue-600">
-                                                            <Eye />
-                                                        </Button>
                                                         {abstract.status === "draft" || abstract.status === "corrections" ? (
-                                                            <Button variant="link" size="sm" className="px-1.5 text-foreground">
-                                                                <Edit />
+                                                            <Button variant="link" size="icon-sm" className="text-foreground" onClick={() => navigate(urls.users.editAbstract.build({ id: abstract.id }))}>
+                                                                <Edit className='size-5' />
                                                             </Button>
                                                         ) : null}
                                                     </TableCell>

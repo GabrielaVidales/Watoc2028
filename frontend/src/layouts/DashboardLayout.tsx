@@ -15,6 +15,7 @@ import websocketDispatcher from '@/stores/websocket-dispatcher'
 import { toast } from 'sonner'
 import { timeAgo } from '@/utils/utils'
 import type { Notification } from '@/domain/notifications'
+import { ScrollArea } from '@/components/ui/scroll-area'
 
 
 export function DropdownMenuAvatar() {
@@ -155,14 +156,12 @@ function DashboardLayout() {
         <SidebarProvider id='sidebar-provider' className='overflow-y-scroll'>
             <AppSidebar />
 
-            <SidebarInset className="h-screen no-scrollbar bg-slate-50">
-
+            <SidebarInset className="min-h-screen overflow-hidden">
                 <header className="sticky top-0 z-50 border-b bg-background shrink-0">
                     <div className='my-2 px-3 mx-auto flex flex-row justify-between items-center gap-6'>
 
                         <div className='flex flex-row items-center sm:items-start gap-3 max-w-sm shrink-0'>
                             <SidebarTrigger />
-
                         </div>
 
                         <div className='flex flex-row items-center'>
@@ -172,12 +171,10 @@ function DashboardLayout() {
                         </div>
                     </div>
                 </header>
-
-                <div className='p-3 lg:p-5 xl:p-8'>
+                <div className='no-scrollbar overflow-auto'>
                     <Outlet />
                 </div>
             </SidebarInset>
-
         </SidebarProvider>
     )
 }

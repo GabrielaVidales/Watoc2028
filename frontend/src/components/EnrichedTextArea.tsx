@@ -17,7 +17,6 @@ import { useEffect, type ReactNode } from "react"
 
 
 type RichTextEditorProps = {
-    title?: string
     value?: string
     invalid?: boolean,
     footer?: ReactNode
@@ -26,7 +25,7 @@ type RichTextEditorProps = {
     onBlur?: () => void
 } & React.ComponentProps<"textarea">
 
-export default function RichTextEditor({ title, value, invalid, multiline = true, placeholder, onBlur, footer, disabled, className, onChange, maxLength, autoComplete, autoCorrect, spellCheck, name, id }: RichTextEditorProps) {
+export default function RichTextEditor({ value, invalid, multiline = true, placeholder, onBlur, footer, disabled, className, onChange, maxLength, autoComplete, autoCorrect, spellCheck, name, id }: RichTextEditorProps) {
     const editor = useEditor({
         editorProps: {
             handleKeyDown({ }, event) {
@@ -34,31 +33,6 @@ export default function RichTextEditor({ title, value, invalid, multiline = true
                     event.preventDefault()
                     return true
                 }
-
-                return false
-            },
-            handlePaste({ }, event) {
-                // if (!multiline) {
-                //     event.preventDefault()
-
-                //     const html =
-                //         event.clipboardData?.getData("text/html") ||
-                //         event.clipboardData?.getData("text/plain") ||
-                //         ""
-
-                //     // console.log(html);
-
-                //     const sanitized = html
-                //         .replace(/<br\s*\/?>/gi, " ")
-                //         .replace(/<\/p>\s*<p>/gi, " ")
-                //         .replace(/\r?\n/g, " ")
-
-                //     console.log(sanitized)
-
-                //     editor?.commands.insertContent(sanitized)
-
-                //     return true
-                // }
 
                 return false
             },
@@ -70,7 +44,7 @@ export default function RichTextEditor({ title, value, invalid, multiline = true
                 spellcheck: spellCheck ? "true" : "false",
                 maxlength: maxLength?.toString(),
                 class: cn(
-                    "ProseMirror min-h-0 w-full bg-background p-3 text-sm outline-none max-w-none",
+                    "ProseMirror w-full min-w-0 max-w-full bg-background p-3 text-sm outline-none max-w-none",
                     "break-all",
                     "[&_p]:wrap-anywhere",
                     "[&_li]:wrap-anywhere",
@@ -130,7 +104,7 @@ export default function RichTextEditor({ title, value, invalid, multiline = true
         <div
             aria-invalid={invalid}
             className={cn(
-                "group/editor relative w-full overflow-hidden rounded-md border border-input bg-background shadow-xs transition-[color,box-shadow] outline-none",
+                "group/editor relative w-full min-w-0 overflow-hidden rounded-md border border-input bg-background shadow-xs transition-[color,box-shadow] outline-none",
 
                 "focus-within:border-ring",
                 "focus-within:ring-ring/50",
@@ -141,16 +115,6 @@ export default function RichTextEditor({ title, value, invalid, multiline = true
             )}
         >
             <div className={cn("flex items-center gap-2 border-b bg-muted/40 p-2")}>
-                {title && (
-                    <label
-                        htmlFor={id}
-                        onClick={() => editor.commands.focus()}
-                        className="px-2 mr-auto font-medium cursor-text"
-                    >
-                        {title}
-                    </label>
-                )}
-
                 <ToolbarButton
                     onClick={() => editor.chain().focus().toggleBold().run()}
                 >
@@ -182,10 +146,10 @@ export default function RichTextEditor({ title, value, invalid, multiline = true
                 </ToolbarButton>
             </div>
 
-            <EditorContent editor={editor} className="tiptap max-h-full" />
+            <EditorContent editor={editor} className="tiptap w-full min-w-0 max-w-full" />
 
             {footer && (
-                <div className="flex py-1 px-3 w-full border-t">
+                <div className="flex py-1 px-3 w-full">
                     {footer}
                 </div>
             )}

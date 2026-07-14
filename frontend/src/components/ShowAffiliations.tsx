@@ -1,13 +1,18 @@
 import axiosClient from '@/clients/axiosClient';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import React from 'react'
+import React, { useState } from 'react'
 import { Spinner } from './ui/spinner';
 import type { Affiliation } from '@/schemas/affiliation-schema';
 import { Button } from './ui/button';
-import { Edit, School2, Trash2 } from 'lucide-react';
+import { Edit, Plus, School2, Trash2, TriangleAlert } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { RefreshCcwIcon } from "lucide-react"
 import { Empty, EmptyContent, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle, } from "@/components/ui/empty"
+import { AlertDialog, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from './ui/alert-dialog'
+import { CardAction, CardDescription, CardHeader, CardTitle } from './ui/card';
+import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, } from "@/components/ui/dialog"
+import { ScrollArea } from './ui/scroll-area';
+import AffiliationForm from '@/forms/AffiliationForm';
 
 
 type Props = {
@@ -26,6 +31,11 @@ function ShowAffiliations({ onAffiliationClicked }: Props) {
 
     const queryClient = useQueryClient()
 
+    const [edit, setEdit] = React.useState<Affiliation | null>(null)
+    const [openEdit, setOpenEdit] = React.useState<boolean>(false)
+
+    const [open, setOpen] = useState(false)
+    const [deleteAffiliation, setDeleteAffiliation] = useState<Affiliation>(null)
     const deleteMutation = useMutation({
         mutationFn: async (id: number | string) => {
             const { data } = await axiosClient.delete(`/abstracts/affiliations/${id}/`);
@@ -33,6 +43,8 @@ function ShowAffiliations({ onAffiliationClicked }: Props) {
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['affiliations'] });
+            setDeleteAffiliation(null)
+            setOpen(false)
         },
     })
 
@@ -67,32 +79,100 @@ function ShowAffiliations({ onAffiliationClicked }: Props) {
 
     return (
         <div className='space-y-3'>
-            {affiliations?.length > 0 && affiliations.map((item, i) => (
-                <div
-                    key={i}
-                    className={cn(
-                        'cursor-pointer p-3 border-2 border-border rounded-md transition-colors duration-300',
-                        'hover:border-primary-light hover:shadow-md',
-                        'flex flex-col items-start md:flex-row md:items-center justify-between'
-                    )}
-                >
-                    <div>
-                        <h4 className="font-medium">{item.institution}</h4>
-                        <p className="text-muted-foreground text-sm">
-                            {item.city}, {item.country}
-                        </p>
-                    </div>
-                    <fieldset className='ml-auto' disabled={isFetching || deleteMutation.isPending}>
-                        <Button variant='ghost' size='icon-sm' onClick={() => onAffiliationClicked?.(item)}>
-                            <Edit className='text-primary-main size-5' />
+            <AlertDialog open={open} onOpenChange={(v) => { setDeleteAffiliation(null); setOpen(v) }}>
+                <AlertDialogContent size='sm'>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle className="p-3 bg-destructive/10 rounded-full mb-2">
+                            <TriangleAlert className='size-8 text-destructive' />
+                        </AlertDialogTitle>
+                        <AlertDialogTitle>Delete Author?</AlertDialogTitle>
+                        <AlertDialogDescription>
+                            This action <strong>cannot be undone</strong>. This will permanently remove the author from this abstract.
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <Button variant='destructive' onClick={() => deleteMutation.mutate(deleteAffiliation.id)} disabled={deleteMutation.isPending}>
+                            {deleteMutation.isPending ? (<>
+                                <Spinner className="mr-2" />
+                                Deleting...
+                            </>) : 'Delete Author'}
                         </Button>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
 
-                        <Button variant='ghost' size='icon-sm' onClick={() => deleteMutation.mutate(item.id)}>
-                            <Trash2 className='text-destructive size-5' />
-                        </Button>
-                    </fieldset>
-                </div>
-            ))}
+            <Dialog open={openEdit} onOpenChange={() => { setOpenEdit(false); setEdit(null); }}>
+                <DialogContent className='max-w-md w-full'>
+                    <DialogHeader>
+                        <DialogTitle>{edit !== null ? 'Edit Affiliation' : 'New Affiliation'}</DialogTitle>
+                        <DialogDescription>
+                            {edit !== null
+                                ? 'Update the necessary fields below and save your changes.'
+                                : 'Fill out the form below to add a new affiliation to the list.'}
+                        </DialogDescription>
+                    </DialogHeader>
+                    <ScrollArea className="-mx-4 max-h-[60vh] overflow-y-auto px-4 overflow-visible">
+                        <AffiliationForm
+                            id='affiliation-form'
+                            defaults={edit}
+                            onSubmitSuccess={() => { setOpenEdit(false); setEdit(null); }}
+                        />
+                    </ScrollArea>
+                    <DialogDescription className='border-t-2 pt-2'>
+                        Note: The affiliations created here can be assigned to authors when adding them to an abstract submission.
+                        Make sure each author is linked to the correct affiliation before submitting.
+                    </DialogDescription>
+                    <DialogFooter>
+                        <DialogClose asChild>
+                            <Button variant="outline">Cancel</Button>
+                        </DialogClose>
+                        <Button type="submit" form='affiliation-form'>Save changes</Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
+
+            <CardHeader>
+                <CardTitle>Manage Affiliations</CardTitle>
+                <CardDescription>
+                    View, create, edit, or remove affiliation records for your organization.
+                </CardDescription>
+                <CardAction className='mt-auto'>
+                    <Button onClick={() => { setEdit(null); setOpenEdit(true) }}>
+                        <Plus />
+                        Add affiliation
+                    </Button>
+                </CardAction>
+            </CardHeader>
+
+            <div className='space-y-2 p-1 sm:p-3  bg-slate-50 border-dashed border-3 rounded-lg'>
+                {affiliations?.length > 0 && affiliations.map((item, i) => (
+                    <div
+                        key={i}
+                        className={cn(
+                            'cursor-pointer p-3 border-2 border-border rounded-md transition-colors duration-300',
+                            'bg-background hover:border-primary-light hover:shadow-md',
+                            'flex flex-col items-start sm:flex-row sm:items-center justify-between'
+                        )}
+                    >
+                        <div>
+                            <h4 className="font-medium">{item.institution}</h4>
+                            <p className="text-muted-foreground text-sm">
+                                {item.city}, {item.country}
+                            </p>
+                        </div>
+                        <fieldset className='ml-auto' disabled={isFetching || deleteMutation.isPending}>
+                            <Button variant='ghost' size='icon-sm' onClick={() => { setEdit(item); setOpenEdit(true); onAffiliationClicked?.(item) }}>
+                                <Edit className='text-primary-main size-5' />
+                            </Button>
+
+                            <Button variant='ghost' size='icon-sm' onClick={() => { setDeleteAffiliation(item); setOpen(true) }}>
+                                <Trash2 className='text-destructive size-5' />
+                            </Button>
+                        </fieldset>
+                    </div>
+                ))}
+            </div>
         </div>
     )
 }

@@ -1,142 +1,250 @@
-import React, { useEffect, useRef, useState } from 'react'
-import AbstractForm from '../AbstractForm'
+import React, { useEffect, } from 'react'
 import { useParams } from 'react-router'
-import { useFetch } from '@/hooks/use-fetch'
-import { abstractSchema, submitAbstractDefaults, type AbstractSchema } from '@/schemas/abstract-schemas'
-import { FormProvider, useForm } from 'react-hook-form'
+import { abstractSchema, presentationTypes, submitAbstractDefaults, type AbstractSchema } from '@/schemas/abstract-schemas'
+import { Controller, useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import axiosClient from '@/clients/axiosClient'
 import { Button } from '@/components/ui/button'
 import { Spinner } from '@/components/ui/spinner'
-import { AlertTriangle, ChevronLeft, ChevronRight, Save, TextQuote } from 'lucide-react'
-import { Separator } from '@/components/ui/separator'
-import type { EditAbstractCallbacks } from '@/pages/protected/EditAbstractPage'
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogMedia, AlertDialogTitle, AlertDialogTrigger, } from "@/components/ui/alert-dialog"
-import { Card, CardAction, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
+import { HardDriveDownload } from 'lucide-react'
+import { Field, FieldDescription, FieldError, FieldLabel } from '@/components/ui/field'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import RichTextEditor, { countWordsFromHTML } from '@/components/EnrichedTextArea'
+import { InputGroupText } from '@/components/ui/input-group'
+import { cn } from '@/lib/utils'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { isAxiosError } from 'axios'
 
+type AbstractFormProps = {
+    abstract?: AbstractSchema,
+}
 
-function EditAbstractBody({ onStepBack, onStepForward }: EditAbstractCallbacks) {
+function EditAbstractBody({ }: AbstractFormProps) {
     const { id } = useParams()
-    const { data, fetchData } = useFetch<AbstractSchema>(`/abstracts/submissions/${id}/`)
 
-    const form = useForm({
+    const queryClient = useQueryClient()
+
+    const { data: abstract } = useQuery<AbstractSchema>({
+        queryKey: ['abstract', id],
+        queryFn: async () => {
+            const { data } = await axiosClient.get(`/abstracts/submissions/${id}/`)
+            return data
+        }
+    })
+
+    const saveMutation = useMutation({
+        mutationFn: async (data: AbstractSchema) => {
+            const { data: response } = await axiosClient.patch(`/abstracts/submissions/${id}/`, data)
+            return response
+        },
+        onSuccess: () => queryClient.invalidateQueries({ queryKey: ['abstract', id] }),
+        onError: error => {
+            if (isAxiosError(error)) {
+                if (import.meta.env.DEV) {
+                    console.error(error.response.data);
+                }
+            } else if (import.meta.env.DEV) {
+                console.error(error);
+            }
+        }
+    })
+
+    const { control, handleSubmit, reset, formState: { isDirty, isSubmitting, isValid } } = useForm({
         resolver: zodResolver(abstractSchema),
         defaultValues: submitAbstractDefaults.parse({}),
         mode: 'onChange',
     })
 
-    const { isValid, isSubmitting, isDirty } = form.formState
-
-    const onFormSubmit = form.handleSubmit(async (data) => {
-        await axiosClient.patch<AbstractSchema>(`/abstracts/submissions/${id}/`, data)
-        await fetchData()
-    })
-
-    const [open, setOpen] = useState(false)
-    const onValidate = async () => {
-        const valid = await form.trigger(undefined, { shouldFocus: true })
-        if (!valid) {
-            setOpen(true)
-            return
+    const onFormSubmit = handleSubmit(
+        async (data) => {
+            await saveMutation.mutateAsync(data)
+        },
+        async (data) => {
+            if (import.meta.env.DEV) {
+                console.error(data)
+            }
         }
-        onStepForward?.()
-    }
+    )
+
+    useEffect(() => {
+        if (abstract) {
+            reset({
+                presentation_type: abstract.presentation_type,
+                title: abstract.title,
+                references: abstract.references,
+                text: abstract.text,
+            })
+        }
+    }, [abstract])
 
     return (
-        <Card className='max-w-full'>
-            <CardHeader>
-                <CardTitle className="flex gap-3 items-center">
-                    <TextQuote className='text-primary-main' />
-                    <h2 className='text-xl font-semibold'>Abstract Content</h2>
-                </CardTitle>
-                <CardAction className='space-x-3'>
-                    <Button variant='outline' size='icon-lg'>
-                        <ChevronLeft />
-                    </Button>
+        <form onSubmit={onFormSubmit} id='abstract-submission-form' className='max-w-full py-8 space-y-8'>
+            <fieldset disabled={isSubmitting} className='space-y-8'>
+                <Controller
+                    name="presentation_type"
+                    defaultValue='oral'
+                    control={control}
+                    render={({ field, fieldState }) => (
+                        <Field orientation="responsive" data-invalid={fieldState.invalid}>
+                            <FieldLabel htmlFor="presentationType">Presentation Format</FieldLabel>
+                            <Select
+                                name={field.name}
+                                value={field.value}
+                                onValueChange={field.onChange}
+                            >
+                                <SelectTrigger
+                                    id="presentationType"
+                                    aria-invalid={fieldState.invalid}
+                                    className="min-w-30 border-2"
+                                >
+                                    <SelectValue placeholder="Choose an option..." />
+                                </SelectTrigger>
+                                <SelectContent position="item-aligned">
+                                    {presentationTypes.map(item => (
+                                        <SelectItem key={item.value} value={item.value}>
+                                            {item.label}
+                                        </SelectItem>
+                                    ))}
+
+                                </SelectContent>
+                            </Select>
+                            {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                            <FieldDescription>Select the preferred format for presenting your work.</FieldDescription>
+                        </Field>
+                    )}
+                />
+
+                <Controller
+                    name="title"
+                    control={control}
+                    render={({ field, fieldState }) => (
+                        <Field data-invalid={fieldState.invalid} className='w-full'>
+                            <FieldLabel htmlFor={field.name}>Abstract title</FieldLabel>
+                            <RichTextEditor
+                                {...field}
+                                title='Abstract title'
+                                invalid={fieldState.invalid}
+                                id={field.name}
+                                multiline={false}
+                                autoComplete="off"
+                                autoCorrect="off"
+                                spellCheck="false"
+                                className="wrap-anywhere text-xl"
+                                maxLength={3500}
+                                footer={
+                                    <InputGroupText className={'ml-auto'}>
+                                        <FieldLabel htmlFor={field.name} className={cn(
+                                            (fieldState.invalid || countWordsFromHTML(field.value || "") > 10) && 'text-destructive'
+                                        )}>
+                                            {countWordsFromHTML(field.value || "")}/10 words
+                                        </FieldLabel>
+                                    </InputGroupText>
+                                }
+                            />
+                            {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                        </Field>
+                    )}
+                />
+
+                <Controller
+                    name="text"
+                    control={control}
+                    render={({ field, fieldState }) => (
+                        <Field data-invalid={fieldState.invalid}>
+                            <FieldLabel htmlFor={field.name}>Abstract text</FieldLabel>
+                            <RichTextEditor
+                                {...field}
+                                invalid={fieldState.invalid}
+                                id={field.name}
+                                autoComplete="off"
+                                autoCorrect="off"
+                                spellCheck="false"
+                                placeholder="Provide a concise summary of your work (max. 350 words)..."
+                                className="min-h-40 wrap-anywhere max-h-80"
+                                maxLength={3500}
+                                footer={
+                                    <InputGroupText className={'ml-auto'}>
+                                        <FieldLabel htmlFor={field.name} className={cn(
+                                            (fieldState.invalid || countWordsFromHTML(field.value || "") > 350) && 'text-destructive'
+                                        )}>
+                                            {countWordsFromHTML(field.value || "")}/350 words
+                                        </FieldLabel>
+                                    </InputGroupText>
+                                }
+                            />
+                            {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                        </Field>
+                    )}
+                />
+
+                <Controller
+                    name="references"
+                    control={control}
+                    render={({ field, fieldState }) => (
+                        <Field data-invalid={fieldState.invalid}>
+                            <FieldLabel htmlFor={field.name}>References</FieldLabel>
+                            <RichTextEditor
+                                {...field}
+                                invalid={fieldState.invalid}
+                                id={field.name}
+                                autoComplete="off"
+                                autoCorrect="off"
+                                spellCheck="false"
+                                placeholder="Provide the references of your work (max. 350 words)..."
+                                className="min-h-20 wrap-anywhere max-h-80"
+                                maxLength={2000}
+                                footer={
+                                    <InputGroupText className={'ml-auto'}>
+                                        <FieldLabel htmlFor={field.name} className={cn(
+                                            (fieldState.invalid || countWordsFromHTML(field.value || "") > 150) && 'text-destructive'
+                                        )}>
+                                            {countWordsFromHTML(field.value || "")}/150 words
+                                        </FieldLabel>
+                                    </InputGroupText>
+                                }
+                            />
+                            {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                        </Field>
+                    )}
+                />
+            </fieldset>
+
+            <div className="sticky bottom-4 z-20">
+                <div className={cn(
+                    "ml-auto flex w-fit items-center gap-3 rounded-xl border px-4 py-3 shadow-md",
+                    (!isDirty && !isSubmitting) ? 'bg-background/90' : 'bg-background'
+                )}>
+                    {!isDirty && !isSubmitting ? (
+                        <span className="text-sm text-muted-foreground">
+                            No unsaved changes
+                        </span>
+                    ) : (
+                        <span className="text-sm text-muted-foreground">
+                            You have unsaved changes
+                        </span>
+                    )}
+
                     <Button
-                        type='submit'
-                        form='abstract-submission-form'
+                        type="submit"
+                        form="abstract-submission-form"
                         disabled={!isValid || !isDirty}
-                        variant='main'
                     >
-                        {isSubmitting ? <Spinner /> : <Save />}
-                        Save Changes
-                    </Button>
-                    <Button variant='outline' size='icon-lg'>
-                        <ChevronRight />
-                    </Button>
-                </CardAction>
-            </CardHeader>
-            <Separator />
-            <CardContent>
-                <FormProvider {...form}>
-                    <form onSubmit={onFormSubmit} id='abstract-submission-form'>
-                        <AbstractForm abstract={data} />
-                    </form>
-                </FormProvider>
-            </CardContent>
-            <Separator />
-            <CardFooter>
-                <fieldset disabled={isSubmitting} className='flex justify-between items-start gap-2 w-full'>
-                    <Button type='button' onClick={onStepBack}>
-                        <ChevronLeft /> Back
-                    </Button>
+                        {isSubmitting ? (
+                            <>
+                                <Spinner />
+                                <span>Saving...</span>
+                            </>
 
-                    <div className='flex flex-col'>
-                        <Button
-                            type='submit'
-                            form='abstract-submission-form'
-                            disabled={!isValid || !isDirty}
-                        >
-                            {isSubmitting ? <Spinner /> : <Save />}
-                            Save Changes
-                        </Button>
-
-                        {!isDirty && !isSubmitting && (
-                            <p className="text-xs text-muted-foreground animate-in fade-in slide-in-from-top-1">
-                                No changes were made.
-                            </p>
+                        ) : (
+                            <>
+                                <HardDriveDownload />
+                                <span>Save</span>
+                            </>
                         )}
-                    </div>
-
-                    <Button type='button' onClick={onValidate}>
-                        Next <ChevronRight />
                     </Button>
-                </fieldset>
-            </CardFooter>
-
-
-            <AlertDialog open={open} onOpenChange={setOpen}>
-                <AlertDialogContent size="sm">
-                    <AlertDialogHeader>
-                        <AlertDialogMedia className="bg-destructive/10 text-destructive dark:bg-destructive/20 dark:text-destructive">
-                            <AlertTriangle />
-                        </AlertDialogMedia>
-                        <AlertDialogTitle>
-                            Some information is incomplete
-                        </AlertDialogTitle>
-                        <AlertDialogDescription className='text-balance'>
-                            Your abstract contains fields that do not meet the submission requirements.
-                        </AlertDialogDescription>
-                        <AlertDialogDescription className='text-balance'>
-
-                            You may continue to the next step, but these issues must be resolved before
-                            the final submission.
-                        </AlertDialogDescription>
-                    </AlertDialogHeader>
-
-                    <AlertDialogFooter>
-                        <AlertDialogCancel>
-                            Go Back and Fix
-                        </AlertDialogCancel>
-                        <AlertDialogAction variant='destructive' onClick={onStepForward}>
-                            Continue Anyway
-                        </AlertDialogAction>
-                    </AlertDialogFooter>
-                </AlertDialogContent>
-            </AlertDialog>
-        </Card>
-
+                </div>
+            </div>
+        </form>
     )
 }
 
