@@ -34,6 +34,24 @@ class AffiliationViewSet(ModelViewSet):
 
         return queryset
 
+    def destroy(self, request, pk=None):
+        instance = self.get_object()
+
+        authors_count = instance.authors.count()
+        if authors_count != 0:
+            raise ValidationError({"errors": {"root": ["This affiliation cannot be deleted because it is currently assigned to one or more authors."]}})
+
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+    """
+    {
+        user_id: number,
+        institution: string
+        country: string
+        city: string
+    }
+    """
+
 
 class AbstractView(ModelViewSet):
     queryset = Abstract.objects.all()
@@ -236,20 +254,6 @@ class AuthorsView(ModelViewSet):
         last_name: string
         email: string
         is_corresponding_author: boolean
-    }
-    """
-
-class AffiliationsView(ModelViewSet):
-    queryset = Affiliation.objects.all()
-    serializer_class = AffiliationSerializer
-    permission_classes = [permissions.IsAuthenticated]
-
-    """
-    {
-        user_id: number,
-        institution: string
-        country: string
-        city: string
     }
     """
 

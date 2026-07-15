@@ -1,7 +1,6 @@
-import React, { act, useCallback, useEffect, useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import AbstractDeclarations from '@/forms/AbstractDeclarationsForm'
 import BeforeSubmitPage from './BeforeSubmitPage'
-import EditAuthorsPage from './EditAuthorsPage'
 import EditAbstractBody from '@/forms/wrappers/EditAbstractBody'
 import { Link, useNavigate, useParams } from 'react-router'
 import { urls } from '@/routes/routes'
@@ -16,22 +15,17 @@ import { CheckIcon, LoaderCircleIcon } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { useQuery } from '@tanstack/react-query'
 import axiosClient from '@/clients/axiosClient'
-import { scrollToElement } from '@/lib/utils'
+import { cn, } from '@/lib/utils'
 import { useScrollSpy } from '@/hooks/useScrollSpy'
-import { ScrollToTop } from '@/components/ScrollToTop'
 import { Separator } from '@/components/ui/separator'
 import ShowAuthorsComponent from '@/components/ShowAuthors'
 import ShowAffiliations from '@/components/ShowAffiliations'
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger, } from "@/components/ui/accordion"
 
-export type EditAbstractCallbacks = {
-    onStepBack?: () => void
-    onStepForward?: () => void
-}
 
 function EditAbstractPage() {
     const navigate = useNavigate()
     const parentRef = useRef<HTMLDivElement | null>(null)
-
 
     const { id } = useParams()
     const { data } = useQuery<AbstractSchema>({
@@ -65,40 +59,6 @@ function EditAbstractPage() {
         }
     }
 
-    // const renderStep = useCallback((step: number) => {
-    //     switch (step) {
-    //         case 1:
-    //             return (<EditAbstractBody onStepBack={() => navigate(urls.users.viewAbstracts)} onStepForward={nextStep} />)
-    //         case 2:
-    //             return (<EditAuthorsPage onStepBack={previousStep} onStepForward={nextStep} />)
-    //         case 3:
-    //             return (
-    //                 <div className='w-full space-y-5'>
-    //                     <div className="flex gap-3 items-center">
-    //                         <Gavel className='text-primary-main' />
-    //                         <h2 className='text-xl font-semibold'>Abstract Declarations</h2>
-    //                     </div>
-    //                     <Separator />
-    //                     <AbstractDeclarations onStepBack={previousStep} onStepForward={nextStep} />
-    //                 </div>
-    //             )
-    //         case 4:
-    //             return (
-    //                 <div className='w-full space-y-5 p-5'>
-    //                     <div className="flex gap-3 items-center">
-    //                         <MessageSquareCode className='text-primary-main' />
-    //                         <h2 className='text-xl font-semibold'>Abstract Preview</h2>
-    //                     </div>
-    //                     <Separator />
-    //                     <BeforeSubmitPage onStepBack={previousStep} onStepForward={nextStep} />
-    //                 </div>
-    //             )
-    //         default:
-    //             return null
-    //     }
-    // }, [currStep])
-
-
     const steps = [
         {
             id: 'abstract-content',
@@ -122,7 +82,6 @@ function EditAbstractPage() {
         },
     ]
 
-
     const activeId = useScrollSpy(steps.map(s => s.id));
 
     useEffect(() => {
@@ -137,9 +96,9 @@ function EditAbstractPage() {
     }
 
     return (
-        <div className="h-full w-full grid grid-cols-1 lg:grid-cols-[1fr_400px] items-start">
-            <main id='main-container' className='bg-slate-200 relative h-full w-full overflow-y-auto no-scrollbar p-5' ref={parentRef}>
-                <Card>
+        <div className="h-full w-full grid grid-cols-1 lg:grid-cols-[1fr_340px] items-start">
+            <main id='main-container' className='bg-primary-main/20 relative h-full w-full overflow-y-auto no-scrollbar p-8 space-y-5' ref={parentRef}>
+                <Card className='max-w-4xl w-full mx-auto'>
                     <CardHeader>
                         <Breadcrumb>
                             <BreadcrumbList>
@@ -183,9 +142,11 @@ function EditAbstractPage() {
 
                         <EditAbstractBody />
                     </CardContent>
+                </Card>
 
-                    <Separator />
+                <Separator />
 
+                <Card className='max-w-4xl w-full mx-auto'>
                     <CardContent>
                         <div id='abstract-authors' />
                         <div className="flex gap-3 items-center">
@@ -195,11 +156,33 @@ function EditAbstractPage() {
 
                         <ShowAuthorsComponent />
 
-                        <ShowAffiliations />
+                        <Accordion
+                            type="single"
+                            collapsible
+                            className="rounded-lg border"
+                        >
+                            <AccordionItem value={'puta-madre'} className={cn(
+                                "border-b px-4 last:border-b-2",
+                                "group relative cursor-pointer border-2 border-border rounded-md transition-colors duration-300",
+                                "hover:border-primary-light hover:shadow-sm",
+                            )}>
+                                <AccordionTrigger className="cursor-pointer text-base focus-visible:outline-none focus-visible:ring-0">
+                                    Manage affiliations
+                                </AccordionTrigger>
+                                <AccordionContent>
+
+                                    <ShowAffiliations />
+
+                                </AccordionContent>
+                            </AccordionItem>
+                        </Accordion>
+
                     </CardContent>
+                </Card>
 
-                    <Separator />
+                <Separator />
 
+                <Card className='max-w-4xl w-full mx-auto'>
                     <CardContent>
                         <div id='abstract-declarations' />
                         <div className="flex gap-3 items-center">
@@ -207,11 +190,13 @@ function EditAbstractPage() {
                             <h2 className='text-xl font-semibold'>Authors Declarations</h2>
                         </div>
 
-                        <AbstractDeclarations onStepBack={previousStep} onStepForward={nextStep} />
+                        <AbstractDeclarations />
                     </CardContent>
+                </Card>
 
-                    <Separator />
+                <Separator />
 
+                <Card className='max-w-4xl w-full mx-auto'>
                     <CardContent>
                         <div id='abstract-review' />
                         <div className="flex gap-3 items-center">
@@ -219,9 +204,7 @@ function EditAbstractPage() {
                             <h2 className='text-xl font-semibold'>Submission Review</h2>
                         </div>
 
-                        <div className='sticky top-48'>
-                            <BeforeSubmitPage onStepBack={previousStep} onStepForward={nextStep} />
-                        </div>
+                        <BeforeSubmitPage />
                     </CardContent>
 
                 </Card>
@@ -245,14 +228,6 @@ function EditAbstractPage() {
                     <CardContent>
                         <Stepper
                             onValueChange={v => {
-                                // if (v > 4) {
-                                //     setCurrState(4)
-                                // } else if (v < 1) {
-                                //     setCurrState(1)
-                                // } else {
-                                //     setCurrState(v)
-                                // }
-
                                 const id = steps[v - 1].id
                                 const element = document.getElementById(id)
                                 if (element && parentRef.current) {
@@ -293,8 +268,8 @@ function EditAbstractPage() {
                                                 {index + 1}
                                             </StepperIndicator>
                                             <div className="mt-0.5 text-left">
-                                                <StepperTitle className='text-base'>{step.title}</StepperTitle>
-                                                <StepperDescription className='text-sm'>{step.label}</StepperDescription>
+                                                <StepperTitle className='text-sm'>{step.title}</StepperTitle>
+                                                <StepperDescription className='text-xs'>{step.label}</StepperDescription>
                                             </div>
                                         </StepperTrigger>
                                         {index < steps.length - 1 && (

@@ -1,5 +1,4 @@
 import axiosClient from '@/clients/axiosClient'
-import { useAuth } from '@/contexts/AuthContext'
 import type { AuthorSchema } from '@/schemas/author-schema'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import React, { useState } from 'react'
@@ -19,6 +18,7 @@ import { ScrollArea } from './ui/scroll-area'
 import { AuthorForm, AuthorFormContent } from '@/forms/AbstractAuthorForm'
 import { CardAction, CardDescription, CardHeader, CardTitle } from './ui/card'
 import { useParams } from 'react-router'
+
 
 type APIError = {
     root: string[],
@@ -190,7 +190,7 @@ function ShowAuthorsComponent({ }: Props) {
                 />
             )}
 
-            <CardHeader>
+            <CardHeader className='px-0'>
                 <CardDescription>
                     Complete the details (full name, email, affiliation and country) of collaboration authors. You can include a maximum of 16 authors. Please indicate which of the authors will present the abstract.                 </CardDescription>
                 <CardAction>
@@ -325,7 +325,6 @@ function ShowAuthorsComponent({ }: Props) {
                 ))}
             </Sortable>
 
-
             <div className="sticky bottom-4 z-20">
                 <div className={cn(
                     "ml-auto flex w-fit items-center gap-3 rounded-xl border px-4 py-3 shadow-md",
@@ -343,7 +342,6 @@ function ShowAuthorsComponent({ }: Props) {
 
                     <Button
                         type="button"
-                        form="abstract-submission-form"
                         onClick={() => saveAuthorsMutation.mutate(authors)}
                         disabled={data === authors || saveAuthorsMutation.isPending}
                     >

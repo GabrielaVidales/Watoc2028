@@ -1,6 +1,5 @@
-import React, { useMemo } from 'react'
 import z from 'zod'
-import type { EditAbstractCallbacks } from './EditAbstractPage'
+import React, { useMemo } from 'react'
 import { Button } from '@/components/ui/button'
 import { useFetch } from '@/hooks/use-fetch'
 import { abstractDeclarationSchema, type AbstractDeclarationValues } from '@/schemas/abstract-declaration-schema'
@@ -9,13 +8,11 @@ import { useNavigate, useParams } from 'react-router'
 import { ChevronLeft, ChevronRight, Save } from 'lucide-react'
 import { useMutation } from '@/hooks/use-mutation'
 import { isAxiosError } from 'axios'
-import { Spinner } from '@/components/ui/spinner'
-import { Separator } from '@/components/ui/separator'
 import { AbstractData } from '@/components/AbstractData'
 import { urls } from '@/routes/routes'
 
 
-function BeforeSubmitPage({ onStepBack, onStepForward }: EditAbstractCallbacks) {
+function BeforeSubmitPage() {
     const { id } = useParams()
     const navigate = useNavigate()
 
@@ -65,7 +62,7 @@ function BeforeSubmitPage({ onStepBack, onStepForward }: EditAbstractCallbacks) 
     }
 
     return (
-        <div className='space-y-4'>
+        <div className='max-w-full py-8 space-y-8'>
 
             <AbstractData abstract={abstract} authors={authors} declarations={declarations}
                 errors={{
@@ -74,41 +71,6 @@ function BeforeSubmitPage({ onStepBack, onStepForward }: EditAbstractCallbacks) 
                     declarations: declarationsErrors
                 }}
             />
-
-            <Separator />
-
-            <fieldset disabled={loading} className='flex justify-between items-start gap-2 w-full'>
-                <Button type='button' onClick={onStepBack}>
-                    <ChevronLeft /> Back
-                </Button>
-
-                <div className='flex flex-col'>
-                    {abstract?.status === 'submitted' ? (
-                        <Button>
-                            Abstract Submitted
-                        </Button>
-                    ) : (
-                        <Button
-                            type='button'
-                            onClick={sendSubmission}
-                            disabled={!!abstractErrors || !!declarationsErrors || !!authorErrors}
-                        >
-                            {loading ? <Spinner /> : <Save />}
-                            Save Changes
-                        </Button>
-                    )}
-
-                    {(!!abstractErrors || !!declarationsErrors || !!authorErrors) && (
-                        <p className="text-xs text-muted-foreground animate-in fade-in slide-in-from-top-1">
-                            No changes were made.
-                        </p>
-                    )}
-                </div>
-
-                <Button type='button' onClick={onStepForward}>
-                    Next <ChevronRight />
-                </Button>
-            </fieldset>
         </div>
     )
 }

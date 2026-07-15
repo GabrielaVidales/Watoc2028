@@ -114,7 +114,7 @@ export default function RichTextEditor({ value, invalid, multiline = true, place
                 "aria-invalid:focus-within:border-destructive"
             )}
         >
-            <div className={cn("flex items-center gap-2 border-b bg-muted/40 p-2")}>
+            <div className={cn("flex items-center gap-2 border-b bg-muted/40 p-1")}>
                 <ToolbarButton
                     onClick={() => editor.chain().focus().toggleBold().run()}
                 >
@@ -169,7 +169,7 @@ function ToolbarButton({ onClick, children, }: ToolbarButtonProps) {
             size="icon"
             variant={"ghost"}
             onClick={onClick}
-            className={cn("h-8 w-8")}
+            className={cn("size-7")}
         >
             {children}
         </Button>

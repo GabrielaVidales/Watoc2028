@@ -34,24 +34,14 @@ export const declarationsLabels = {
 }
 
 export const abstractDeclarationSchema = z.object({
-  confirm_accuracy: z.boolean().default(false).refine((val) => val === true, {
-    message: "You must confirm that the information is correct.",
-  }),
-  consent_publication: z.boolean().default(false).refine((val) => val === true, {
-    message: "You must consent to the publication of the abstract.",
-  }),
-  submit_on_behalf: z.boolean().default(false).refine((val) => val === true, {
-    message: "You must confirm you are submitting on behalf of all authors.",
-  }),
-  commitment_attendance: z.boolean().default(false).refine((val) => val === true, {
-    message: "You must commit to attending the congress in person.",
-  }),
-  not_previously_published: z.boolean().default(false).refine((val) => val === true, {
-    message: "You must confirm the abstract has not been previously published.",
-  }),
-  no_ai_used: z.boolean().default(false).refine((val) => val === true, {
-    message: "You must certify that no AI tools were used in this work.",
-  }),
+  abstract_id: z.number().optional(),
+  confirm_accuracy: z.boolean().refine((val) => val === true, { message: "Required", }),
+  consent_publication: z.boolean().refine((val) => val === true, { message: "Required", }),
+  submit_on_behalf: z.boolean().refine((val) => val === true, { message: "Required", }),
+  commitment_attendance: z.boolean().refine((val) => val === true, { message: "Required", }),
+  not_previously_published: z.boolean().refine((val) => val === true, { message: "Required", }),
+  no_ai_used: z.boolean().refine((val) => val === true, { message: "Required", }),
 })
 
 export type AbstractDeclarationValues = z.infer<typeof abstractDeclarationSchema>
+

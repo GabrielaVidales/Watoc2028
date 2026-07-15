@@ -7,7 +7,7 @@ import axiosClient from '@/clients/axiosClient'
 import { Button } from '@/components/ui/button'
 import { Spinner } from '@/components/ui/spinner'
 import { HardDriveDownload } from 'lucide-react'
-import { Field, FieldDescription, FieldError, FieldLabel } from '@/components/ui/field'
+import { Field, FieldDescription, FieldError, FieldLabel, FieldTitle } from '@/components/ui/field'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import RichTextEditor, { countWordsFromHTML } from '@/components/EnrichedTextArea'
 import { InputGroupText } from '@/components/ui/input-group'
@@ -87,6 +87,7 @@ function EditAbstractBody({ }: AbstractFormProps) {
                     render={({ field, fieldState }) => (
                         <Field orientation="responsive" data-invalid={fieldState.invalid}>
                             <FieldLabel htmlFor="presentationType">Presentation Format</FieldLabel>
+                            <FieldDescription>Select the preferred format for presenting your work.</FieldDescription>
                             <Select
                                 name={field.name}
                                 value={field.value}
@@ -109,7 +110,6 @@ function EditAbstractBody({ }: AbstractFormProps) {
                                 </SelectContent>
                             </Select>
                             {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-                            <FieldDescription>Select the preferred format for presenting your work.</FieldDescription>
                         </Field>
                     )}
                 />
@@ -120,6 +120,9 @@ function EditAbstractBody({ }: AbstractFormProps) {
                     render={({ field, fieldState }) => (
                         <Field data-invalid={fieldState.invalid} className='w-full'>
                             <FieldLabel htmlFor={field.name}>Abstract title</FieldLabel>
+                            <FieldDescription>
+                                Provide a concise, descriptive title (maximum 10 words). Do not include author names, affiliations, or other identifying information.
+                            </FieldDescription>
                             <RichTextEditor
                                 {...field}
                                 title='Abstract title'
@@ -152,6 +155,9 @@ function EditAbstractBody({ }: AbstractFormProps) {
                     render={({ field, fieldState }) => (
                         <Field data-invalid={fieldState.invalid}>
                             <FieldLabel htmlFor={field.name}>Abstract text</FieldLabel>
+                            <FieldDescription>
+                                Abstract text must not exceed 300 words. Abstracts must be writter in English and not contain any information about the presenters or the institutions involves, this is to facilitate the review process.
+                            </FieldDescription>
                             <RichTextEditor
                                 {...field}
                                 invalid={fieldState.invalid}
@@ -183,6 +189,9 @@ function EditAbstractBody({ }: AbstractFormProps) {
                     render={({ field, fieldState }) => (
                         <Field data-invalid={fieldState.invalid}>
                             <FieldLabel htmlFor={field.name}>References</FieldLabel>
+                            <FieldDescription>
+                                References are required, and must not exceed 150 words.
+                            </FieldDescription>
                             <RichTextEditor
                                 {...field}
                                 invalid={fieldState.invalid}

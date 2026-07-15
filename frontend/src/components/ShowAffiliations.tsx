@@ -13,6 +13,8 @@ import { CardAction, CardDescription, CardHeader, CardTitle } from './ui/card';
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, } from "@/components/ui/dialog"
 import { ScrollArea } from './ui/scroll-area';
 import AffiliationForm from '@/forms/AffiliationForm';
+import { toast } from 'sonner';
+import { isAxiosError } from 'axios';
 
 
 type Props = {
@@ -46,6 +48,14 @@ function ShowAffiliations({ onAffiliationClicked }: Props) {
             setDeleteAffiliation(null)
             setOpen(false)
         },
+        onError: (error) => {
+            if (isAxiosError(error)) {
+                toast.error(error.response.data.errors.root)
+                if (import.meta.env.DEV){
+                    console.error(error.response.data.errors.root);
+                }
+            }
+        }
     })
 
     if (isLoading) return (
@@ -85,9 +95,9 @@ function ShowAffiliations({ onAffiliationClicked }: Props) {
                         <AlertDialogTitle className="p-3 bg-destructive/10 rounded-full mb-2">
                             <TriangleAlert className='size-8 text-destructive' />
                         </AlertDialogTitle>
-                        <AlertDialogTitle>Delete Author?</AlertDialogTitle>
+                        <AlertDialogTitle>Delete Affiliation?</AlertDialogTitle>
                         <AlertDialogDescription>
-                            This action <strong>cannot be undone</strong>. This will permanently remove the author from this abstract.
+                            This action <strong>cannot be undone</strong>. This will permanently remove this affiliation.
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
@@ -132,8 +142,7 @@ function ShowAffiliations({ onAffiliationClicked }: Props) {
                 </DialogContent>
             </Dialog>
 
-            <CardHeader>
-                <CardTitle>Manage Affiliations</CardTitle>
+            <CardHeader className='px-0'>
                 <CardDescription>
                     View, create, edit, or remove affiliation records for your organization.
                 </CardDescription>

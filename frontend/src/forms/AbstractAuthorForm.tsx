@@ -23,6 +23,7 @@ import { countries, getCountryImage } from '@/utils/countriesInfo'
 import { Switch } from '@/components/ui/switch'
 import { isAxiosError } from 'axios'
 import { useAuth } from '@/contexts/AuthContext'
+import { useParams } from 'react-router'
 
 
 export function AuthorForm({ children }: React.PropsWithChildren) {
@@ -57,7 +58,8 @@ type Props = {
     onSubmit?: () => void
 }
 export function AuthorFormContent({ onSubmit, values }: Props) {
-    const { currentUser: { id } } = useAuth()
+    const { id: abstractId } = useParams()
+
     const queryClient = useQueryClient()
 
     const { control, setValue, handleSubmit, getValues, reset, formState: { isSubmitting, isLoading } } = useFormContext<AuthorFormSchema>()
@@ -110,7 +112,7 @@ export function AuthorFormContent({ onSubmit, values }: Props) {
             reset(data)
             onSubmit?.()
             queryClient.invalidateQueries({
-                queryKey: ['authors', id],
+                queryKey: ['authors', abstractId],
             })
         } catch (error) {
             if (isAxiosError(error)) {

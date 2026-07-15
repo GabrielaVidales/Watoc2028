@@ -258,12 +258,10 @@ class AbstractDeclarationSerializer(serializers.ModelSerializer):
     abstract_id = serializers.PrimaryKeyRelatedField(
         queryset=models.Abstract.objects.all(),
         source="abstract",
-        write_only=True,
     )
 
     class Meta:
         model = models.AbstractDeclaration
-        # fields = '__all__'
         exclude = ["abstract"]
 
 

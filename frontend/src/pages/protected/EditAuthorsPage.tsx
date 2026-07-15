@@ -14,6 +14,7 @@ import { Separator } from '@/components/ui/separator'
 import AddOrEditAuthorDialog from '@/forms/wrappers/AddOrEditAuthorDialog'
 import type { EditAbstractCallbacks } from './EditAbstractPage'
 
+"DEPRECAR ESTA MADRE"
 
 function EditAuthorsPage({ onStepBack, onStepForward }: EditAbstractCallbacks) {
     const { id } = useParams()
