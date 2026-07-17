@@ -63,10 +63,10 @@ export function AvatarUpload({
             <div className="relative">
                 <div
                     className={cn(
-                        "group/avatar relative h-30 w-30 cursor-pointer shadow-sm overflow-hidden rounded-full border-2 border-dashed transition-colors",
+                        "group/avatar relative size-40 cursor-pointer shadow-sm overflow-hidden rounded-full bg-muted/50 border-2 border-dashed transition-colors",
                         isDragging
-                            ? "border-primary bg-primary/5"
-                            : "border-muted-foreground/25 hover:border-muted-foreground/20",
+                            ? "border-solid border-primary-light ring-primary-light/50 ring-[3px]"
+                            : "border-input hover:border-primary-light",
                         previewUrl && "border-solid"
                     )}
                     onDragEnter={handleDragEnter}
@@ -85,7 +85,7 @@ export function AvatarUpload({
                         />
                     ) : (
                         <div className="flex h-full w-full items-center justify-center">
-                            <UserIcon className="text-muted-foreground size-6" />
+                            <UserIcon className="text-muted-foreground/25 size-12" />
                         </div>
                     )}
                 </div>
@@ -104,10 +104,10 @@ export function AvatarUpload({
             </div>
 
             <div className="space-y-0.5 text-center">
-                <p className="text-sm font-medium">
+                <p className="font-medium">
                     {currentFile ? "Avatar uploaded" : "Upload avatar"}
                 </p>
-                <p className="text-muted-foreground text-xs">
+                <p className="text-muted-foreground text-sm">
                     PNG, JPG up to {formatBytes(maxSize)}
                 </p>
             </div>

@@ -325,7 +325,7 @@ function ShowAuthorsComponent({ }: Props) {
                 ))}
             </Sortable>
 
-            <div className="sticky bottom-4 z-20">
+            <div className="sticky bottom-20 z-20">
                 <div className={cn(
                     "ml-auto flex w-fit items-center gap-3 rounded-xl border px-4 py-3 shadow-md",
                     (data === authors) ? 'bg-background/90' : 'bg-background'

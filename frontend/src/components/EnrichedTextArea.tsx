@@ -106,8 +106,8 @@ export default function RichTextEditor({ value, invalid, multiline = true, place
             className={cn(
                 "group/editor relative w-full min-w-0 overflow-hidden rounded-md border border-input bg-background shadow-xs transition-[color,box-shadow] outline-none",
 
-                "focus-within:border-ring",
-                "focus-within:ring-ring/50",
+                "focus-within:border-primary-light",
+                "focus-within:ring-primary-light/50",
                 "focus-within:ring-[3px]",
                 "aria-invalid:border-destructive",
                 "aria-invalid:focus-within:ring-destructive/20",

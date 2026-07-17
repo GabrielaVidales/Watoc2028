@@ -96,7 +96,7 @@ function EditAbstractBody({ }: AbstractFormProps) {
                                 <SelectTrigger
                                     id="presentationType"
                                     aria-invalid={fieldState.invalid}
-                                    className="min-w-30 border-2"
+                                    className="min-w-30"
                                 >
                                     <SelectValue placeholder="Choose an option..." />
                                 </SelectTrigger>
@@ -218,7 +218,7 @@ function EditAbstractBody({ }: AbstractFormProps) {
                 />
             </fieldset>
 
-            <div className="sticky bottom-4 z-20">
+            <div className="sticky bottom-20 z-20">
                 <div className={cn(
                     "ml-auto flex w-fit items-center gap-3 rounded-xl border px-4 py-3 shadow-md",
                     (!isDirty && !isSubmitting) ? 'bg-background/90' : 'bg-background'

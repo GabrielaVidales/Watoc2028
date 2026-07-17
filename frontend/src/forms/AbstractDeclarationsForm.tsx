@@ -314,7 +314,7 @@ function AbstractDeclarations() {
                 />
             </fieldset>
 
-            <div className="sticky bottom-4 z-20">
+            <div className="sticky bottom-20 z-20">
                 <Item
                     variant="outline"
                     className={cn(

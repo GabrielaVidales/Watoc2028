@@ -352,7 +352,7 @@ class AbstractSerializer(serializers.ModelSerializer):
         instance.save()
         # TODO Notificación: Abstract creado
         # transaction.on_commit(lambda: signals.on_abstract_created(instance))
-        transaction.set_rollback(True)
+        # transaction.set_rollback(True)
         return instance
 
     @transaction.atomic

@@ -123,35 +123,39 @@ export function AbstractData({ abstract, authors, declarations, errors }: Abstra
                 </h3>
 
                 <div className="divide-y divide-border/60 border rounded-xl overflow-hidden bg-background">
-                    {declarations && Object.keys(declarations).map(field => (
-                        <div key={field} className={cn(
-                            'flex flex-col sm:flex-row sm:items-center justify-between p-4 gap-4 transition-colors',
-                            Boolean(declarationsErrors?.[field]) ? "bg-destructive/5" : "hover:bg-muted/30"
-                        )}>
-                            <FieldContent className="space-y-1">
-                                <FieldTitle className="text-sm font-semibold tracking-tight text-foreground">
-                                    {declarationsLabels?.[field]?.title}
-                                </FieldTitle>
-                                <FieldDescription className='text-xs text-muted-foreground max-w-xl leading-normal'>
-                                    {declarationsLabels?.[field]?.description}
-                                </FieldDescription>
-                                {Boolean(declarationsErrors?.[field]) && (
-                                    <FieldError errors={[declarationsErrors?.[field]?.error]} className="text-xs mt-1" />
-                                )}
-                            </FieldContent>
+                    {declarations && Object.keys(declarations).map(field =>
 
-                            <div className="flex items-center shrink-0 sm:ml-auto">
-                                <span className={cn(
-                                    "text-xs font-bold px-3 py-1.5 rounded-full border tracking-wide shadow-sm min-w-18 text-center",
-                                    declarations?.[field]
-                                        ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/20"
-                                        : "bg-muted text-muted-foreground border-transparent"
+                        field === 'abstract_id' ? null :
+
+                            (
+                                <div key={field} className={cn(
+                                    'flex flex-col sm:flex-row sm:items-center justify-between p-4 gap-4 transition-colors',
+                                    Boolean(declarationsErrors?.[field]) ? "bg-destructive/5" : "hover:bg-muted/30"
                                 )}>
-                                    {declarations?.[field] ? 'Accepted' : 'No'}
-                                </span>
-                            </div>
-                        </div>
-                    ))}
+                                    <FieldContent className="space-y-1">
+                                        <FieldTitle className="text-sm font-semibold tracking-tight text-foreground">
+                                            {declarationsLabels?.[field]?.title}
+                                        </FieldTitle>
+                                        <FieldDescription className='text-xs text-muted-foreground max-w-xl leading-normal'>
+                                            {declarationsLabels?.[field]?.description}
+                                        </FieldDescription>
+                                        {Boolean(declarationsErrors?.[field]) && (
+                                            <FieldError errors={[declarationsErrors?.[field]?.error]} className="text-xs mt-1" />
+                                        )}
+                                    </FieldContent>
+
+                                    <div className="flex items-center shrink-0 sm:ml-auto">
+                                        <span className={cn(
+                                            "text-xs font-bold px-3 py-1.5 rounded-full border tracking-wide shadow-sm min-w-18 text-center",
+                                            declarations?.[field]
+                                                ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/20"
+                                                : "bg-muted text-muted-foreground border-transparent"
+                                        )}>
+                                            {declarations?.[field] ? 'Accepted' : 'No'}
+                                        </span>
+                                    </div>
+                                </div>
+                            ))}
                 </div>
             </div>
         </div>
@@ -234,14 +238,14 @@ const AuthorsPreview = ({ authors }) => {
             <div className="text-sm font-normal leading-relaxed">
                 {authorsLine}
             </div>
-            <div className="flex flex-col gap-1">
+            <div>
                 {uniqueAffiliations.map((aff, idx) => (
-                    <span key={aff.id} className="text-xs mt-1 italic leading-tight">
-                        <sup className="font-bold mr-1 not-italic">{idx + 1}</sup>
-                        {[aff.institute, aff.city, aff.nationality]
+                    <p key={aff.id} className="text-xs mt-1 italic leading-tight">
+                        <sup className="text-[10px] font-bold mr-1 not-italic">{idx + 1}</sup>
+                        {[aff.institution, aff.city, aff.country]
                             .filter(Boolean)
                             .join(", ")}
-                    </span>
+                    </p>
                 ))}
             </div>
         </div>
