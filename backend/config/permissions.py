@@ -10,12 +10,18 @@ class HasCSRFToken(permissions.BasePermission):
 
     def has_permission(self, request, view):
         if request.method in ("POST", "PUT", "PATCH", "DELETE"):
+            if request.dont_enforce_cookies:
+                print('Mobile user -> Skip cookies check')
+                return True
+            
             csrf_header = request.headers.get('X-Csrftoken')
             csrf_cookie = request.COOKIES.get('csrftoken')
             
             if not csrf_cookie or not csrf_header or not compare_digest(csrf_cookie, csrf_header):
                 raise PermissionDenied(
                     {
+                        "client": f'{request.is_mobile}'.lower(),
+                        "dont_enforce_cookies": f'{request.dont_enforce_cookies}'.lower(),
                         "code": "csrf_validation_failed",
                         "message": "CSRF token missing or invalid.",
                         "details": "A valid X-CSRFToken header is required for security purposes.",

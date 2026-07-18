@@ -108,6 +108,8 @@ SIMPLE_JWT = {
 }
 
 MIDDLEWARE = [
+    "config.middleware.ClientOriginMiddleware",
+    "config.middleware.AccessTokenMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
