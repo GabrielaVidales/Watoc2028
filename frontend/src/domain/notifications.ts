@@ -4,9 +4,9 @@ type UserDetail = Omit<UserSchema, 'roles' | 'participant' | 'email_verified'>
 
 type Notification = {
     id?: number
-    recipient
+    recipient: UserDetail
     actor: UserDetail
-    verb: string
+    message: string
     target_url: string
     is_read: boolean
     created_at: number

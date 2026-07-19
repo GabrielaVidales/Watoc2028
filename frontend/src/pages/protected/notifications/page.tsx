@@ -205,7 +205,7 @@ function NotificationsPage() {
                                                         {actorName}
                                                     </span>{" "}
                                                     <span className="text-muted-foreground">
-                                                        {notification.verb}
+                                                        {notification.message}
                                                     </span>
                                                 </p>
 

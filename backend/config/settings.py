@@ -1,7 +1,7 @@
 from pathlib import Path
 from datetime import timedelta
 from dotenv import load_dotenv
-import os
+import os, sys
 
 # Cargar variables de entorno desde el .env
 load_dotenv()
@@ -12,6 +12,7 @@ DEBUG = os.getenv("DEBUG", "False") == "True"
 SECRET_KEY = os.getenv("SECRET_KEY")
 
 BASE_DIR = Path(__file__).resolve().parent.parent
+sys.path.insert(0, os.path.join(BASE_DIR, "apps"))
 
 ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS").split(",")
 
@@ -42,18 +43,20 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    # Respetas que las apps van aquí
+    "apps.auth.apps.AuthConfig",
+    "apps.users.apps.UsersConfig",
+    "apps.abstracts.apps.AbstractsConfig",
+    "apps.notifications.apps.NotificationsConfig",
+    "apps.contact_requests.apps.ContactRequestsConfig",
+    "apps.payments.apps.PaymentsConfig",
+    # Bibliotecas de terceros
     "django_extensions",
     "corsheaders",
     "rest_framework",
     "rest_framework_simplejwt",
     "rest_framework_simplejwt.token_blacklist",
-    "auth",
-    "users",
-    "abstracts",
-    "notifications",
-    "contact_requests",
     "admin_honeypot",
-    "payments",
     "drf_spectacular",
 ]
 
@@ -262,7 +265,7 @@ LOGGING = {
             "style": "{",
         },
         "detailed": {
-            "format": "[{levelname}] {asctime} {name} - {message}",
+            "format": "[{levelname}] {asctime} — {message}",
             "style": "{",
         },
     },
@@ -282,6 +285,7 @@ LOGGING = {
             "backupCount": 5,
             "formatter": "verbose",
             "level": "INFO",
+            "encoding": "utf-8",
         },
         # Archivo solo para errores
         "error_file": {
@@ -291,6 +295,7 @@ LOGGING = {
             "backupCount": 5,
             "formatter": "verbose",
             "level": "ERROR",
+            "encoding": "utf-8",
         },
         # Archivo específico para password reset
         "password_reset_file": {
@@ -300,6 +305,27 @@ LOGGING = {
             "backupCount": 3,
             "formatter": "detailed",
             "level": "INFO",
+            "encoding": "utf-8",
+        },
+        # Archivo específico para logs de abstracts
+        "abstracts_file": {
+            "class": "logging.handlers.RotatingFileHandler",
+            "filename": os.path.join(LOG_DIR, "abstracts.log"),
+            "maxBytes": 1024 * 1024 * 5,  # 5 MB
+            "backupCount": 3,
+            "formatter": "detailed",
+            "level": "INFO",
+            "encoding": "utf-8",
+        },
+        # Archivo específico para logs de notificaciones
+        "notifications_file": {
+            "class": "logging.handlers.RotatingFileHandler",
+            "filename": os.path.join(LOG_DIR, "notifications.log"),
+            "maxBytes": 1024 * 1024 * 5,  # 5 MB
+            "backupCount": 3,
+            "formatter": "detailed",
+            "level": "INFO",
+            "encoding": "utf-8",
         },
     },
     "loggers": {
@@ -314,10 +340,20 @@ LOGGING = {
             "level": "INFO",
             "propagate": False,
         },
-        "users": {
+        "apps.users": {
             "handlers": ["console", "file"],
             "level": "INFO",
             "propagate": False,
+        },
+        "apps.abstracts": {
+            "handlers": ["abstracts_file"],
+            "level": "INFO",
+            "propagate": False,
+        },
+        "apps.notifications": {
+            "handlers": ["notifications_file"],
+            "level": "INFO",
+            "propagate": True,
         },
     },
 }

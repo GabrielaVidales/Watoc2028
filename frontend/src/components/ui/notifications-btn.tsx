@@ -21,7 +21,7 @@ export function NotificationsBell() {
     const { data, isLoading, refetch } = useQuery<NotificationResponse>({
         queryKey: ['notifications'],
         queryFn: async () => {
-            const { data } = await axiosClient.get(`/notifications/for-user/`);
+            const { data } = await axiosClient.get(`/notifications/user/`);
             return data
         },
     })
@@ -79,7 +79,7 @@ export function NotificationsBell() {
                 </Button>
             </PopoverTrigger>
             <PopoverContent align="end" className="max-w-xs sm:max-w-sm md:max-w-md w-full md:w-100 max-sm:px-1">
-                <div className="flex flex-col sm:flex-row gap-2 items-center justify-between border-b px-0 pb-3">
+                <section className="flex flex-col sm:flex-row gap-2 items-center justify-between border-b px-0 pb-3">
                     <div>
                         <h4 className="font-semibold">Notifications</h4>
                         <p className="text-xs text-muted-foreground">
@@ -102,14 +102,15 @@ export function NotificationsBell() {
                             size="icon-sm"
                             variant="outline"
                             onClick={async () => { await refetch() }}
-                            className={cn(
-                                isLoading && "animate-spin"
-                            )}
                         >
-                            <RotateCw />
+                            <RotateCw
+                                className={cn(
+                                    isLoading && "animate-spin"
+                                )}
+                            />
                         </Button>
                     </div>
-                </div>
+                </section>
 
                 <div className="flex h-80 items-center justify-center my-3">
                     <ScrollArea className="w-full h-80 -mr-3 pr-3">
@@ -135,16 +136,15 @@ export function NotificationsBell() {
                             {notifications?.map((notification) => {
                                 const actorName = notification.actor
                                     ? `${notification.actor.first_name} ${notification.actor.last_name}`
-                                    : "[System] —";
+                                    : "System:";
 
                                 return (
                                     <fieldset
                                         disabled={isLoading || mutation.isPending || deleteMut.isPending}
                                         key={notification.id}
                                         className={cn(
-                                            "group relative cursor-pointer p-3 border-2 border-border rounded-md transition-colors duration-300",
+                                            "group relative cursor-pointer p-2 border-2 border-border rounded-md transition-colors duration-300",
                                             "hover:border-primary-light hover:shadow-sm",
-                                            "flex flex-col items-start md:flex-row md:items-center justify-between gap-3",
                                             notification.is_read && "bg-muted-foreground/13"
                                         )}
                                     >
@@ -163,7 +163,7 @@ export function NotificationsBell() {
                                             className="flex flex-1 items-center gap-3 min-w-0 pr-12 md:pr-0"
                                         >
                                             <div className="relative shrink-0">
-                                                <Avatar className="size-11 border shadow-sm">
+                                                <Avatar className="size-10 border shadow-sm">
                                                     <AvatarImage src={notification.actor?.photo as string ?? null} />
                                                     <AvatarFallback>
                                                         {notification.actor ? (
@@ -173,27 +173,27 @@ export function NotificationsBell() {
                                                                 .join("")
                                                                 .slice(0, 2)
                                                         ) : (
-                                                            <Settings className="size-4" />
+                                                            <Settings className="size-6 text-muted-foreground/50" />
                                                         )}
                                                     </AvatarFallback>
                                                 </Avatar>
 
                                                 {!notification.is_read && (
-                                                    <span className="absolute -right-1 -top-1 size-3 rounded-full bg-destructive ring-2 ring-background" />
+                                                    <span className="absolute right-0 top-0 size-2 rounded-full bg-destructive ring-2 ring-background" />
                                                 )}
                                             </div>
 
-                                            <div className="min-w-0 flex-1 text-xs sm:text-sm">
+                                            <div className="min-w-0 flex-1 text-xs">
                                                 <p className="leading-relaxed">
                                                     <span className="font-semibold">
                                                         {actorName}
                                                     </span>{" "}
                                                     <span className="text-muted-foreground">
-                                                        {notification.verb}
+                                                        {notification.message}
                                                     </span>
                                                 </p>
 
-                                                <p className="mt-1 text-muted-foreground">
+                                                <p className="text-xs text-muted-foreground">
                                                     {new Date(notification.created_at).toLocaleString()}
                                                 </p>
                                             </div>
@@ -202,13 +202,13 @@ export function NotificationsBell() {
                                         <DropdownMenu>
                                             <DropdownMenuTrigger asChild>
                                                 <Button variant="ghost" size="icon"
-                                                //  className="shrink-0 opacity-0 transition-opacity group-hover:opacity-100"
-                                                  className={cn(
-            "absolute top-2 right-2 shrink-0 transition-opacity",
-            "opacity-100",
-            "md:opacity-0 md:group-hover:opacity-100"
-        )}
-                                                 >
+                                                    //  className="shrink-0 opacity-0 transition-opacity group-hover:opacity-100"
+                                                    className={cn(
+                                                        "absolute top-2 right-2 shrink-0 transition-opacity",
+                                                        "opacity-100",
+                                                        "md:opacity-0 md:group-hover:opacity-100"
+                                                    )}
+                                                >
                                                     <MoreHorizontal className="size-4" />
                                                 </Button>
                                             </DropdownMenuTrigger>

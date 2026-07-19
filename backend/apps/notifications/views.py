@@ -5,8 +5,6 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from django.db.models import Q
-from django.conf import settings
-from django.core import exceptions
 from .serializers import NotificationSerializer
 from .models import Notification
 from config.permissions import HasCSRFToken
@@ -25,14 +23,11 @@ class NotificationViewSet(ModelViewSet):
         channel_layer = get_channel_layer()
         async_to_sync(channel_layer.group_send)(
             "notificaciones",
-            {
-                "type": "enviar_notificacion",
-                "message": serializer.data
-            }
+            {"type": "enviar_notificacion", "message": serializer.data},
         )
         return Response(serializer.data)
 
-    @action(detail=False, methods=["get"], url_path="for-user")
+    @action(detail=False, methods=["get"], url_path="user")
     def get_for_user(self, request: Request):
         user = request.user
         notifications = self.get_queryset().filter(recipient=user)
@@ -66,13 +61,11 @@ class NotificationViewSet(ModelViewSet):
         notification.is_read = is_read
         notification.save(update_fields=["is_read"])
         serializer = self.get_serializer(notification)
-        return Response(serializer.data)
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
     @action(detail=False, methods=["patch"], url_path="toggle-all-read")
-    def toggle_all_read(self, request:Request, pk:int=None):
+    def toggle_all_read(self, request: Request, pk: int = None):
         user = request.user
         notification = self.get_queryset().filter(Q(recipient=user))
         notification.update(is_read=True)
         return Response(status=status.HTTP_204_NO_CONTENT)
-        
-

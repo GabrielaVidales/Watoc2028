@@ -119,7 +119,7 @@ function NotificationToast({ id, duration = 7000, notification }: { id: number |
                         {actorName}
                     </span>{" "}
                     <span className="text-muted-foreground">
-                        {notification.verb}
+                        {notification.message}
                     </span>
                 </p>
 

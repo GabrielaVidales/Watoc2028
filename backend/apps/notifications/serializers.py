@@ -1,7 +1,5 @@
-from django.utils import timezone
 from rest_framework import serializers
-from users.serializers import UserSerializer
-from users.models import User
+from apps.users.models import User
 from .models import Notification
 
 
@@ -14,7 +12,12 @@ class UserDetailNotification(serializers.ModelSerializer):
             "last_login",
             "email_verified",
             "groups",
+            "is_staff",
+            "is_active",
+            "middle_name",
             "user_permissions",
+            "nationality",
+            "city",
         ]
 
 
@@ -42,7 +45,7 @@ class NotificationSerializer(serializers.ModelSerializer):
             "actor",
             "recipient_id",
             "actor_id",
-            "verb",
+            "message",
             "target_url",
             "is_read",
             "created_at",
@@ -50,4 +53,3 @@ class NotificationSerializer(serializers.ModelSerializer):
         
     def get_created_at(self, obj):
         return int(obj.created_at.timestamp() * 1000)
-

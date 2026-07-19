@@ -51,7 +51,7 @@ function Sockets() {
                             {actorName}
                         </span>{" "}
                         <span className="text-muted-foreground">
-                            {notification.verb}
+                            {notification.vemessagerb}
                         </span>
                     </p>
 

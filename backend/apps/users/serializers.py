@@ -1,3 +1,4 @@
+from apps.abstracts.serializers import AbstractSerializer
 from django.contrib.auth import password_validation
 from django.core import exceptions
 from django.contrib.auth import get_user_model
@@ -9,8 +10,6 @@ import bleach
 
 User = get_user_model()
 
-
-from abstracts.serializers import AbstractSerializer
 
 class ParticipantSerializer(serializers.ModelSerializer):
     abstracts = serializers.SerializerMethodField()
