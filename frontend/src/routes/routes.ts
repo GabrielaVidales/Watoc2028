@@ -92,6 +92,10 @@ export const urls = {
             payment: '/payment',
             dinner: '/dinner',
         }),
+
+        reviews: createRouteGroup('/reviews', {
+            list: '/list'
+        })
     }),
     payments: createRouteGroup('/payments', {
         success: '/success',
