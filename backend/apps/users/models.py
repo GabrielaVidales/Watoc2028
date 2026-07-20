@@ -4,12 +4,9 @@ from .managers import CustomUserManager
 from .text_choices import (
     Nationality,
     PrefixType,
-    AbstractPresentation,
-    AbstactStatus,
     DietaryRestrictionsList,
     FoodAllergiesList,
 )
-import html, bleach
 
 
 class User(AbstractUser):
@@ -70,6 +67,7 @@ class Participant(models.Model):
         User,
         primary_key=True,
         on_delete=models.CASCADE,
+        related_name='participant'
     )
     affiliation = models.CharField(max_length=100, blank=True)
     job_title = models.CharField(max_length=100, blank=True)

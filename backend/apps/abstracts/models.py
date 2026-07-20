@@ -68,6 +68,10 @@ class Abstract(models.Model):
         null=True,
         blank=True,
     )
+    is_editable = models.BooleanField(
+        null=True,
+        blank=True,
+    )
 
     def get_plain_title(self):
         unescaped_title = html.unescape(self.title)

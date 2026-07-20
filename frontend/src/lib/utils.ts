@@ -39,3 +39,15 @@ export const getFileSize = (file: File | number) => {
   const exactSize = (Math.round(size * 100) / 100) + ' ' + units[i];
   return exactSize;
 };
+
+
+export const countWords = (input: string) => {
+  if (!input) return 0
+
+  return input
+    .split(/\s+/)
+    .filter(Boolean)
+    .length
+}
+
+export const countWordsBelowLimit = (input: string, limit: number) => countWords(input) <= limit

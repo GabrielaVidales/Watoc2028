@@ -32,6 +32,7 @@ class UserView(ModelViewSet):
 
     def perform_create(self, serializer):
         user = serializer.save(email_verified=False)
+        # TODO: añadir un transaction.on_commit
         send_email_confirmation_email.delay(user.id)
 
     @action(detail=False, methods=["get"], url_path="session")

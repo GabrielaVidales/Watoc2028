@@ -1,12 +1,12 @@
 import axiosClient from '@/clients/axiosClient';
-import type { NotificationResponse } from '@/domain/notifications';
+import type { NotificationResponse, Notification } from '@/domain/notifications';
 import { cn } from '@/lib/utils';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger, } from "@/components/ui/dropdown-menu"
 import { Link, useNavigate } from 'react-router';
 import React from 'react'
-import { CheckCheck, MessageCircleCheck, MessageCircleReply, MoreHorizontal, RotateCw, Settings, Settings2, Trash2 } from 'lucide-react';
+import { BellOff, CheckCheck, MessageCircleCheck, MessageCircleReply, MoreHorizontal, RotateCw, Settings, Settings2, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
     Breadcrumb,
@@ -27,41 +27,17 @@ import {
 } from "@/components/ui/card"
 import { urls } from '@/routes/routes';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import NotificationItem from './notification-item-component';
 
 
 function NotificationsPage() {
-    const navigate = useNavigate()
 
-    const queryClient = useQueryClient()
-
-    const { data, refetch, isLoading } = useQuery<NotificationResponse>({
+    const { data, } = useQuery<NotificationResponse>({
         queryKey: ['notifications'],
         queryFn: async () => {
-            const { data } = await axiosClient.get(`/notifications/for-user/`);
+            const { data } = await axiosClient.get(`/notifications/user/`);
             console.log(data);
             return data
-        },
-    })
-
-    const mutation = useMutation({
-        mutationFn: async (ctx: { id: number, is_read: boolean }) => {
-            const { data } = await axiosClient.patch(`/notifications/${ctx.id}/toggle-is-read/`, { is_read: ctx.is_read });
-            return data;
-        },
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['notifications'], refetchType: 'all' });
-            refetch()
-        },
-    })
-
-    const deleteMut = useMutation({
-        mutationFn: async (id: number) => {
-            const { data } = await axiosClient.delete(`/notifications/${id}/`);
-            return data;
-        },
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['notifications'], refetchType: 'all' });
-            refetch()
         },
     })
 
@@ -75,8 +51,12 @@ function NotificationsPage() {
 
     const { notifications, unread_count } = data
 
+    const unread: Notification[] = []
+    const read: Notification[] = []
+    notifications.forEach(n => n.is_read ? read.push(n) : unread.push(n))
+
     return (
-        <div className='w-full max-w-5xl mx-auto'>
+        <div className='w-full max-w-5xl mx-auto p-8'>
             <Breadcrumb className='mb-8'>
                 <BreadcrumbList>
                     <BreadcrumbItem>
@@ -111,12 +91,7 @@ function NotificationsPage() {
                 <Card>
                     <CardHeader>
                         <div className="flex items-center justify-between border-b">
-
                             <TabsList variant="line">
-                                <TabsTrigger value="all">
-                                    All
-                                </TabsTrigger>
-
                                 <TabsTrigger value="unread">
                                     Unread
                                 </TabsTrigger>
@@ -124,9 +99,14 @@ function NotificationsPage() {
                                 <TabsTrigger value="read">
                                     Read
                                 </TabsTrigger>
+
+                                <TabsTrigger value="all">
+                                    All
+                                </TabsTrigger>
                             </TabsList>
 
                             <div className="flex gap-2">
+
                                 <Button
                                     size="sm"
                                     variant="outline"
@@ -144,128 +124,61 @@ function NotificationsPage() {
                             </div>
 
                         </div>
-
                     </CardHeader>
+
                     <CardContent>
-                        <TabsContent value="all">
-                            {notifications?.map((notification) => {
-                                const actorName = notification.actor
-                                    ? `${notification.actor.first_name} ${notification.actor.last_name}`
-                                    : "[System] —";
-
-                                return (
-                                    <fieldset
-                                        disabled={isLoading || mutation.isPending || deleteMut.isPending}
-                                        key={notification.id}
-                                        className={cn(
-                                            "group cursor-pointer p-3 border-2 border-border rounded-md transition-colors duration-300",
-                                            "hover:border-primary-light hover:shadow-sm",
-                                            "flex flex-col items-start md:flex-row md:items-center justify-between gap-3",
-                                            notification.is_read && "bg-muted-foreground/13"
-                                        )}
-                                    >
-                                        <div
-                                            onClick={async () => {
-                                                if (!notification.is_read) {
-                                                    await mutation.mutateAsync({
-                                                        id: notification.id,
-                                                        is_read: true,
-                                                    })
-                                                }
-                                                if (notification.target_url) {
-                                                    navigate(notification.target_url || "#")
-                                                }
-                                            }}
-                                            className="flex flex-1 items-center gap-3 min-w-0"
-                                        >
-                                            <div className="relative shrink-0">
-                                                <Avatar className="size-11 border shadow-sm">
-                                                    <AvatarImage src={notification.actor?.photo as string ?? null} />
-                                                    <AvatarFallback>
-                                                        {notification.actor ? (
-                                                            actorName
-                                                                .split(" ")
-                                                                .map((x) => x[0])
-                                                                .join("")
-                                                                .slice(0, 2)
-                                                        ) : (
-                                                            <Settings className="size-4" />
-                                                        )}
-                                                    </AvatarFallback>
-                                                </Avatar>
-
-                                                {!notification.is_read && (
-                                                    <span className="absolute -right-1 -top-1 size-3 rounded-full bg-destructive ring-2 ring-background" />
-                                                )}
-                                            </div>
-
-                                            <div className="min-w-0 flex-1">
-                                                <p className="text-sm leading-relaxed">
-                                                    <span className="font-semibold">
-                                                        {actorName}
-                                                    </span>{" "}
-                                                    <span className="text-muted-foreground">
-                                                        {notification.message}
-                                                    </span>
-                                                </p>
-
-                                                <p className="mt-1 text-xs text-muted-foreground">
-                                                    {new Date(notification.created_at).toLocaleString()}
-                                                </p>
-                                            </div>
+                        <section className='p-3 rounded-lg border-2 border-dashed min-h-70'>
+                            <TabsContent value="unread" className='space-y-1'>
+                                {unread?.map((notification) =>
+                                    <NotificationItem key={notification.id} notification={notification} />
+                                )}
+                                {unread.length === 0 && (
+                                    <div className="flex flex-col items-center justify-center text-center py-12 px-4 animate-in fade-in-50 duration-300">
+                                        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-muted">
+                                            <BellOff className="h-6 w-6 text-muted-foreground" />
                                         </div>
+                                        <h3 className="mt-4 text-sm font-semibold tracking-tight">No unread notifications</h3>
+                                        <p className="mt-1 text-xs text-muted-foreground">
+                                            You're all caught up! You don't have any unread notifications right now.
+                                        </p>
+                                    </div>
+                                )}
+                            </TabsContent>
 
-                                        <DropdownMenu>
-                                            <DropdownMenuTrigger asChild>
-                                                <Button variant="ghost" size="icon" className="shrink-0 opacity-0 transition-opacity group-hover:opacity-100">
-                                                    <MoreHorizontal className="size-4" />
-                                                </Button>
-                                            </DropdownMenuTrigger>
+                            <TabsContent value="read" className='space-y-1'>
+                                {read?.map((notification) =>
+                                    <NotificationItem key={notification.id} notification={notification} />
+                                )}
+                                {read.length === 0 && (
+                                    <div className="flex flex-col items-center justify-center text-center py-12 px-4 animate-in fade-in-50 duration-300">
+                                        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-muted">
+                                            <BellOff className="h-6 w-6 text-muted-foreground" />
+                                        </div>
+                                        <h3 className="mt-4 text-sm font-semibold tracking-tight">No notifications</h3>
+                                        <p className="mt-1 text-xs text-muted-foreground">
+                                            You're all caught up! You don't have any notifications right now.
+                                        </p>
+                                    </div>
+                                )}
+                            </TabsContent>
 
-                                            <DropdownMenuContent className="w-40" align="end">
-                                                <DropdownMenuGroup>
-                                                    <DropdownMenuLabel className="text-xs text-muted-foreground">
-                                                        Actions
-                                                    </DropdownMenuLabel>
-
-                                                    <DropdownMenuItem
-                                                        onClick={() => {
-                                                            mutation.mutate({
-                                                                id: notification.id,
-                                                                is_read: !notification.is_read,
-                                                            })
-                                                        }}
-                                                    >
-                                                        {notification.is_read ? (
-                                                            <React.Fragment>
-                                                                <MessageCircleReply />
-                                                                <span>Mark as unread</span>
-                                                            </React.Fragment>
-                                                        ) : (
-                                                            <React.Fragment>
-                                                                <MessageCircleCheck />
-                                                                <span>Mark as read</span>
-                                                            </React.Fragment>
-                                                        )}
-                                                    </DropdownMenuItem>
-
-                                                    <DropdownMenuItem
-                                                        variant="destructive"
-                                                        onClick={() => {
-                                                            deleteMut.mutate(notification.id)
-                                                        }}
-                                                    >
-                                                        <Trash2 />
-                                                        <span>Delete</span>
-                                                    </DropdownMenuItem>
-                                                </DropdownMenuGroup>
-                                            </DropdownMenuContent>
-                                        </DropdownMenu>
-                                    </fieldset>
-                                );
-                            })}
-                        </TabsContent>
-                        <TabsContent value="read">Change your password here.</TabsContent>
+                            <TabsContent value="all" className='space-y-1'>
+                                {notifications?.map((notification) =>
+                                    <NotificationItem key={notification.id} notification={notification} />
+                                )}
+                                {notifications.length === 0 && (
+                                    <div className="flex flex-col items-center justify-center text-center py-12 px-4 animate-in fade-in-50 duration-300">
+                                        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-muted">
+                                            <BellOff className="h-6 w-6 text-muted-foreground" />
+                                        </div>
+                                        <h3 className="mt-4 text-sm font-semibold tracking-tight">No notifications</h3>
+                                        <p className="mt-1 text-xs text-muted-foreground">
+                                            You're all caught up! You don't have any notifications right now.
+                                        </p>
+                                    </div>
+                                )}
+                            </TabsContent>
+                        </section>
                     </CardContent>
                 </Card>
             </Tabs>

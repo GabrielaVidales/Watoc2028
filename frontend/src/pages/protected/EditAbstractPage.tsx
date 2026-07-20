@@ -110,7 +110,6 @@ function EditAbstractPage() {
 
     return (
         <>
-
             <div className="lg:sticky lg:top-0 h-full grid grid-cols-1 lg:grid-cols-[1fr_340px]">
                 <main id='main-container' className='h-full w-full overflow-y-auto no-scrollbar' ref={parentRef}>
 

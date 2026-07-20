@@ -5,7 +5,6 @@ import { ProtectedRoute } from './contexts/ProtectedRoute'
 import { GuestRoute } from './contexts/GuestRoute'
 
 // import { ThemeProvider } from '@mui/material/styles';
-import CssBaseline from '@mui/material/CssBaseline';
 import RegisterPage from './pages/auth/register/RegisterPage'
 import Home from './pages/home/Home'
 import VenuePage from './pages/venue/VenuePage'
@@ -42,6 +41,9 @@ import TestPage from './pages/test'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import NotificationsPage from './pages/protected/notifications/page'
 import ManageUsersPage from './pages/protected/administration/manage-users/manage_users'
+import ReviewsList from './pages/protected/reviews/list/page'
+import ReviewAbstract from './pages/protected/reviews/view/page'
+import ManageReviewsPage from './pages/protected/administration/manage-reviews/manage-reviews'
 
 function App() {
 	const queryClient = new QueryClient()
@@ -110,9 +112,13 @@ function App() {
 
 						<Route element={<ProtectedRoute allowedRoles={['admin']} />} >
 							<Route path={urls.users.administration.manageUsers} element={<ManageUsersPage />} />
+							<Route path={urls.users.administration.manageReviewers} element={<ManageReviewsPage />} />
 						</Route>
 
-
+						<Route element={<ProtectedRoute allowedRoles={['reviewer']} />} >
+							<Route path={urls.users.reviews.list} element={<ReviewsList />} />
+							<Route path={urls.users.reviews.view.url} element={<ReviewAbstract />} />
+						</Route>
 
 						<Route path={urls.users.profile} element={<UserDashboardPage />} />
 						<Route path={urls.users.settings} element={<SettingsPage />} />

@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     "apps.auth.apps.AuthConfig",
     "apps.users.apps.UsersConfig",
     "apps.abstracts.apps.AbstractsConfig",
+    "apps.reviews.apps.ReviewsConfig",
     "apps.notifications.apps.NotificationsConfig",
     "apps.contact_requests.apps.ContactRequestsConfig",
     "apps.payments.apps.PaymentsConfig",

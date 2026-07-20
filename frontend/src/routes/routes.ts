@@ -94,7 +94,8 @@ export const urls = {
         }),
 
         reviews: createRouteGroup('/reviews', {
-            list: '/list'
+            list: '/list',
+            view: withBuilder('/view/:id')
         })
     }),
     payments: createRouteGroup('/payments', {

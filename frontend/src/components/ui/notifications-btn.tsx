@@ -11,6 +11,7 @@ import { Link, useNavigate } from "react-router"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import axiosClient from "@/clients/axiosClient"
 import { Fragment } from "react"
+import { urls } from "@/routes/routes"
 
 
 export function NotificationsBell() {
@@ -261,7 +262,7 @@ export function NotificationsBell() {
 
                 <div className="border-t">
                     <Button variant="ghost" className="w-full justify-center text-xs" asChild>
-                        <Link to="/notifications">
+                        <Link to={urls.users.notifications}>
                             View all notifications
                             <ArrowRight className="ml-2 size-4" />
                         </Link>

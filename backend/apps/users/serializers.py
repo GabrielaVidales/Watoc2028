@@ -50,6 +50,7 @@ class UserSerializer(serializers.ModelSerializer):
             "last_login",
             "date_joined",
             "participant",
+            "data",
         ]
         extra_kwargs = {
             "first_name": {
@@ -73,11 +74,25 @@ class UserSerializer(serializers.ModelSerializer):
     participant = ParticipantSerializer(required=False)
     photo = serializers.SerializerMethodField()
 
-    def get_photo(self, obj):
-        if not obj.photo:
+    data = serializers.SerializerMethodField()
+
+    def get_data(self, user):
+        data = {}
+        user_is_participant = user.groups.filter(name="participant").exists()
+        if user_is_participant and hasattr(user,'participant'):
+            data['participant'] = ParticipantSerializer(user.participant).data
+            
+        user_is_reviewer = user.groups.filter(name="reviewer").exists()
+        if user_is_reviewer:
+            data['reviewer'] = 'user.review_assignments'
+
+        return data
+
+    def get_photo(self, user):
+        if not user.photo:
             return None
         try:
-            photo_url = obj.photo.url
+            photo_url = user.photo.url
             timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
             request = self.context.get("request")
 
