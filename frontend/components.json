@@ -1,6 +1,6 @@
 {
   "$schema": "https://ui.shadcn.com/schema.json",
-  "style": "new-york-v4",
+  "style": "new-york",
   "rsc": false,
   "tsx": true,
   "tailwind": {
@@ -20,6 +20,11 @@
     "hooks": "@/hooks"
   },
   "registries": {
-    "@reui": "https://reui.io/r/{style}/{name}.json"
+    "@reui": {
+			"url": "https://reui.io/r/base-nova/{name}.json",
+			"headers": {
+				"Authorization": "Bearer ${REUI_LICENSE_KEY}"
+			}
+		}
   }
 }

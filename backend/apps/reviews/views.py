@@ -7,19 +7,22 @@ from apps.reviews.models import ReviewAssignment, Review
 from apps.reviews.serializers import ReviewAssignmentSerializer, ReviewSerializer
 from apps.users.serializers import UserSerializer
 from django.contrib.auth import get_user_model
+from django_filters.rest_framework import DjangoFilterBackend
+from apps.reviews.filters import UserFilter
 
 User = get_user_model()
+
 
 class ReviewAssignmentViewSet(ModelViewSet):
     queryset = ReviewAssignment.objects.all()
     serializer_class = ReviewAssignmentSerializer
     permission_classes = [permissions.AllowAny]
-    
+
     @action(detail=False, methods=["get"], url_path="from-user")
     def get_by_user(self, request, pk=None):
         user = request.user
         queryset = user.review_assignments.all()
-        serializer=self.get_serializer(queryset, many=True)
+        serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
 
     @action(detail=True, methods=["get"], url_path="reviews")
@@ -39,9 +42,13 @@ class ReviewerViewSet(ListAPIView):
     queryset = User.objects.all()
     serializer_class = UserSerializer
     permission_classes = [permissions.AllowAny]
-    
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = UserFilter
+
     def list(self, request):
         queryset = self.queryset.filter(review_assignments__isnull=False).distinct()
+        print(queryset)
+        queryset = self.filter_queryset(self.queryset)
+        print(queryset)
         serializer = self.get_serializer(queryset, many=True)
-        return Response(serializer.data)  
-
+        return Response(serializer.data)

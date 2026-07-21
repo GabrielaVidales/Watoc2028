@@ -1,53 +1,16 @@
-"use client"
-"use no memo"
-
 import type React from "react"
-import {
-  createContext,
-  useCallback,
-  useContext,
-  useEffect,
-  useId,
-  useMemo,
-  useRef,
-  useState,
-} from "react"
+import { createContext, useCallback, useContext, useEffect, useId, useMemo, useRef, useState, } from "react"
 import { useRender } from "@base-ui/react/use-render"
 import { cva } from "class-variance-authority"
-
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
-import {
-  ButtonGroup,
-  ButtonGroupText,
-} from "@/components/ui/button-group"
-import {
-  DropdownMenu,
-  DropdownMenuCheckboxItem,
-  DropdownMenuContent,
-  DropdownMenuGroup,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuSub,
-  DropdownMenuSubContent,
-  DropdownMenuSubTrigger,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+import { ButtonGroup, ButtonGroupText, } from "@/components/ui/button-group"
+import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuSub, DropdownMenuSubContent, DropdownMenuSubTrigger, DropdownMenuTrigger, } from "@/components/ui/dropdown-menu"
 import { Input } from "@/components/ui/input"
-import {
-  InputGroup,
-  InputGroupAddon,
-  InputGroupButton,
-  InputGroupInput,
-  InputGroupText,
-} from "@/components/ui/input-group"
+import { InputGroup, InputGroupAddon, InputGroupButton, InputGroupInput, InputGroupText, } from "@/components/ui/input-group"
 import { Kbd } from "@/components/ui/kbd"
 import { ScrollArea } from "@/components/ui/scroll-area"
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip"
+import { Tooltip, TooltipContent, TooltipTrigger, } from "@/components/ui/tooltip"
 import { AlertCircleIcon, XIcon, CheckIcon, PlusIcon } from "lucide-react"
 
 // i18n Configuration Interface
@@ -351,14 +314,11 @@ function FilterInput<T = unknown>({
         // height on purpose so the style's `.cn-input-group` applies (h-8 nova,
         // h-9 maia/luma, h-7 mira, h-10 sera); sm/lg step down/up from it.
         // Base covers nova/lyra/rhea/vega; only deviating styles are listed.
-        context.size == "sm" &&
-          "h-7!",
-        context.size == "lg" &&
-          "h-9!",
+        context.size == "sm" && "h-8!",
+        context.size == "lg" && "h-9!",
         // Sera's `.cn-input` is `px-0` (underline inputs sit flush); inside a
         // segmented chip that collides with the neighbouring segment, so give
         // the value input the same inline padding sera uses elsewhere.
-        "",
         className
       )}
     >
@@ -379,17 +339,19 @@ function FilterInput<T = unknown>({
         onKeyDown={handleKeyDown}
         className={cn(
           context.size == "sm" &&
-            "h-7! text-xs",
+          "h-7! text-xs",
           context.size == "lg" &&
-            "h-9!"
+          "h-9!",
         )}
         {...props}
       />
       {!isValid && validationMessage && (
         <InputGroupAddon align="inline-end">
           <Tooltip>
-            <TooltipTrigger render={<InputGroupButton size="icon-xs" />}>
-              <AlertCircleIcon className="text-destructive size-3.5" />
+            <TooltipTrigger asChild>
+              <InputGroupButton size="icon-xs">
+                <AlertCircleIcon className="text-destructive size-3.5" />
+              </InputGroupButton>
             </TooltipTrigger>
             <TooltipContent>
               <p className="text-sm">{validationMessage}</p>
@@ -414,8 +376,7 @@ interface FilterRemoveButtonProps extends React.ButtonHTMLAttributes<HTMLButtonE
 function FilterRemoveButton({
   className,
   icon = (
-    <XIcon
-    />
+    <XIcon />
   ),
   ...props
 }: FilterRemoveButtonProps) {
@@ -610,7 +571,7 @@ interface ResolvedFieldOptions<T = unknown> {
   resolveSelected: (values: T[]) => FilterOption<T>[]
 }
 
-// Value->option cache shared across every component instance rendering the
+// Value-option cache shared across every component instance rendering the
 // SAME field object (the Add Filter submenu and the active-filter chip both
 // receive the same config reference from the fields map). Keyed by the field
 // object so it is shared when fields are memoized and garbage-collected
@@ -658,7 +619,7 @@ function useFieldOptions<T = unknown>(
   const [debouncedQuery, setDebouncedQuery] = useState(searchInput)
   useEffect(() => {
     if (!isAsync) return
-    const timer = setTimeout(() => setDebouncedQuery(searchInput), 250)
+    const timer = setTimeout(() => setDebouncedQuery(searchInput), 350)
     return () => clearTimeout(timer)
   }, [searchInput, isAsync])
 
@@ -816,17 +777,15 @@ function FilterOperatorDropdown<T = unknown>({
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger
-        render={
-          <Button
-            variant="outline"
-            size={context.size}
-            className="text-muted-foreground hover:text-foreground"
-          >
-            {operatorLabel}
-          </Button>
-        }
-      />
+      <DropdownMenuTrigger asChild>
+        <Button
+          variant="secondary"
+          size={context.size}
+          className=" text-muted-foreground hover:text-foreground font-normal border-2!"
+        >
+          {operatorLabel}
+        </Button>
+      </DropdownMenuTrigger>
       <DropdownMenuContent align="start" className="w-fit min-w-fit">
         {operators.map((op) => (
           <DropdownMenuItem
@@ -838,9 +797,9 @@ function FilterOperatorDropdown<T = unknown>({
           >
             <span>{op.label}</span>
             <CheckIcon className={cn(
-                                "text-primary ms-auto",
-                                op.value === operator ? "opacity-100" : "opacity-0"
-                              )} />
+              "text-primary ms-auto",
+              op.value === operator ? "opacity-100" : "opacity-0"
+            )} />
           </DropdownMenuItem>
         ))}
       </DropdownMenuContent>
@@ -925,8 +884,8 @@ function SelectOptionsPopover<T = unknown>({
   const filteredUnselectedOptions = isAsync
     ? unselectedOptions
     : unselectedOptions.filter((opt) =>
-        opt.label.toLowerCase().includes(searchInput.toLowerCase())
-      )
+      opt.label.toLowerCase().includes(searchInput.toLowerCase())
+    )
 
   const allFilteredOptions = useMemo(
     () => [...filteredSelectedOptions, ...filteredUnselectedOptions],
@@ -941,6 +900,9 @@ function SelectOptionsPopover<T = unknown>({
   // Toggle a single option, shared by the plain and custom (renderOptionList)
   // renderers so both behave identically.
   const toggleOption = (option: FilterOption<T>) => {
+    const cache = getFieldOptionCache(field);
+    cache.set(option.value, option);
+
     const isSelected = effectiveValues.includes(option.value)
     const next = isSelected
       ? (effectiveValues.filter((v) => v !== option.value) as T[])
@@ -994,6 +956,7 @@ function SelectOptionsPopover<T = unknown>({
     )
   }
 
+  // TODO: Poner que se pueda hacer por debounce
   const renderMenuContent = () => (
     <>
       {field.searchable !== false && (
@@ -1016,7 +979,7 @@ function SelectOptionsPopover<T = unknown>({
             className={cn(
               "border-input h-8 rounded-none border-0 bg-transparent! px-2 text-sm shadow-none",
               "focus-visible:border-border focus-visible:ring-0 focus-visible:ring-offset-0",
-              open && "placeholder:text-foreground"
+              open && "placeholder:text-muted-foreground"
             )}
             value={searchInput}
             onChange={(e) => setSearchInput(e.target.value)}
@@ -1100,7 +1063,7 @@ function SelectOptionsPopover<T = unknown>({
               renderOption: renderOptionItem,
             })
           ) : (
-            <ScrollArea className="size-full min-h-0 **:data-[slot=scroll-area-scrollbar]:m-0 [&_[data-slot=scroll-area-viewport]]:h-full [&_[data-slot=scroll-area-viewport]]:overscroll-contain">
+            <ScrollArea className="size-full min-h-0 **:data-[slot=scroll-area-scrollbar]:m-0 **:data-[slot=scroll-area-viewport]:h-full **:data-[slot=scroll-area-viewport]:overscroll-contain">
               {/* Selected items */}
               {filteredSelectedOptions.length > 0 && (
                 <DropdownMenuGroup className="px-1">
@@ -1148,38 +1111,36 @@ function SelectOptionsPopover<T = unknown>({
         }
       }}
     >
-      <DropdownMenuTrigger
-        render={
-          <Button variant="outline" size={context.size}>
-            <div className="flex items-center gap-1.5">
-              {field.customValueRenderer ? (
-                field.customValueRenderer(
-                  values,
-                  isAsync ? resolveSelected(values) : field.options || []
-                )
-              ) : (
-                <>
-                  {selectedOptions.length > 0 && (
-                    <div className="flex items-center -space-x-1.5">
-                      {selectedOptions.slice(0, 3).map((option) => (
-                        <div key={String(option.value)}>{option.icon}</div>
-                      ))}
-                    </div>
-                  )}
-                  {selectedOptions.length === 1
-                    ? selectedOptions[0].label
-                    : selectedOptions.length > 1
-                      ? `${selectedOptions.length} ${context.i18n.selectedCount}`
-                      : context.i18n.select}
-                </>
-              )}
-            </div>
-          </Button>
-        }
-      />
+      <DropdownMenuTrigger asChild>
+        <Button variant="outline" size={context.size}>
+          <div className="flex items-center font-normal gap-1.5">
+            {field.customValueRenderer ? (
+              field.customValueRenderer(
+                values,
+                isAsync ? resolveSelected(values) : field.options || []
+              )
+            ) : (
+              <>
+                {selectedOptions.length > 0 && (
+                  <div className="flex items-center -space-x-1.5">
+                    {selectedOptions.slice(0, 3).map((option) => (
+                      <div key={String(option.value)}>{option.icon}</div>
+                    ))}
+                  </div>
+                )}
+                {selectedOptions.length === 1
+                  ? selectedOptions[0].label
+                  : selectedOptions.length > 1
+                    ? `${selectedOptions.length} ${context.i18n.selectedCount}`
+                    : context.i18n.select}
+              </>
+            )}
+          </div>
+        </Button>
+      </DropdownMenuTrigger>
       <DropdownMenuContent
         align="start"
-        className={cn("w-[200px] px-0", field.className)}
+        className={cn("w-50 px-0", field.className)}
       >
         {renderMenuContent()}
       </DropdownMenuContent>
@@ -1215,7 +1176,7 @@ function FilterValueSelector<T = unknown>({
         placeholder={field.placeholder}
         pattern={field.pattern}
         field={field}
-        className={cn("w-36", field.className)}
+        className={cn("w-36 h-full", field.className)}
         autoFocus={autoFocus}
       />
     )
@@ -1286,6 +1247,7 @@ export const FiltersContent = <T = unknown,>({
     },
     [filters, onChange]
   )
+
 
   return (
     <div
@@ -1465,7 +1427,12 @@ function FilterSubmenuContent<T = unknown>({
         onSelect={(e) => {
           if (isMultiSelect) e.preventDefault()
         }}
-        onCheckedChange={() => onToggle(option.value as T, isSelected)}
+        onCheckedChange={() => {
+          // ✅ Guardar en caché antes de togglear
+          const cache = getFieldOptionCache(field);
+          cache.set(option.value, option);
+          onToggle(option.value as T, isSelected);
+        }}
       >
         {option.icon && option.icon}
         <span className="truncate">{option.label}</span>
@@ -1499,7 +1466,7 @@ function FilterSubmenuContent<T = unknown>({
             className={cn(
               "h-8 rounded-none border-0 bg-transparent! px-2 text-sm shadow-none",
               "focus-visible:border-border focus-visible:ring-0 focus-visible:ring-offset-0",
-              isActive && "placeholder:text-foreground"
+              isActive && "placeholder:text-muted-foreground"
             )}
             value={searchInput}
             onBlur={() => isActive && inputRef.current?.focus()}
@@ -1614,7 +1581,7 @@ function FilterSubmenuContent<T = unknown>({
               renderOption: renderOptionItem,
             })
           ) : (
-            <ScrollArea className="size-full min-h-0 **:data-[slot=scroll-area-scrollbar]:m-0 [&_[data-slot=scroll-area-viewport]]:h-full [&_[data-slot=scroll-area-viewport]]:overscroll-contain">
+            <ScrollArea className="size-full min-h-0 **:data-[slot=scroll-area-scrollbar]:m-0 **:data-[slot=scroll-area-viewport]:h-full **:data-[slot=scroll-area-viewport]:overscroll-contain">
               <DropdownMenuGroup>
                 {filteredOptions.map((option, index) =>
                   renderOptionItem(option, index)
@@ -1716,6 +1683,35 @@ export function Filters<T = unknown>({
       return () => clearTimeout(timer)
     }
   }, [lastAddedFilterId])
+
+
+  //TODO:
+  const [preloadTrigger, setPreloadTrigger] = useState(0)
+
+  useEffect(() => {
+    // Solo precargar si hay campos con loadOptions y filtros con valores
+    const fieldsWithLoadOptions = flattenFields(fields).filter(f =>
+      f.loadOptions && filters.some(filter => filter.field === f.key && filter.values.length > 0)
+    )
+
+    if (fieldsWithLoadOptions.length === 0) return
+
+    const promises = fieldsWithLoadOptions.map(field => {
+      if (field.loadOptions) {
+        const result = field.loadOptions('')
+
+        return Promise.resolve(result).then(options => {
+          const cache = getFieldOptionCache(field)
+          options.forEach(opt => cache.set(opt.value, opt))
+        })
+      }
+      return Promise.resolve()
+    })
+
+    Promise.all(promises).then(() => {
+      setPreloadTrigger(prev => prev + 1)
+    })
+  }, [filters, fields]) // Dependencias
 
   const mergedI18n: FilterI18nConfig = useMemo(
     () => ({
@@ -1845,9 +1841,11 @@ export function Filters<T = unknown>({
               }
             }}
           >
-            <DropdownMenuTrigger render={triggerButton} />
+            <DropdownMenuTrigger asChild>
+              {triggerButton}
+            </DropdownMenuTrigger>
             <DropdownMenuContent
-              className={cn("w-[220px]", menuPopupClassName)}
+              className={cn("w-55", menuPopupClassName)}
               align="start"
             >
               {showSearchInput && (
@@ -1866,7 +1864,7 @@ export function Filters<T = unknown>({
                       className={cn(
                         "h-8 rounded-none border-0 bg-transparent! px-2 text-sm shadow-none",
                         "focus-visible:border-border focus-visible:ring-0 focus-visible:ring-offset-0",
-                        activeMenu === "root" && "placeholder:text-foreground"
+                        activeMenu === "root" && "placeholder:text-muted-foreground"
                       )}
                       value={menuSearchInput}
                       onFocus={() => setActiveMenu("root")}
@@ -1954,7 +1952,7 @@ export function Filters<T = unknown>({
                   className="flex max-h-[min(var(--available-height),24rem)] w-full scroll-pt-2 scroll-pb-2 flex-col overscroll-contain"
                   role="listbox"
                   id={`${rootId}-listbox`}
-                  onMouseEnter={() => setActiveMenu("root")}
+                // onMouseEnter={() => setActiveMenu("root")}
                 >
                   <ScrollArea className="**:data-[slot=scroll-area-scrollbar]:m-0">
                     {(() => {
@@ -1989,11 +1987,12 @@ export function Filters<T = unknown>({
                               open={openSubMenu === fieldKey}
                               onOpenChange={(open) => {
                                 if (open) {
-                                  setOpenSubMenu(fieldKey)
+                                  setOpenSubMenu(fieldKey);
+                                  setActiveMenu(fieldKey);
                                 } else {
                                   if (openSubMenu === fieldKey) {
-                                    setOpenSubMenu(null)
-                                    setActiveMenu("root")
+                                    setOpenSubMenu(null);
+                                    setActiveMenu("root");
                                   }
                                 }
                               }}
@@ -2005,17 +2004,14 @@ export function Filters<T = unknown>({
                                 data-highlighted={isHighlighted || undefined}
                                 onMouseEnter={() => {
                                   setHighlightedIndex(index)
-                                  setActiveMenu("root")
+                                  // setActiveMenu("root")
                                 }}
                                 className="data-popup-open:bg-accent data-popup-open:text-accent-foreground data-highlighted:bg-accent data-highlighted:text-accent-foreground"
                               >
                                 {field.icon}
                                 <span>{field.label}</span>
                               </DropdownMenuSubTrigger>
-                              <DropdownMenuSubContent
-                                className="w-[200px]"
-                                side="right"
-                              >
+                              <DropdownMenuSubContent className="w-50">
                                 <FilterSubmenuContent
                                   field={field}
                                   currentValues={currentValues}
@@ -2036,8 +2032,8 @@ export function Filters<T = unknown>({
                                     if (isMultiSelect) {
                                       const nextValues = isSelected
                                         ? (currentValues.filter(
-                                            (v) => v !== value
-                                          ) as T[])
+                                          (v) => v !== value
+                                        ) as T[])
                                         : ([...currentValues, value] as T[])
 
                                       if (sessionFilter) {
@@ -2127,7 +2123,7 @@ export function Filters<T = unknown>({
             >
               <ButtonGroupText className="bg-background dark:bg-input/30">
                 {field.icon && field.icon}
-                {field.label}
+                <span className="truncate">{field.label}</span>
               </ButtonGroupText>
               <FilterOperatorDropdown<T>
                 field={field}

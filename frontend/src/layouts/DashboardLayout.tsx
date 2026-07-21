@@ -171,7 +171,7 @@ function DashboardLayout() {
                         </div>
                     </div>
                 </header>
-                <div className='no-scrollbar overflow-auto h-full'>
+                <div className='no-scrollbar overflow-auto h-full bg-muted'>
                     <Outlet />
                 </div>
             </SidebarInset>
