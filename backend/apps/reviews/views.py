@@ -39,16 +39,10 @@ class ReviewViewSet(ModelViewSet):
 
 
 class ReviewerViewSet(ListAPIView):
-    queryset = User.objects.all()
     serializer_class = UserSerializer
     permission_classes = [permissions.AllowAny]
     filter_backends = [DjangoFilterBackend]
     filterset_class = UserFilter
 
-    def list(self, request):
-        queryset = self.queryset.filter(review_assignments__isnull=False).distinct()
-        print(queryset)
-        queryset = self.filter_queryset(self.queryset)
-        print(queryset)
-        serializer = self.get_serializer(queryset, many=True)
-        return Response(serializer.data)
+    def get_queryset(self):
+        return User.objects.filter(review_assignments__isnull=False).distinct()

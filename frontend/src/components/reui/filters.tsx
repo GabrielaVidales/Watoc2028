@@ -11,7 +11,7 @@ import { InputGroup, InputGroupAddon, InputGroupButton, InputGroupInput, InputGr
 import { Kbd } from "@/components/ui/kbd"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Tooltip, TooltipContent, TooltipTrigger, } from "@/components/ui/tooltip"
-import { AlertCircleIcon, XIcon, CheckIcon, PlusIcon } from "lucide-react"
+import { AlertCircleIcon, XIcon, CheckIcon, PlusIcon, Search, FunnelXIcon } from "lucide-react"
 
 // i18n Configuration Interface
 export interface FilterI18nConfig {
@@ -119,8 +119,8 @@ export const DEFAULT_I18N: FilterI18nConfig = {
     isNot: "is not",
     isAnyOf: "is any of",
     isNotAnyOf: "is not any of",
-    includesAll: "includes all",
-    excludesAll: "excludes all",
+    includesAll: "includes",
+    excludesAll: "excludes",
     before: "before",
     after: "after",
     between: "between",
@@ -195,8 +195,8 @@ const useFilterContext = () => useContext(FilterContext)
 const filtersContainerVariants = cva("flex flex-wrap items-center", {
   variants: {
     variant: {
-      solid: "gap-2",
-      default: "",
+      solid: "flex flex-col gap-3 items-start",
+      default: "space-y-1",
     },
     size: {
       sm: "gap-1.5",
@@ -1311,6 +1311,7 @@ interface FiltersProps<T = unknown> {
   i18n?: Partial<FilterI18nConfig>
   showSearchInput?: boolean
   trigger?: React.ReactNode
+  actions?: React.ReactNode
   allowMultiple?: boolean
   menuPopupClassName?: string
   collapseAddButton?: boolean
@@ -1606,6 +1607,7 @@ export function Filters<T = unknown>({
   i18n,
   showSearchInput = true,
   trigger,
+  actions,
   allowMultiple = true,
   menuPopupClassName,
   enableShortcut = false,
@@ -1841,9 +1843,17 @@ export function Filters<T = unknown>({
               }
             }}
           >
-            <DropdownMenuTrigger asChild>
-              {triggerButton}
-            </DropdownMenuTrigger>
+            <div className="w-full flex justify-between gap-3">
+              <DropdownMenuTrigger asChild>
+                {triggerButton}
+              </DropdownMenuTrigger>
+
+              {actions && (
+                <div className='flex gap-3 ml-auto'>
+                  {actions}
+                </div>
+              )}
+            </div>
             <DropdownMenuContent
               className={cn("w-55", menuPopupClassName)}
               align="start"
@@ -2109,39 +2119,43 @@ export function Filters<T = unknown>({
           </DropdownMenu>
         )}
 
-        {filters.map((filter) => {
-          const field = fieldsMap[filter.field]
-          if (!field) return null
-          return (
-            <ButtonGroup
-              key={filter.id}
-              // Sera is an underline style: its group text and input group carry
-              // only a bottom border. Normalise the boxed segments (operator,
-              // value, remove) to the same treatment so the whole chip reads as
-              // one underlined group instead of mixing boxes and rules.
-              className=""
-            >
-              <ButtonGroupText className="bg-background dark:bg-input/30">
-                {field.icon && field.icon}
-                <span className="truncate">{field.label}</span>
-              </ButtonGroupText>
-              <FilterOperatorDropdown<T>
-                field={field}
-                operator={filter.operator}
-                values={filter.values}
-                onChange={(operator) => updateFilter(filter.id, { operator })}
-              />
-              <FilterValueSelector<T>
-                field={field}
-                values={filter.values}
-                operator={filter.operator}
-                onChange={(values) => updateFilter(filter.id, { values })}
-                autoFocus={filter.id === lastAddedFilterId}
-              />
-              <FilterRemoveButton onClick={() => removeFilter(filter.id)} />
-            </ButtonGroup>
-          )
-        })}
+        <ScrollArea className="h-80 w-full rounded-md border-2 border-dashed bg-muted/50">
+          <div className="flex flex-wrap gap-2 p-2">
+            {filters.map((filter) => {
+              const field = fieldsMap[filter.field]
+              if (!field) return null
+              return (
+                <ButtonGroup
+                  key={filter.id}
+                  // Sera is an underline style: its group text and input group carry
+                  // only a bottom border. Normalise the boxed segments (operator,
+                  // value, remove) to the same treatment so the whole chip reads as
+                  // one underlined group instead of mixing boxes and rules.
+                  className="shadow-sm rounded-md"
+                >
+                  <ButtonGroupText className="bg-background dark:bg-input/30 px-3">
+                    {field.icon && field.icon}
+                    <span className="truncate">{field.label}</span>
+                  </ButtonGroupText>
+                  <FilterOperatorDropdown<T>
+                    field={field}
+                    operator={filter.operator}
+                    values={filter.values}
+                    onChange={(operator) => updateFilter(filter.id, { operator })}
+                  />
+                  <FilterValueSelector<T>
+                    field={field}
+                    values={filter.values}
+                    operator={filter.operator}
+                    onChange={(values) => updateFilter(filter.id, { values })}
+                    autoFocus={filter.id === lastAddedFilterId}
+                  />
+                  <FilterRemoveButton onClick={() => removeFilter(filter.id)} />
+                </ButtonGroup>
+              )
+            })}
+          </div>
+        </ScrollArea>
       </div>
     </FilterContext.Provider>
   )
