@@ -2,6 +2,48 @@ import * as React from "react"
 import { Avatar as AvatarPrimitive } from "radix-ui"
 
 import { cn } from "@/lib/utils"
+import { cva, type VariantProps } from "class-variance-authority"
+
+const avatarFallbackVariants = cva(
+  "flex size-full items-center justify-center rounded-full text-sm group-data-[size=sm]/avatar:text-xs",
+  {
+    variants: {
+      variant: {
+        default: 'bg-muted text-muted-foreground',
+        red: "bg-red-500 text-white",
+        orange: "bg-orange-500 text-white",
+        amber: "bg-amber-500 text-white",
+        emerald: "bg-emerald-500 text-white",
+        teal: "bg-teal-500 text-white",
+        cyan: "bg-cyan-500 text-white",
+        blue: "bg-blue-500 text-white",
+        indigo: "bg-indigo-500 text-white",
+        violet: "bg-violet-500 text-white",
+        pink: "bg-pink-500 text-white",
+        rose: "bg-rose-500 text-white",
+      },
+    },
+    defaultVariants: {
+      variant: "default",
+    },
+  }
+)
+
+const VARIANT_KEYS = [
+  "default",
+  "red",
+  "orange",
+  "amber",
+  "emerald",
+  "teal",
+  "cyan",
+  "blue",
+  "indigo",
+  "violet",
+  "pink",
+  "rose",
+] as const
+
 
 function Avatar({
   className,
@@ -36,17 +78,22 @@ function AvatarImage({
   )
 }
 
+export interface AvatarFallbackProps extends React.ComponentPropsWithoutRef<typeof AvatarPrimitive.Fallback>, VariantProps<typeof avatarFallbackVariants> { }
+
 function AvatarFallback({
   className,
+  variant,
   ...props
-}: React.ComponentProps<typeof AvatarPrimitive.Fallback>) {
+}: AvatarFallbackProps) {
+  const randomVariant = React.useMemo(() => {
+    const index = Math.floor(Math.random() * VARIANT_KEYS.length)
+    return VARIANT_KEYS[index > 0 ? index : index + 1]
+  }, [])
+  const selectedVariant = variant || randomVariant
   return (
     <AvatarPrimitive.Fallback
       data-slot="avatar-fallback"
-      className={cn(
-        "bg-muted text-muted-foreground flex size-full items-center justify-center rounded-full text-sm group-data-[size=sm]/avatar:text-xs",
-        className
-      )}
+      className={cn(avatarFallbackVariants({ variant: selectedVariant }), className)}
       {...props}
     />
   )

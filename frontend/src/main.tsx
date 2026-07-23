@@ -5,15 +5,18 @@ import { AuthProvider } from './contexts/AuthContext.js'
 import React, { StrictMode } from 'react'
 import { Toaster } from './components/ui/sonner.jsx'
 import './index.css'
+import { ThemeProvider } from './components/theme-provider.jsx'
 
 
 createRoot(document.getElementById('root')).render(
   // <StrictMode>
-    <AuthProvider>
-      <BrowserRouter>
+  <AuthProvider>
+    <BrowserRouter>
+      <ThemeProvider>
         <App />
-        <Toaster />
-      </BrowserRouter>
-    </AuthProvider>
+      </ThemeProvider>
+      <Toaster />
+    </BrowserRouter>
+  </AuthProvider>
   // </StrictMode>,
 )

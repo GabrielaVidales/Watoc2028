@@ -4,14 +4,15 @@ from rest_framework.filters import SearchFilter
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.exceptions import ValidationError
+from django_filters import rest_framework as filters
 from django.contrib.auth import get_user_model
 from django.template.loader import render_to_string
 from rest_framework.decorators import action
 from django.conf import settings
 from django.http import HttpResponse
-from django.db.models import Sum, Count, Q
+from apps.abstracts.filters import AbstractSearchFilter
 from .models import Affiliation, Abstract, Author, AbstactStatus, AbstractDeclaration, AbstractPresentation
-from .serializers import AffiliationSerializer, AbstractSerializer, AuthorSerializer, AbstractDeclarationSerializer, AbstractSubmitSerializer
+from .serializers import AffiliationSerializer, AbstractSerializer, AuthorSerializer, AbstractDeclarationSerializer
 import os, logging, html
 
 User = get_user_model()
@@ -29,8 +30,8 @@ class AffiliationViewSet(ModelViewSet):
         queryset = Affiliation.objects.all()
 
         user = self.request.user
-        if not user.is_staff:
-            queryset = queryset.filter(user__id=user.id)
+        if user.is_superuser:
+            return queryset.filter(user__id=user.id)
 
         return queryset
 
@@ -57,6 +58,8 @@ class AbstractView(ModelViewSet):
     queryset = Abstract.objects.all()
     serializer_class = AbstractSerializer
     permission_classes = [permissions.IsAuthenticated]
+    filter_backends = [filters.DjangoFilterBackend]
+    filterset_class = AbstractSearchFilter
 
     # region otras vistas
     @action(detail=True, methods=["get"], url_path="affiliations")

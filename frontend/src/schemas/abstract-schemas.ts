@@ -146,6 +146,22 @@ export const validateAuthorsSchema = abstractSchema.pick({ authors: true })
 
 
 
+const abstractDTO = abstractSchema.omit({ user: true }).extend({
+    user: z.object({
+        id: z.number()
+            .optional(),
+        full_name: z.string().trim()
+            .max(310, "Input too long")
+            .optional(),
+        email: z.email('Please provide a valid email address')
+            .max(100, 'Input too long'),
+    }),
+})
+
+export type AbstractDTO = z.infer<typeof abstractDTO>
+
+
+
 export type AbstractSchema = z.infer<typeof abstractSchema>
 
 export type AuthorSchema = z.infer<typeof authorSchema>

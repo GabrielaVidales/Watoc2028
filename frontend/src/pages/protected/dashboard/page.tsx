@@ -240,7 +240,7 @@ function UserDashboardPage() {
                         </CardContent>
                     </Card>
 
-                    <Card className="relative overflow-hidden border border-slate-200 bg-white shadow-sm transition-all hover:shadow-md dark:border-slate-800 dark:bg-slate-950">
+                    <Card className="relative overflow-hidden border border-slate-200  shadow-sm transition-all hover:shadow-md dark:border-slate-800 dark:bg-slate-950">
                         <div className="absolute -right-12 -top-12 h-32 w-32 rounded-full bg-blue-50/50 blur-2xl dark:bg-blue-950/20 pointer-events-none" />
 
                         <CardContent>

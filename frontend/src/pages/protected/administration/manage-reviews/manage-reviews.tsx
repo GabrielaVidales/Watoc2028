@@ -3,7 +3,7 @@ import { createFilter, Filters, type Filter, type FilterFieldConfig, type Filter
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import type { UserSchema } from '@/schemas/user-schemas'
-import { CalendarIcon, CheckCircle2, FunnelXIcon, FilterIcon, IdCard, ListFilterIcon, Mail, Power, Search, ShieldCheck, User2, X, Eye, Trash2, Menu, MoreHorizontal, Plus, Dot, Circle, FunctionSquare } from 'lucide-react'
+import { CalendarIcon, CheckCircle2, FunnelXIcon, FilterIcon, IdCard, ListFilterIcon, Mail, Power, Search, ShieldCheck, User2, X, Eye, Trash2, Menu, MoreHorizontal, Plus, Dot, Circle, FunctionSquare, ListFilter, DatabaseSearch, UserSquare, ArrowBigUpDash, Users, UserCheck, UserX, UserRound, ClipboardCheck } from 'lucide-react'
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { format, } from "date-fns"
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
@@ -18,82 +18,38 @@ import { Badge } from '@/components/ui/badge'
 import { formatDate } from '@/utils/formatDate'
 import { motion, AnimatePresence } from "motion/react"
 import { Separator } from '@/components/ui/separator'
-import { ScrollArea } from '@/components/ui/scroll-area'
+import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area'
+import { useDebounce } from 'use-debounce'
+import { InputGroup, InputGroupAddon, InputGroupInput } from '@/components/ui/input-group'
 
 
 function ManageReviewsPage() {
     const [query, setQuery] = useState('')
+    const [queryParams] = useDebounce(query, 300)
     const { data: filteredUsers, isLoading } = useQuery<UserSchema[]>({
-        queryKey: ['users', query],
+        queryKey: ['users', queryParams],
         queryFn: async () => {
             await new Promise(r => setTimeout(r, 1000))
-            const { data } = await axiosClient.get<UserSchema[]>(`/reviews/users${query}`)
+            const { data } = await axiosClient.get<UserSchema[]>(`/reviews/users${queryParams}`)
             return data
         }
     })
 
     const operators: FilterOperator[] = [
-        { value: "is_any_of", label: 'is' },
-        { value: "is_not_any_of", label: 'is not' },
-        { value: "includes_all", label: 'includes' },
-        { value: "excludes_all", label: 'excludes' },
+        { value: "includes", label: "includes" },
+        { value: "excludes", label: "excludes" },
     ]
 
     const fields = useMemo<FilterFieldConfig[]>(() => [
         {
-            key: 'assignee',
-            label: 'Assignee',
-            icon: <User2 className='size-3.5' />,
-            type: "multiselect",
-            className: "w-40 max-w-40 bg-destructive",
-            placeholder: "Search assignee...",
-            searchable: true,
-            operators: operators,
-            loadOptions: async (query: string) => {
-                console.log(query);
-                const { data } = await axiosClient.get<UserSchema[]>('/reviews/users')
-                return data.map(u => ({
-                    label: u.full_name,
-                    value: u.id,
-                    icon: (
-                        <Avatar className="size-5">
-                            <AvatarImage
-                                src={u.photo as string || null}
-                                alt={u.full_name}
-                            />
-                            <AvatarFallback>{u.first_name[0]}{u.last_name[0]}</AvatarFallback>
-                        </Avatar>
-                    ),
-                }))
-            },
-            customValueRenderer: (values: any[], options: any[]) => {
-                // Buscamos en las opciones actuales (las que devolvió loadOptions)
-                const selected = values.map(val => options.find(opt => opt.value === val)).filter(Boolean);
-                if (selected.length === 0) return <span className="text-muted-foreground">Select...</span>;
-                if (selected.length === 1) {
-                    const user = selected[0];
-                    return (
-                        <span className="flex items-center gap-1.5 max-w-40">
-                            {user.icon || <User2 className="size-3.5" />}
-                              <span className="min-w-0 truncate">{user.label}</span>
-                        </span>
-                    );
-                }
-                return <span>{selected.length} selected</span>;
-            },
-        },
-        {
             key: 'roles',
             label: 'Roles',
-            icon: <ShieldCheck className='size-3.5 text-muted-foreground' />,
+            icon: <ShieldCheck className='size-3.5 shrink-0' />,
             type: 'multiselect',
             className: "w-[180px]",
             placeholder: "Filter by role...",
             defaultOperator: 'includes',
-            operators: [
-                { value: "includes", label: "includes" },
-                { value: "excludes", label: "excludes" },
-            ],
+            operators: operators,
             options: [
                 { value: 'admin', label: 'Administrator', },
                 { value: 'reviewer', label: 'Reviewer', },
@@ -103,7 +59,7 @@ function ManageReviewsPage() {
         {
             key: 'email',
             label: 'Email',
-            icon: <Mail className='size-3.5' />,
+            icon: <Mail className='size-3.5 shrink-0' />,
             type: 'text',
             className: "w-[200px]",
             placeholder: "example@email.com",
@@ -112,7 +68,7 @@ function ManageReviewsPage() {
         {
             key: 'is_active',
             label: 'Status',
-            icon: <CheckCircle2 className='size-3.5 text-muted-foreground' />,
+            icon: <CheckCircle2 className='size-3.5 shrink-0' />,
             type: 'select',
             className: "w-[180px]",
             placeholder: "Select status...",
@@ -121,19 +77,19 @@ function ManageReviewsPage() {
                 {
                     label: 'Active',
                     value: 'true',
-                    icon: <Circle className="size-3 fill-green-600 text-green-600" />
+                    icon: <Circle className="size-3 shrink-0 fill-green-600 text-green-600" />
                 },
                 {
                     label: 'Inactive',
                     value: 'false',
-                    icon: <Circle className="size-3 fill-red-600 text-red-600" />
+                    icon: <Circle className="size-3 shrink-0 fill-red-600 text-red-600" />
                 },
             ]
         },
         {
             key: 'first_name',
             label: 'First name',
-            icon: <IdCard className='size-3.5' />,
+            icon: <IdCard className='size-3.5 shrink-0' />,
             type: 'text',
             className: "w-[150px]",
             operators: []
@@ -141,7 +97,7 @@ function ManageReviewsPage() {
         {
             key: 'last_name',
             label: 'Last name',
-            icon: <IdCard className='size-3.5' />,
+            icon: <IdCard className='size-3.5 shrink-0' />,
             type: 'text',
             className: "w-[150px]",
             operators: []
@@ -149,7 +105,7 @@ function ManageReviewsPage() {
         {
             key: "creation_date",
             label: "Creation Date",
-            icon: <CalendarIcon className="size-3.5" />,
+            icon: <CalendarIcon className="size-3.5 shrink-0" />,
             type: "custom",
             operators: [
                 { value: "is", label: "is" },
@@ -167,12 +123,7 @@ function ManageReviewsPage() {
     ], []);
 
 
-    const [filters, setFilters] = useState<Filter[]>([
-        createFilter('email', 'is', ['eduardo1582000@gmail.com']),
-        createFilter('roles', 'includes', ['reviewer', 'participant']),
-        createFilter('first_name', 'is', ['eduardo']),
-        createFilter('last_name', 'is', ['escalante']),
-    ])
+    const [filters, setFilters] = useState<Filter[]>([])
 
     const handleFiltersChange = useCallback((filters: Filter[]) => {
         setFilters(filters)
@@ -183,144 +134,270 @@ function ManageReviewsPage() {
         setQuery(query)
     }
 
-    return (
-        <div className='w-full mx-auto p-8'>
-            <div>
-                <h1 className="text-2xl font-semibold">
-                    Manage Users
-                </h1>
+    useEffect(() => {
+        const query = filtersToQuery(filters)
+        setQuery(query)
+    }, [filters])
 
-                <p className="text-sm text-muted-foreground">
-                    Search, filter and manage registered users.
-                </p>
+
+    const colorClasses = {
+        blue: {
+            border: "border-t-blue-700",
+            text: "text-blue-700",
+            fill: "fill-blue-700",
+        },
+        green: {
+            border: "border-t-green-700",
+            text: "text-green-700",
+            fill: "fill-green-700",
+        },
+        red: {
+            border: "border-t-red-700",
+            text: "text-red-700",
+            fill: "fill-red-700",
+        },
+        amber: {
+            border: "border-t-amber-700",
+            text: "text-amber-700",
+            fill: "fill-amber-700",
+        },
+    } as const
+
+    return (
+        <div className='w-full h-full flex flex-col'>
+            <div className='bg-background border-b-2 border-b-border p-8'>
+                <div className="flex items-center gap-3">
+                    <div className="flex size-14 shrink-0 items-center justify-center rounded-lg bg-primary-light/10 border-3 border-primary-main/20 text-primary">
+                        <UserSquare className="text-primary-main stroke-2 size-12" />
+                    </div>
+
+                    <div>
+                        <h1 className="text-2xl font-semibold">
+                            Manage Users
+                        </h1>
+                        <p className="text-sm text-muted-foreground">
+                            Search, filter and manage registered users.
+                        </p>
+                    </div>
+                </div>
+
+                <ScrollArea className='flex justify-between gap-5 mt-8 w-full'>
+                    <div className="flex w-max space-x-4">
+                        {[
+                            {
+                                color: "blue",
+                                title: "Total Users",
+                                count: 19,
+                                Icon: Users,
+                            },
+                            {
+                                color: "green",
+                                title: "Active Users",
+                                count: 15,
+                                Icon: UserCheck,
+                            },
+                            {
+                                color: "amber",
+                                title: "Administrators",
+                                count: 2,
+                                Icon: ShieldCheck,
+                            },
+                            {
+                                color: "blue",
+                                title: "Participants",
+                                count: 10,
+                                Icon: UserRound,
+                            },
+                            {
+                                color: "green",
+                                title: "Reviewers",
+                                count: 7,
+                                Icon: ClipboardCheck,
+                            },
+                        ].map((item) => {
+                            const c = colorClasses[item.color]
+
+                            return (
+                                <Card key={item.title} className={cn("w-55 shrink-0 border-t-6 py-4 gap-0", c.border)}>
+                                    <CardHeader className="items-center">
+                                        <CardAction className="order-first">
+                                            <item.Icon className={cn("size-5", c.text, c.fill)} />
+                                        </CardAction>
+                                        <CardTitle>{item.title}</CardTitle>
+                                    </CardHeader>
+
+                                    <CardContent>
+                                        <CardDescription className={cn("text-3xl font-bold", c.text)}>
+                                            {item.count}
+                                        </CardDescription>
+                                    </CardContent>
+                                </Card>
+                            )
+                        })}
+                    </div>
+                    <ScrollBar orientation="horizontal" />
+                </ScrollArea>
             </div>
 
-            <section className='grid grid-cols-[1fr_480px] gap-4'>
-                <div className='space-y-4'>
-                    <Card>
-                        <CardContent className='flex justify-between w-full'>
-                            <Button variant='success'>
-                                Add User
-                                <Plus />
-                            </Button>
-                        </CardContent>
-                    </Card>
-                    <Card>
-                        <CardContent className='flex flex-col w-full gap-1.5 min-h-80'>
-                            <AnimatePresence>
-                                {filteredUsers?.map((user, index) => (
-                                    <motion.div
-                                        key={user.id}
-                                        initial={{ opacity: 0, x: -10, scale: 0.98 }}
-                                        animate={{ opacity: 1, x: 0, scale: 1 }}
-                                        exit={{ opacity: 0, x: 10, scale: 0.98 }}
-                                        transition={{
-                                            duration: 0.4,
-                                            delay: index * 0.1,
-                                            ease: "easeOut",
-                                        }}
-                                    >
-                                        <Card
-                                            className={cn(
-                                                "border-l-6 border-l-primary-dark w-full py-3",
-                                                "group cursor-pointer outline-2 outline-transparent rounded-md transition-colors duration-300",
-                                                "hover:outline-primary-light hover:shadow-sm",
-                                            )}
-                                        >
-                                            <CardContent className="flex items-center gap-4">
-                                                <Avatar className="size-14 shrink-0 shadow-md border">
-                                                    <AvatarImage src={user.photo as string || undefined} />
-                                                    <AvatarFallback className='text-lg'>
-                                                        {user.full_name
-                                                            ?.split(" ")
-                                                            .map((x) => x[0])
-                                                            .join("")
-                                                            .slice(0, 2)}
-                                                    </AvatarFallback>
-                                                </Avatar>
-
-                                                <div className="min-w-0 flex-1">
-                                                    <div className="flex items-center gap-2">
-                                                        <h3 className="truncate font-medium text-lg text-primary-main">
-                                                            {user.full_name}
-                                                        </h3>
-
-                                                        <Badge
-                                                            variant={user.is_active ? "success" : "destructive"}
-                                                            className="h-5 px-2 text-[10px]"
-                                                        >
-                                                            {user.is_active ? "Active" : "Inactive"}
-                                                        </Badge>
-                                                    </div>
-
-                                                    <p className="truncate text-sm text-muted-foreground">
-                                                        {user.email}
-                                                    </p>
-
-                                                    <p className="mt-1 text-xs text-muted-foreground">
-                                                        Joined {formatDate(user.date_joined)} • Last login {formatDate(user.last_login)}
-                                                    </p>
-                                                </div>
-
-                                                <div className="flex items-center gap-1">
-                                                    <Button variant="ghost" size="icon-lg">
-                                                        <MoreHorizontal className="size-6" />
-                                                    </Button>
-                                                </div>
-                                            </CardContent>
-                                        </Card>
-                                    </motion.div>
-                                ))}
-                            </AnimatePresence>
-                        </CardContent>
-                    </Card>
-                </div>
-                <Card className='gap-3'>
-                    <CardHeader className="border-b gap-0">
-                        <div className="flex items-start gap-3">
-                            <div className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-primary-light/10 border-2 border-primary-main/20 text-primary">
-                                <FunctionSquare className="text-primary-main stroke-[2.5] size-7" />
-                            </div>
-
+            <section className='flex-1 h-full'>
+                <div className='space-y-4 bg-card py-4 px-8 h-full'>
+                    <div className='flex justify-between'>
+                        <div className="flex items-center gap-4">
                             <div>
-                                <CardTitle className='text-lg'>Search Filters</CardTitle>
-                                <CardDescription className='text-sm'>
-                                    Add one or more filters to refine the search.
-                                </CardDescription>
+                                <p className="text-sm font-medium">
+                                    {filteredUsers?.length ?? 0} users found
+                                </p>
+
+                                <p className="text-xs text-muted-foreground">
+                                    {filters.length > 0
+                                        ? `${filters.length} active filter${filters.length > 1 ? "s" : ""}`
+                                        : "Showing all users"}
+                                </p>
                             </div>
+
+                            {filters.length > 0 && (
+                                <Badge variant="secondary">
+                                    {filters.length} filter{filters.length > 1 ? "s" : ""}
+                                </Badge>
+                            )}
                         </div>
-                    </CardHeader>
-                    <CardContent >
-                        <Filters
-                            size='sm'
-                            variant='default'
-                            filters={filters}
-                            fields={fields}
-                            onChange={handleFiltersChange}
-                            className='w-full space-y-3'
-                            trigger={
-                                <Button variant="default" size='sm'>
-                                    <FilterIcon />
-                                    Add Filter
-                                </Button>
-                            }
-                            actions={
-                                <div className='flex gap-3 ml-auto'>
-                                    <Button variant="outline" size='sm' onClick={() => setFilters([])}>
-                                        <FunnelXIcon />
-                                        Clear
+
+                        <div className='flex gap-2'>
+                            <InputGroup className="max-w-xs">
+                                <InputGroupInput placeholder="Search..." />
+                                <InputGroupAddon>
+                                    <Search />
+                                </InputGroupAddon>
+                            </InputGroup>
+
+                            <Popover>
+                                <PopoverTrigger asChild>
+                                    <Button variant='outline' size='sm' className='group relative pr-6!'>
+                                        <ListFilter />
+                                        Filters
+
+                                        {filters.length > 0 && (
+                                            <button
+                                                type="button"
+                                                onClick={(e) => {
+                                                    e.stopPropagation()
+                                                    setFilters([])
+                                                }}
+                                                className="absolute right-1 top-1/2 -translate-y-1/2 rounded-sm p-1 opacity-0 transition-opacity group-hover:opacity-100 group-hover:bg-accent"
+                                            >
+                                                <X className="size-3 opacity-0 transition-opacity group-hover:opacity-100" />
+                                            </button>
+                                        )}
                                     </Button>
-                                    <Button onClick={applyFilters} size='sm'>
-                                        Apply
-                                    </Button>
-                                </div>
-                            }
-                        />
-                    </CardContent>
-                </Card>
+                                </PopoverTrigger>
+                                <PopoverContent className="w-120">
+                                    <div className="grid gap-2">
+                                        <div className="flex justify-between">
+                                            <div className='space-y-1'>
+                                                <h4 className="leading-none font-medium">Filters</h4>
+                                                <p className='text-muted-foreground text-xs'>Refine search params</p>
+                                            </div>
+                                            <Button variant="outline" size='sm' onClick={() => setFilters([])}>
+                                                <FunnelXIcon />
+                                                Clear
+                                            </Button>
+                                        </div>
+                                        <div className="grid gap-2">
+                                            <Filters
+                                                size='sm'
+                                                variant='default'
+                                                filters={filters}
+                                                fields={fields}
+                                                onChange={handleFiltersChange}
+                                                className='w-full'
+                                                trigger={
+                                                    <Button variant="default" size='sm'>
+                                                        <FilterIcon />
+                                                        Add Filter
+                                                    </Button>
+                                                }
+                                            />
+                                        </div>
+                                    </div>
+                                </PopoverContent>
+                            </Popover>
+
+                            <Button size='sm'>
+                                <Plus />
+                                Add User
+                            </Button>
+                        </div>
+                    </div>
+
+                    <div>
+                        <AnimatePresence>
+                            {filteredUsers?.map((user, index) => (
+                                <motion.div
+                                    key={user.id}
+                                    initial={{ opacity: 0, x: -10, scale: 0.98 }}
+                                    animate={{ opacity: 1, x: 0, scale: 1 }}
+                                    exit={{ opacity: 0, x: 10, scale: 0.98 }}
+                                    transition={{
+                                        duration: 0.4,
+                                        delay: index * 0.1,
+                                        ease: "easeOut",
+                                    }}
+                                >
+                                    <Card
+                                        className={cn(
+                                            "border-l-6 border-l-primary-dark w-full py-3 rounded-l-none!",
+                                            "group cursor-pointer outline-2 outline-transparent rounded-md transition-colors duration-300",
+                                            "hover:outline-primary-light hover:shadow-sm",
+                                        )}
+                                    >
+                                        <CardContent className="flex items-center gap-4">
+                                            <Avatar className="size-16 shrink-0 shadow-md border-3 bg-card">
+                                                <AvatarImage src={user.photo as string || undefined} />
+                                                <AvatarFallback className='text-xl'>
+                                                    {user.full_name
+                                                        ?.split(" ")
+                                                        .map((x) => x[0])   
+                                                        .join("")
+                                                        .slice(0, 2)}
+                                                </AvatarFallback>
+                                            </Avatar>
+
+                                            <div className="min-w-0 flex-1">
+                                                <div className="flex items-center gap-2">
+                                                    <h3 className="truncate font-medium text-lg text-primary-main">
+                                                        {user.full_name}
+                                                    </h3>
+
+                                                    <Badge
+                                                        variant={user.is_active ? "success" : "destructive"}
+                                                        className="h-5 px-2 text-[10px]"
+                                                    >
+                                                        {user.is_active ? "Active" : "Inactive"}
+                                                    </Badge>
+                                                </div>
+
+                                                <p className="truncate text-sm font-medium text-muted-foreground">
+                                                    {user.email}
+                                                </p>
+
+                                                <p className="mt-1 text-xs text-muted-foreground">
+                                                    Joined {formatDate(user.date_joined)} • Last login {formatDate(user.last_login)}
+                                                </p>
+                                            </div>
+
+                                            <div className="flex items-center gap-1">
+                                                <Button variant="ghost" size="icon-lg">
+                                                    <MoreHorizontal className="size-6" />
+                                                </Button>
+                                            </div>
+                                        </CardContent>
+                                    </Card>
+                                </motion.div>
+                            ))}
+                        </AnimatePresence>
+                    </div>
+                </div>
             </section>
-
-
         </div>
     )
 }

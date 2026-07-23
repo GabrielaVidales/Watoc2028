@@ -157,7 +157,7 @@ function DashboardLayout() {
             <AppSidebar />
 
             <SidebarInset className="min-h-screen overflow-hidden">
-                <header className="sticky top-0 z-50 border-b bg-background shrink-0">
+                <header className="sticky top-0 z-50 border-b bg-card shrink-0">
                     <div className='my-2 px-3 mx-auto flex flex-row justify-between items-center gap-6'>
 
                         <div className='flex flex-row items-center sm:items-start gap-3 max-w-sm shrink-0'>
@@ -171,7 +171,7 @@ function DashboardLayout() {
                         </div>
                     </div>
                 </header>
-                <div className='no-scrollbar overflow-auto h-full bg-indigo-50'>
+                <div className='no-scrollbar overflow-auto h-full bg-secondary'>
                     <Outlet />
                 </div>
             </SidebarInset>

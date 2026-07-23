@@ -100,7 +100,7 @@ function ReviewForm({ defaultValue }: Props) {
                                     maxLength={1500}
                                     placeholder="Write a comment..."
                                 />
-                                <InputGroupAddon align="block-end" className=' py-1'>
+                                <InputGroupAddon align="block-end" className='py-1'>
                                     <InputGroupText className={'ml-auto'}>
                                         <FieldLabel htmlFor={field.name} className={cn(
                                             (fieldState.invalid || countWords(field.value || "") > 350) && 'text-destructive'

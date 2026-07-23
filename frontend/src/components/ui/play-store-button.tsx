@@ -14,15 +14,18 @@ function PlayStoreButton({ href = '#', className = '' }: StoreButtonProps) {
             target="_blank"
             rel="noopener noreferrer"
             role="button"
-            className={cn("market-btn google-btn", className)}
+            className={cn("bg-card flex border p-3 gap-0 bg-no-repeat", className)}
         >
-            <span className="market-button-subtitle">
-                Download on the
-            </span>
+            <span className='google-btn size-7 bg-contain'></span>
+            <div className='flex flex-col justify-stretch'>
+                <span className="text-xs text-muted-foreground leading-1 mt-1">
+                    Download on the
+                </span>
 
-            <span className="market-button-title">
-                Google Play
-            </span>
+                <span className="text-base">
+                    Google Play
+                </span>
+            </div>
         </a>
     )
 }

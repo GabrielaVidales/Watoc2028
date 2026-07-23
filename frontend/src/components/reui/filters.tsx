@@ -11,7 +11,7 @@ import { InputGroup, InputGroupAddon, InputGroupButton, InputGroupInput, InputGr
 import { Kbd } from "@/components/ui/kbd"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Tooltip, TooltipContent, TooltipTrigger, } from "@/components/ui/tooltip"
-import { AlertCircleIcon, XIcon, CheckIcon, PlusIcon, Search, FunnelXIcon } from "lucide-react"
+import { AlertCircleIcon, XIcon, CheckIcon, PlusIcon, Search, FunnelXIcon, ChevronDown } from "lucide-react"
 
 // i18n Configuration Interface
 export interface FilterI18nConfig {
@@ -770,6 +770,10 @@ function FilterOperatorDropdown<T = unknown>({
     [field, values, context.i18n]
   )
 
+  if (field.type === 'text' && operator === 'is') {
+    return null
+  }
+
   // Find the operator label, with fallback to formatted operator name
   const operatorLabel =
     operators.find((op) => op.value === operator)?.label ||
@@ -777,13 +781,14 @@ function FilterOperatorDropdown<T = unknown>({
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger asChild>
+      <DropdownMenuTrigger asChild className="group">
         <Button
-          variant="secondary"
+          variant="outline"
           size={context.size}
-          className=" text-muted-foreground hover:text-foreground font-normal border-2!"
+          className="hover:text-foreground font-normal rounded-none justify-between w-25 max-w-25"
         >
           {operatorLabel}
+          <ChevronDown className="transition-transform duration-200 group-data-[state=open]:rotate-180" />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="start" className="w-fit min-w-fit">
@@ -1619,9 +1624,7 @@ export function Filters<T = unknown>({
   const [activeMenu, setActiveMenu] = useState<string>("root")
   const [openSubMenu, setOpenSubMenu] = useState<string | null>(null)
   const [highlightedIndex, setHighlightedIndex] = useState(-1)
-  const [lastAddedFilterId, setLastAddedFilterId] = useState<string | null>(
-    null
-  )
+  const [lastAddedFilterId, setLastAddedFilterId] = useState<string | null>(null)
   const rootInputRef = useRef<HTMLInputElement>(null)
   const rootId = useId()
 
@@ -1687,11 +1690,7 @@ export function Filters<T = unknown>({
   }, [lastAddedFilterId])
 
 
-  //TODO:
-  const [preloadTrigger, setPreloadTrigger] = useState(0)
-
   useEffect(() => {
-    // Solo precargar si hay campos con loadOptions y filtros con valores
     const fieldsWithLoadOptions = flattenFields(fields).filter(f =>
       f.loadOptions && filters.some(filter => filter.field === f.key && filter.values.length > 0)
     )
@@ -1709,11 +1708,7 @@ export function Filters<T = unknown>({
       }
       return Promise.resolve()
     })
-
-    Promise.all(promises).then(() => {
-      setPreloadTrigger(prev => prev + 1)
-    })
-  }, [filters, fields]) // Dependencias
+  }, [filters, fields])
 
   const mergedI18n: FilterI18nConfig = useMemo(
     () => ({
@@ -1827,9 +1822,37 @@ export function Filters<T = unknown>({
 
   return (
     <FilterContext.Provider value={contextValue}>
-      <div
-        className={cn(filtersContainerVariants({ variant, size }), className)}
-      >
+      <div className={cn(filtersContainerVariants({ variant, size }), className)}>
+
+        <ScrollArea className="min-h-10 w-full rounded-md border bg-secondary">
+          <div className="flex flex-wrap gap-2 p-2">
+            {filters.map((filter) => {
+              const field = fieldsMap[filter.field]
+              if (!field) return null
+              return (
+                <ButtonGroup key={filter.id} className="rounded-md">
+                  <ButtonGroupText className="bg-background dark:bg-input/30 px-3 w-30 max-w-30">
+                    {field.icon && field.icon}
+                    <span className="truncate" title={field.label}>{field.label}</span>
+                  </ButtonGroupText>
+                  <FilterOperatorDropdown<T>
+                    field={field}
+                    operator={filter.operator}
+                    values={filter.values}
+                    onChange={(operator) => updateFilter(filter.id, { operator })}
+                  />
+                  <FilterValueSelector<T>
+                    field={field}
+                    values={filter.values}
+                    operator={filter.operator}
+                    onChange={(values) => updateFilter(filter.id, { values })}
+                    autoFocus={filter.id === lastAddedFilterId}
+                  />
+                  <FilterRemoveButton onClick={() => removeFilter(filter.id)} />
+                </ButtonGroup>
+              )
+            })}
+
         {selectableFields.length > 0 && (
           <DropdownMenu
             open={addFilterOpen}
@@ -2119,42 +2142,8 @@ export function Filters<T = unknown>({
           </DropdownMenu>
         )}
 
-        <ScrollArea className="h-80 w-full rounded-md border-2 border-dashed bg-muted/50">
-          <div className="flex flex-wrap gap-2 p-2">
-            {filters.map((filter) => {
-              const field = fieldsMap[filter.field]
-              if (!field) return null
-              return (
-                <ButtonGroup
-                  key={filter.id}
-                  // Sera is an underline style: its group text and input group carry
-                  // only a bottom border. Normalise the boxed segments (operator,
-                  // value, remove) to the same treatment so the whole chip reads as
-                  // one underlined group instead of mixing boxes and rules.
-                  className="shadow-sm rounded-md"
-                >
-                  <ButtonGroupText className="bg-background dark:bg-input/30 px-3">
-                    {field.icon && field.icon}
-                    <span className="truncate">{field.label}</span>
-                  </ButtonGroupText>
-                  <FilterOperatorDropdown<T>
-                    field={field}
-                    operator={filter.operator}
-                    values={filter.values}
-                    onChange={(operator) => updateFilter(filter.id, { operator })}
-                  />
-                  <FilterValueSelector<T>
-                    field={field}
-                    values={filter.values}
-                    operator={filter.operator}
-                    onChange={(values) => updateFilter(filter.id, { values })}
-                    autoFocus={filter.id === lastAddedFilterId}
-                  />
-                  <FilterRemoveButton onClick={() => removeFilter(filter.id)} />
-                </ButtonGroup>
-              )
-            })}
           </div>
+
         </ScrollArea>
       </div>
     </FilterContext.Provider>

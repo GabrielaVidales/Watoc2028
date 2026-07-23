@@ -174,7 +174,7 @@ export function NotificationsBell() {
                                                                 .join("")
                                                                 .slice(0, 2)
                                                         ) : (
-                                                            <Settings className="size-6 text-muted-foreground/50" />
+                                                            <Settings className="size-6" />
                                                         )}
                                                     </AvatarFallback>
                                                 </Avatar>

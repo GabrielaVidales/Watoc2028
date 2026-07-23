@@ -55,7 +55,7 @@ function ReviewAbstract() {
 
             </main>
 
-            <aside className=" w-full border-t lg:border-t-0 lg:border-l bg-background">
+            <aside className=" w-full border-t lg:border-t-0 lg:border-l-2 bg-card dark:border-l-input">
                 <div className="py-6 space-y-6 lg:sticky lg:top-0 lg:h-screen lg:overflow-y-auto lg:py-8 lg:space-y-8">
                     <CardHeader>
                         <div className="flex items-center gap-3 w-full">
@@ -97,8 +97,8 @@ function ReviewAbstract() {
                         </ButtonGroup>
                     </CardHeader>
 
-                    <ScrollArea className='h-110 my-4 border-y bg-secondary'>
-                        <CardContent className="text-sm text-muted-foreground py-8">
+                    <ScrollArea className='h-110 border-y bg-secondary'>
+                        <CardContent className="text-sm text-muted-foreground py-4">
                             <ReviewForm />
 
                         </CardContent>

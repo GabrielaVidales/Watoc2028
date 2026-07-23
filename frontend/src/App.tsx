@@ -3,8 +3,6 @@ import { Routes, useLocation } from 'react-router'
 import { Route } from 'react-router'
 import { ProtectedRoute } from './contexts/ProtectedRoute'
 import { GuestRoute } from './contexts/GuestRoute'
-
-// import { ThemeProvider } from '@mui/material/styles';
 import RegisterPage from './pages/auth/register/RegisterPage'
 import Home from './pages/home/Home'
 import VenuePage from './pages/venue/VenuePage'
