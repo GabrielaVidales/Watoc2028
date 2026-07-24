@@ -7,8 +7,7 @@ from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.utils.decorators import method_decorator
 from django.contrib.auth import get_user_model
-from .serializers import UserSerializer, ParticipantSerializer, TourSerializer
-from .models import Tour
+from .serializers import UserSerializer, ParticipantSerializer
 from config.permissions import HasCSRFToken
 from .tasks import send_email_confirmation_email
 import logging
@@ -119,9 +118,3 @@ class UserView(ModelViewSet):
             status=status.HTTP_200_OK,
         )
 
-
-class TourView(ModelViewSet):
-    queryset = Tour.objects.all()
-    serializer_class = TourSerializer
-    permission_classes = [permissions.AllowAny]
-    http_method_names = ["get"]

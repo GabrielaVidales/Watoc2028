@@ -1,4 +1,4 @@
-from apps.abstracts.serializers import AbstractSerializer
+from apps.participants.serializers import ParticipantSerializer
 from django.contrib.auth import password_validation
 from django.core import exceptions
 from django.contrib.auth import get_user_model
@@ -9,23 +9,6 @@ from . import models, validators
 import bleach
 
 User = get_user_model()
-
-
-class ParticipantSerializer(serializers.ModelSerializer):
-    abstracts = serializers.SerializerMethodField()
-
-    class Meta:
-        model = models.Participant
-        fields = (
-            "affiliation",
-            "job_title",
-            "field_of_study",
-            "abstracts",
-        )
-
-    def get_abstracts(self, obj: models.Participant):
-        serializer = AbstractSerializer(obj.user.abstracts, many=True)
-        return serializer.data
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -71,7 +54,6 @@ class UserSerializer(serializers.ModelSerializer):
             "photo": {"required": False},
         }
 
-    participant = ParticipantSerializer(required=False)
     photo = serializers.SerializerMethodField()
 
     data = serializers.SerializerMethodField()
@@ -152,11 +134,3 @@ class UserSerializer(serializers.ModelSerializer):
 
         return user
 
-
-"""TOURS DATA"""
-
-
-class TourSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = models.Tour
-        fields = "__all__"

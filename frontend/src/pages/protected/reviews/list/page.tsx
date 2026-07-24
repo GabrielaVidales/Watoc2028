@@ -4,12 +4,14 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { useAuth } from '@/contexts/AuthContext'
-import type { Review } from '@/domain/reviews'
+import type { ReviewAssignment } from '@/domain/reviews'
 import { cn } from '@/lib/utils'
+import { SelectAbstractCommand } from '@/pages/test'
 import { urls } from '@/routes/routes'
+import type { AbstractDTO } from '@/schemas/abstract-schemas'
 import { useQuery } from '@tanstack/react-query'
 import { Search, X } from 'lucide-react'
-import React from 'react'
+import { useState } from 'react'
 import { useNavigate } from 'react-router'
 
 type Props = {}
@@ -17,9 +19,12 @@ type Props = {}
 function ReviewsList({ }: Props) {
     const navigate = useNavigate()
 
+    const [selected, setSelected] = useState<Partial<AbstractDTO>>(null);
+
+
     const { currentUser: user } = useAuth()
 
-    const { data, isLoading } = useQuery<Review[]>({
+    const { data, isLoading } = useQuery<ReviewAssignment[]>({
         queryKey: ['reviews', user.id],
         queryFn: async () => {
             const { data } = await axiosClient.get('/reviews/assignments')
@@ -69,10 +74,9 @@ function ReviewsList({ }: Props) {
                         <Table>
                             <TableHeader>
                                 <TableRow>
-                                    <TableHead>Abstract</TableHead>
                                     <TableHead>Reviewer</TableHead>
                                     <TableHead>Status</TableHead>
-                                    <TableHead>Assigned</TableHead>
+                                    <TableHead>Abstract</TableHead>
                                     <TableHead className="text-right">
                                         Actions
                                     </TableHead>
@@ -82,24 +86,6 @@ function ReviewsList({ }: Props) {
                             <TableBody>
                                 {data.map((assignment) => (
                                     <TableRow key={assignment.id}>
-
-                                        <TableCell>
-                                            <div className="flex flex-col">
-                                                <span className="font-medium">
-                                                    {assignment.abstract.title}
-                                                </span>
-
-                                                <Badge
-                                                    variant="secondary"
-                                                    className="w-fit mt-1"
-                                                >
-                                                    {assignment.abstract.presentation_type === "poster"
-                                                        ? "Poster"
-                                                        : "Oral"}
-                                                </Badge>
-                                            </div>
-                                        </TableCell>
-
                                         <TableCell>
                                             {assignment.user ? (
                                                 <div className="flex items-center gap-2">
@@ -137,13 +123,12 @@ function ReviewsList({ }: Props) {
                                             </Badge>
                                         </TableCell>
 
-
                                         <TableCell>
-                                            {new Date(
-                                                assignment.created_at
-                                            ).toLocaleDateString()}
+                                            <SelectAbstractCommand
+                                                value={selected}
+                                                onChange={setSelected}
+                                            />
                                         </TableCell>
-
 
                                         <TableCell className="text-right">
                                             <div className="flex justify-end gap-2">

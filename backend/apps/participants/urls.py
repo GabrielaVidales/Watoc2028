@@ -2,6 +2,7 @@ from rest_framework.routers import DefaultRouter
 from . import views
 
 router = DefaultRouter()
-router.register(r"users", views.UserView, "users")
+router.register(r"tours", views.TourView, "tours")
+
 
 urlpatterns = [] + router.urls
