@@ -1,23 +1,19 @@
-import React from 'react'
+import { InfoAlert } from '@/components/InfoAlert';
+import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator, } from "@/components/ui/breadcrumb";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle, } from "@/components/ui/card";
+import { Spinner } from '@/components/ui/spinner';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useAuth } from '@/contexts/AuthContext';
 import ChangePasswordForm from '@/forms/ChangePasswordForm';
 import EditUserForm from '@/forms/EditUserForm';
-import { useAuth } from '@/contexts/AuthContext'
-import { UserRoundPen, Image, LockKeyhole, ShieldAlert } from "lucide-react";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle, } from "@/components/ui/card"
-import { ChangePhotoForm, } from './change-photo-form';
 import { useProfiles } from '@/hooks/use-profiles';
-import { InfoAlert } from '@/components/InfoAlert';
-import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator, } from "@/components/ui/breadcrumb"
-import { Link } from 'react-router';
 import { urls } from '@/routes/routes';
-import { Spinner } from '@/components/ui/spinner';
-import { GalleryUpload } from '@/components/ui/file-upload';
-import { UserPictureForm } from '@/forms/UserPictureForm';
+import { Image, LockKeyhole, ShieldAlert, UserRoundPen } from "lucide-react";
+import { Link } from 'react-router';
 import { NotificationSettings } from './components/notifications-settings-component';
 
 function SettingsPage() {
-    const { currentUser } = useAuth()
+    const { currentUser: user } = useAuth()
     const { profile } = useProfiles()
 
     return (
@@ -71,7 +67,7 @@ function SettingsPage() {
                         <CardContent className='px-10'>
                             {profile ? (
                                 <EditUserForm defaultValues={{
-                                    ...currentUser,
+                                    ...user,
                                     email: {
                                         value: '',
                                         confirm: ''

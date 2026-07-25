@@ -10,14 +10,17 @@ from .models import Notification
 from config.permissions import HasCSRFToken
 from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
+from config.pagination import Pagination
 
 
 class NotificationViewSet(ModelViewSet):
     queryset = Notification.objects.all()
     serializer_class = NotificationSerializer
     permission_classes = [permissions.IsAuthenticated, HasCSRFToken]
+    pagination_class = Pagination
 
     def list(self, request):
+        """TODO: Esto es solo para testeo, eliminar después"""
         notification = Notification.objects.first()
         serializer = self.get_serializer(notification)
         channel_layer = get_channel_layer()
@@ -32,10 +35,12 @@ class NotificationViewSet(ModelViewSet):
         user = request.user
         notifications = self.get_queryset().filter(recipient=user)
         unread_count = notifications.filter(is_read=False).count()
-        serializer = self.get_serializer(notifications, many=True)
+        page = self.paginate_queryset(notifications)
+        serializer = self.get_serializer(page, many=True, context={"request": request})
+        paginated = self.get_paginated_response(serializer.data)
         return Response(
             {
-                "notifications": serializer.data,
+                "notifications": paginated.data,
                 "unread_count": unread_count,
             }
         )

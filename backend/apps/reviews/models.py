@@ -54,6 +54,9 @@ class ReviewAssignment(models.Model):
         db_column="created_at",
         auto_now_add=True,
     )
+    # is_active = models.BooleanField(
+    #     db_column='is_active',
+    # )
 
 
 class Review(models.Model):

@@ -1,4 +1,5 @@
 import type { UserSchema } from "@/schemas/user-schemas"
+import type { PaginatedResponse } from "./pagination"
 
 type UserDetail = Omit<UserSchema, 'roles' | 'participant' | 'email_verified'>
 
@@ -13,13 +14,11 @@ type Notification = {
 }
 
 type NotificationResponse = {
-    notifications: Notification[]
+    notifications: PaginatedResponse<Notification>
     unread_count: number
 }
 
 
 export type {
-    NotificationResponse,
-    Notification,
-    UserDetail
+    Notification, NotificationResponse, UserDetail
 }

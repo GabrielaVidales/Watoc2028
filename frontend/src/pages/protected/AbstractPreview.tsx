@@ -1,15 +1,14 @@
-import React from 'react'
-import { Link, useParams } from 'react-router'
-import { useFetch } from '@/hooks/use-fetch'
-import { type AbstractSchema, type AuthorSchema } from '@/schemas/abstract-schemas'
-import { type AbstractDeclarationValues } from '@/schemas/abstract-declaration-schema'
-import { ChevronsLeft, Download, FileText } from 'lucide-react'
-import { Button } from '@/components/ui/button'
-import { isAxiosError } from 'axios'
 import axiosClient from '@/clients/axiosClient'
 import { AbstractData } from '@/components/AbstractData'
-import { urls } from '@/routes/routes'
+import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
+import { useFetch } from '@/hooks/use-fetch'
+import { urls } from '@/routes/routes'
+import { type AbstractDeclarationValues } from '@/schemas/abstract-declaration-schema'
+import { type AbstractSchema, type AuthorSchema } from '@/schemas/abstracts/abstract-schemas'
+import { isAxiosError } from 'axios'
+import { ChevronsLeft, Download, FileText } from 'lucide-react'
+import { Link, useParams } from 'react-router'
 
 type Props = {}
 

@@ -10,7 +10,7 @@ import watocLogo from '../../assets/WatocPNGLogo.png'
 const AnimatedBox = motion.create(Container)
 
 export const SuccessRegisterPage = () => {
-    const { handleLogout, currentUser } = useAuth()
+    const { handleLogout, currentUser: user } = useAuth()
     const navigate = useNavigate();
 
     return (
@@ -50,7 +50,7 @@ export const SuccessRegisterPage = () => {
                         </Typography>
 
                         <Typography variant="body1" color="text.secondary" sx={{ fontSize: '0.9rem', fontStyle: 'italic', bgcolor: '#f0f4f8', p: 2, borderRadius: 2 }}>
-                            We have successfully received your information for <strong>WATOC 2028</strong>. We will send updates to <strong>{currentUser?.email}</strong> about call for abstracts, early bird registration, and keynote speakers to your email soon.
+                            We have successfully received your information for <strong>WATOC 2028</strong>. We will send updates to <strong>{user?.email}</strong> about call for abstracts, early bird registration, and keynote speakers to your email soon.
                         </Typography>
 
                         <Button

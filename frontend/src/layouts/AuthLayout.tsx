@@ -36,8 +36,7 @@ const authRoutes = [
 ]
 
 function AuthLayout() {
-    const { currentUser } = useAuth()
-    const { title } = useHeader()
+    const { currentUser: user } = useAuth()
 
     return (
         <>
@@ -74,7 +73,7 @@ function AuthLayout() {
                             </Button>
                         </Link>
 
-                        {(currentUser ? authRoutes : guessRoutes).map(routes => (
+                        {(user ? authRoutes : guessRoutes).map(routes => (
                             <Link to={routes.url} key={routes.url} className="sm:flex">
                                 <Button variant='ghost' className='flex items-center gap-2 text-white sm:text-base lg:text-lg hover:bg-white/10 hover:text-white transition-all font-medium px-4'>
                                     {routes.icon}

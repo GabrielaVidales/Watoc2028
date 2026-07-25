@@ -68,18 +68,18 @@ const menuItems = [
 ]
 
 export default function NavBar({
-    enableScroll = true, 
-    variant = 'fixed', 
+    enableScroll = true,
+    variant = 'fixed',
     scrollThreshold = 150,
-     invertImg = true,
+    invertImg = true,
 }: Props) {
     const scroll = useScroll(scrollThreshold)
 
-    const { currentUser } = useAuth()
+    const { currentUser: user } = useAuth()
 
     const menus = [
         ...menuItems,
-        currentUser ? {
+        user ? {
             label: 'Profile',
             url: urls.users.profile,
             submenus: [],
@@ -286,7 +286,7 @@ export default function NavBar({
                         </PopoverContent>
                     </Popover>
                 </div>
-            </div>  
+            </div>
         </header >
     )
 }

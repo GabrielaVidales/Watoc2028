@@ -1,12 +1,11 @@
-import React from "react";
-import miniLogo from '@/assets/logo_img.png'
-import { Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarHeader, SidebarMenu, SidebarMenuAction, SidebarMenuButton, SidebarMenuItem, SidebarMenuSub, SidebarMenuSubButton, SidebarMenuSubItem, useSidebar, } from "@/components/ui/sidebar"
-import { Link, NavLink, useNavigate, } from "react-router"
-import { ArrowLeftFromLine, BadgeCheckIcon, Bell, Bot, ChevronDown, ChevronRight, ChevronUp, FileBadge, FileCheck, FileType2, Folder, Forward, LayoutDashboard, LayoutList, LogOut, MessageSquareDot, MoreHorizontal, PackageCheck, Settings2, TableProperties, Trash2, Users, type LucideIcon, } from "lucide-react"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger, } from "@/components/ui/dropdown-menu"
+import miniLogo from '@/assets/logo_img.png';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger, } from "@/components/ui/dropdown-menu";
+import { Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarMenuSub, SidebarMenuSubButton, SidebarMenuSubItem, useSidebar } from "@/components/ui/sidebar";
 import { useAuth } from "@/contexts/AuthContext";
-import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { urls } from "@/routes/routes";
+import { ArrowLeftFromLine, BadgeCheckIcon, Bell, Bot, ChevronDown, ChevronRight, ChevronUp, FileBadge, FileCheck, FileType2, LayoutDashboard, LayoutList, LogOut, MessageSquareDot, PackageCheck, Settings2, TableProperties, Users, type LucideIcon } from "lucide-react";
+import { Link, NavLink, useNavigate, } from "react-router";
+import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "./ui/collapsible";
 import { ScrollArea } from "./ui/scroll-area";
 
@@ -25,10 +24,10 @@ type NavCollapsible = {
 }
 
 
-const congressModules: NavItem[] = [
+const participantModules: NavItem[] = [
     {
         name: "Abstract Submissions",
-        url: urls.users.viewAbstracts,
+        url: urls.users.submissions.summary,
         icon: FileType2,
     },
     {
@@ -65,7 +64,7 @@ const adminModules: NavCollapsible[] = [
 
 const reviewerModules: NavCollapsible[] = [
     {
-        title: 'Manage Reviews',
+        title: 'Abstract Reviews',
         icon: FileCheck,
         isActive: true,
         items: [
@@ -78,9 +77,8 @@ const reviewerModules: NavCollapsible[] = [
     }
 ]
 
-
 export function AppSidebar() {
-    const { currentUser } = useAuth()
+    const { currentUser: user } = useAuth()
 
     return (
         <Sidebar>
@@ -113,7 +111,23 @@ export function AppSidebar() {
                                 </SidebarMenuButton>
                             </SidebarMenuItem>
 
-                            {currentUser.roles.includes('admin') && (
+                            <SidebarMenuItem>
+                                <SidebarMenuButton asChild>
+                                    <NavLink to={urls.users.settings} className="hover:translate-x-1 transition-transform duration-300">
+                                        <Settings2 />
+                                        <span>Settings</span>
+                                    </NavLink>
+                                </SidebarMenuButton>
+                            </SidebarMenuItem>
+                        </SidebarGroupContent>
+                    </SidebarGroup>
+
+                    <SidebarGroup>
+                        <SidebarGroupLabel>
+                            SPECIAL MODULES
+                        </SidebarGroupLabel>
+                        <SidebarGroupContent>
+                            {user.roles.includes('admin') && (
                                 <SidebarMenu>
                                     {adminModules.map((item) => (
                                         <Collapsible
@@ -149,24 +163,7 @@ export function AppSidebar() {
                                     ))}
                                 </SidebarMenu>
                             )}
-
-                            <SidebarMenuItem>
-                                <SidebarMenuButton asChild>
-                                    <NavLink to={urls.users.settings} className="hover:translate-x-1 transition-transform duration-300">
-                                        <Settings2 />
-                                        <span>Settings</span>
-                                    </NavLink>
-                                </SidebarMenuButton>
-                            </SidebarMenuItem>
-                        </SidebarGroupContent>
-                    </SidebarGroup>
-
-                    <SidebarGroup>
-                        <SidebarGroupLabel>
-                            ABSTRACT REVIEWS
-                        </SidebarGroupLabel>
-                        <SidebarGroupContent>
-                            {currentUser.roles.includes('reviewer') && (
+                            {user.roles.includes('reviewer') && (
                                 <SidebarMenu>
                                     {reviewerModules.map((item) => (
                                         <Collapsible
@@ -211,7 +208,7 @@ export function AppSidebar() {
                             CONGRESS
                         </SidebarGroupLabel>
                         <SidebarGroupContent>
-                            {congressModules.map((item, i) => (
+                            {participantModules.map((item, i) => (
                                 <SidebarMenuItem key={i}>
                                     <SidebarMenuButton asChild>
                                         <NavLink to={item.url} title={item.name} className="hover:translate-x-1 transition-transform duration-300">
@@ -228,9 +225,9 @@ export function AppSidebar() {
 
             <SidebarFooter>
                 <SidebarFooterContent user={{
-                    avatar: currentUser.photo as string || null,
-                    email: currentUser.email,
-                    name: currentUser.full_name
+                    avatar: user.photo as string || null,
+                    email: user.email,
+                    name: user.full_name
                 }} />
             </SidebarFooter>
         </Sidebar>

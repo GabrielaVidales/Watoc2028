@@ -18,7 +18,7 @@ import { Button } from '@/components/ui/button'
 
 
 function SidebarsLayout() {
-    const { currentUser, handleLogout } = useAuth()
+    const { currentUser: user, handleLogout } = useAuth()
 
     const sidebarLinks = [
         {
@@ -90,21 +90,21 @@ function SidebarsLayout() {
                     >
                         <div className="flex flex-col py-6 h-full overflow-y-auto">
                             <Avatar className="size-32 border-4 border-secondary shadow-sm mb-4 mx-auto">
-                                <AvatarImage src={currentUser.photo as string} alt="Profile" />
+                                <AvatarImage src={user.photo as string} alt="Profile" />
                                 <AvatarFallback className='text-2xl'>
-                                    {currentUser.first_name[0]}
-                                    {currentUser.last_name[0]}
+                                    {user.first_name[0]}
+                                    {user.last_name[0]}
                                 </AvatarFallback>
                             </Avatar>
 
                             <div className="space-y-2 mb-6 text-center">
                                 <h1 className="text-lg font-bold text-foreground">
-                                    {currentUser.full_name}
+                                    {user.full_name}
                                 </h1>
 
                                 <div className="flex flex-col text-sm leading-relaxed">
                                     <span className="text-muted-foreground">
-                                        {currentUser.email}
+                                        {user.email}
                                     </span>
                                 </div>
 

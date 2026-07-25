@@ -1,12 +1,9 @@
 type RouteTree<T> = {
     [K in keyof T]:
-    T[K] extends { build: (...args: any) => any }
-    ? T[K]
-    : T[K] extends string
-    ? string
-    : T[K] extends object
-    ? RouteTree<T[K]>
-    : never
+    T[K] extends { build: (...args: any) => any } ?
+    T[K] : T[K] extends string ?
+    string : T[K] extends object ?
+    RouteTree<T[K]> : never
 }
 
 
@@ -44,7 +41,7 @@ function createRouteGroup<T extends Record<string, any>>(
 }
 
 
-const withBuilder = <T extends string>(url: T) => ({
+const routeWithParams = <T extends string>(url: T) => ({
     url,
     build(this: { url: string }, params: { [K in RouteParams<T>]: string | number }) {
         let final = this.url
@@ -78,12 +75,19 @@ export const urls = {
             manageUsers: '/manage-users',
             manageReviewers: '/manage-reviewers',
         }),
+
+        submissions: createRouteGroup('/submissions', {
+            summary: '/summary',
+            edit: routeWithParams('/edit/:id'),
+        }),
+
+
         profile: '/profile',
         settings: '/settings',
         notifications: '/notifications',
         viewAbstracts: '/my-abstracts',
-        editAbstract: withBuilder('/abstract/:id/edit'),
-        previewAbstract: withBuilder('/abstract/:id/preview'),
+        editAbstract: routeWithParams('/abstract/:id/edit'),
+        previewAbstract: routeWithParams('/abstract/:id/preview'),
         submitAbstract: '/abstract',
         confirmAssistance: createRouteGroup('/confirm-assistance', {
             start: '',
@@ -95,7 +99,7 @@ export const urls = {
 
         reviews: createRouteGroup('/reviews', {
             list: '/list',
-            view: withBuilder('/view/:id')
+            view: routeWithParams('/view/:id')
         })
     }),
     payments: createRouteGroup('/payments', {
@@ -103,5 +107,3 @@ export const urls = {
         failed: '/failed',
     }),
 } as const
-
-

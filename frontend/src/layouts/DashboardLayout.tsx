@@ -19,13 +19,13 @@ import { ScrollArea } from '@/components/ui/scroll-area'
 
 
 export function DropdownMenuAvatar() {
-    const { currentUser, handleLogout } = useAuth()
+    const { currentUser: user, handleLogout } = useAuth()
     return (
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="rounded-full">
                     <Avatar className="h-8 w-8 rounded-full border border-primary">
-                        <AvatarImage src={currentUser.photo as string || null} alt={`${currentUser.full_name} Profile Picture`} />
+                        <AvatarImage src={user.photo as string || null} alt={`${user.full_name} Profile Picture`} />
                         <AvatarFallback>LR</AvatarFallback>
                     </Avatar>
                     <ChevronDown />

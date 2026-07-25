@@ -1,12 +1,11 @@
+import { UserSearchInput } from '@/components/UserSearchInput'
 import { Field, FieldContent, FieldError, FieldLabel } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { type AuthorSchema } from '@/schemas/abstract-schemas'
-import { Controller, useFormContext } from 'react-hook-form'
-import { countries } from '@/utils/countriesInfo'
-import React from 'react'
-import { UserSearchInput } from '@/components/UserSearchInput'
 import { Separator } from '@/components/ui/separator'
+import { type AuthorSchema } from '@/schemas/abstracts/abstract-schemas'
+import { countries } from '@/utils/countriesInfo'
+import { Controller, useFormContext } from 'react-hook-form'
 
 
 function AuthorForm() {

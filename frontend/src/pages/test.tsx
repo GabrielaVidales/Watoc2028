@@ -4,10 +4,12 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList, CommandShortcut } from "@/components/ui/command"
 import { Field, FieldContent, FieldDescription, FieldLabel } from '@/components/ui/field'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
+import { Switch } from '@/components/ui/switch'
+import type { PaginatedResponse } from '@/domain/pagination'
 import { cn } from '@/lib/utils'
-import type { AbstractDTO } from '@/schemas/abstract-schemas'
+import type { AbstractDTO } from '@/schemas/abstracts/abstract-schemas'
 import { useQuery } from '@tanstack/react-query'
-import { ChevronDown, Plus, Pointer, SearchX, X } from 'lucide-react'
+import { Check, ChevronDown, Plus, Pointer, SearchX, X } from 'lucide-react'
 import React, { useEffect } from 'react'
 import { useDebounce } from 'use-debounce'
 
@@ -38,6 +40,10 @@ function TestPage() {
                                 Select a submission from the list
                             </FieldDescription>
                         </FieldContent>
+
+                        <Switch>
+                            <Check className='size-3 stroke-3'/>
+                        </Switch>
 
                         <SelectAbstractCommand
                             value={selected}
@@ -70,10 +76,10 @@ export function SelectAbstractCommand({
     const { data: abstracts = [], isFetching } = useQuery<AbstractDTO[]>({
         queryKey: ["users", debouncedSearch],
         queryFn: async () => {
-            const { data } = await axiosClient.get("/abstracts/submissions", {
+            const { data } = await axiosClient.get<PaginatedResponse<AbstractDTO>>("/abstracts/submissions", {
                 params: { title: debouncedSearch },
             });
-            return data;
+            return data.results;
         },
     });
 

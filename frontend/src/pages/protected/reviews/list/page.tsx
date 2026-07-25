@@ -8,7 +8,7 @@ import type { ReviewAssignment } from '@/domain/reviews'
 import { cn } from '@/lib/utils'
 import { SelectAbstractCommand } from '@/pages/test'
 import { urls } from '@/routes/routes'
-import type { AbstractDTO } from '@/schemas/abstract-schemas'
+import type { AbstractDTO } from '@/schemas/abstracts/abstract-schemas'
 import { useQuery } from '@tanstack/react-query'
 import { Search, X } from 'lucide-react'
 import { useState } from 'react'
@@ -41,8 +41,6 @@ function ReviewsList({ }: Props) {
     }
 
     const pendingReviews = data.filter(r => r.status === 'pending')
-    console.log(pendingReviews);
-
 
     return (
         <div className='p-8'>

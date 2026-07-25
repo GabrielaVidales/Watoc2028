@@ -10,6 +10,7 @@ export type UserProfile = {
 
 export type AuthContextValue = {
     currentUser?: UserSchema | null,
+    isLoading: boolean,
     handleLogin: (email: string, password: string) => Promise<void>
     handleLogout: () => Promise<void>
     fetchUser: () => Promise<void>
@@ -30,21 +31,23 @@ export const useAuth = () => {
 
 export const AuthProvider = ({ children }: PropsWithChildren) => {
     const [currentUser, setCurrentUser] = useState<UserSchema | null>()
+    const [isLoading, setIsLoading] = useState(true);
 
     async function fetchUser() {
+        setIsLoading(true);
         try {
             const res = await axiosClient.get('/users/session/');
-            if (import.meta.env.DEV){
+            if (import.meta.env.DEV) {
                 console.log(res.data);
             }
-            if (res.data.anonymous) {
-                setCurrentUser(null);
-            } else setCurrentUser(res.data.user)
+            setCurrentUser(res.data.anonymous ? null : res.data.user);
         } catch (error) {
             if (import.meta.env.DEV) {
                 console.log(error.response);
             }
             setCurrentUser(null);
+        } finally {
+            setIsLoading(false);
         }
     }
 
@@ -76,6 +79,7 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
 
     const value: AuthContextValue = {
         currentUser,
+        isLoading,
         handleLogin,
         handleLogout,
         fetchUser,

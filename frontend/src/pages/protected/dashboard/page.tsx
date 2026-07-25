@@ -16,7 +16,7 @@ import { AppStoreButton, PlayStoreButton } from '@/components/ui/play-store-butt
 function UserDashboardPage() {
     const navigate = useNavigate()
 
-    const { currentUser } = useAuth()
+    const { currentUser: user } = useAuth()
 
     const { profile } = useProfiles()
 
@@ -27,7 +27,7 @@ function UserDashboardPage() {
             <header className="mb-8 flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
                 <div>
                     <h1 className="text-3xl font-bold tracking-tight text-foreground">Control Panel</h1>
-                    <p className="text-sm text-muted-foreground">Welcome back, {currentUser.full_name}</p>
+                    <p className="text-sm text-muted-foreground">Welcome back, {user.full_name}</p>
                 </div>
                 <Button size="lg" className="gap-2 shadow-sm">
                     <PlusCircle className="h-4 w-4" />
@@ -159,7 +159,7 @@ function UserDashboardPage() {
                             <User className="h-5 w-5 text-primary-main" />
                             <div className="flex flex-col">
                                 <CardTitle className="text-base font-bold leading-none">
-                                    {currentUser.prefix} {currentUser.first_name} {currentUser.last_name}
+                                    {user.prefix} {user.first_name} {user.last_name}
                                 </CardTitle>
                                 {profile?.participant && (
                                     <span className="text-xs text-muted-foreground mt-1">
@@ -167,9 +167,9 @@ function UserDashboardPage() {
                                     </span>
                                 )}
 
-                                {currentUser.pronouns && (
+                                {user.pronouns && (
                                     <span className="text-xs text-muted-foreground mt-1">
-                                        ({currentUser.pronouns})
+                                        ({user.pronouns})
                                     </span>
                                 )}
                             </div>
@@ -178,7 +178,7 @@ function UserDashboardPage() {
                         <CardContent className="space-y-3.5">
                             <div className="flex items-center text-sm text-foreground/90 gap-2.5">
                                 <Mail className="h-4 w-4 text-primary-main shrink-0" />
-                                <span className="truncate">{currentUser.email}</span>
+                                <span className="truncate">{user.email}</span>
                             </div>
 
                             {profile?.participant && (
@@ -190,13 +190,13 @@ function UserDashboardPage() {
 
                             <div className="flex items-center text-sm text-foreground/90 gap-2.5">
                                 <MapPin className="h-4 w-4 text-primary-main shrink-0" />
-                                <span>{currentUser.city}, {currentUser.nationality}</span>
+                                <span>{user.city}, {user.nationality}</span>
                             </div>
 
                             <div className="flex items-start text-sm text-foreground/90 gap-2.5 pt-0.5">
                                 <Shield className="h-4 w-4 text-primary-main shrink-0 mt-0.5" />
                                 <div className="flex flex-wrap gap-1">
-                                    {currentUser.roles.map((role) => {
+                                    {user.roles.map((role) => {
 
                                         const className =
                                             role === "admin"
@@ -218,14 +218,14 @@ function UserDashboardPage() {
                                 <div className="flex justify-between">
                                     <span>Joined:</span>
                                     <span className="font-medium text-foreground">
-                                        {currentUser.date_joined ? formatDate(currentUser.date_joined) : '—'}
+                                        {user.date_joined ? formatDate(user.date_joined) : '—'}
                                     </span>
                                 </div>
                                 <div className="flex justify-between">
                                     <span>Last login:</span>
 
                                     <span className="font-medium text-foreground">
-                                        {currentUser.last_login ? formatDate(currentUser.last_login) : '—'}
+                                        {user.last_login ? formatDate(user.last_login) : '—'}
 
                                     </span>
                                 </div>

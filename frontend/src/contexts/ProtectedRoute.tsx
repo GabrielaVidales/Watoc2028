@@ -11,17 +11,17 @@ type ProtectedRouteProps = React.PropsWithChildren & {
 }
 
 export function ProtectedRoute({ allowedRoles }: ProtectedRouteProps) {
-    const { currentUser } = useAuth()
+    const { currentUser: user } = useAuth()
 
-    if (currentUser === undefined) {
+    if (user === undefined) {
         return <LoadingPage />
     }
 
-    if (!currentUser) {
+    if (!user) {
         return <Navigate to={urls.auth.login} replace />
     }
 
-    if (!currentUser.is_active) {
+    if (!user.is_active) {
         return (
             <div className='h-screen flex flex-col justify-center items-center'>
                 <h1 className='text-2xl font-semibold'>
@@ -31,15 +31,12 @@ export function ProtectedRoute({ allowedRoles }: ProtectedRouteProps) {
         )
     }
 
-    const authorized = currentUser?.roles.some(
-        role => allowedRoles?.includes(role)
-    )
-
+    const authorized = user?.roles.some(role => allowedRoles?.includes(role))
     if (!authorized) {
         return <Navigate to={urls.users.profile} replace />
     }
 
-    if (!currentUser.roles.includes('admin') && !currentUser.email_verified) {
+    if (!user.roles.includes('admin') && !user.email_verified) {
         return <VerifyYourEmailPage />
     }
 

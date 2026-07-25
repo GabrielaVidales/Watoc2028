@@ -90,18 +90,11 @@ function App() {
 						DEPRECAR ESTAS RUTAS POCO A POCO
 					*/}
 					<Route element={<ProtectedRoute allowedRoles={['admin', 'participant']} />} >
-
-						<Route path={urls.users.submitAbstract} element={<CreateAbstractPage />} />
-						<Route path={urls.users.previewAbstract.url} element={<AbstractPreview />} />
-
 						<Route path={urls.users.confirmAssistance.start} element={<ConfirmationPage />} />
 						<Route path={urls.users.confirmAssistance.fee} element={<SelectFeePage />} />
 						<Route path={urls.users.confirmAssistance.dinner} element={<DinnerPage />} />
 						<Route path={urls.users.confirmAssistance.tour} element={<SelectTourPage />} />
 						<Route path={urls.users.confirmAssistance.payment} element={<ConfirmPaymentPage />} />
-
-						{/* Confirmar pagos en stripe */}
-						{/* <Route path={urls.payments.success} element={<PaymentSuccess />} /> */}
 					</Route>
 				</Route>
 
@@ -118,10 +111,14 @@ function App() {
 							<Route path={urls.users.reviews.view.url} element={<ReviewAbstract />} />
 						</Route>
 
+						<Route element={<ProtectedRoute allowedRoles={['participant']} />} >
+							<Route path={urls.users.submissions.summary} element={<AbstractSubmissionsPage />} />
+							<Route path={urls.users.submissions.edit.url} element={<EditAbstractPage />} />
+						</Route>
+
+						{/* Rutas para todos los usuarios */}
 						<Route path={urls.users.profile} element={<UserDashboardPage />} />
 						<Route path={urls.users.settings} element={<SettingsPage />} />
-						<Route path={urls.users.viewAbstracts} element={<AbstractSubmissionsPage />} />
-						<Route path={urls.users.editAbstract.url} element={<EditAbstractPage />} />
 						<Route path={urls.users.notifications} element={<NotificationsPage />} />
 					</Route>
 					<Route path={'/test'} element={<TestPage />} />

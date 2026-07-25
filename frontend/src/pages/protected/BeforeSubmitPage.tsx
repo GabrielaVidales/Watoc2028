@@ -1,15 +1,13 @@
-import z from 'zod'
-import React, { useMemo } from 'react'
-import { Button } from '@/components/ui/button'
-import { useFetch } from '@/hooks/use-fetch'
-import { abstractDeclarationSchema, type AbstractDeclarationValues } from '@/schemas/abstract-declaration-schema'
-import { abstractSchema, validateAuthorsSchema, type AbstractSchema, type AuthorSchema } from '@/schemas/abstract-schemas'
-import { useNavigate, useParams } from 'react-router'
-import { ChevronLeft, ChevronRight, Save } from 'lucide-react'
-import { useMutation } from '@/hooks/use-mutation'
-import { isAxiosError } from 'axios'
 import { AbstractData } from '@/components/AbstractData'
+import { useFetch } from '@/hooks/use-fetch'
+import { useMutation } from '@/hooks/use-mutation'
 import { urls } from '@/routes/routes'
+import { abstractDeclarationSchema, type AbstractDeclarationValues } from '@/schemas/abstract-declaration-schema'
+import { abstractSchema, validateAuthorsSchema, type AbstractSchema, type AuthorSchema } from '@/schemas/abstracts/abstract-schemas'
+import { isAxiosError } from 'axios'
+import { useMemo } from 'react'
+import { useNavigate, useParams } from 'react-router'
+import z from 'zod'
 
 
 function BeforeSubmitPage() {

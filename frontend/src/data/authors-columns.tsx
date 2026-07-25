@@ -1,5 +1,4 @@
-import { cn } from "@/lib/utils"
-import type { AuthorAffiliationSchema, AuthorSchema } from "@/schemas/abstract-schemas"
+import type { AuthorAffiliationSchema, AuthorSchema } from "@/schemas/abstracts/abstract-schemas"
 import { type ColumnDef } from "@tanstack/react-table"
 
 export const authorColumns: ColumnDef<AuthorSchema>[] = [

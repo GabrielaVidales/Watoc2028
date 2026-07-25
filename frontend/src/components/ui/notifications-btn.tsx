@@ -1,17 +1,17 @@
-import type { NotificationResponse } from "@/domain/notifications"
+import axiosClient from "@/clients/axiosClient"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Popover, PopoverContent, PopoverTrigger, } from "@/components/ui/popover"
-import { ArrowRight, Bell, BellOff, CheckCheck, MessageCircleCheck, MessageCircleReply, MoreHorizontal, RotateCw, RotateCwIcon, Settings, Trash2, } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger, } from "@/components/ui/dropdown-menu"
 import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle, } from "@/components/ui/empty"
+import { Popover, PopoverContent, PopoverTrigger, } from "@/components/ui/popover"
+import type { NotificationResponse } from "@/domain/notifications"
 import { cn } from "@/lib/utils"
-import { ScrollArea } from "./scroll-area"
-import { Link, useNavigate } from "react-router"
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
-import axiosClient from "@/clients/axiosClient"
-import { Fragment } from "react"
 import { urls } from "@/routes/routes"
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
+import { ArrowRight, Bell, BellOff, CheckCheck, MessageCircleCheck, MessageCircleReply, MoreHorizontal, RotateCw, Settings, Trash2 } from "lucide-react"
+import { Fragment } from "react"
+import { Link, useNavigate } from "react-router"
+import { ScrollArea } from "./scroll-area"
 
 
 export function NotificationsBell() {
@@ -23,11 +23,12 @@ export function NotificationsBell() {
         queryKey: ['notifications'],
         queryFn: async () => {
             const { data } = await axiosClient.get(`/notifications/user/`);
+            console.log(data);
             return data
         },
     })
 
-    const notifications = data?.notifications || []
+    const notifications = data?.notifications.results || []
 
     const unreadCount = data?.unread_count || 0
 
@@ -185,7 +186,7 @@ export function NotificationsBell() {
                                             </div>
 
                                             <div className="min-w-0 flex-1 text-xs">
-                                                <p className="leading-relaxed">
+                                                <p className="leading-relaxed wrap-anywhere pr-8 break-all">
                                                     <span className="font-semibold">
                                                         {actorName}
                                                     </span>{" "}

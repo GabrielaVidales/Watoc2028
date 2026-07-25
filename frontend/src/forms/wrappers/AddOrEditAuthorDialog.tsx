@@ -1,20 +1,18 @@
-import { authorDefaults, authorSchema, type AuthorAffiliationSchema, type AuthorSchema } from '@/schemas/abstract-schemas'
-import { zodResolver } from '@hookform/resolvers/zod'
-import React, { useEffect, useRef } from 'react'
-import { FormProvider, useForm } from 'react-hook-form'
-import { AlertDialog, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, } from "@/components/ui/alert-dialog"
-import AuthorForm from '../AuthorForm'
-import { Button } from '@/components/ui/button'
-import type z from 'zod'
 import axiosClient from '@/clients/axiosClient'
-import { useParams } from 'react-router'
-import { isAxiosError } from 'axios'
-import { Spinner } from '@/components/ui/spinner'
-import { Save, SearchX } from 'lucide-react'
-import { useFetch } from '@/hooks/use-fetch'
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion'
-import { cn } from '@/lib/utils'
 import { InfoAlert } from '@/components/InfoAlert'
+import { AlertDialog, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, } from "@/components/ui/alert-dialog"
+import { Button } from '@/components/ui/button'
+import { Spinner } from '@/components/ui/spinner'
+import { useFetch } from '@/hooks/use-fetch'
+import { authorDefaults, authorSchema, type AuthorAffiliationSchema, type AuthorSchema } from '@/schemas/abstracts/abstract-schemas'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { isAxiosError } from 'axios'
+import { Save } from 'lucide-react'
+import { useEffect, useRef } from 'react'
+import { FormProvider, useForm } from 'react-hook-form'
+import { useParams } from 'react-router'
+import type z from 'zod'
+import AuthorForm from '../AuthorForm'
 
 type AddOrEditAuthorProps = {
     open: boolean,

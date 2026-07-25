@@ -10,7 +10,7 @@ class Pagination(PageNumberPagination):
         try:
             return min(int(request.query_params.get("limit", 10)), self.max_page_size)
         except (TypeError, ValueError):
-            return 20
+            return 10
 
     def get_paginated_response(self, data):
         return Response(

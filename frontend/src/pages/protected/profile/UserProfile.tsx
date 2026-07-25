@@ -16,7 +16,7 @@ import { InfoAlert } from '@/components/InfoAlert';
 
 
 export default function UserProfile() {
-	const { currentUser, handleLogout } = useAuth()
+	const { currentUser: user, handleLogout } = useAuth()
 	const { profile } = useProfiles()
 
 	return (
@@ -27,13 +27,13 @@ export default function UserProfile() {
 						<CardContent className='p-6'>
 							<div className="flex flex-col items-center">
 								<Avatar className="size-32 border-4 border-secondary shadow-sm mb-4">
-									<AvatarImage src={currentUser.photo as string} alt="Profile" />
+									<AvatarImage src={user.photo as string} alt="Profile" />
 									<AvatarFallback className="text-2xl">JD</AvatarFallback>
 								</Avatar>
 
 								<div className="space-y-2 mb-6 text-center">
 									<h1 className="text-2xl font-bold text-foreground">
-										{currentUser.full_name}
+										{user.full_name}
 									</h1>
 
 									{profile?.participant && (
@@ -59,17 +59,17 @@ export default function UserProfile() {
 								<div className="w-full space-y-3 py-4 border-y border-muted/50 mb-6">
 									<div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
 										<Mail className="size-4 shrink-0 text-primary/70" />
-										<span className="truncate px-1">{currentUser.email}</span>
+										<span className="truncate px-1">{user.email}</span>
 									</div>
 
 									<div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
 										<MapPin className="size-4 shrink-0 text-primary/70" />
-										<span>{currentUser.city}, {currentUser.nationality}</span>
+										<span>{user.city}, {user.nationality}</span>
 									</div>
 
 									<div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
 										<Calendar className="size-4 shrink-0 text-primary/70" />
-										<span>Joined {formatDate(currentUser.date_joined)}</span>
+										<span>Joined {formatDate(user.date_joined)}</span>
 									</div>
 								</div>
 
@@ -165,7 +165,7 @@ export default function UserProfile() {
 								<h2 className='text-2xl font-semibold text-primary-main'>Edit your profile data</h2>
 								{profile?.participant && (
 									<EditUserForm defaultValues={{
-										...currentUser,
+										...user,
 										email: {
 											value: '',
 											confirm: ''

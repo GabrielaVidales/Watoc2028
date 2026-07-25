@@ -1,44 +1,35 @@
 import axiosClient from '@/clients/axiosClient';
-import type { NotificationResponse, Notification } from '@/domain/notifications';
-import { cn } from '@/lib/utils';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger, } from "@/components/ui/dropdown-menu"
-import { Link, useNavigate } from 'react-router';
-import React from 'react'
-import { BellOff, CheckCheck, MessageCircleCheck, MessageCircleReply, MoreHorizontal, RotateCw, Settings, Settings2, Trash2 } from 'lucide-react';
+import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator, } from "@/components/ui/breadcrumb";
 import { Button } from '@/components/ui/button';
-import {
-    Breadcrumb,
-    BreadcrumbItem,
-    BreadcrumbLink,
-    BreadcrumbList,
-    BreadcrumbPage,
-    BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb"
-import {
-    Card,
-    CardAction,
-    CardContent,
-    CardDescription,
-    CardFooter,
-    CardHeader,
-    CardTitle,
-} from "@/components/ui/card"
+import { Card, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Field, FieldLabel } from '@/components/ui/field';
+import { Pagination, PaginationContent, PaginationItem, PaginationNext, PaginationPrevious } from "@/components/ui/pagination";
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import type { Notification, NotificationResponse } from '@/domain/notifications';
 import { urls } from '@/routes/routes';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { keepPreviousData, useQuery } from '@tanstack/react-query';
+import { BellOff, CheckCheck, RotateCw, Settings2 } from 'lucide-react';
+import { useState } from 'react';
+import { Link } from 'react-router';
 import NotificationItem from './notification-item-component';
 
-
 function NotificationsPage() {
-
-    const { data, } = useQuery<NotificationResponse>({
-        queryKey: ['notifications'],
+    const [page, setPage] = useState(1)
+    const [itemsPerPage, setItemsPerPage] = useState(10)
+    const { data, isLoading } = useQuery<NotificationResponse>({
+        queryKey: ['notifications', page, itemsPerPage],
         queryFn: async () => {
-            const { data } = await axiosClient.get(`/notifications/user/`);
-            console.log(data);
+            const { data } = await axiosClient.get('/notifications/user/', {
+                params: {
+                    page: page,
+                    limit: itemsPerPage,
+                }
+            });
             return data
         },
+        placeholderData: keepPreviousData
     })
 
     if (!data) {
@@ -49,11 +40,11 @@ function NotificationsPage() {
         )
     }
 
-    const { notifications, unread_count } = data
+    const { results } = data.notifications
 
     const unread: Notification[] = []
     const read: Notification[] = []
-    notifications.forEach(n => n.is_read ? read.push(n) : unread.push(n))
+    results.forEach(n => n.is_read ? read.push(n) : unread.push(n))
 
     return (
         <div className='w-full max-w-5xl mx-auto p-8'>
@@ -106,19 +97,36 @@ function NotificationsPage() {
                             </TabsList>
 
                             <div className="flex gap-2">
+                                <Field orientation="horizontal" className="w-fit">
+                                    <FieldLabel htmlFor="select-rows-per-page">Items per page</FieldLabel>
+                                    <Select defaultValue="10" onValueChange={(value) => {
+                                        const limit = Number(value)
+                                        if (!isNaN(limit)) {
+                                            setItemsPerPage(limit)
+                                            setPage(1)
+                                        }
+                                    }}>
+                                        <SelectTrigger className="w-20" id="select-rows-per-page">
+                                            <SelectValue />
+                                        </SelectTrigger>
+                                        <SelectContent align="start">
+                                            <SelectGroup>
+                                                <SelectItem value="3">3</SelectItem>
+                                                <SelectItem value="10">10</SelectItem>
+                                                <SelectItem value="25">25</SelectItem>
+                                                <SelectItem value="50">50</SelectItem>
+                                                <SelectItem value="100">100</SelectItem>
+                                            </SelectGroup>
+                                        </SelectContent>
+                                    </Select>
+                                </Field>
 
-                                <Button
-                                    size="sm"
-                                    variant="outline"
-                                >
+                                <Button size="sm" variant="outline">
                                     <CheckCheck />
                                     Mark all as read
                                 </Button>
 
-                                <Button
-                                    size="sm"
-                                    variant="outline"
-                                >
+                                <Button size="sm" variant="outline">
                                     <RotateCw />
                                 </Button>
                             </div>
@@ -126,65 +134,173 @@ function NotificationsPage() {
                         </div>
                     </CardHeader>
 
-                    <CardContent>
-                        <section className='p-3 rounded-lg border-2 border-dashed min-h-70'>
-                            <TabsContent value="unread" className='space-y-1'>
-                                {unread?.map((notification) =>
-                                    <NotificationItem key={notification.id} notification={notification} />
-                                )}
-                                {unread.length === 0 && (
-                                    <div className="flex flex-col items-center justify-center text-center py-12 px-4 animate-in fade-in-50 duration-300">
-                                        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-muted">
-                                            <BellOff className="h-6 w-6 text-muted-foreground" />
-                                        </div>
-                                        <h3 className="mt-4 text-sm font-semibold tracking-tight">No unread notifications</h3>
-                                        <p className="mt-1 text-xs text-muted-foreground">
-                                            You're all caught up! You don't have any unread notifications right now.
-                                        </p>
+                    <ScrollArea className='px-4 h-100 bg-secondary border-y'>
+                        <TabsContent value="unread" className='space-y-1 py-4'>
+                            {unread?.map((notification) =>
+                                <NotificationItem key={notification.id} notification={notification} />
+                            )}
+                            {unread.length === 0 && (
+                                <div className="flex flex-col items-center justify-center text-center py-12 px-4 animate-in fade-in-50 duration-300">
+                                    <div className="flex h-12 w-12 items-center justify-center rounded-full bg-muted">
+                                        <BellOff className="h-6 w-6 text-muted-foreground" />
                                     </div>
-                                )}
-                            </TabsContent>
+                                    <h3 className="mt-4 text-sm font-semibold tracking-tight">No unread notifications</h3>
+                                    <p className="mt-1 text-xs text-muted-foreground">
+                                        You're all caught up! You don't have any unread notifications right now.
+                                    </p>
+                                </div>
+                            )}
+                        </TabsContent>
 
-                            <TabsContent value="read" className='space-y-1'>
-                                {read?.map((notification) =>
-                                    <NotificationItem key={notification.id} notification={notification} />
-                                )}
-                                {read.length === 0 && (
-                                    <div className="flex flex-col items-center justify-center text-center py-12 px-4 animate-in fade-in-50 duration-300">
-                                        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-muted">
-                                            <BellOff className="h-6 w-6 text-muted-foreground" />
-                                        </div>
-                                        <h3 className="mt-4 text-sm font-semibold tracking-tight">No notifications</h3>
-                                        <p className="mt-1 text-xs text-muted-foreground">
-                                            You're all caught up! You don't have any notifications right now.
-                                        </p>
+                        <TabsContent value="read" className='space-y-1 py-4'>
+                            {read?.map((notification) =>
+                                <NotificationItem key={notification.id} notification={notification} />
+                            )}
+                            {read.length === 0 && (
+                                <div className="flex flex-col items-center justify-center text-center py-12 px-4 animate-in fade-in-50 duration-300">
+                                    <div className="flex h-12 w-12 items-center justify-center rounded-full bg-muted">
+                                        <BellOff className="h-6 w-6 text-muted-foreground" />
                                     </div>
-                                )}
-                            </TabsContent>
+                                    <h3 className="mt-4 text-sm font-semibold tracking-tight">No notifications</h3>
+                                    <p className="mt-1 text-xs text-muted-foreground">
+                                        You're all caught up! You don't have any notifications right now.
+                                    </p>
+                                </div>
+                            )}
+                        </TabsContent>
 
-                            <TabsContent value="all" className='space-y-1'>
-                                {notifications?.map((notification) =>
-                                    <NotificationItem key={notification.id} notification={notification} />
-                                )}
-                                {notifications.length === 0 && (
-                                    <div className="flex flex-col items-center justify-center text-center py-12 px-4 animate-in fade-in-50 duration-300">
-                                        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-muted">
-                                            <BellOff className="h-6 w-6 text-muted-foreground" />
-                                        </div>
-                                        <h3 className="mt-4 text-sm font-semibold tracking-tight">No notifications</h3>
-                                        <p className="mt-1 text-xs text-muted-foreground">
-                                            You're all caught up! You don't have any notifications right now.
-                                        </p>
+                        <TabsContent value="all" className='space-y-1 py-4'>
+                            {results?.map((notification) =>
+                                <NotificationItem key={notification.id} notification={notification} />
+                            )}
+                            {results.length === 0 && (
+                                <div className="flex flex-col items-center justify-center text-center py-12 px-4 animate-in fade-in-50 duration-300">
+                                    <div className="flex h-12 w-12 items-center justify-center rounded-full bg-muted">
+                                        <BellOff className="h-6 w-6 text-muted-foreground" />
                                     </div>
-                                )}
-                            </TabsContent>
-                        </section>
-                    </CardContent>
+                                    <h3 className="mt-4 text-sm font-semibold tracking-tight">No notifications</h3>
+                                    <p className="mt-1 text-xs text-muted-foreground">
+                                        You're all caught up! You don't have any notifications right now.
+                                    </p>
+                                </div>
+                            )}
+                        </TabsContent>
+                    </ScrollArea>
+
+                    <CardFooter>
+                        {!isLoading && (
+                            <PaginationController
+                                page={page}
+                                onPageChange={setPage}
+                                totalPages={data.notifications.meta.total_pages}
+                            />
+                        )}
+                    </CardFooter>
                 </Card>
             </Tabs>
-
         </div>
     )
 }
 
 export default NotificationsPage
+
+
+type PaginationControllerProps = {
+    page: number
+    totalPages: number
+    onPageChange: (page: number) => void
+}
+
+export function PaginationController({
+    onPageChange,
+    totalPages,
+    page,
+}: PaginationControllerProps) {
+
+    const previousPage = page > 1 ? page - 1 : null
+    const nextPage = page < totalPages ? page + 1 : null
+    const pages = Array.from(
+        { length: totalPages },
+        (_, i) => i + 1
+    )
+
+    return (
+        <Pagination>
+            <PaginationContent>
+                <PaginationItem>
+                    <PaginationPrevious
+                        href="#"
+                        onClick={e => {
+                            e.preventDefault()
+                            if (page > 1)
+                                onPageChange(page - 1)
+                        }}
+                    />
+                </PaginationItem>
+
+                <PaginationItem>
+                    {previousPage ? (
+                        <button
+                            type="button"
+                            className="h-9 min-w-9 px-3 border rounded-md text-sm hover:bg-accent"
+                            onClick={() => onPageChange(previousPage)}
+                        >
+                            {previousPage}
+                        </button>
+                    ) : (
+                        <div className="h-9 min-w-9 bg-muted rounded-md border" />
+                    )}
+                </PaginationItem>
+
+                <PaginationItem>
+                    <Select
+                        value={String(page)}
+                        onValueChange={(value) =>
+                            onPageChange(Number(value))
+                        }
+                    >
+                        <SelectTrigger className="w-16 h-9">
+                            <SelectValue />
+                        </SelectTrigger>
+
+                        <SelectContent>
+                            {pages.map((item) => (
+                                <SelectItem
+                                    key={item}
+                                    value={String(item)}
+                                >
+                                    {item}
+                                </SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
+                </PaginationItem>
+
+                <PaginationItem>
+                    {nextPage ? (
+                        <button
+                            type="button"
+                            className="h-9 min-w-9 px-3 border rounded-md text-sm hover:bg-accent"
+                            onClick={() => onPageChange(nextPage)}
+                        >
+                            {nextPage}
+                        </button>
+                    ) : (
+                        <div className="h-9 min-w-9 bg-muted rounded-md border" />
+                    )}
+                </PaginationItem>
+
+                <PaginationItem>
+                    <PaginationNext
+                        href="#"
+                        onClick={e => {
+                            e.preventDefault()
+                            if (page < totalPages)
+                                onPageChange(page + 1)
+                        }}
+                    />
+                </PaginationItem>
+            </PaginationContent>
+        </Pagination>
+    )
+}

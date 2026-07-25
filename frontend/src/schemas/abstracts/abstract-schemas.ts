@@ -1,6 +1,6 @@
-import z from "zod";
 import { countWordsFromHTML } from "@/components/EnrichedTextArea";
 import { countries } from "@/utils/countriesInfo";
+import z from "zod";
 
 
 const countriesArray = countries.map(country => country.value)

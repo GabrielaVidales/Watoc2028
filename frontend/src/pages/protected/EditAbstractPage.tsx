@@ -1,27 +1,23 @@
-import React, { useEffect, useRef, useState } from 'react'
-import AbstractDeclarations from '@/forms/AbstractDeclarationsForm'
-import BeforeSubmitPage from './BeforeSubmitPage'
-import EditAbstractBody from '@/forms/wrappers/EditAbstractBody'
-import { Link, useNavigate, useParams } from 'react-router'
-import { urls } from '@/routes/routes'
-import { Button } from '@/components/ui/button'
-import { Gavel, HardDriveDownload, MailOpen, MessageSquareCode, RotateCw, TextQuote, UserPlus } from 'lucide-react'
-import type { AbstractSchema } from '@/schemas/abstract-schemas'
-import { Spinner } from '@/components/ui/spinner'
-import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator, } from "@/components/ui/breadcrumb"
-import { Card, CardAction, CardContent, CardDescription, CardFooter, CardHeader, CardTitle, } from "@/components/ui/card"
-import { Stepper, StepperDescription, StepperIndicator, StepperItem, StepperNav, StepperSeparator, StepperTitle, StepperTrigger, } from "@/components/reui/stepper"
-import { CheckIcon, LoaderCircleIcon } from 'lucide-react'
-import { Badge } from '@/components/ui/badge'
-import { useQuery } from '@tanstack/react-query'
 import axiosClient from '@/clients/axiosClient'
-import { cn, } from '@/lib/utils'
-import { useScrollSpy } from '@/hooks/useScrollSpy'
-import { Separator } from '@/components/ui/separator'
-import ShowAuthorsComponent from '@/components/ShowAuthors'
+import { Stepper, StepperDescription, StepperIndicator, StepperItem, StepperNav, StepperSeparator, StepperTitle, StepperTrigger, } from "@/components/reui/stepper"
 import ShowAffiliations from '@/components/ShowAffiliations'
+import ShowAuthorsComponent from '@/components/ShowAuthors'
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger, } from "@/components/ui/accordion"
+import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator, } from "@/components/ui/breadcrumb"
+import { Button } from '@/components/ui/button'
+import { Card, CardAction, CardContent, CardDescription, CardFooter, CardHeader, CardTitle, } from "@/components/ui/card"
+import AbstractDeclarations from '@/forms/AbstractDeclarationsForm'
+import EditAbstractBody from '@/forms/wrappers/EditAbstractBody'
 import { useIsMobile } from '@/hooks/use-mobile'
+import { useScrollSpy } from '@/hooks/useScrollSpy'
+import { cn, } from '@/lib/utils'
+import { urls } from '@/routes/routes'
+import type { AbstractSchema } from '@/schemas/abstracts/abstract-schemas'
+import { useQuery } from '@tanstack/react-query'
+import { CheckIcon, Gavel, LoaderCircleIcon, MailOpen, MessageSquareCode, RotateCw, TextQuote, UserPlus } from 'lucide-react'
+import { useEffect, useRef, useState } from 'react'
+import { Link, useNavigate, useParams } from 'react-router'
+import BeforeSubmitPage from './BeforeSubmitPage'
 
 
 function EditAbstractPage() {
