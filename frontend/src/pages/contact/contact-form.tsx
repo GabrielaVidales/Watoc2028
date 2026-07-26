@@ -11,7 +11,7 @@ import { Checkbox } from '@/components/ui/checkbox'
 import { Button } from '@/components/ui/button'
 import { ChevronRight } from 'lucide-react'
 import { Separator } from '@/components/ui/separator'
-import axiosClient from '@/clients/axiosClient'
+import api from '@/clients/api'
 import { isAxiosError } from 'axios'
 import { AnimatePresence, motion } from 'motion/react'
 import { InfoAlert } from '@/components/InfoAlert'
@@ -44,7 +44,7 @@ function ContactForm() {
     const onFormSubmit = handleSubmit(async (validData) => {
         if (isSubmitting || isSubmitSuccessful) return
         try {
-            const response = await axiosClient.post('/contact/', toSnakeCase(validData))
+            const response = await api.post('/contact/', toSnakeCase(validData))
             if (import.meta.env.DEV) {
                 console.log(response);
             }

@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 
 
 export const useProfiles = () => {
-    const { currentUser: user, getProfile } = useAuth();
+    const { user: user, getProfile } = useAuth();
 
     const [profile, setProfile] = useState<UserProfile>(null);
     const [fetching, setFetching] = useState(true);

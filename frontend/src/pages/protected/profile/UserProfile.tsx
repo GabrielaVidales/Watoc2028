@@ -16,7 +16,7 @@ import { InfoAlert } from '@/components/InfoAlert';
 
 
 export default function UserProfile() {
-	const { currentUser: user, handleLogout } = useAuth()
+	const { user: user, handleLogout } = useAuth()
 	const { profile } = useProfiles()
 
 	return (

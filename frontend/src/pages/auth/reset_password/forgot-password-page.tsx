@@ -1,4 +1,4 @@
-import axiosClient from '@/clients/axiosClient'
+import api from '@/clients/api'
 import { InfoAlert } from '@/components/InfoAlert'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card'
@@ -28,7 +28,7 @@ function ForgotPasswordPage() {
     const onFormSubmit = handleSubmit(async (data) => {
         console.log(data);
         try {
-            const res = await axiosClient.post('/auth/password-reset/request/', data)
+            const res = await api.post('/auth/password-reset/request/', data)
             if (res.data.detail) {
                 setMessage(res.data.detail)
             }

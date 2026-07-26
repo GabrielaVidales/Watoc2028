@@ -16,7 +16,7 @@ import { AppStoreButton, PlayStoreButton } from '@/components/ui/play-store-butt
 function UserDashboardPage() {
     const navigate = useNavigate()
 
-    const { currentUser: user } = useAuth()
+    const { user: user } = useAuth()
 
     const { profile } = useProfiles()
 

@@ -103,11 +103,10 @@ class CustomTokenRefreshView(TokenRefreshView):
     permission_classes = [permissions.AllowAny]
 
     def post(self, request, *args, **kwargs):
-        refresh_token = request.COOKIES.get("refresh_token")
-        if not refresh_token:
+        if not request.has_refresh_token:
             return Response(status=status.HTTP_401_UNAUTHORIZED)
 
-        serializer = self.get_serializer(data={"refresh": refresh_token})
+        serializer = self.get_serializer(data={"refresh": request.refresh_token})
         try:
             serializer.is_valid(raise_exception=True)
         except TokenError as e:
@@ -123,17 +122,23 @@ class CustomTokenRefreshView(TokenRefreshView):
             response.delete_cookie("refresh_token", path="/")
             return response
 
-        access_token = serializer.validated_data["access"]
         response = Response(status=status.HTTP_200_OK)
-        response.set_cookie(
-            "access_token",
-            access_token,
-            httponly=True,
-            secure=settings.COOKIE_SECURE,
-            samesite="Lax",
-            max_age=900,
-            path="/",
-        )
+        
+        # Si el cliente es mobile, no se insertan cookies
+        if request.is_mobile:
+            return response
+        
+        # Para clientes web, poner cookies
+        if "access" in serializer.validated_data:
+            response.set_cookie(
+                "access_token",
+                serializer.validated_data["access"],
+                httponly=True,
+                secure=settings.COOKIE_SECURE,
+                samesite="Lax",
+                max_age=900,
+                path="/",
+            )
         if "refresh" in serializer.validated_data:
             response.set_cookie(
                 "refresh_token",

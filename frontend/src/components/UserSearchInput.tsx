@@ -1,11 +1,11 @@
 import type { UserSchema } from "@/schemas/user-schemas"
-import axiosClient from "@/clients/axiosClient"
-import { useDebounce } from "@/hooks/use-debounce"
+import api from "@/clients/api"
 import { cn } from "@/lib/utils"
 import { useEffect, useState, type HTMLAttributes } from "react"
 import { Button } from "./ui/button"
 import { CircleUserRound, Plus, Search, SearchX } from "lucide-react"
-import { Command, CommandDialog, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList, CommandShortcut, } from "@/components/ui/command"
+import {  CommandDialog, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList, CommandShortcut, } from "@/components/ui/command"
+import { useDebounce } from "use-debounce"
 
 export type UserSearchInputProps = {
     delay?: number
@@ -21,7 +21,7 @@ export function UserSearchInput({
 
     const [users, setUsers] = useState<Partial<UserSchema>[]>([])
     const [input, setInput] = useState('')
-    const search = useDebounce(input, delay)
+    const [search] = useDebounce(input, delay)
 
     const searchUsers = async (input: string) => {
         const trimmedInput = input.trim()
@@ -30,7 +30,7 @@ export function UserSearchInput({
             return
         }
         try {
-            const res = await axiosClient.get(`users?search=${trimmedInput}`)
+            const res = await api.get(`users?search=${trimmedInput}`)
             setUsers(res.data)
         } catch (err) {
             if (import.meta.env.DEV) {

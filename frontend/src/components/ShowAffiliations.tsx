@@ -1,4 +1,4 @@
-import axiosClient from '@/clients/axiosClient';
+import api from '@/clients/api';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import React, { useState } from 'react'
 import { Spinner } from './ui/spinner';
@@ -26,7 +26,7 @@ function ShowAffiliations({ onAffiliationClicked }: Props) {
     const { data: affiliations, isLoading, isError, isFetching, error, refetch } = useQuery<Affiliation[]>({
         queryKey: ['affiliations'],
         queryFn: async () => {
-            const { data } = await axiosClient.get('/abstracts/affiliations');
+            const { data } = await api.get('/abstracts/affiliations');
             return data
         },
     })
@@ -40,7 +40,7 @@ function ShowAffiliations({ onAffiliationClicked }: Props) {
     const [deleteAffiliation, setDeleteAffiliation] = useState<Affiliation>(null)
     const deleteMutation = useMutation({
         mutationFn: async (id: number | string) => {
-            const { data } = await axiosClient.delete(`/abstracts/affiliations/${id}/`);
+            const { data } = await api.delete(`/abstracts/affiliations/${id}/`);
             return data;
         },
         onSuccess: () => {

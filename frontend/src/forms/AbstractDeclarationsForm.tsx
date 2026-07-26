@@ -1,4 +1,4 @@
-import axiosClient from '@/clients/axiosClient'
+import api from '@/clients/api'
 import { Button } from '@/components/ui/button'
 import { Field, FieldDescription, FieldError, FieldLabel, } from '@/components/ui/field'
 import { Item } from '@/components/ui/item'
@@ -21,7 +21,7 @@ function AbstractDeclarations() {
     const { data: declarationsData } = useQuery<AbstractDeclarationValues>({
         queryKey: ['abstract', 'declarations', id],
         queryFn: async () => {
-            const { data } = await axiosClient.get(`/abstracts/submissions/${id}/declarations/`)
+            const { data } = await api.get(`/abstracts/submissions/${id}/declarations/`)
             return data
         }
     })
@@ -30,7 +30,7 @@ function AbstractDeclarations() {
 
     const patchMutation = useMutation({
         mutationFn: async (data: AbstractDeclarationValues) => {
-            const res = await axiosClient.patch(`/abstracts/submissions/${id}/declarations/`, data)
+            const res = await api.patch(`/abstracts/submissions/${id}/declarations/`, data)
             if (import.meta.env.DEV) {
                 console.log('Success:', res.data);
             }

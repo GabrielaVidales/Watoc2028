@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Eye, EyeOff, KeySquare, Lock, Send, User } from 'lucide-react';
 import PasswordStrengthMeter from '@/components/PasswordStrengthMeter';
-import axiosClient from '@/clients/axiosClient';
+import api from '@/clients/api';
 import { InputGroup, InputGroupAddon, InputGroupButton, InputGroupInput } from '@/components/ui/input-group';
 import { Spinner } from '@/components/ui/spinner';
 import { Separator } from '@/components/ui/separator';
@@ -61,7 +61,7 @@ export default function RegisterForm() {
 
     const onFormSubmit = handleSubmit(async (data) => {
         try {
-            await axiosClient.post('/users/', data)
+            await api.post('/users/', data)
             navigate(urls.auth.login, {
                 replace: true,
                 state: {

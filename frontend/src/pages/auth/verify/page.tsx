@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Link, useSearchParams } from "react-router";
 import { AxiosError } from "axios";
-import axiosClient from "@/clients/axiosClient";
+import api from "@/clients/api";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Loader2, CheckCircle2, XCircle, } from "lucide-react";
@@ -39,7 +39,7 @@ function VerifyPage() {
 
                 await new Promise(resolve => setTimeout(resolve, 1000));
 
-                const response = await axiosClient.post<VerifyResponse>("/auth/verify-email/", { token });
+                const response = await api.post<VerifyResponse>("/auth/verify-email/", { token });
 
                 const { code, detail } = response.data;
                 switch (code) {

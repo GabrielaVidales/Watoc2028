@@ -10,7 +10,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { PhotoCropDialog } from "./photo-crop-dialog"
 import { Save, Trash2 } from "lucide-react"
 import { Spinner } from "@/components/ui/spinner";
-import axiosClient from "@/clients/axiosClient";
+import api from "@/clients/api";
 import { useAuth } from "@/contexts/AuthContext";
 
 type Props = {
@@ -35,14 +35,14 @@ export function ChangePhotoForm({ data }: Props) {
         console.log(data);
         if (data.profilePictureDeleted) {
             console.log('Borrando foto');
-            await axiosClient.delete('/users/change-profile-pic/')
+            await api.delete('/users/change-profile-pic/')
             await fetchUser()
             reset()
 
 
         } else if (data.profilePicture) {
             console.log('Guardando foto');
-            await axiosClient.post('/users/change-profile-pic/', data, {
+            await api.post('/users/change-profile-pic/', data, {
                 headers: {
                     'Content-Type': 'multipart/form-data'
                 }

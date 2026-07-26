@@ -1,4 +1,4 @@
-import axiosClient from '@/clients/axiosClient'
+import api from '@/clients/api'
 import { Button } from '@/components/ui/button'
 import { ButtonGroup } from '@/components/ui/button-group'
 import { Card, CardAction, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
@@ -21,7 +21,7 @@ function ReviewAbstract() {
     const { data: assignment, isLoading } = useQuery({
         queryKey: ['review', id],
         queryFn: async () => {
-            const { data } = await axiosClient.get<ReviewAssignment>(`/reviews/assignments/${id}/`)
+            const { data } = await api.get<ReviewAssignment>(`/reviews/assignments/${id}/`)
             return data
         }
     })

@@ -1,4 +1,4 @@
-import axiosClient from '@/clients/axiosClient';
+import api from '@/clients/api';
 import type { NotificationResponse, Notification } from '@/domain/notifications';
 import { cn } from '@/lib/utils';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
@@ -21,7 +21,7 @@ function NotificationItem({ notification }: Props) {
 
     const mutation = useMutation({
         mutationFn: async (ctx: { id: number, is_read: boolean }) => {
-            const { data } = await axiosClient.patch(`/notifications/${ctx.id}/toggle-is-read/`, { is_read: ctx.is_read });
+            const { data } = await api.patch(`/notifications/${ctx.id}/toggle-is-read/`, { is_read: ctx.is_read });
             return data;
         },
         onSuccess: () => {
@@ -31,7 +31,7 @@ function NotificationItem({ notification }: Props) {
 
     const deleteMut = useMutation({
         mutationFn: async (id: number) => {
-            const { data } = await axiosClient.delete(`/notifications/${id}/`);
+            const { data } = await api.delete(`/notifications/${id}/`);
             return data;
         },
         onSuccess: () => {

@@ -1,4 +1,4 @@
-import axiosClient from '@/clients/axiosClient'
+import api from '@/clients/api'
 import RichTextEditor, { countWordsFromHTML } from '@/components/EnrichedTextArea'
 import { Button } from '@/components/ui/button'
 import { Field, FieldDescription, FieldError, FieldLabel } from '@/components/ui/field'
@@ -27,14 +27,14 @@ function EditAbstractBody({ }: AbstractFormProps) {
     const { data: abstract } = useQuery<AbstractSchema>({
         queryKey: ['abstract', id],
         queryFn: async () => {
-            const { data } = await axiosClient.get(`/abstracts/submissions/${id}/`)
+            const { data } = await api.get(`/abstracts/submissions/${id}/`)
             return data
         }
     })
 
     const saveMutation = useMutation({
         mutationFn: async (data: AbstractSchema) => {
-            const { data: response } = await axiosClient.patch(`/abstracts/submissions/${id}/`, data)
+            const { data: response } = await api.patch(`/abstracts/submissions/${id}/`, data)
             return response
         },
         onSuccess: () => queryClient.invalidateQueries({ queryKey: ['abstract', id] }),

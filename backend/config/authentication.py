@@ -14,12 +14,12 @@ class CustomJWTAuthentication(JWTAuthentication):
         
         # Si es mobile aquí se detiene
         if request.is_mobile:
-            print('Mobile no autenticado')
             return None
         
         # Intentamos obtener el token de la cookie 'access_token'
         raw_token = request.COOKIES.get("access_token")
         if raw_token is None:
+            print('No autenticado')
             return None
         
         validated_token = self.get_validated_token(raw_token)

@@ -17,10 +17,7 @@ import { useEffect } from 'react';
 import HomeLayout from './layouts/HomeLayout'
 import VisaRequirements from '@/pages/visa/VisaRequirements'
 import AuthLayout from './layouts/AuthLayout'
-import CreateAbstractPage from './pages/protected/CreateAbstractPage'
 import { urls } from './routes/routes'
-import EditAbstractPage from './pages/protected/EditAbstractPage'
-import AbstractPreview from './pages/protected/AbstractPreview'
 import ConfirmationPage from './pages/protected/confirmation-assistance/page'
 import { SelectFeePage } from './pages/protected/confirmation-assistance/fee/page'
 import { SelectTourPage } from './pages/protected/confirmation-assistance/tour/page'
@@ -33,19 +30,17 @@ import VerifyEmailPage from './pages/auth/verify/page'
 import SettingsPage from './pages/protected/settings/settings-page'
 import ForgotPasswordPage from './pages/auth/reset_password/forgot-password-page'
 import CreatePasswordPage from './pages/auth/create_new_password/create-new-password'
-import AbstractSubmissionsPage from './pages/protected/abstract-submissions/page'
+import AbstractSubmissionsPage from './pages/protected/submissions/summary/page'
 import UserDashboardPage from './pages/protected/dashboard/page'
 import TestPage from './pages/test'
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import NotificationsPage from './pages/protected/notifications/page'
 import ManageUsersPage from './pages/protected/administration/manage-users/manage_users'
 import ReviewsList from './pages/protected/reviews/list/page'
 import ReviewAbstract from './pages/protected/reviews/view/page'
 import ManageReviewsPage from './pages/protected/administration/manage-reviews/manage-reviews'
+import EditAbstractPage from './pages/protected/EditAbstractPage'
 
 function App() {
-	const queryClient = new QueryClient()
-
 	const { pathname } = useLocation()
 
 	useEffect(() => {
@@ -57,79 +52,77 @@ function App() {
 	}, [pathname])
 
 	return (
-		<QueryClientProvider client={queryClient}>
-			<Routes>
-				<Route path='/' element={<HomeLayout />}>
-					<Route index element={<Home />} />
-					<Route path='/watoc' element={<AboutWATOC />} />
-					<Route path='/venue' element={<VenuePage />} />
-					<Route path='/hotel-booking' element={<HotelBooking />} />
-					<Route path='/abstract-submission' element={<AbstractSubmissionInfo />} />
-					<Route path='/young-watoc' element={<YoungWatoc />} />
-					<Route path='/visa' element={<VisaRequirements />} />
-					<Route path='/restaurants' element={<Restaurants />} />
-					<Route path='/transportation' element={<Transportation />} />
-					<Route path='/contact' element={<ContactPage />} />
-				</Route>
+		<Routes>
+			<Route path='/' element={<HomeLayout />}>
+				<Route index element={<Home />} />
+				<Route path='/watoc' element={<AboutWATOC />} />
+				<Route path='/venue' element={<VenuePage />} />
+				<Route path='/hotel-booking' element={<HotelBooking />} />
+				<Route path='/abstract-submission' element={<AbstractSubmissionInfo />} />
+				<Route path='/young-watoc' element={<YoungWatoc />} />
+				<Route path='/visa' element={<VisaRequirements />} />
+				<Route path='/restaurants' element={<Restaurants />} />
+				<Route path='/transportation' element={<Transportation />} />
+				<Route path='/contact' element={<ContactPage />} />
+			</Route>
 
-
-				{/* Rutas sólo para usuarios no loggeados */}
-				<Route element={<GuestRoute redirectTo={urls.users.profile} />}>
-					<Route element={<AuthLayout />}>
-						<Route path={urls.auth.login} element={<LoginPage />} />
-						<Route path={urls.auth.register} element={<RegisterPage />} />
-						<Route path={urls.auth.forgotPassword} element={<ForgotPasswordPage />} />
-						<Route path={urls.auth.resetPassword} element={<CreatePasswordPage />} />
-					</Route>
-				</Route>
-
-				{/* Rutas protegidas van aquí */}
+			{/* Rutas sólo para usuarios no loggeados */}
+			<Route element={<GuestRoute redirectTo={urls.users.profile} />}>
 				<Route element={<AuthLayout />}>
-
-					{/* 
-						DEPRECAR ESTAS RUTAS POCO A POCO
-					*/}
-					<Route element={<ProtectedRoute allowedRoles={['admin', 'participant']} />} >
-						<Route path={urls.users.confirmAssistance.start} element={<ConfirmationPage />} />
-						<Route path={urls.users.confirmAssistance.fee} element={<SelectFeePage />} />
-						<Route path={urls.users.confirmAssistance.dinner} element={<DinnerPage />} />
-						<Route path={urls.users.confirmAssistance.tour} element={<SelectTourPage />} />
-						<Route path={urls.users.confirmAssistance.payment} element={<ConfirmPaymentPage />} />
-					</Route>
+					<Route path={urls.auth.login} element={<LoginPage />} />
+					<Route path={urls.auth.register} element={<RegisterPage />} />
+					<Route path={urls.auth.forgotPassword} element={<ForgotPasswordPage />} />
+					<Route path={urls.auth.resetPassword} element={<CreatePasswordPage />} />
 				</Route>
+			</Route>
 
+			{import.meta.env.DEV && (
 				<Route element={<ProtectedRoute allowedRoles={['admin', 'participant', 'reviewer']} />} >
-					<Route element={<DashboardLayout />}>
-
-						<Route element={<ProtectedRoute allowedRoles={['admin']} />} >
-							<Route path={urls.users.administration.manageUsers} element={<ManageUsersPage />} />
-							<Route path={urls.users.administration.manageReviewers} element={<ManageReviewsPage />} />
+					<Route element={<AuthLayout />}>
+						{/*  DEPRECAR ESTAS RUTAS POCO A POCO  */}
+						<Route element={<ProtectedRoute allowedRoles={['admin', 'participant']} />} >
+							<Route path={urls.users.confirmAssistance.start} element={<ConfirmationPage />} />
+							<Route path={urls.users.confirmAssistance.fee} element={<SelectFeePage />} />
+							<Route path={urls.users.confirmAssistance.dinner} element={<DinnerPage />} />
+							<Route path={urls.users.confirmAssistance.tour} element={<SelectTourPage />} />
+							<Route path={urls.users.confirmAssistance.payment} element={<ConfirmPaymentPage />} />
 						</Route>
-
-						<Route element={<ProtectedRoute allowedRoles={['reviewer']} />} >
-							<Route path={urls.users.reviews.list} element={<ReviewsList />} />
-							<Route path={urls.users.reviews.view.url} element={<ReviewAbstract />} />
-						</Route>
-
-						<Route element={<ProtectedRoute allowedRoles={['participant']} />} >
-							<Route path={urls.users.submissions.summary} element={<AbstractSubmissionsPage />} />
-							<Route path={urls.users.submissions.edit.url} element={<EditAbstractPage />} />
-						</Route>
-
-						{/* Rutas para todos los usuarios */}
-						<Route path={urls.users.profile} element={<UserDashboardPage />} />
-						<Route path={urls.users.settings} element={<SettingsPage />} />
-						<Route path={urls.users.notifications} element={<NotificationsPage />} />
 					</Route>
-					<Route path={'/test'} element={<TestPage />} />
 				</Route>
+			)}
 
-				<Route path={urls.auth.verify} element={<VerifyEmailPage />} />
+			<Route element={<ProtectedRoute allowedRoles={['admin', 'participant', 'reviewer']} />} >
+				<Route element={<DashboardLayout />}>
 
-				{/* Para rutas diferentes */}
-				<Route path='*' element={<NotFound />} />
-			</Routes>
-		</QueryClientProvider>
+					<Route element={<ProtectedRoute allowedRoles={['admin']} />} >
+						<Route path={urls.users.administration.manageUsers} element={<ManageUsersPage />} />
+						<Route path={urls.users.administration.manageReviewers} element={<ManageReviewsPage />} />
+					</Route>
+
+					<Route element={<ProtectedRoute allowedRoles={['reviewer']} />} >
+						<Route path={urls.users.reviews.list} element={<ReviewsList />} />
+						<Route path={urls.users.reviews.view.url} element={<ReviewAbstract />} />
+					</Route>
+
+					<Route element={<ProtectedRoute allowedRoles={['participant']} />} >
+						<Route path={urls.users.submissions.summary} element={<AbstractSubmissionsPage />} />
+						<Route path={urls.users.submissions.edit.url} element={<EditAbstractPage />} />
+					</Route>
+
+
+					{/* Rutas para todos los usuarios */}
+					<Route path={urls.users.profile} element={<UserDashboardPage />} />
+					<Route path={urls.users.settings} element={<SettingsPage />} />
+					<Route path={urls.users.notifications} element={<NotificationsPage />} />
+				</Route>
+				<Route path={'/test'} element={<TestPage />} />
+			</Route>
+
+			<Route path={urls.auth.verify} element={<VerifyEmailPage />} />
+
+			{/* Para rutas diferentes */}
+			<Route path='*' element={<NotFound />} />
+		</Routes>
 	)
 }
 

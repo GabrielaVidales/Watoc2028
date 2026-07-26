@@ -1,4 +1,4 @@
-import axiosClient from "@/clients/axiosClient"
+import api from "@/clients/api"
 import { isAxiosError } from "axios"
 import { useCallback, useState } from "react"
 
@@ -17,7 +17,7 @@ export const useMutation = () => {
         try {
             await new Promise(r=>setTimeout(r, 200))
 
-            const res = await axiosClient[method]<T>(url, body)
+            const res = await api[method]<T>(url, body)
             return res.data
         } catch (err) {
             if (import.meta.env.DEV) {

@@ -75,7 +75,7 @@ export default function NavBar({
 }: Props) {
     const scroll = useScroll(scrollThreshold)
 
-    const { currentUser: user } = useAuth()
+    const { user: user } = useAuth()
 
     const menus = [
         ...menuItems,

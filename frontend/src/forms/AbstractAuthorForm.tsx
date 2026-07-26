@@ -1,5 +1,5 @@
 import React from 'react'
-import axiosClient from '@/clients/axiosClient'
+import api from '@/clients/api'
 import { Field, FieldContent, FieldError, FieldLabel } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
 import { InputGroup, InputGroupAddon, InputGroupInput } from '@/components/ui/input-group'
@@ -100,11 +100,11 @@ export function AuthorFormContent({ onSubmit, values }: Props) {
     const onFormSubmit = handleSubmit(async (data) => {
         try {
             if (data.id) {
-                const res = await axiosClient.patch(`/abstracts/authors/${data.id}/`, { ...data, abstract_id: 1 })
+                const res = await api.patch(`/abstracts/authors/${data.id}/`, { ...data, abstract_id: 1 })
                 if (import.meta.env.DEV)
                     console.log(res);
             } else {
-                const res = await axiosClient.post('/abstracts/authors/', { ...data, id: undefined, abstract_id: 1 })
+                const res = await api.post('/abstracts/authors/', { ...data, id: undefined, abstract_id: 1 })
                 if (import.meta.env.DEV)
                     console.log(res);
             }
@@ -517,7 +517,7 @@ export function UserSearchCommand({ onUserSelected }: UserSearchProps) {
         queryFn: async () => {
             if (input === '') return []
             try {
-                const { data } = await axiosClient.get<UserSchema[]>(`users?search=${debouncedInput}`)
+                const { data } = await api.get<UserSchema[]>(`users?search=${debouncedInput}`)
                 return data
             } catch (error) {
                 return []
@@ -603,7 +603,7 @@ export function AffiliationSearchCommand({ onAffiliationSelected }: AffiliationS
         queryKey: ['users', debouncedInput],
         queryFn: async () => {
             try {
-                const { data } = await axiosClient.get<Affiliation[]>(`abstracts/affiliations/?search=${debouncedInput}`)
+                const { data } = await api.get<Affiliation[]>(`abstracts/affiliations/?search=${debouncedInput}`)
                 return data
             } catch (error) {
                 return []

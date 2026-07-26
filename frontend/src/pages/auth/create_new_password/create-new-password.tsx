@@ -1,4 +1,4 @@
-import axiosClient from '@/clients/axiosClient'
+import api from '@/clients/api'
 import { InfoAlert } from '@/components/InfoAlert'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card'
@@ -32,7 +32,7 @@ function CreatePasswordPage() {
             }
 
             try {
-                const res = await axiosClient.post("/auth/password-reset/verify/", { token });
+                const res = await api.post("/auth/password-reset/verify/", { token });
                 console.log(res);
 
                 setState("success");
@@ -105,7 +105,7 @@ export function CreatePasswordForm() {
             confirm_password: data.confirmPassword
         }
         try {
-            const res = await axiosClient.post('/auth/password-reset/confirm/', payload)
+            const res = await api.post('/auth/password-reset/confirm/', payload)
             if (res.data.detail) {
                 setMessage(res.data.detail)
                 setTimeout(()=>{

@@ -1,4 +1,4 @@
-import axiosClient from "@/clients/axiosClient"
+import api from "@/clients/api"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger, } from "@/components/ui/dropdown-menu"
@@ -22,7 +22,7 @@ export function NotificationsBell() {
     const { data, isLoading, refetch } = useQuery<NotificationResponse>({
         queryKey: ['notifications'],
         queryFn: async () => {
-            const { data } = await axiosClient.get(`/notifications/user/`);
+            const { data } = await api.get(`/notifications/user/`);
             console.log(data);
             return data
         },
@@ -35,11 +35,11 @@ export function NotificationsBell() {
     const mutation = useMutation({
         mutationFn: async (ctx: { id?: number, is_read?: boolean, mark_all_read?: boolean }) => {
             if (ctx.mark_all_read) {
-                const { data } = await axiosClient.patch(`/notifications/toggle-all-read/`);
+                const { data } = await api.patch(`/notifications/toggle-all-read/`);
                 return data;
             }
 
-            const { data } = await axiosClient.patch(`/notifications/${ctx.id}/toggle-is-read/`, { is_read: ctx.is_read });
+            const { data } = await api.patch(`/notifications/${ctx.id}/toggle-is-read/`, { is_read: ctx.is_read });
             return data;
         },
         onSuccess: () => {
@@ -50,7 +50,7 @@ export function NotificationsBell() {
 
     const deleteMut = useMutation({
         mutationFn: async (id: number) => {
-            const { data } = await axiosClient.delete(`/notifications/${id}/`);
+            const { data } = await api.delete(`/notifications/${id}/`);
             return data;
         },
         onSuccess: () => {

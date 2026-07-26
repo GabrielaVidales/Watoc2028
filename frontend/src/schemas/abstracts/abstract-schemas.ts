@@ -67,20 +67,17 @@ export const authorSchema = z.object({
 })
 
 export const abstractSchema = z.object({
-    id: z.number().nullable().optional().default(null),
+    id: z.number().nullable().optional(),
 
     title: z.string()
         .min(1, "Please enter the abstract title")
-        .refine((val) => countWordsFromHTML(val) <= 10, "The abstract title must not exceed 10 words.")
-        .default(''),
+        .refine((val) => countWordsFromHTML(val) <= 10, "The abstract title must not exceed 10 words."),
 
-    presentation_type: z.enum(presentationTypes.map(v => v.value), 'Opción no válida')
-        .default(''),
+    presentation_type: z.enum(presentationTypes.map(v => v.value), 'Opción no válida'),
 
     text: z.string()
         .refine((val) => countWordsFromHTML(val) <= 350, "Abstract must be at most 350 words")
-        .refine((val) => countWordsFromHTML(val) > 99, "Abstract must be at least 100 words")
-        .default(''),
+        .refine((val) => countWordsFromHTML(val) > 99, "Abstract must be at least 100 words"),
 
     authors: z.array(authorSchema)
         .min(1, "At least one author is required")
@@ -93,13 +90,11 @@ export const abstractSchema = z.object({
                 });
             }
         })
-        .optional()
-        .default([]),
+        .optional(),
 
     references: z.string()
         .min(1, "Please provide the references")
-        .refine((val) => countWordsFromHTML(val) <= 150, "References must be at most 150 words")
-        .default(''),
+        .refine((val) => countWordsFromHTML(val) <= 150, "References must be at most 150 words"),
 
     status: z.enum(ABSTRACT_STATUS).optional(),
 

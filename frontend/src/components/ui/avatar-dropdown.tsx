@@ -14,7 +14,7 @@ import { ChevronDown } from 'lucide-react'
 import { Link } from 'react-router'
 
 export function AvatarDropdown() {
-    const { handleLogout, currentUser: user } = useAuth()
+    const { handleLogout, user: user } = useAuth()
 
     return (
         <DropdownMenu>

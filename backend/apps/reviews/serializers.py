@@ -53,24 +53,64 @@ class AbstractSerializer(serializers.ModelSerializer):
 
 
 class ReviewAssignmentSerializer(serializers.ModelSerializer):
-    created_at = serializers.SerializerMethodField()
-    last_update = serializers.SerializerMethodField()
-    user = RelatedUserSerializer()
-    assigned_by = RelatedUserSerializer()
-    abstract = AbstractSerializer()
+    # estos son read_only=True para que POST reciba los ID
+    user = RelatedUserSerializer(read_only=True)
+    abstract = AbstractSerializer(read_only=True)
+    assigned_by = RelatedUserSerializer(read_only=True)
+
+    user_id = serializers.PrimaryKeyRelatedField(
+        queryset=User.objects.all(),
+        source="user",
+        write_only=True,
+    )
+    abstract_id = serializers.PrimaryKeyRelatedField(
+        queryset=Abstract.objects.all(),
+        source="abstract",
+        write_only=True,
+    )
+    assigned_by_id = serializers.PrimaryKeyRelatedField(
+        queryset=User.objects.all(),
+        source="assigned_by",
+        write_only=True,
+    )
+    due_date = serializers.DateTimeField(write_only=True)
+
+    last_update_timestamp = serializers.SerializerMethodField()
+    created_at_timestamp = serializers.SerializerMethodField()
+    due_date_timestamp = serializers.SerializerMethodField()
 
     class Meta:
         model = ReviewAssignment
-        fields = "__all__"
+        fields = [
+            "id",
+            "user", "user_id",
+            "abstract", "abstract_id",
+            "assigned_by", "assigned_by_id",
+            "is_active",
+            "due_date", "due_date_timestamp",
+            "created_at_timestamp",
+            "last_update_timestamp",
+        ]
 
-    def get_created_at(self, obj):
+    def get_due_date_timestamp(self, obj):
+        return int(obj.due_date.timestamp() * 1000)
+
+    def get_created_at_timestamp(self, obj):
         return int(obj.created_at.timestamp() * 1000)
 
-    def get_last_update(self, obj):
+    def get_last_update_timestamp(self, obj):
         return int(obj.last_update.timestamp() * 1000)
 
+    @transaction.atomic
+    def create(self, validated_data):
+        print(validated_data)
+        response = super().create(validated_data)
 
-class ReviewSerializer(serializers.ModelSerializer):    
+        transaction.set_rollback(True)
+        return response
+
+
+class ReviewSerializer(serializers.ModelSerializer):
     class Meta:
         model = Review
         fields = "__all__"

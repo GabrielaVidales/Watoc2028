@@ -13,7 +13,7 @@ import { Link } from 'react-router';
 import { NotificationSettings } from './components/notifications-settings-component';
 
 function SettingsPage() {
-    const { currentUser: user } = useAuth()
+    const { user: user } = useAuth()
     const { profile } = useProfiles()
 
     return (

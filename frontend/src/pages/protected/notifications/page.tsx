@@ -1,4 +1,4 @@
-import axiosClient from '@/clients/axiosClient';
+import api from '@/clients/api';
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator, } from "@/components/ui/breadcrumb";
 import { Button } from '@/components/ui/button';
 import { Card, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -21,7 +21,7 @@ function NotificationsPage() {
     const { data, isLoading } = useQuery<NotificationResponse>({
         queryKey: ['notifications', page, itemsPerPage],
         queryFn: async () => {
-            const { data } = await axiosClient.get('/notifications/user/', {
+            const { data } = await api.get('/notifications/user/', {
                 params: {
                     page: page,
                     limit: itemsPerPage,

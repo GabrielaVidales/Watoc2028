@@ -1,55 +1,45 @@
-import axiosClient from '@/clients/axiosClient'
+import api from '@/clients/api'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList, CommandShortcut } from "@/components/ui/command"
 import { Field, FieldContent, FieldDescription, FieldLabel } from '@/components/ui/field'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
+import { Separator } from '@/components/ui/separator'
 import { Switch } from '@/components/ui/switch'
 import type { PaginatedResponse } from '@/domain/pagination'
+import ReviewAssignmentForm from '@/forms/reviews/review-assignment-form'
 import { cn } from '@/lib/utils'
 import type { AbstractDTO } from '@/schemas/abstracts/abstract-schemas'
+import type { UserSchema } from '@/schemas/user-schemas'
 import { useQuery } from '@tanstack/react-query'
-import { Check, ChevronDown, Plus, Pointer, SearchX, X } from 'lucide-react'
-import React, { useEffect } from 'react'
+import { Check, ChevronDown, Circle, Plus, Pointer, SearchX, X } from 'lucide-react'
+import React, { useEffect, type HTMLAttributes } from 'react'
 import { useDebounce } from 'use-debounce'
 
 function TestPage() {
     const [selected, setSelected] = React.useState<Partial<AbstractDTO>>(null);
+    const [user, setUser] = React.useState<Partial<UserSchema>>(null);
 
     useEffect(() => {
         console.log(selected);
     }, [selected])
 
     return (
-        <div className='max-w-2xl mx-auto w-full gap-4 p-2'>
+        <div className='max-w-lg mx-auto w-full gap-4 p-2'>
 
             <Card className='w-full mx-auto'>
                 <CardHeader>
-                    <CardTitle>Manage Authors</CardTitle>
+                    <CardTitle>Review Assignment</CardTitle>
                     <CardDescription>
                         View, create, edit, or remove author records for your submission.
                     </CardDescription>
                 </CardHeader>
-                <CardContent className='border-y p-3 space-y-1'>
-                    <Field orientation="responsive">
-                        <FieldContent>
-                            <FieldLabel>
-                                Assign submission
-                            </FieldLabel>
-                            <FieldDescription>
-                                Select a submission from the list
-                            </FieldDescription>
-                        </FieldContent>
 
-                        <Switch>
-                            <Check className='size-3 stroke-3'/>
-                        </Switch>
+                <Separator />
 
-                        <SelectAbstractCommand
-                            value={selected}
-                            onChange={setSelected}
-                        />
-                    </Field>
+                <CardContent>
+                    <ReviewAssignmentForm />
                 </CardContent>
             </Card>
 
@@ -74,9 +64,9 @@ export function SelectAbstractCommand({
     const [search, setSearch] = React.useState("");
     const [debouncedSearch] = useDebounce(search, 400);
     const { data: abstracts = [], isFetching } = useQuery<AbstractDTO[]>({
-        queryKey: ["users", debouncedSearch],
+        queryKey: ["abstracts", debouncedSearch],
         queryFn: async () => {
-            const { data } = await axiosClient.get<PaginatedResponse<AbstractDTO>>("/abstracts/submissions", {
+            const { data } = await api.get<PaginatedResponse<AbstractDTO>>("/abstracts/submissions", {
                 params: { title: debouncedSearch },
             });
             return data.results;
@@ -176,3 +166,148 @@ export function SelectAbstractCommand({
     )
 }
 
+
+
+
+type SelectCommandProps<T> = {
+    value: Partial<T> | null
+    onChange: (item: T | null) => Promise<void> | void
+
+    // fetching
+    endpoint: string
+    queryKey: string
+    searchParam?: string // default: "search"
+    queryParams?: Record<string, unknown> // params extra fijos, si hacen falta
+
+    // identidad / comparación
+    getId: (item: Partial<T> | T) => string | number
+
+
+    // presentación
+    getTriggerLabel: (value: Partial<T> | null) => React.ReactNode
+    renderOption: (item: T, isSelected: boolean) => React.ReactNode
+
+    placeholder?: string
+    emptyLabel?: string
+    emptyHint?: string
+    contentClassName?: string
+
+}
+
+export function SelectCommand<T>({
+    value,
+    onChange,
+    endpoint,
+    queryKey,
+    searchParam = "search",
+    queryParams,
+    getId,
+    getTriggerLabel,
+    renderOption,
+    placeholder = "Search...",
+    emptyLabel = "No results found",
+    emptyHint = "Try another search.",
+    className,
+    contentClassName,
+}: SelectCommandProps<T> & Omit<HTMLAttributes<HTMLDivElement>, 'onChange'>) {
+    const [open, setOpen] = React.useState(false);
+    const [search, setSearch] = React.useState("");
+    const [debouncedSearch] = useDebounce(search, 400);
+
+    const { data: items = [], isFetching } = useQuery<T[]>({
+        queryKey: [queryKey, debouncedSearch],
+        queryFn: async () => {
+            const { data } = await api.get<PaginatedResponse<T>>(endpoint, {
+                params: { [searchParam]: debouncedSearch, ...queryParams },
+            });
+            return data.results;
+        },
+    });
+
+    const onItemSelected = (item: T) => {
+        onChange(item);
+        setSearch("");
+    };
+
+    const onItemUnselected = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+        e.stopPropagation();
+        onChange(null);
+        setSearch("");
+    };
+
+    return (
+        <Popover open={open} onOpenChange={setOpen}>
+            <PopoverTrigger asChild>
+                <Button
+                    type="button"
+                    variant="outline"
+                    role="combobox"
+                    className={cn(
+                        "w-80 justify-between relative pr-7!",
+                        className,
+                    )}
+                >
+                    <span className='truncate'>{getTriggerLabel(value)}</span>
+                    {value ? (
+                        <div
+                            onClick={onItemUnselected}
+                            className={cn(
+                                "absolute right-1 top-1/2 -translate-y-1/2 rounded-sm p-1 opacity-100 transition-opacity hover:text-destructive",
+                                "inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium cursor-pointer",
+                                "[&_svg]:pointer-events-none shrink-0 [&_svg]:shrink-0 outline-none",
+                                "size-6 [&_svg:not([class*='size-'])]:size-3",
+                            )}
+                        >
+                            <X className="size-4" />
+                        </div>
+                    ) : (
+                        <ChevronDown className={cn(
+                            "absolute right-1 top-1/2 -translate-y-1/2 rounded-sm p-1 size-6",
+                            "shrink-0 opacity-100 transition-transform duration-200",
+                            open && "-rotate-180",
+                        )} />
+                    )}
+                </Button>
+            </PopoverTrigger>
+
+            <PopoverContent className={cn("md:w-100 p-0", contentClassName)} align="end">
+                <Command shouldFilter={false}>
+                    <CommandInput value={search} onValueChange={setSearch} placeholder={placeholder} />
+                    <CommandList className="max-h-87.5">
+                        <CommandEmpty>
+                            <div className="flex flex-col items-center justify-center py-6 text-center text-muted-foreground">
+                                <SearchX className="mb-2 size-6" />
+                                {isFetching ? <p>Searching...</p> : (
+                                    <>
+                                        <p>{emptyLabel}</p>
+                                        <p className="text-xs">{emptyHint}</p>
+                                    </>
+                                )}
+                            </div>
+                        </CommandEmpty>
+
+                        {items.length > 0 && (
+                            <CommandGroup>
+                                {items.map((item) => {
+                                    const id = getId(item);
+                                    const isSelected = value != null && getId(value) === id;
+
+                                    return (
+                                        <CommandItem
+                                            key={id}
+                                            value={String(id)}
+                                            onSelect={() => onItemSelected(item)}
+                                            className={cn(isSelected ? "bg-secondary" : "bg-card")}
+                                        >
+                                            {renderOption(item, isSelected)}
+                                        </CommandItem>
+                                    );
+                                })}
+                            </CommandGroup>
+                        )}
+                    </CommandList>
+                </Command>
+            </PopoverContent>
+        </Popover>
+    );
+}

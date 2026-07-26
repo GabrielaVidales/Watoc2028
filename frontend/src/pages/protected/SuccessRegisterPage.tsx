@@ -10,7 +10,7 @@ import watocLogo from '../../assets/WatocPNGLogo.png'
 const AnimatedBox = motion.create(Container)
 
 export const SuccessRegisterPage = () => {
-    const { handleLogout, currentUser: user } = useAuth()
+    const { handleLogout, user: user } = useAuth()
     const navigate = useNavigate();
 
     return (

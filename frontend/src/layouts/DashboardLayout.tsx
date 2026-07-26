@@ -19,7 +19,7 @@ import { ScrollArea } from '@/components/ui/scroll-area'
 
 
 export function DropdownMenuAvatar() {
-    const { currentUser: user, handleLogout } = useAuth()
+    const { user: user, handleLogout } = useAuth()
     return (
         <DropdownMenu>
             <DropdownMenuTrigger asChild>

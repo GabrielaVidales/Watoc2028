@@ -8,7 +8,7 @@ import { Controller, useForm } from 'react-hook-form'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { cn } from '@/lib/utils'
 import React from 'react'
-import axiosClient from '@/clients/axiosClient'
+import api from '@/clients/api'
 import { isAxiosError } from 'axios'
 import { useAuth } from '@/contexts/AuthContext'
 
@@ -18,7 +18,7 @@ type Props = {
 }
 
 function AffiliationForm({ defaults, onSubmitSuccess, id }: Props & React.HTMLProps<HTMLFormElement>) {
-    const { currentUser: { id: userId } } = useAuth()
+    const { user: { id: userId } } = useAuth()
 
     const { control, handleSubmit, reset, resetField, formState: { isDirty, isSubmitting } } = useForm({
         resolver: zodResolver(affiliationSchema),
@@ -54,7 +54,7 @@ function AffiliationForm({ defaults, onSubmitSuccess, id }: Props & React.HTMLPr
     const queryClient = useQueryClient()
 
     const createMutation = useMutation({
-        mutationFn: async (data: Affiliation) => await axiosClient.post('/abstracts/affiliations/', { ...data, user_id: userId }),
+        mutationFn: async (data: Affiliation) => await api.post('/abstracts/affiliations/', { ...data, user_id: userId }),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['affiliations'] });
         },
@@ -70,7 +70,7 @@ function AffiliationForm({ defaults, onSubmitSuccess, id }: Props & React.HTMLPr
     const editMutation = useMutation({
         mutationFn: async (data: Affiliation) => {
             const { id, ...values } = data
-            await axiosClient.patch(`/abstracts/affiliations/${id}/`, values)
+            await api.patch(`/abstracts/affiliations/${id}/`, values)
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['affiliations'] });

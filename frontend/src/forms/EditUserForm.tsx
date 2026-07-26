@@ -1,4 +1,4 @@
-import axiosClient from '@/clients/axiosClient'
+import api from '@/clients/api'
 import { InfoAlert } from '@/components/InfoAlert'
 import { Button } from '@/components/ui/button'
 import { CardTitle } from '@/components/ui/card'
@@ -64,7 +64,7 @@ function EditUserForm({ defaultValues }: P) {
 
     const onFormSubmit = handleSubmit(async (data) => {
         try {
-            await axiosClient.patch(`/users/${data.id}/`, {
+            await api.patch(`/users/${data.id}/`, {
                 ...data,
                 email: data.email.value || undefined
             })

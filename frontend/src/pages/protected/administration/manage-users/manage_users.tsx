@@ -44,10 +44,11 @@ import { Separator } from '@/components/ui/separator'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
 import { useQuery } from '@tanstack/react-query'
-import axiosClient from '@/clients/axiosClient'
+import api from '@/clients/api'
 import { useDebounce } from 'use-debounce'
 import { cn } from '@/lib/utils'
 import { Skeleton } from '@/components/ui/skeleton'
+import type { PaginatedResponse } from '@/domain/pagination'
 
 
 type SearchFilters = {
@@ -59,7 +60,6 @@ type SearchFilters = {
 function ManageUsersPage() {
     const [selectedUsers, setSelectedUsers] = useState<UserSchema[]>([])
 
-    const [search, setSearch] = React.useState('')
     const [filters, setFilters] = React.useState<SearchFilters>({
         admin: false,
         reviewer: false,
@@ -73,16 +73,19 @@ function ManageUsersPage() {
         }))
     }
 
+    const [search, setSearch] = React.useState('')
     const [debouncedInput] = useDebounce(search, 500)
-    const { data, isFetching } = useQuery<UserSchema[]>({
+    const { data, isFetching } = useQuery<PaginatedResponse<UserSchema>>({
         queryKey: ['users', debouncedInput],
         queryFn: async () => {
-            const { data } = await axiosClient.get(`users?search=${debouncedInput}`)
+            const { data } = await api.get(`/users?search=${debouncedInput}`)
+            console.log(data);
+            
             return data
         }
     })
 
-    const users = data ?? []
+    const users = data?.results || []
 
 
     return (
@@ -135,7 +138,7 @@ function ManageUsersPage() {
                             <Search />
                         </InputGroupAddon>
                         <InputGroupAddon align="inline-end">
-                            {selectedUsers.length} results
+                            {data ? (data.results ? data.results.length : 0) : 0} results
                         </InputGroupAddon>
                     </InputGroup>
                 </div>

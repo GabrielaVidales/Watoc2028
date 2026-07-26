@@ -78,7 +78,7 @@ const reviewerModules: NavCollapsible[] = [
 ]
 
 export function AppSidebar() {
-    const { currentUser: user } = useAuth()
+    const { user: user } = useAuth()
 
     return (
         <Sidebar>

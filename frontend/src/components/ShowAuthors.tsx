@@ -1,4 +1,4 @@
-import axiosClient from '@/clients/axiosClient'
+import api from '@/clients/api'
 import type { AuthorSchema } from '@/schemas/author-schema'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import React, { useState } from 'react'
@@ -38,7 +38,7 @@ function ShowAuthorsComponent({ }: Props) {
         refetchOnWindowFocus: false,
         refetchOnReconnect: false,
         queryFn: async () => {
-            const { data } = await axiosClient<AuthorSchema[]>(`/abstracts/submissions/${abstractId}/authors`)
+            const { data } = await api<AuthorSchema[]>(`/abstracts/submissions/${abstractId}/authors`)
             return data
         }
     })
@@ -50,7 +50,7 @@ function ShowAuthorsComponent({ }: Props) {
             const data = {
                 authors: authors.map(a => ({ ...a, affiliation_id: a.affiliation.id, }))
             }
-            const { data: response } = await axiosClient.patch(`/abstracts/submissions/${abstractId}/authors/`, data)
+            const { data: response } = await api.patch(`/abstracts/submissions/${abstractId}/authors/`, data)
             return response
         },
         onSuccess: () => {
@@ -72,7 +72,7 @@ function ShowAuthorsComponent({ }: Props) {
 
     const deleteAuthorMutation = useMutation({
         mutationFn: async (id: number) => {
-            const { data: response } = await axiosClient.delete(`/abstracts/authors/${id}/`)
+            const { data: response } = await api.delete(`/abstracts/authors/${id}/`)
             return response
         },
         onSuccess: () => {

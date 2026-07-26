@@ -9,6 +9,7 @@ from django.utils.decorators import method_decorator
 from django.contrib.auth import get_user_model
 from .serializers import UserSerializer, ParticipantSerializer
 from config.permissions import HasCSRFToken
+from config.pagination import Pagination
 from .tasks import send_email_confirmation_email
 import logging
 
@@ -23,6 +24,8 @@ class UserView(ModelViewSet):
     parser_classes = (MultiPartParser, FormParser, JSONParser)
     filter_backends = [SearchFilter]
     search_fields = ["first_name", "last_name", "email"]
+    pagination_class = Pagination
+    
 
     def get_permissions(self):
         if self.action == "create" or self.action == "session":

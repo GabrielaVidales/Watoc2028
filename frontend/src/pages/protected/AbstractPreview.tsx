@@ -1,4 +1,4 @@
-import axiosClient from '@/clients/axiosClient'
+import api from '@/clients/api'
 import { AbstractData } from '@/components/AbstractData'
 import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
@@ -21,7 +21,7 @@ function AbstractPreview({ }: Props) {
 
     const handlePreview = async (id: number | string, name: string = 'abstract') => {
         try {
-            const response = await axiosClient.get<Blob>(`/abstracts/submissions/${id}/preview`, {
+            const response = await api.get<Blob>(`/abstracts/submissions/${id}/preview`, {
                 responseType: 'blob',
             })
             const href = URL.createObjectURL(response.data);

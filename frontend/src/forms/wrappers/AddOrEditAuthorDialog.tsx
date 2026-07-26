@@ -1,4 +1,4 @@
-import axiosClient from '@/clients/axiosClient'
+import api from '@/clients/api'
 import { InfoAlert } from '@/components/InfoAlert'
 import { AlertDialog, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, } from "@/components/ui/alert-dialog"
 import { Button } from '@/components/ui/button'
@@ -36,11 +36,11 @@ function AddOrEditAuthorDialog({ author, open, setOpen, onSubmit, onClose }: Add
     const onFormSubmit = handleSubmit(async (data) => {
         try {
             if (data.id) {
-                await axiosClient.patch(`/authors/${data.id}/`, {
+                await api.patch(`/authors/${data.id}/`, {
                     ...data, abstract_id: id,
                 })
             } else {
-                await axiosClient.post('/authors/', {
+                await api.post('/authors/', {
                     ...data, abstract_id: id,
                 })
             }

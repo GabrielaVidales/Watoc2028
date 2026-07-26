@@ -36,7 +36,7 @@ const authRoutes = [
 ]
 
 function AuthLayout() {
-    const { currentUser: user } = useAuth()
+    const { user: user } = useAuth()
 
     return (
         <>

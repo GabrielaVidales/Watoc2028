@@ -29,9 +29,9 @@ import { ArrowRight, CircleAlert, Download, Eye, FilePenLine, FileText, Pencil, 
 import { useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { Link, useNavigate } from 'react-router'
-import { PaginationController } from './notifications/page'
+import { PaginationController } from '../../notifications/page'
 
-function ViewAbstracts() {
+function AbstractSubmissionPage() {
     const { user: user } = useAuth()
     const navigate = useNavigate()
 
@@ -205,13 +205,13 @@ function ViewAbstracts() {
                                             </Button>
 
                                             {abstract.status !== 'submitted' && (
-                                                <Button variant="outline" size="icon-lg" onClick={() => navigate(urls.users.editAbstract.build({ id: abstract.id }))}>
+                                                <Button variant="outline" size="icon-lg" onClick={() => navigate(urls.users.submissions.edit.build({ id: abstract.id }))}>
                                                     <Pencil className="size-5" />
                                                 </Button>
                                             )}
 
                                             {abstract.status !== 'submitted' && (
-                                                <Button variant="outline" size="icon-lg" onClick={() => navigate(urls.users.editAbstract.build({ id: abstract.id }) + '?action=submit')}>
+                                                <Button variant="outline" size="icon-lg" onClick={() => navigate(urls.users.submissions.edit.build({ id: abstract.id }) + '?action=submit')}>
                                                     <Send className="size-5" />
                                                 </Button>
                                             )}
@@ -528,4 +528,4 @@ export function PreviewAbstractDialog({ id }: { id: string | number }) {
 
 
 
-export default ViewAbstracts
+export default AbstractSubmissionPage

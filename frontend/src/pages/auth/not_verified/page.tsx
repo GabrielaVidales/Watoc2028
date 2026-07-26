@@ -2,13 +2,13 @@ import React, { useEffect, useState } from 'react';
 import { Clock, LogOut, Mail, Shield } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
-import axiosClient from '@/clients/axiosClient';
+import api from '@/clients/api';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from "sonner"
 
 
 function VerifyYourEmailPage() {
-    const { handleLogout, currentUser: { email } } = useAuth()
+    const { handleLogout, user: { email } } = useAuth()
     const [cooldown, setCooldown] = useState(0)
 
     useEffect(() => {
@@ -24,7 +24,7 @@ function VerifyYourEmailPage() {
 
     const resendEmail = async () => {
         try {
-            const response = await axiosClient.post('/users/resend-verification-email/')
+            const response = await api.post('/users/resend-verification-email/')
             if (import.meta.env.DEV){
                 console.log(response);
             }

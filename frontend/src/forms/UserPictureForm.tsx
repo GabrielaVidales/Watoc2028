@@ -11,7 +11,7 @@ import { centerCrop, makeAspectCrop, ReactCrop, type Crop, type PixelCrop } from
 import 'react-image-crop/dist/ReactCrop.css';
 import { Spinner } from '@/components/ui/spinner';
 import { cn } from '@/lib/utils';
-import axiosClient from '@/clients/axiosClient';
+import api from '@/clients/api';
 import { Save, Trash2 } from 'lucide-react';
 import { GalleryUpload } from '@/components/ui/file-upload';
 import { AvatarUpload } from '@/components/ui/upload-avatar';
@@ -22,7 +22,7 @@ import { Mail, MapPin, Briefcase, GraduationCap, Calendar, ShieldCheck } from 'l
 import { formatDate } from '@/utils/formatDate';
 
 export function UserPictureForm() {
-    const { fetchUser, currentUser: user } = useAuth()
+    const { fetchUser, user: user } = useAuth()
 
     const { handleSubmit, reset, control, formState: { isValid, isSubmitting } } = useForm({
         resolver: zodResolver(profilePicSchema),
@@ -32,7 +32,7 @@ export function UserPictureForm() {
     })
 
     const onFormSubmit = handleSubmit(async (data) => {
-        await axiosClient.post('/users/change-profile-pic/', data, {
+        await api.post('/users/change-profile-pic/', data, {
             headers: {
                 'Content-Type': 'multipart/form-data'
             }

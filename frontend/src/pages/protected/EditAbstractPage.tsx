@@ -1,4 +1,4 @@
-import axiosClient from '@/clients/axiosClient'
+import api from '@/clients/api'
 import { Stepper, StepperDescription, StepperIndicator, StepperItem, StepperNav, StepperSeparator, StepperTitle, StepperTrigger, } from "@/components/reui/stepper"
 import ShowAffiliations from '@/components/ShowAffiliations'
 import ShowAuthorsComponent from '@/components/ShowAuthors'
@@ -29,7 +29,7 @@ function EditAbstractPage() {
     const { data } = useQuery<AbstractSchema>({
         queryKey: ['abstract', 'edit'],
         queryFn: async () => {
-            const { data } = await axiosClient.get(`/abstracts/submissions/${id}/`)
+            const { data } = await api.get(`/abstracts/submissions/${id}/`)
             return data
         }
     })
@@ -106,10 +106,14 @@ function EditAbstractPage() {
 
     return (
         <>
-            <div className="lg:sticky lg:top-0 h-full grid grid-cols-1 lg:grid-cols-[1fr_340px]">
+            <div className={cn(
+                "h-full grid",
+                isMobile ? "grid-cols-1" : "sticky top-0 grid-cols-[1fr_340px]",
+
+            )}>
                 <main id='main-container' className='h-full w-full overflow-y-auto no-scrollbar' ref={parentRef}>
 
-                    <div className='lg:sticky lg:top-0 border-b-2 p-8 z-100 bg-slate-50'>
+                    <div className='lg:sticky lg:top-0 border-b-2 p-8 z-100 bg-background'>
                         <Breadcrumb>
                             <BreadcrumbList>
                                 <BreadcrumbItem>
@@ -144,7 +148,7 @@ function EditAbstractPage() {
                     <div className={cn(
                         "p-2 md:p-4 lg:p-6",
                         "space-y-4 md:space-y-8 lg:space-y-12",
-                        "bg-primary-light/50"
+                        "bg-secondary"
                     )}>
                         <Card className='max-w-3xl w-full mx-auto' id='abstract-content'>
                             <CardHeader>
@@ -165,7 +169,7 @@ function EditAbstractPage() {
 
                             <CardContent>
                                 <div className='bg-muted p-4 border-2 border-muted-foreground/20 border-dashed rounded-lg'>
-                                    <EditAbstractBody />
+                                    {/* <EditAbstractBody /> */}
                                 </div>
                             </CardContent>
                         </Card>
@@ -228,95 +232,98 @@ function EditAbstractPage() {
                     </div>
                 </main>
 
-                <aside className=" w-full border-t lg:border-t-0 lg:border-l bg-background">
-                    <div className="py-6 lg:sticky lg:top-0 lg:h-screen lg:overflow-y-auto lg:py-8">
-                        <CardHeader>
-                            <div>
-                                <CardTitle>
-                                    Status
-                                </CardTitle>
-                                <CardDescription>
-                                    Your submission status
-                                </CardDescription>
-                            </div>
-                            <CardAction>
-                                <div className='cursor-pointer flex flex-col justify-center items-center gap-1 h-14 bg-primary-main hover:bg-primary-light text-primary-contrast py-[1.5] px-3 rounded-lg'>
-                                    <MailOpen />
-                                    <span className='text-xs'>
-                                        {data.status.toUpperCase()}
-                                    </span>
+
+                {!isMobile && (
+                    <aside className=" w-full border-t lg:border-t-0 lg:border-l bg-background">
+                        <div className="py-6 lg:sticky lg:top-0 lg:h-screen lg:overflow-y-auto lg:py-8">
+                            <CardHeader>
+                                <div>
+                                    <CardTitle>
+                                        Status
+                                    </CardTitle>
+                                    <CardDescription>
+                                        Your submission status
+                                    </CardDescription>
                                 </div>
-                            </CardAction>
-                        </CardHeader>
-                        <CardContent>
-                            <Stepper
-                                onValueChange={v => {
-                                    const id = steps[v - 1].id
-                                    const element = document.getElementById(id)
-                                    if (element && parentRef.current) {
-                                        const parent = parentRef.current;
+                                <CardAction>
+                                    <div className='cursor-pointer flex flex-col justify-center items-center gap-1 h-14 bg-primary-main hover:bg-primary-light text-primary-contrast py-[1.5] px-3 rounded-lg'>
+                                        <MailOpen />
+                                        <span className='text-xs'>
+                                            {data.status.toUpperCase()}
+                                        </span>
+                                    </div>
+                                </CardAction>
+                            </CardHeader>
+                            <CardContent>
+                                <Stepper
+                                    onValueChange={v => {
+                                        const id = steps[v - 1].id
+                                        const element = document.getElementById(id)
+                                        if (element && parentRef.current) {
+                                            const parent = parentRef.current;
 
-                                        // Calculamos la posición del elemento relativa al contenedor main
-                                        const targetOffsetTop = element.offsetTop;
+                                            // Calculamos la posición del elemento relativa al contenedor main
+                                            const targetOffsetTop = element.offsetTop;
 
-                                        // Restamos unos 16-20px si quieres dejar un pequeño margen de cortesía arriba
-                                        parent.scrollTo({
-                                            top: targetOffsetTop - (isMobile ? 60 : 160), //  - 140 + 80,
-                                            behavior: 'smooth'
-                                        });
-                                    }
-                                }}
-                                value={currStep}
-                                defaultValue={2}
-                                className="h-full w-full py-6"
-                                orientation="vertical"
-                                indicators={{
-                                    completed: (
-                                        <CheckIcon className="size-3.5" />
-                                    ),
-                                    loading: (
-                                        <LoaderCircleIcon className="size-3.5 animate-spin" />
-                                    ),
-                                }}
-                            >
-                                <StepperNav>
-                                    {steps.map((step, index) => (
-                                        <StepperItem
-                                            key={index}
-                                            step={index + 1}
-                                            className="relative items-start not-last:flex-1"
-                                        >
-                                            <StepperTrigger className="items-start gap-2.5 pb-8 last:pb-0">
-                                                <StepperIndicator>
-                                                    {index + 1}
-                                                </StepperIndicator>
-                                                <div className="mt-0.5 text-left">
-                                                    <StepperTitle className='text-sm'>{step.title}</StepperTitle>
-                                                    <StepperDescription className='text-xs'>{step.label}</StepperDescription>
-                                                </div>
-                                            </StepperTrigger>
-                                            {index < steps.length - 1 && (
-                                                <StepperSeparator className="group-data-[state=completed]/step:bg-primary absolute inset-y-0 top-7 left-3 -order-1 m-0 -translate-x-1/2 group-data-[orientation=vertical]/stepper-nav:h-[calc(100%-2rem)]" />
-                                            )}
-                                        </StepperItem>
-                                    ))}
-                                </StepperNav>
-                            </Stepper>
-                        </CardContent>
-                        <CardContent className="text-sm text-muted-foreground">
-                            Your abstract is currently in draft. Once you click "Submit", it will move to the <strong>Review Process</strong>.
-                        </CardContent>
-                        <CardFooter className="justify-end gap-2">
-                            <Button variant="outline" onClick={previousStep}>Decline</Button>
-                            <Button
-                                onClick={nextStep}
-                                disabled={activeId !== 'abstract-review'}
-                            >
-                                Accept
-                            </Button>
-                        </CardFooter>
-                    </div>
-                </aside>
+                                            // Restamos unos 16-20px si quieres dejar un pequeño margen de cortesía arriba
+                                            parent.scrollTo({
+                                                top: targetOffsetTop - (isMobile ? 60 : 160), //  - 140 + 80,
+                                                behavior: 'smooth'
+                                            });
+                                        }
+                                    }}
+                                    value={currStep}
+                                    defaultValue={2}
+                                    className="h-full w-full py-6"
+                                    orientation="vertical"
+                                    indicators={{
+                                        completed: (
+                                            <CheckIcon className="size-3.5" />
+                                        ),
+                                        loading: (
+                                            <LoaderCircleIcon className="size-3.5 animate-spin" />
+                                        ),
+                                    }}
+                                >
+                                    <StepperNav>
+                                        {steps.map((step, index) => (
+                                            <StepperItem
+                                                key={index}
+                                                step={index + 1}
+                                                className="relative items-start not-last:flex-1"
+                                            >
+                                                <StepperTrigger className="items-start gap-2.5 pb-8 last:pb-0">
+                                                    <StepperIndicator>
+                                                        {index + 1}
+                                                    </StepperIndicator>
+                                                    <div className="mt-0.5 text-left">
+                                                        <StepperTitle className='text-sm'>{step.title}</StepperTitle>
+                                                        <StepperDescription className='text-xs'>{step.label}</StepperDescription>
+                                                    </div>
+                                                </StepperTrigger>
+                                                {index < steps.length - 1 && (
+                                                    <StepperSeparator className="group-data-[state=completed]/step:bg-primary absolute inset-y-0 top-7 left-3 -order-1 m-0 -translate-x-1/2 group-data-[orientation=vertical]/stepper-nav:h-[calc(100%-2rem)]" />
+                                                )}
+                                            </StepperItem>
+                                        ))}
+                                    </StepperNav>
+                                </Stepper>
+                            </CardContent>
+                            <CardContent className="text-sm text-muted-foreground">
+                                Your abstract is currently in draft. Once you click "Submit", it will move to the <strong>Review Process</strong>.
+                            </CardContent>
+                            <CardFooter className="justify-end gap-2">
+                                <Button variant="outline" onClick={previousStep}>Decline</Button>
+                                <Button
+                                    onClick={nextStep}
+                                    disabled={activeId !== 'abstract-review'}
+                                >
+                                    Accept
+                                </Button>
+                            </CardFooter>
+                        </div>
+                    </aside>
+                )}
             </div>
         </>
     )

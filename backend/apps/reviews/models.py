@@ -40,6 +40,9 @@ class ReviewAssignment(models.Model):
         related_name="assigned_reviews",
         null=True,
     )
+    due_date = models.DateTimeField(
+        db_column="due_date",
+    )
     status = models.CharField(
         max_length=16,
         db_column="status",
@@ -54,9 +57,9 @@ class ReviewAssignment(models.Model):
         db_column="created_at",
         auto_now_add=True,
     )
-    # is_active = models.BooleanField(
-    #     db_column='is_active',
-    # )
+    is_active = models.BooleanField(
+        db_column="is_active",
+    )
 
 
 class Review(models.Model):
@@ -64,7 +67,7 @@ class Review(models.Model):
         db_table = "reviews"
         ordering = ["submitted_at"]
 
-    assignment  = models.ForeignKey(
+    assignment = models.ForeignKey(
         ReviewAssignment,
         on_delete=models.CASCADE,
         related_name="reviews",
@@ -77,7 +80,7 @@ class Review(models.Model):
     )
     comments = models.TextField()
     suggestions = models.TextField()
-    submitted_at  = models.DateTimeField(
+    submitted_at = models.DateTimeField(
         db_column="created_at",
         auto_now_add=True,
     )

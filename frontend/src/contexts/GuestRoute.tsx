@@ -7,7 +7,7 @@ export type GuestRouteProps = {
 }
 
 export function GuestRoute({ redirectTo = '/' }: GuestRouteProps) {
-    const { currentUser: user } = useAuth()
+    const { user: user } = useAuth()
 
     if (user === undefined) {
         return <LoadingPage />

@@ -11,7 +11,7 @@ type ProtectedRouteProps = React.PropsWithChildren & {
 }
 
 export function ProtectedRoute({ allowedRoles }: ProtectedRouteProps) {
-    const { currentUser: user } = useAuth()
+    const { user: user } = useAuth()
 
     if (user === undefined) {
         return <LoadingPage />

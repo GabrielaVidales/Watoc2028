@@ -7,7 +7,7 @@ import { ChevronLeft, ChevronRight, ExternalLink } from 'lucide-react'
 import { Label } from "@/components/ui/label"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { FieldContent, FieldDescription, FieldLegend, FieldSet, FieldTitle } from '@/components/ui/field'
-import axiosClient from '@/clients/axiosClient'
+import api from '@/clients/api'
 import { Separator } from '@/components/ui/separator'
 import { Spinner } from '@/components/ui/spinner'
 
@@ -19,7 +19,7 @@ function ConfirmPaymentPage() {
     const onProceedPayment = async () => {
         try {
             setLoading(true)
-            const res = await axiosClient.post('/payments/create-checkout-session/')
+            const res = await api.post('/payments/create-checkout-session/')
             console.log(res);
             console.log(res.data.checkout_url);
 

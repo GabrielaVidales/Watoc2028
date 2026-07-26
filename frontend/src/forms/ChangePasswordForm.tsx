@@ -1,4 +1,4 @@
-import axiosClient from '@/clients/axiosClient'
+import api from '@/clients/api'
 import { InfoAlert } from '@/components/InfoAlert'
 import PasswordStrengthMeter from '@/components/PasswordStrengthMeter'
 import { Button } from '@/components/ui/button'
@@ -31,7 +31,7 @@ function ChangePasswordForm() {
 
     const onFormSubmit = handleSubmit(async (data) => {
         try {
-            const res = await axiosClient.post('/users/change-password/', {
+            const res = await api.post('/users/change-password/', {
                 oldPassword: data.oldPassword,
                 newPassword: data.password.value
             })

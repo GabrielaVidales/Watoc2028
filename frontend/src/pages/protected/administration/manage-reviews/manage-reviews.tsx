@@ -1,39 +1,40 @@
-import axiosClient from '@/clients/axiosClient'
-import { createFilter, Filters, type Filter, type FilterFieldConfig, type FilterOperator } from '@/components/reui/filters'
+import api from '@/clients/api'
+import { Filters, type Filter, type FilterFieldConfig, type FilterOperator } from '@/components/reui/filters'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import type { UserSchema } from '@/schemas/user-schemas'
-import { CalendarIcon, CheckCircle2, FunnelXIcon, FilterIcon, IdCard, ListFilterIcon, Mail, Power, Search, ShieldCheck, User2, X, Eye, Trash2, Menu, MoreHorizontal, Plus, Dot, Circle, FunctionSquare, ListFilter, DatabaseSearch, UserSquare, ArrowBigUpDash, Users, UserCheck, UserX, UserRound, ClipboardCheck } from 'lucide-react'
+import { CalendarIcon, CheckCircle2, FunnelXIcon, FilterIcon, IdCard, Mail, Search, ShieldCheck, X, MoreHorizontal, Plus, Circle, ListFilter, UserSquare, Users, UserCheck, UserRound, ClipboardCheck } from 'lucide-react'
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { format, } from "date-fns"
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { Calendar } from '@/components/ui/calendar'
-import { Card, CardAction, CardContent, CardDescription, CardFooter, CardHeader, CardTitle, } from "@/components/ui/card"
+import { Card, CardAction, CardContent, CardDescription, CardHeader, CardTitle, } from "@/components/ui/card"
 import { useQuery } from '@tanstack/react-query'
-import { Spinner } from '@/components/ui/spinner'
-import { Item, ItemActions, ItemContent } from '@/components/ui/item'
 import { cn } from '@/lib/utils'
-import { UserSearchCommand } from '@/forms/AbstractAuthorForm'
 import { Badge } from '@/components/ui/badge'
 import { formatDate } from '@/utils/formatDate'
 import { motion, AnimatePresence } from "motion/react"
-import { Separator } from '@/components/ui/separator'
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area'
 import { useDebounce } from 'use-debounce'
 import { InputGroup, InputGroupAddon, InputGroupInput } from '@/components/ui/input-group'
+import type { PaginatedResponse } from '@/domain/pagination'
 
 
 function ManageReviewsPage() {
     const [query, setQuery] = useState('')
     const [queryParams] = useDebounce(query, 300)
-    const { data: filteredUsers, isLoading } = useQuery<UserSchema[]>({
+    const { data } = useQuery<UserSchema[]>({
         queryKey: ['users', queryParams],
         queryFn: async () => {
             await new Promise(r => setTimeout(r, 1000))
-            const { data } = await axiosClient.get<UserSchema[]>(`/reviews/users${queryParams}`)
+            const { data } = await api.get<UserSchema[]>(`/reviews/users${queryParams}`)
             return data
         }
     })
+
+
+    const filteredUsers = (data as any)?.results || []
+    console.log(filteredUsers);
 
     const operators: FilterOperator[] = [
         { value: "includes", label: "includes" },
@@ -121,7 +122,6 @@ function ManageReviewsPage() {
             ),
         },
     ], []);
-
 
     const [filters, setFilters] = useState<Filter[]>([])
 
@@ -356,7 +356,7 @@ function ManageReviewsPage() {
                                                 <AvatarFallback className='text-xl'>
                                                     {user.full_name
                                                         ?.split(" ")
-                                                        .map((x) => x[0])   
+                                                        .map((x) => x[0])
                                                         .join("")
                                                         .slice(0, 2)}
                                                 </AvatarFallback>

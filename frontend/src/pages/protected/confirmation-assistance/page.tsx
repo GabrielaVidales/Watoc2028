@@ -12,7 +12,7 @@ import { Card, CardAction, CardDescription, CardFooter, CardHeader, CardTitle, }
 import { Badge } from '@/components/ui/badge'
 import { Combobox, ComboboxChip, ComboboxChips, ComboboxChipsInput, ComboboxContent, ComboboxEmpty, ComboboxItem, ComboboxList, ComboboxValue, } from "@/components/ui/combobox"
 import DinnerForm from '@/pages/protected/confirmation-assistance/dinner/dinner-form'
-import axiosClient from '@/clients/axiosClient'
+import api from '@/clients/api'
 import { SelectFeePage } from './fee/page'
 import { SelectTourPage } from './tour/page'
 import { ChevronLeft, ChevronRight } from 'lucide-react'

@@ -1,4 +1,4 @@
-import axiosClient from "@/clients/axiosClient"
+import api from "@/clients/api"
 import { isAxiosError } from "axios"
 import { useCallback, useEffect, useState } from "react"
 
@@ -12,7 +12,7 @@ export const useFetch = <T>(url?: string | null) => {
 
         setFetching(true)
         try {
-            const res = await axiosClient.get<T>(url)
+            const res = await api.get<T>(url)
             setData(res.data)
             setError(null)            
         } catch (error) {

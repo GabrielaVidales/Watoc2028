@@ -1,4 +1,4 @@
-import axiosClient from '@/clients/axiosClient'
+import api from '@/clients/api'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -22,12 +22,12 @@ function ReviewsList({ }: Props) {
     const [selected, setSelected] = useState<Partial<AbstractDTO>>(null);
 
 
-    const { currentUser: user } = useAuth()
+    const { user: user } = useAuth()
 
     const { data, isLoading } = useQuery<ReviewAssignment[]>({
         queryKey: ['reviews', user.id],
         queryFn: async () => {
-            const { data } = await axiosClient.get('/reviews/assignments')
+            const { data } = await api.get('/reviews/assignments')
             return data
         }
     })
