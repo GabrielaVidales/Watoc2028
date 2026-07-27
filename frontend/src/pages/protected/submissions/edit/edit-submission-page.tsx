@@ -6,7 +6,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger, } from "@
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator, } from "@/components/ui/breadcrumb"
 import { Button } from '@/components/ui/button'
 import { Card, CardAction, CardContent, CardDescription, CardFooter, CardHeader, CardTitle, } from "@/components/ui/card"
-import AbstractDeclarations from '@/forms/AbstractDeclarationsForm'
+import AbstractDeclarations from '@/forms/submissions/AbstractDeclarationsForm'
 import EditAbstractBody from '@/forms/wrappers/EditAbstractBody'
 import { useIsMobile } from '@/hooks/use-mobile'
 import { useScrollSpy } from '@/hooks/useScrollSpy'
@@ -14,7 +14,7 @@ import { cn, } from '@/lib/utils'
 import { routes } from '@/routes/routes'
 import type { AbstractSchema } from '@/schemas/abstracts/abstract-schemas'
 import { useQuery } from '@tanstack/react-query'
-import { CheckIcon, Gavel, IdCard, LoaderCircleIcon, LucideFileEdit, MailOpen, MessageSquareCode, RotateCw, ScanText, TextQuote, UserPlus } from 'lucide-react'
+import { CheckIcon, Gavel, IdCard, Info, LoaderCircleIcon, LucideFileEdit, MailOpen, MessageSquareCode, RotateCw, ScanText, TextQuote, UserPlus } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router'
 import BeforeSubmitPage from '../../BeforeSubmitPage'
@@ -27,6 +27,23 @@ function EditAbstractPage() {
     const isMobile = useIsMobile()
     const navigate = useNavigate()
     const parentRef = useRef<HTMLDivElement | null>(null)
+
+    const onStepperChange = (v: number) => {
+        const id = steps[v - 1].id
+        const element = document.getElementById(id)
+        if (element && parentRef.current) {
+            const parent = parentRef.current;
+
+            // Calculamos la posición del elemento relativa al contenedor main
+            const targetOffsetTop = element.offsetTop;
+
+            // Restamos unos 16-20px si quieres dejar un pequeño margen de cortesía arriba
+            parent.scrollTo({
+                top: targetOffsetTop - (isMobile ? 60 : 120), //  - 140 + 80,
+                behavior: 'smooth'
+            });
+        }
+    }
 
     const { id } = useParams()
     const { data } = useQuery<AbstractSchema>({
@@ -142,7 +159,6 @@ function EditAbstractPage() {
                     </div>
 
                     <div className={cn("p-2 md:p-4 lg:p-6 bg-secondary space-y-4 md:space-y-8 lg:space-y-12",)}>
-
                         <Card className='max-w-4xl mx-auto w-full gap-0' id='abstract-content'>
                             <CardContent className='space-y-5 md:py-5 md:px-10'>
                                 <CardTitle className="flex gap-3 items-center">
@@ -154,36 +170,12 @@ function EditAbstractPage() {
                             </CardContent>
                         </Card>
 
-                        <Card className='max-w-3xl w-full mx-auto'>
-                            <CardHeader>
-                                <div className="flex items-center gap-3">
-                                    <div className="flex size-12 items-center justify-center rounded-lg bg-primary-light/10 border-2 border-primary-main/20 text-primary">
-                                        <TextQuote className="text-primary-main stroke-[2.5] size-7" />
-                                    </div>
-
-                                    <div>
-                                        <CardTitle className='text-xl'>Abstract Content</CardTitle>
-                                        <CardDescription className='text-base'>
-                                            Enter the title, category and abstract of your submission.
-                                        </CardDescription>
-                                    </div>
-                                </div>
-                            </CardHeader>
-
-
-                            <CardContent>
-                                <div className='bg-muted p-4 border-2 border-muted-foreground/20 border-dashed rounded-lg'>
-                                    {/* <EditAbstractBody /> */}
-                                </div>
-                            </CardContent>
-                        </Card>
-
-                        <Card className='max-w-3xl w-full mx-auto' id='abstract-authors' >
-                            <CardContent>
-                                <div className="flex gap-3 items-center">
+                        <Card className='max-w-4xl mx-auto w-full gap-0' id='abstract-authors'>
+                            <CardContent className='space-y-5 md:py-5 md:px-10'>
+                                <CardTitle className="flex gap-3 items-center">
                                     <UserPlus className='text-primary-main' />
                                     <h2 className='text-xl font-semibold'>Authors List</h2>
-                                </div>
+                                </CardTitle>
 
                                 <ShowAuthorsComponent />
 
@@ -207,20 +199,20 @@ function EditAbstractPage() {
                                         </AccordionContent>
                                     </AccordionItem>
                                 </Accordion>
-
                             </CardContent>
                         </Card>
 
-                        <Card className='max-w-3xl w-full mx-auto' id='abstract-declarations'>
-                            <CardContent>
-                                <div className="flex gap-3 items-center">
-                                    <Gavel className='text-primary-main' />
-                                    <h2 className='text-xl font-semibold'>Authors Declarations</h2>
-                                </div>
+                        <Card className='max-w-4xl mx-auto w-full gap-0' id='abstract-declarations'>
+                            <CardContent className='space-y-5 md:py-5 md:px-10'>
+                                <CardTitle className="flex gap-3 items-center">
+                                    <Info className='text-primary-main' />
+                                    <h2 className='text-xl font-semibold'>Additional Information</h2>
+                                </CardTitle>
 
                                 <AbstractDeclarations />
                             </CardContent>
                         </Card>
+
 
                         <Card className='max-w-3xl w-full mx-auto mb-20' id='abstract-review'>
                             <CardContent>
@@ -260,22 +252,7 @@ function EditAbstractPage() {
                             </CardHeader>
                             <CardContent>
                                 <Stepper
-                                    onValueChange={v => {
-                                        const id = steps[v - 1].id
-                                        const element = document.getElementById(id)
-                                        if (element && parentRef.current) {
-                                            const parent = parentRef.current;
-
-                                            // Calculamos la posición del elemento relativa al contenedor main
-                                            const targetOffsetTop = element.offsetTop;
-
-                                            // Restamos unos 16-20px si quieres dejar un pequeño margen de cortesía arriba
-                                            parent.scrollTo({
-                                                top: targetOffsetTop - (isMobile ? 60 : 160), //  - 140 + 80,
-                                                behavior: 'smooth'
-                                            });
-                                        }
-                                    }}
+                                    onValueChange={onStepperChange}
                                     value={currStep}
                                     defaultValue={2}
                                     className="h-full w-full py-6"

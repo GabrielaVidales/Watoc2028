@@ -8,13 +8,13 @@ export const authorSchema = object({
     .nullable(),
     first_name: z.string()
         .min(1, "Required")
-        .max(100, 'Input too long'),
+        .max(60, 'Input too long'),
     last_name: z.string()
         .min(1, "Required")
-        .max(100, 'Input too long'),
+        .max(60, 'Input too long'),
     order: z.number()
         .optional(),
-    email: z.email('Please provide a valid email address')
+    email: z.email('Invalid email')
         .max(100, 'Input too long'),
     is_corresponding_author: z.boolean(),
     affiliation_id: z.number().nullable(),

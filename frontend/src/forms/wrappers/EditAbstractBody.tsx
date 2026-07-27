@@ -1,21 +1,21 @@
 import api from '@/clients/api'
 import RichTextEditor, { countWordsFromHTML } from '@/components/EnrichedTextArea'
 import { Button } from '@/components/ui/button'
-import { CardTitle } from '@/components/ui/card'
 import { Field, FieldDescription, FieldError, FieldLabel } from '@/components/ui/field'
 import { InputGroupText } from '@/components/ui/input-group'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Spinner } from '@/components/ui/spinner'
 import { useIsMobile } from '@/hooks/use-mobile'
-import { cn } from '@/lib/utils'
-import { abstractSchema, presentationTypes, submitAbstractDefaults, type AbstractSchema } from '@/schemas/abstracts/abstract-schemas'
+import { abstractSchema, presentationTypes, type AbstractSchema } from '@/schemas/abstracts/abstract-schemas'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { isAxiosError } from 'axios'
-import { HardDriveDownload, RotateCcw, SaveIcon, ScanText } from 'lucide-react'
-import { useEffect, } from 'react'
+import { RotateCcw } from 'lucide-react'
+import { Fragment, useEffect, } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { useParams } from 'react-router'
+import { toast } from 'sonner'
+import { cn } from '@/lib/utils'
 
 type AbstractFormProps = {
     abstract?: AbstractSchema,
@@ -68,6 +68,7 @@ function EditAbstractBody({ }: AbstractFormProps) {
     const onFormSubmit = handleSubmit(
         async (data) => {
             await saveMutation.mutateAsync(data)
+            toast.info('Submission saved successfully!', { position: 'top-center', dismissible: true })
         },
         async (data) => {
             if (import.meta.env.DEV) {
@@ -83,7 +84,7 @@ function EditAbstractBody({ }: AbstractFormProps) {
                 title: abstract.title,
                 references: abstract.references,
                 text: abstract.text,
-            })
+            },)
         }
     }, [abstract])
 
@@ -236,22 +237,19 @@ function EditAbstractBody({ }: AbstractFormProps) {
                     )}
                 />
 
-                <div className={cn("sticky", isMobile ? 'bottom-5' : "bottom-20")}>
+                <div className={cn(
+                    "sticky select-none",
+                    isMobile ? 'bottom-5' : "bottom-20",
+                )}>
                     <div className={cn(
-                        "ml-auto flex flex-col-reverse w-fit items-center gap-1 rounded-xl border p-3 shadow-md",
-                        (!isDirty && !isSubmitting) ? 'bg-background/90' : 'bg-background'
+                        "ml-auto flex flex-col-reverse w-60 items-center gap-2 rounded-xl border p-3 shadow-md bg-card",
+                        (!isDirty && !isSubmitting) ? 'opacity-70' : 'opacity-100', 'hover:opacity-100',
                     )}>
-                        {!isDirty && !isSubmitting ? (
-                            <span className="max-sm:text-xs text-sm text-muted-foreground">
-                                No unsaved changes
-                            </span>
-                        ) : (
-                            <span className="max-sm:text-xs text-sm text-muted-foreground">
-                                You have unsaved changes
-                            </span>
-                        )}
+                        <span className="text-xs text-muted-foreground">
+                            {!isDirty && !isSubmitting ? "No unsaved changes" : "You have unsaved changes"}
+                        </span>
 
-                        <div className='flex items-center gap-3'>
+                        <div className='flex justify-between items-center gap-5'>
                             <Button
                                 type="submit"
                                 size={isMobile ? 'sm' : 'default'}
@@ -259,10 +257,10 @@ function EditAbstractBody({ }: AbstractFormProps) {
                                 disabled={!isValid || !isDirty}
                             >
                                 {isSubmitting ? (
-                                    <>
+                                    <Fragment >
                                         <Spinner />
                                         <span>Saving...</span>
-                                    </>
+                                    </Fragment>
                                 ) : (
                                     <span>Save</span>
                                 )}

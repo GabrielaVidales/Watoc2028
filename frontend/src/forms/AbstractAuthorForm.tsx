@@ -2,7 +2,7 @@ import React from 'react'
 import api from '@/clients/api'
 import { Field, FieldContent, FieldError, FieldLabel } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
-import { InputGroup, InputGroupAddon, InputGroupInput } from '@/components/ui/input-group'
+import { InputGroup, InputGroupAddon, InputGroupInput, InputGroupText } from '@/components/ui/input-group'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Mail, Plus, School, Search, UserRoundX, X } from 'lucide-react'
 import { Controller, FormProvider, useForm, useFormContext } from 'react-hook-form'
@@ -21,9 +21,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { countries, getCountryImage } from '@/utils/countriesInfo'
 import { Switch } from '@/components/ui/switch'
 import { isAxiosError } from 'axios'
-import { useAuth } from '@/contexts/AuthContext'
 import { useParams } from 'react-router'
 import { authorFormSchema, type AuthorFormSchema, type AuthorSchema } from '@/schemas/abstracts/author-schema'
+import type { PaginatedResponse } from '@/domain/pagination'
+import { SelectCommand } from '@/pages/test'
 
 
 export function AuthorForm({ children }: React.PropsWithChildren) {
@@ -57,12 +58,13 @@ type Props = {
     values?: AuthorSchema
     onSubmit?: () => void
 }
+
 export function AuthorFormContent({ onSubmit, values }: Props) {
     const { id: abstractId } = useParams()
 
     const queryClient = useQueryClient()
 
-    const { control, setValue, handleSubmit, getValues, reset, formState: { isSubmitting, isLoading } } = useFormContext<AuthorFormSchema>()
+    const { control, setValue, handleSubmit, getValues, reset, formState: { isSubmitting } } = useFormContext<AuthorFormSchema>()
     const [user, setUser] = React.useState<Partial<UserSchema>>(null)
     const handleUserSelection = (user: UserSchema | null) => {
         if (user === null) {
@@ -82,6 +84,9 @@ export function AuthorFormContent({ onSubmit, values }: Props) {
 
     const [affiliation, setAffiliation] = React.useState<Affiliation>(null)
     const handleAffiliationSelected = (affiliation: Affiliation | null) => {
+        console.log(affiliation);
+
+
         if (affiliation === null) {
             setValue('affiliation_id', null)
             setValue('institution', '')
@@ -168,99 +173,100 @@ export function AuthorFormContent({ onSubmit, values }: Props) {
 
     return (
         <form id='author-form' onSubmit={onFormSubmit}>
-            <fieldset className='px-1 space-y-3 grid grid-cols-1 md:grid-cols-2 md:gap-x-5 gap-3' disabled={isSubmitting}>
+            <fieldset className='px-1 py-3 space-y-3 grid grid-cols-1 md:grid-cols-2 md:gap-x-5 gap-3' disabled={isSubmitting}>
                 <div className='space-y-3'>
                     {/* Related user */}
                     <Field>
                         <FieldLabel htmlFor={'related-user-id'}>Search registered author</FieldLabel>
-                        <Item variant='outline' className={cn(
-                            "group relative cursor-pointer p-3 border-2 border-border rounded-md transition-colors duration-300",
-                            "hover:border-primary-light hover:shadow-sm",
-                            "flex flex-row items-center justify-between gap-3",
-                        )}>
-                            <ItemActions>
-                                <Avatar className="size-8 border shadow-sm">
-                                    <AvatarImage loading='lazy' src={user?.photo as string ?? null} />
-                                    <AvatarFallback>
-                                        {user ? (
-                                            user.full_name
-                                                .split(" ")
-                                                .map((x) => x[0])
-                                                .join("")
-                                                .slice(0, 2)
 
-                                        ) : (
-                                            'NA'
-                                        )}
-                                    </AvatarFallback>
-                                </Avatar>
-                            </ItemActions>
-                            <ItemContent className='mb-auto'>
-                                {user ? (
-                                    <div className='text-xs'>
-                                        <p className='tracking-wide font-medium'>{user.first_name} {user.last_name}</p>
-                                        <p className='text-muted-foreground'>{user.email}</p>
+                        <SelectCommand<UserSchema>
+                            onChange={handleUserSelection}
+                            value={user}
+                            endpoint='/users/'
+                            queryKey='users'
+                            getId={u => u.id}
+                            getTriggerLabel={user => user ? (
+                                <div className='text-left font-normal flex gap-2 items-center'>
+                                    <Avatar className="size-8 shrink-0 border shadow-sm">
+                                        <AvatarImage loading='lazy' src={user?.photo as string ?? null} />
+                                        <AvatarFallback>
+                                            <span className='text-xs leading-0'>
+                                                {user?.full_name
+                                                    .split(" ")
+                                                    .map((x) => x[0])
+                                                    .join("")
+                                                    .slice(0, 2)
+                                                }
+                                            </span>
+                                        </AvatarFallback>
+                                    </Avatar>
+                                    <div className="truncate">
+                                        <p className="truncate" title={user?.full_name}>{user?.full_name}</p>
+                                        <p className='truncate text-muted-foreground text-xs'>{user?.email}</p>
                                     </div>
-                                ) : (
+                                </div>
+                            ) : (
+                                <div className='text-left font-normal flex gap-2 items-center'>
+                                    <Avatar className="size-8 shrink-0 border shadow-sm">
+                                        <AvatarImage src={null} />
+                                        <AvatarFallback>
+                                            NA
+                                        </AvatarFallback>
+                                    </Avatar>
                                     <div className='text-xs'>
                                         <p className='tracking-wide font-medium'>Not user selected</p>
                                         <p className='text-muted-foreground'>No information displayed</p>
                                     </div>
-                                )}
-                            </ItemContent>
-                            <ItemActions>
-                                {user ? (
-                                    <Button
-                                        type='button'
-                                        variant="ghost"
-                                        size="icon-sm"
-                                        className='hover:text-destructive'
-                                        onClick={() => handleUserSelection(null)}
-                                    >
-                                        <X />
-                                    </Button>
-                                ) : (
-                                    <Popover>
-                                        <PopoverTrigger asChild>
-                                            <Button
-                                                type='button'
-                                                variant="outline"
-                                                size="sm"
-                                                className='hover:text-primary-main'
-                                            >
-                                                <span>Search</span>
-                                                <Search />
-                                            </Button>
-                                        </PopoverTrigger>
-                                        <PopoverContent className="w-xs bg-transparent shadow-none border-none">
-                                            <UserSearchCommand onUserSelected={handleUserSelection} />
-                                        </PopoverContent>
-                                    </Popover>
-                                )}
-                            </ItemActions>
-                        </Item>
+                                </div>
+                            )}
+                            className='h-12'
+                            contentClassName='md:max-w-70'
+                            renderOption={(user) => (
+                                <>
+                                    <Avatar className="size-8 shrink-0 border shadow-sm">
+                                        <AvatarImage loading='lazy' src={user?.photo as string ?? null} />
+                                        <AvatarFallback>
+                                            <span className='text-xs leading-0'>
+                                                {user?.full_name
+                                                    .split(" ")
+                                                    .map((x) => x[0])
+                                                    .join("")
+                                                    .slice(0, 2)
+                                                }
+                                            </span>
+                                        </AvatarFallback>
+                                    </Avatar>
+                                    <div className="truncate">
+                                        <p className="truncate" title={user?.full_name}>{user?.full_name}</p>
+                                        <p className='truncate text-muted-foreground text-xs'>{user?.email}</p>
+                                    </div>
+                                    <CommandShortcut>
+                                        <Plus className="size-4" />
+                                    </CommandShortcut>
+                                </>
+                            )}
+                        />
                     </Field>
 
-                    <fieldset className='space-y-1' disabled={Boolean(user)}>
+                    <fieldset className='space-y-5' disabled={Boolean(user)}>
                         <Controller
                             name={`first_name`}
                             control={control}
                             render={({ field, fieldState }) => (
                                 <Field data-invalid={fieldState.invalid}>
                                     <FieldLabel htmlFor={field.name}>First Name</FieldLabel>
-                                    <Input
-                                        {...field}
-                                        id={field.name}
-                                        aria-invalid={fieldState.invalid}
-                                        autoComplete="off"
-                                        maxLength={100}
-                                    />
-                                    <div className={cn(
-                                        "overflow-hidden transition-all h-6 duration-200 ease-in-out",
-                                        fieldState.invalid ? " opacity-100" : " opacity-0"
-                                    )}>
-                                        <FieldError errors={[fieldState.error]} />
-                                    </div>
+                                    <InputGroup>
+                                        <InputGroupInput
+                                            {...field}
+                                            id={field.name}
+                                            aria-invalid={fieldState.invalid}
+                                            autoComplete="off"
+                                            maxLength={100}
+                                        />
+                                        <InputGroupAddon align="inline-end">
+                                            <FieldError errors={[fieldState.error]} />
+                                        </InputGroupAddon>
+                                    </InputGroup>
                                 </Field>
                             )}
                         />
@@ -270,19 +276,18 @@ export function AuthorFormContent({ onSubmit, values }: Props) {
                             render={({ field, fieldState }) => (
                                 <Field data-invalid={fieldState.invalid}>
                                     <FieldLabel htmlFor={field.name}>Last Name</FieldLabel>
-                                    <Input
-                                        {...field}
-                                        id={field.name}
-                                        aria-invalid={fieldState.invalid}
-                                        autoComplete="off"
-                                        maxLength={100}
-                                    />
-                                    <div className={cn(
-                                        "overflow-hidden transition-all h-6 duration-200 ease-in-out",
-                                        fieldState.invalid ? " opacity-100" : " opacity-0"
-                                    )}>
-                                        <FieldError errors={[fieldState.error]} />
-                                    </div>
+                                    <InputGroup>
+                                        <InputGroupInput
+                                            {...field}
+                                            id={field.name}
+                                            aria-invalid={fieldState.invalid}
+                                            autoComplete="off"
+                                            maxLength={100}
+                                        />
+                                        <InputGroupAddon align="inline-end">
+                                            <FieldError errors={[fieldState.error]} />
+                                        </InputGroupAddon>
+                                    </InputGroup>
                                 </Field>
                             )}
                         />
@@ -301,132 +306,113 @@ export function AuthorFormContent({ onSubmit, values }: Props) {
                                             maxLength={100}
                                             placeholder='email@example.com'
                                         />
-                                        <InputGroupAddon>
-                                            <Mail />
+                                        <InputGroupAddon align='inline-start'>
+                                            <Mail className={cn(fieldState.invalid && 'text-destructive')} />
+                                        </InputGroupAddon>
+                                        <InputGroupAddon align="inline-end">
+                                            <FieldError errors={[fieldState.error]} />
                                         </InputGroupAddon>
                                     </InputGroup>
-                                    <div className={cn(
-                                        "overflow-hidden transition-all h-6 duration-200 ease-in-out",
-                                        fieldState.invalid ? " opacity-100" : " opacity-0"
-                                    )}>
-                                        <FieldError errors={[fieldState.error]} />
-                                    </div>
+                                </Field>
+                            )}
+                        />
+                        <Controller
+                            name="is_corresponding_author"
+                            control={control}
+                            render={({ field, fieldState }) => (
+                                <Field orientation="horizontal" data-invalid={fieldState.invalid} className='justify-between'>
+                                    <FieldContent>
+                                        <FieldLabel htmlFor="form-rhf-switch-twoFactor">
+                                            Mark as corresponding author
+                                        </FieldLabel>
+                                        {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                                    </FieldContent>
+                                    <Switch
+                                        id="form-rhf-switch-twoFactor"
+                                        name={field.name}
+                                        checked={field.value}
+                                        onCheckedChange={field.onChange}
+                                        aria-invalid={fieldState.invalid}
+                                    />
                                 </Field>
                             )}
                         />
                     </fieldset>
-
-                    <Controller
-                        name="is_corresponding_author"
-                        control={control}
-                        render={({ field, fieldState }) => (
-                            <Field orientation="horizontal" data-invalid={fieldState.invalid} className='justify-between'>
-                                <FieldContent>
-                                    <FieldLabel htmlFor="form-rhf-switch-twoFactor">
-                                        Mark as corresponding author
-                                    </FieldLabel>
-                                    {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-                                </FieldContent>
-                                <Switch
-                                    id="form-rhf-switch-twoFactor"
-                                    name={field.name}
-                                    checked={field.value}
-                                    onCheckedChange={field.onChange}
-                                    aria-invalid={fieldState.invalid}
-                                />
-                            </Field>
-                        )}
-                    />
                 </div>
 
                 <div className="space-y-3 border-t pt-6 md:pt-0 md:border-t-0 md:border-l-2 md:pl-6">
                     {/* Afiliación */}
                     <Field>
                         <FieldLabel htmlFor={'related-user-id'}>Search existing affiliation</FieldLabel>
-                        <Item variant='outline' className={cn(
-                            "group relative cursor-pointer p-3 border-2 border-border rounded-md transition-colors duration-300",
-                            "hover:border-primary-light hover:shadow-sm",
-                            "flex flex-row items-center justify-between gap-3",
-                        )}>
-                            <ItemActions>
-                                <Avatar className="size-8 border shadow-sm flex justify-center items-center">
-                                    <School className='size-5 text-muted-foreground' />
-                                </Avatar>
-                            </ItemActions>
-                            <ItemContent className='mb-auto'>
-                                {affiliation ? (
-                                    <div className='text-xs'>
+                        <SelectCommand<Affiliation>
+                            onChange={handleAffiliationSelected}
+                            value={affiliation}
+                            endpoint='/abstracts/affiliations/'
+                            queryKey='affiliations'
+                            getId={u => u.id}
+                            getTriggerLabel={affiliation => affiliation ? (
+                                <div className='text-left font-normal flex gap-2 items-center'>
+                                    <Avatar className="size-8 border shadow-sm flex justify-center items-center">
+                                        <School className='size-5 text-muted-foreground' />
+                                    </Avatar>
+                                    <div className='text-sm'>
                                         <p className='tracking-wide font-medium'>{affiliation.institution}</p>
-                                        <p className='text-muted-foreground'>{affiliation.city}, {affiliation.country}</p>
+                                        <p className='text-xs text-muted-foreground'>{affiliation.city}, {affiliation.country}</p>
                                     </div>
-                                ) : (
+                                </div>
+                            ) : (
+                                <div className='text-left font-normal flex gap-2 items-center'>
+                                    <Avatar className="size-8 border shadow-sm flex justify-center items-center">
+                                        <School className='size-5 text-muted-foreground' />
+                                    </Avatar>
                                     <div className='text-xs'>
                                         <p className='tracking-wide font-medium'>Not affiliation selected</p>
                                         <p className='text-muted-foreground'>No information displayed</p>
                                     </div>
-                                )}
+                                </div>
+                            )}
+                            className='h-12'
+                            contentClassName='md:max-w-70'
+                            renderOption={(affiliation) => (
+                                <>
+                                    <Avatar className="size-8 border shadow-sm flex justify-center items-center">
+                                        <School className='size-5 text-muted-foreground' />
+                                    </Avatar>
 
-                            </ItemContent>
-                            <ItemActions>
-                                {affiliation ? (
-                                    <Button
-                                        type='button'
-                                        variant="ghost"
-                                        size="icon-sm"
-                                        className='hover:text-destructive'
-                                        onClick={() => handleAffiliationSelected(null)}
-                                    >
-                                        <X />
-                                    </Button>
-                                ) : (
-                                    <Popover>
-                                        <PopoverTrigger asChild>
-                                            <Button
-                                                type='button'
-                                                variant="outline"
-                                                size="sm"
-                                                className='hover:text-primary-main'
-                                            >
-                                                <span>Search</span>
-                                                <Search />
-                                            </Button>
-                                        </PopoverTrigger>
-                                        <PopoverContent className="w-xs bg-transparent shadow-none border-none">
-                                            <AffiliationSearchCommand onAffiliationSelected={handleAffiliationSelected} />
-                                        </PopoverContent>
-                                    </Popover>
-                                )}
-                            </ItemActions>
-                        </Item>
+                                    <div className='text-sm'>
+                                        <p className='tracking-wide font-medium'>{affiliation.institution}</p>
+                                        <p className='text-xs text-muted-foreground'>{affiliation.city}, {affiliation.country}</p>
+                                    </div>
+                                    <CommandShortcut>
+                                        <Plus className='size-5' />
+                                    </CommandShortcut>
+                                </>
+                            )}
+                        />
                     </Field>
 
-                    <fieldset className='space-y-1' disabled={Boolean(affiliation)}>
+                    <fieldset className='space-y-5' disabled={Boolean(affiliation)}>
                         <Controller
                             name={'institution'}
                             control={control}
                             render={({ field, fieldState }) => (
                                 <Field data-invalid={fieldState.invalid}>
                                     <FieldLabel htmlFor={field.name}>Institution</FieldLabel>
-                                    <Input
-                                        {...field}
-                                        id={field.name}
-                                        aria-invalid={fieldState.invalid}
-                                        autoComplete="off"
-                                        maxLength={100}
-                                    />
-
-                                    <div
-                                        className={cn(
-                                            "overflow-hidden transition-all h-6 duration-200 ease-in-out",
-                                            fieldState.invalid ? " opacity-100" : " opacity-0"
-                                        )}
-                                    >
-                                        <FieldError errors={[fieldState.error]} />
-                                    </div>
+                                    <InputGroup>
+                                        <InputGroupInput
+                                            {...field}
+                                            id={field.name}
+                                            aria-invalid={fieldState.invalid}
+                                            autoComplete="off"
+                                            maxLength={100}
+                                        />
+                                        <InputGroupAddon align="inline-end">
+                                            <FieldError errors={[fieldState.error]} />
+                                        </InputGroupAddon>
+                                    </InputGroup>
                                 </Field>
                             )}
                         />
-
                         <Controller
                             name={`country`}
                             control={control}
@@ -461,39 +447,27 @@ export function AuthorFormContent({ onSubmit, values }: Props) {
                                             ))}
                                         </SelectContent>
                                     </Select>
-                                    <div
-                                        className={cn(
-                                            "overflow-hidden transition-all h-6 duration-200 ease-in-out",
-                                            fieldState.invalid ? " opacity-100" : " opacity-0"
-                                        )}
-                                    >
-                                        <FieldError errors={[fieldState.error]} />
-                                    </div>
                                 </Field>
                             )}
                         />
-
                         <Controller
                             name={'city'}
                             control={control}
                             render={({ field, fieldState }) => (
                                 <Field data-invalid={fieldState.invalid}>
                                     <FieldLabel htmlFor={field.name}>City</FieldLabel>
-                                    <Input
-                                        {...field}
-                                        id={field.name}
-                                        aria-invalid={fieldState.invalid}
-                                        autoComplete="off"
-                                        maxLength={100}
-                                    />
-                                    <div
-                                        className={cn(
-                                            "overflow-hidden transition-all h-6 duration-200 ease-in-out",
-                                            fieldState.invalid ? " opacity-100" : " opacity-0"
-                                        )}
-                                    >
-                                        <FieldError errors={[fieldState.error]} />
-                                    </div>
+                                    <InputGroup>
+                                        <InputGroupInput
+                                            {...field}
+                                            id={field.name}
+                                            aria-invalid={fieldState.invalid}
+                                            autoComplete="off"
+                                            maxLength={100}
+                                        />
+                                        <InputGroupAddon align="inline-end">
+                                            <FieldError errors={[fieldState.error]} />
+                                        </InputGroupAddon>
+                                    </InputGroup>
                                 </Field>
                             )}
                         />
@@ -501,174 +475,5 @@ export function AuthorFormContent({ onSubmit, values }: Props) {
                 </div>
             </fieldset>
         </form>
-    )
-}
-
-
-type UserSearchProps = {
-    onUserSelected?: (item: Partial<UserSchema>) => void
-}
-
-export function UserSearchCommand({ onUserSelected }: UserSearchProps) {
-    const [input, setInput] = React.useState('')
-    const [debouncedInput] = useDebounce(input, 300)
-    const { data, isLoading } = useQuery<UserSchema[]>({
-        queryKey: ['users', debouncedInput],
-        queryFn: async () => {
-            if (input === '') return []
-            try {
-                const { data } = await api.get<UserSchema[]>(`users?search=${debouncedInput}`)
-                return data
-            } catch (error) {
-                return []
-            }
-        }
-    })
-
-    return (
-        <Command shouldFilter={false} className="w-full h-full rounded-lg border shadow-md">
-            <CommandInput
-                placeholder="Search by name or email..."
-                value={input}
-                onValueChange={(value) => { setInput(value) }}
-            />
-            <CommandList>
-                {input === "" ? (
-                    <div className="flex flex-col items-center justify-center py-10 text-center">
-                        <Search className="size-8 text-muted-foreground" />
-                        <p className="font-medium">Search for an author</p>
-                        <p className="text-sm text-muted-foreground">
-                            Enter a name or email address.
-                        </p>
-                    </div>
-                ) : isLoading ? (
-                    <div className="space-y-3 p-4">
-                        <Skeleton className="h-14 w-full" />
-                        <Skeleton className="h-14 w-full" />
-                        <Skeleton className="h-14 w-full" />
-                    </div>
-                ) : data?.length === 0 ? (
-                    <CommandEmpty>
-                        <div className="flex flex-col items-center justify-center gap-2 py-8">
-                            <UserRoundX className="size-8 text-muted-foreground" />
-                            <p className="font-medium">No users found</p>
-                            <p className="text-sm text-muted-foreground">
-                                No users match "{input}".
-                            </p>
-                        </div>
-                    </CommandEmpty>
-                ) : (
-                    <CommandGroup heading="Users">
-                        {data.map((user) => (
-                            <CommandItem
-                                key={user.id}
-                                className='cursor-pointer p-2'
-                                onSelect={() => onUserSelected(user)}
-                            >
-                                <Avatar className="size-12 border shadow-sm">
-                                    <AvatarImage loading='lazy' src={user.photo as string ?? null} />
-                                    <AvatarFallback>
-                                        {user.full_name
-                                            .split(" ")
-                                            .map((x) => x[0])
-                                            .join("")
-                                            .slice(0, 2)}
-                                    </AvatarFallback>
-                                </Avatar>
-                                <div>
-                                    <p className='tracking-wide font-medium'>{user.first_name} {user.last_name}</p>
-                                    <p className='text-xs text-muted-foreground'>{user.email}</p>
-                                </div>
-                                <CommandShortcut>
-                                    <Plus className='size-5' />
-                                </CommandShortcut>
-                            </CommandItem>
-                        ))}
-                    </CommandGroup>
-                )}
-            </CommandList>
-        </Command>
-    )
-}
-
-
-type AffiliationSearchProps = {
-    onAffiliationSelected?: (item: Partial<Affiliation>) => void
-}
-
-export function AffiliationSearchCommand({ onAffiliationSelected }: AffiliationSearchProps) {
-    const [input, setInput] = React.useState('')
-    const [debouncedInput] = useDebounce(input, 300)
-    const { data, isLoading } = useQuery<Affiliation[]>({
-        queryKey: ['users', debouncedInput],
-        queryFn: async () => {
-            try {
-                const { data } = await api.get<Affiliation[]>(`abstracts/affiliations/?search=${debouncedInput}`)
-                return data
-            } catch (error) {
-                return []
-            }
-        }
-    })
-
-    return (
-        <Command shouldFilter={false} className="w-full h-full rounded-lg border shadow-md">
-
-            <CommandInput
-                placeholder="Search by name or email..."
-                value={input}
-                onValueChange={(value) => { setInput(value) }}
-            />
-            <CommandList>
-                {input === "" ? (
-                    <div className="flex flex-col items-center justify-center py-10 text-center">
-                        <School className="size-8 text-muted-foreground" />
-                        <p className="font-medium">Search for an affiliation</p>
-                        <p className="text-sm text-muted-foreground">
-                            Enter an institution, city or country.
-                        </p>
-                    </div>
-                ) : isLoading ? (
-                    <div className="space-y-3 p-4">
-                        <Skeleton className="h-14 w-full" />
-                        <Skeleton className="h-14 w-full" />
-                        <Skeleton className="h-14 w-full" />
-                    </div>
-                ) : data?.length === 0 ? (
-                    <CommandEmpty>
-                        <div className="flex flex-col items-center justify-center gap-2 py-8">
-                            <School className="size-8 text-muted-foreground" />
-                            <p className="font-medium">No affiliations found</p>
-                            <p className="text-sm text-muted-foreground">
-                                No affiliations match "{input}".
-                            </p>
-                        </div>
-                    </CommandEmpty>
-                ) : (
-                    <CommandGroup heading="Previously used affiliations">
-                        {data.map((affiliation) => (
-                            <CommandItem
-                                key={affiliation.id}
-                                className='cursor-pointer p-2'
-                                onSelect={() => onAffiliationSelected(affiliation)}
-                            >
-                                <Avatar className="size-8 border shadow-sm flex justify-center items-center">
-                                    <School className='size-5 text-muted-foreground' />
-                                </Avatar>
-
-                                <div className='text-sm'>
-                                    <p className='tracking-wide font-medium'>{affiliation.institution}</p>
-                                    <p className='text-xs text-muted-foreground'>{affiliation.city}, {affiliation.country}</p>
-                                </div>
-                                <CommandShortcut>
-                                    <Plus className='size-5' />
-                                </CommandShortcut>
-                            </CommandItem>
-                        ))}
-                    </CommandGroup>
-                )}
-            </CommandList>
-
-        </Command>
     )
 }

@@ -40,10 +40,9 @@ function NotificationsPage() {
         )
     }
 
-    const { results } = data.notifications
-
     const unread: Notification[] = []
     const read: Notification[] = []
+    const { results } = data.notifications
     results.forEach(n => n.is_read ? read.push(n) : unread.push(n))
 
     return (

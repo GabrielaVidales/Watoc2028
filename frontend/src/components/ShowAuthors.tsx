@@ -1,5 +1,4 @@
 import api from '@/clients/api'
-import type { AuthorSchema } from '@/schemas/author-schema'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import React, { useState } from 'react'
 import { Spinner } from './ui/spinner'
@@ -16,8 +15,9 @@ import { AlertDialog, AlertDialogCancel, AlertDialogContent, AlertDialogDescript
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from './ui/dialog'
 import { ScrollArea } from './ui/scroll-area'
 import { AuthorForm, AuthorFormContent } from '@/forms/AbstractAuthorForm'
-import { CardAction, CardDescription, CardHeader, CardTitle } from './ui/card'
+import { CardAction, CardDescription, CardHeader } from './ui/card'
 import { useParams } from 'react-router'
+import type { AuthorSchema } from '@/schemas/abstracts/author-schema'
 
 
 type APIError = {
@@ -127,7 +127,7 @@ function ShowAuthorsComponent({ }: Props) {
     }
 
     return (
-        <div className='max-w-full py-8 space-y-8'>
+        <div className='max-w-full'>
             <AlertDialog open={open} onOpenChange={(v) => { setDeleteAuthor(null); setOpen(v) }}>
                 <AlertDialogContent size='sm'>
                     <AlertDialogHeader>
@@ -152,16 +152,16 @@ function ShowAuthorsComponent({ }: Props) {
             </AlertDialog>
 
             <Dialog open={openA} onOpenChange={() => { setOpenA(false); setEditAuthor(null); }}>
-                <DialogContent className='md:max-w-3xl w-full'>
+                <DialogContent className='md:max-w-3xl w-full gap-0'>
                     <DialogHeader>
                         <DialogTitle>{editAuthor !== null ? 'Edit Author' : 'Add a new author'}</DialogTitle>
-                        <DialogDescription>
+                        <DialogDescription className='max-sm:text-xs'>
                             {editAuthor !== null
-                                ? 'Update the necessary fields below and save your changes.'
-                                : 'Fill out the form below to add a new author to the list.'}
+                                ? 'Update an existent co-author.'
+                                : 'Add a new co-author to the list.'}
                         </DialogDescription>
                     </DialogHeader>
-                    <ScrollArea className="-mx-4 max-h-[60vh] overflow-y-auto px-4 overflow-visible">
+                    <ScrollArea className="-mx-4 my-1 border-y overflow-y-auto px-4 overflow-visible max-sm:max-h-[40dvh] max-ms:max-h-[50dvh] max-h-[60dvh]">
                         <AuthorForm>
                             <AuthorFormContent values={editAuthor} onSubmit={() => {
                                 setOpenA(false);
@@ -169,15 +169,15 @@ function ShowAuthorsComponent({ }: Props) {
                             }} />
                         </AuthorForm>
                     </ScrollArea>
-                    <DialogDescription className='border-t-2 pt-2'>
+                    <DialogDescription className='max-sm:text-[10px] text-xs pt-2'>
                         Note: If you add a registered user as a co-author for your submission, they will be notified to see the work they are related to.
                         If the co-author is not a registered user, you can add their information manually.
                     </DialogDescription>
                     <DialogFooter>
                         <DialogClose asChild>
-                            <Button variant="outline">Cancel</Button>
+                            <Button size='sm' variant="outline">Cancel</Button>
                         </DialogClose>
-                        <Button form='author-form'>Save changes</Button>
+                        <Button size='sm' form='author-form'>Save changes</Button>
                     </DialogFooter>
                 </DialogContent>
             </Dialog>

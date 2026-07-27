@@ -26,6 +26,7 @@ class AffiliationViewSet(ModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
     search_fields = ["institution", "city", "country"]
     filter_backends = [SearchFilter]
+    pagination_class = Pagination
 
     def get_queryset(self):
         queryset = Affiliation.objects.all()
