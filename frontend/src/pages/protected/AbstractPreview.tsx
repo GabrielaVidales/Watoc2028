@@ -3,7 +3,7 @@ import { AbstractData } from '@/components/AbstractData'
 import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
 import { useFetch } from '@/hooks/use-fetch'
-import { urls } from '@/routes/routes'
+import { routes } from '@/routes/routes'
 import { type AbstractDeclarationValues } from '@/schemas/abstract-declaration-schema'
 import { type AbstractSchema, type AuthorSchema } from '@/schemas/abstracts/abstract-schemas'
 import { isAxiosError } from 'axios'
@@ -75,7 +75,7 @@ function AbstractPreview({ }: Props) {
                     <Separator />
                     
                     <section className='p-5 flex items-center justify-center'>
-                        <Link to={urls.users.viewAbstracts}>
+                        <Link to={routes.users.submissions.summary}>
                             <Button>
                                 <ChevronsLeft/>
                                 Return to abstracts

@@ -13,7 +13,7 @@ import { isAxiosError } from 'axios';
 import { InfoAlert } from '@/components/InfoAlert';
 import { cn } from '@/lib/utils';
 import { AnimatePresence, motion } from 'motion/react';
-import { urls } from '@/routes/routes';
+import { routes } from '@/routes/routes';
 
 export default function LoginForm() {
     const navigate = useNavigate()
@@ -151,7 +151,7 @@ export default function LoginForm() {
                 />
 
                 <div className='flex justify-end'>
-                    <Link to={urls.auth.forgotPassword} className='w-fit text-primary-main hover:text-primary-light active:text-primary-dark'>
+                    <Link to={routes.auth.forgotPassword} className='w-fit text-primary-main hover:text-primary-light active:text-primary-dark'>
                         Forgot password?
                     </Link>
                 </div>

@@ -1,7 +1,7 @@
 import { Field, FieldContent, FieldDescription, FieldError, FieldLabel } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { affiliationSchema, type Affiliation } from '@/schemas/affiliation-schema'
+import { affiliationSchema, type Affiliation } from '@/schemas/abstracts/affiliation-schema'
 import { countries, getCountryImage } from '@/utils/countriesInfo'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Controller, useForm } from 'react-hook-form'

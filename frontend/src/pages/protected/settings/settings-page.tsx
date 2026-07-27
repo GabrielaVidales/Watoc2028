@@ -7,7 +7,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import ChangePasswordForm from '@/forms/ChangePasswordForm';
 import EditUserForm from '@/forms/EditUserForm';
 import { useProfiles } from '@/hooks/use-profiles';
-import { urls } from '@/routes/routes';
+import { routes } from '@/routes/routes';
 import { Image, LockKeyhole, ShieldAlert, UserRoundPen } from "lucide-react";
 import { Link } from 'react-router';
 import { NotificationSettings } from './components/notifications-settings-component';
@@ -18,22 +18,7 @@ function SettingsPage() {
 
     return (
         <div className='mx-auto w-full max-w-5xl flex flex-col gap-5'>
-            <Breadcrumb>
-                <BreadcrumbList>
-                    <BreadcrumbItem>
-                        <BreadcrumbLink asChild>
-                            <Link to={urls.users.profile}>
-                                Dashboard
-                            </Link>
-                        </BreadcrumbLink>
-                    </BreadcrumbItem>
-                    <BreadcrumbSeparator />
-                    <BreadcrumbItem>
-                        <BreadcrumbPage>Settings</BreadcrumbPage>
-                    </BreadcrumbItem>
-                </BreadcrumbList>
-            </Breadcrumb>
-
+    
             <div className='space-y-3'>
                 <h1 className='text-2xl font-medium'>Account Settings</h1>
             </div>

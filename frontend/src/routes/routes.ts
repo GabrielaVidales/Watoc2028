@@ -55,7 +55,7 @@ const routeWithParams = <T extends string>(url: T) => ({
 })
 
 
-export const urls = {
+export const routes = {
     home: {
         index: '/',
         watoc: '/watoc',
@@ -71,6 +71,10 @@ export const urls = {
         resetPassword: '/reset-password',
     }),
     users: createRouteGroup('/user', {
+        profile: '/profile',
+        settings: '/settings',
+        notifications: '/notifications',
+
         administration: createRouteGroup('/administration', {
             manageUsers: '/manage-users',
             manageReviewers: '/manage-reviewers',
@@ -81,14 +85,6 @@ export const urls = {
             edit: routeWithParams('/edit/:id'),
         }),
 
-
-        profile: '/profile',
-        settings: '/settings',
-        notifications: '/notifications',
-        viewAbstracts: '/my-abstracts',
-        editAbstract: routeWithParams('/abstract/:id/edit'),
-        previewAbstract: routeWithParams('/abstract/:id/preview'),
-        submitAbstract: '/abstract',
         confirmAssistance: createRouteGroup('/confirm-assistance', {
             start: '',
             fee: '/fee',

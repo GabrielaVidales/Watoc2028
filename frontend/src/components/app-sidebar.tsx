@@ -1,13 +1,14 @@
-import miniLogo from '@/assets/logo_img.png';
+import miniLogo from '@/assets/WatocPNGLogoBlank.png';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger, } from "@/components/ui/dropdown-menu";
 import { Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarMenuSub, SidebarMenuSubButton, SidebarMenuSubItem, useSidebar } from "@/components/ui/sidebar";
 import { useAuth } from "@/contexts/AuthContext";
-import { urls } from "@/routes/routes";
+import { routes } from "@/routes/routes";
 import { ArrowLeftFromLine, BadgeCheckIcon, Bell, Bot, ChevronDown, ChevronRight, ChevronUp, FileBadge, FileCheck, FileType2, LayoutDashboard, LayoutList, LogOut, MessageSquareDot, PackageCheck, Settings2, TableProperties, Users, type LucideIcon } from "lucide-react";
 import { Link, NavLink, useNavigate, } from "react-router";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "./ui/collapsible";
 import { ScrollArea } from "./ui/scroll-area";
+import { cn } from '@/lib/utils';
 
 
 type NavItem = {
@@ -27,17 +28,17 @@ type NavCollapsible = {
 const participantModules: NavItem[] = [
     {
         name: "Abstract Submissions",
-        url: urls.users.submissions.summary,
+        url: routes.users.submissions.summary,
         icon: FileType2,
     },
     {
         name: "Congress Registration",
-        url: urls.users.confirmAssistance.start,
+        url: routes.users.confirmAssistance.start,
         icon: PackageCheck,
     },
     {
         name: "Certificate of Attendance",
-        url: urls.users.profile,
+        url: routes.users.profile,
         icon: FileBadge,
     },
 ]
@@ -50,12 +51,12 @@ const adminModules: NavCollapsible[] = [
         items: [
             {
                 name: "Manage Users",
-                url: urls.users.administration.manageUsers,
+                url: routes.users.administration.manageUsers,
                 icon: Users,
             },
             {
                 name: "Abstract Reviews",
-                url: urls.users.administration.manageReviewers,
+                url: routes.users.administration.manageReviewers,
                 icon: LayoutList,
             },
         ]
@@ -70,7 +71,7 @@ const reviewerModules: NavCollapsible[] = [
         items: [
             {
                 name: 'My reviews',
-                url: urls.users.reviews.list,
+                url: routes.users.reviews.list,
                 icon: TableProperties
             }
         ]
@@ -80,31 +81,40 @@ const reviewerModules: NavCollapsible[] = [
 export function AppSidebar() {
     const { user: user } = useAuth()
 
+    const style = 'border-r-2 bg-indigo-900 text-neutral-100 dark:border-indigo-900 dark:bg-indigo-950 dark:text-indigo-50'
+
     return (
         <Sidebar>
-            <SidebarHeader className="py-5">
+            <SidebarHeader className={style}>
                 <TeamSwitcher />
             </SidebarHeader>
 
-            <SidebarContent className="no-scrollbar">
+            <SidebarContent className={style}>
                 <ScrollArea className="h-full">
                     <SidebarGroup>
-                        <SidebarGroupLabel>
+                        <SidebarGroupLabel className='text-neutral-100'>
                             MAIN
                         </SidebarGroupLabel>
                         <SidebarGroupContent>
                             <SidebarMenuItem>
-                                <SidebarMenuButton asChild>
-                                    <NavLink to={urls.users.profile} className="hover:translate-x-1 transition-transform duration-300">
-                                        <LayoutDashboard />
-                                        <span>Dashboard</span>
-                                    </NavLink>
-                                </SidebarMenuButton>
+                                <NavLink to={routes.users.profile} end>
+                                    {({ isActive }) => (
+                                        <SidebarMenuButton className={cn(
+                                            " active:bg-white/30",
+                                            "dark:hover:bg-white/50 dark:active:bg-white/30",
+                                            "text-neutral-50 hover:translate-x-1 transition-transform duration-300",
+                                            isActive && 'bg-white/30'
+                                        )}>
+                                            <LayoutDashboard />
+                                            <span>Dashboard</span>
+                                        </SidebarMenuButton>
+                                    )}
+                                </NavLink>
                             </SidebarMenuItem>
 
                             <SidebarMenuItem>
                                 <SidebarMenuButton asChild>
-                                    <NavLink to={urls.users.notifications} className="hover:translate-x-1 transition-transform duration-300">
+                                    <NavLink to={routes.users.notifications} className="hover:translate-x-1 transition-transform duration-300">
                                         <MessageSquareDot />
                                         <span>Notifications</span>
                                     </NavLink>
@@ -113,7 +123,7 @@ export function AppSidebar() {
 
                             <SidebarMenuItem>
                                 <SidebarMenuButton asChild>
-                                    <NavLink to={urls.users.settings} className="hover:translate-x-1 transition-transform duration-300">
+                                    <NavLink to={routes.users.settings} className="hover:translate-x-1 transition-transform duration-300">
                                         <Settings2 />
                                         <span>Settings</span>
                                     </NavLink>
@@ -123,7 +133,7 @@ export function AppSidebar() {
                     </SidebarGroup>
 
                     <SidebarGroup>
-                        <SidebarGroupLabel>
+                        <SidebarGroupLabel className='text-neutral-100'>
                             SPECIAL MODULES
                         </SidebarGroupLabel>
                         <SidebarGroupContent>
@@ -149,8 +159,8 @@ export function AppSidebar() {
                                                         {item.items?.map((subItem) => (
                                                             <SidebarMenuSubItem key={subItem.name}>
                                                                 <SidebarMenuSubButton asChild>
-                                                                    <NavLink to={subItem.url} className="hover:translate-x-1 transition-transform duration-300">
-                                                                        {subItem.icon && <subItem.icon />}
+                                                                    <NavLink to={subItem.url} className="text-neutral-100! hover:translate-x-1 transition-transform duration-300">
+                                                                         {subItem.icon && <subItem.icon className='text-neutral-100!' />}
                                                                         <span>{subItem.name}</span>
                                                                     </NavLink>
                                                                 </SidebarMenuSubButton>
@@ -185,8 +195,8 @@ export function AppSidebar() {
                                                         {item.items?.map((subItem) => (
                                                             <SidebarMenuSubItem key={subItem.name}>
                                                                 <SidebarMenuSubButton asChild>
-                                                                    <NavLink to={subItem.url} className="hover:translate-x-1 transition-transform duration-300">
-                                                                        {subItem.icon && <subItem.icon />}
+                                                                    <NavLink to={subItem.url} className="text-neutral-100! hover:translate-x-1 transition-transform duration-300">
+                                                                        {subItem.icon && <subItem.icon className='text-neutral-100!' />}
                                                                         <span>{subItem.name}</span>
                                                                     </NavLink>
                                                                 </SidebarMenuSubButton>
@@ -204,7 +214,7 @@ export function AppSidebar() {
                     </SidebarGroup>
 
                     <SidebarGroup>
-                        <SidebarGroupLabel>
+                        <SidebarGroupLabel className='text-neutral-100'>
                             CONGRESS
                         </SidebarGroupLabel>
                         <SidebarGroupContent>
@@ -223,7 +233,7 @@ export function AppSidebar() {
                 </ScrollArea>
             </SidebarContent>
 
-            <SidebarFooter>
+            <SidebarFooter className={style}>
                 <SidebarFooterContent user={{
                     avatar: user.photo as string || null,
                     email: user.email,
@@ -288,19 +298,19 @@ export function SidebarFooterContent({ user, }: {
                         <DropdownMenuSeparator />
                         <DropdownMenuGroup>
                             <DropdownMenuItem asChild>
-                                <Link to={urls.users.profile}>
+                                <Link to={routes.users.profile}>
                                     <BadgeCheckIcon />
                                     Account
                                 </Link>
                             </DropdownMenuItem>
                             <DropdownMenuItem asChild>
-                                <Link to={urls.users.settings}>
+                                <Link to={routes.users.settings}>
                                     <Settings2 />
                                     Settings
                                 </Link>
                             </DropdownMenuItem>
                             <DropdownMenuItem asChild>
-                                <Link to={urls.users.notifications}>
+                                <Link to={routes.users.notifications}>
                                     <Bell />
                                     Notifications
                                 </Link>
@@ -332,13 +342,13 @@ export function TeamSwitcher() {
                             size="lg"
                             className="cursor-pointer data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
                         >
-                            <div className="flex aspect-square size-16 items-center justify-center rounded-lg text-sidebar-primary-foreground">
+                            <div className="flex aspect-square size-48 items-center justify-center rounded-lg text-sidebar-primary-foreground">
                                 <img src={miniLogo} className="" />
                             </div>
-                            <div className="grid flex-1 text-left text-base leading-tight">
+                            {/* <div className="grid flex-1 text-left text-base leading-tight">
                                 <span className="truncate font-medium">WATOC 2028</span>
                                 <span className="truncate text-sm">Mérida, MX</span>
-                            </div>
+                            </div> */}
                             <ChevronDown className="ml-auto" />
                         </SidebarMenuButton>
                     </DropdownMenuTrigger>
@@ -353,7 +363,7 @@ export function TeamSwitcher() {
                             Action
                         </DropdownMenuLabel>
                         <DropdownMenuItem
-                            onClick={() => navigate(urls.home.index)}
+                            onClick={() => navigate(routes.home.index)}
                             className="gap-2 p-2 cursor-pointer"
                         >
                             <div className="flex size-6 items-center justify-center rounded-md border">

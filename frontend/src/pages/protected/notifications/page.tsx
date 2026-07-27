@@ -8,7 +8,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import type { Notification, NotificationResponse } from '@/domain/notifications';
-import { urls } from '@/routes/routes';
+import { routes } from '@/routes/routes';
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import { BellOff, CheckCheck, RotateCw, Settings2 } from 'lucide-react';
 import { useState } from 'react';
@@ -17,7 +17,7 @@ import NotificationItem from './notification-item-component';
 
 function NotificationsPage() {
     const [page, setPage] = useState(1)
-    const [itemsPerPage, setItemsPerPage] = useState(10)
+    const [itemsPerPage, setItemsPerPage] = useState(5)
     const { data, isLoading } = useQuery<NotificationResponse>({
         queryKey: ['notifications', page, itemsPerPage],
         queryFn: async () => {
@@ -52,7 +52,7 @@ function NotificationsPage() {
                 <BreadcrumbList>
                     <BreadcrumbItem>
                         <BreadcrumbLink asChild>
-                            <Link to={urls.users.profile}>
+                            <Link to={routes.users.profile}>
                                 Dashboard
                             </Link>
                         </BreadcrumbLink>
@@ -97,29 +97,11 @@ function NotificationsPage() {
                             </TabsList>
 
                             <div className="flex gap-2">
-                                <Field orientation="horizontal" className="w-fit">
-                                    <FieldLabel htmlFor="select-rows-per-page">Items per page</FieldLabel>
-                                    <Select defaultValue="10" onValueChange={(value) => {
-                                        const limit = Number(value)
-                                        if (!isNaN(limit)) {
-                                            setItemsPerPage(limit)
-                                            setPage(1)
-                                        }
-                                    }}>
-                                        <SelectTrigger className="w-20" id="select-rows-per-page">
-                                            <SelectValue />
-                                        </SelectTrigger>
-                                        <SelectContent align="start">
-                                            <SelectGroup>
-                                                <SelectItem value="3">3</SelectItem>
-                                                <SelectItem value="10">10</SelectItem>
-                                                <SelectItem value="25">25</SelectItem>
-                                                <SelectItem value="50">50</SelectItem>
-                                                <SelectItem value="100">100</SelectItem>
-                                            </SelectGroup>
-                                        </SelectContent>
-                                    </Select>
-                                </Field>
+                                <SelectItemsPerPage
+                                    itemsPerPage={itemsPerPage}
+                                    setItemsPerPage={setItemsPerPage}
+
+                                />
 
                                 <Button size="sm" variant="outline">
                                     <CheckCheck />
@@ -205,6 +187,7 @@ function NotificationsPage() {
 export default NotificationsPage
 
 
+
 type PaginationControllerProps = {
     page: number
     totalPages: number
@@ -216,7 +199,6 @@ export function PaginationController({
     totalPages,
     page,
 }: PaginationControllerProps) {
-
     const previousPage = page > 1 ? page - 1 : null
     const nextPage = page < totalPages ? page + 1 : null
     const pages = Array.from(
@@ -302,5 +284,38 @@ export function PaginationController({
                 </PaginationItem>
             </PaginationContent>
         </Pagination>
+    )
+}
+
+
+
+type SelectItemsPerPageProps = {
+    itemsPerPage: number
+    setItemsPerPage: (n: number) => void
+    options?: number[]
+}
+
+export function SelectItemsPerPage({ setItemsPerPage, itemsPerPage, options = [5, 10, 20] }: SelectItemsPerPageProps) {
+    return (
+        <Field orientation="horizontal" className="w-fit">
+            <FieldLabel htmlFor="select-rows-per-page">Items per page</FieldLabel>
+            <Select defaultValue="10" value={`${itemsPerPage}`} onValueChange={(value) => {
+                const limit = Number(value)
+                if (!isNaN(limit)) {
+                    setItemsPerPage(limit)
+                }
+            }}>
+                <SelectTrigger className="w-20" id="select-rows-per-page">
+                    <SelectValue />
+                </SelectTrigger>
+                <SelectContent align="start">
+                    <SelectGroup>
+                    {options.map(item => (
+                        <SelectItem key={item} value={`${item}`}>{item}</SelectItem>
+                    ))}
+                    </SelectGroup>
+                </SelectContent>
+            </Select>
+        </Field>
     )
 }

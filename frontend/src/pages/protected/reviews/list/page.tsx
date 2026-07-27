@@ -1,4 +1,6 @@
 import api from '@/clients/api'
+import { CustomFilter } from '@/components/custom/custom-filter'
+import type { Filter } from '@/components/reui/filters'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -7,7 +9,7 @@ import { useAuth } from '@/contexts/AuthContext'
 import type { ReviewAssignment } from '@/domain/reviews'
 import { cn } from '@/lib/utils'
 import { SelectAbstractCommand } from '@/pages/test'
-import { urls } from '@/routes/routes'
+import { routes } from '@/routes/routes'
 import type { AbstractDTO } from '@/schemas/abstracts/abstract-schemas'
 import { useQuery } from '@tanstack/react-query'
 import { Search, X } from 'lucide-react'
@@ -19,8 +21,9 @@ type Props = {}
 function ReviewsList({ }: Props) {
     const navigate = useNavigate()
 
-    const [selected, setSelected] = useState<Partial<AbstractDTO>>(null);
+    const [filters, setFilters] = useState<Filter[]>([])
 
+    const [selected, setSelected] = useState<Partial<AbstractDTO>>(null);
 
     const { user: user } = useAuth()
 
@@ -54,6 +57,13 @@ function ReviewsList({ }: Props) {
                         <p className="text-sm text-muted-foreground">
                             Manage your assigned abstracts and submit reviews.
                         </p>
+                    </div>
+
+                    <div > 
+                        <CustomFilter
+                            filters={filters}
+                            setFilters={setFilters}
+                        />
                     </div>
 
                     <div className="flex gap-2">
@@ -140,7 +150,7 @@ function ReviewsList({ }: Props) {
                                                 <Button
                                                     size="sm"
                                                     variant="outline"
-                                                    onClick={() => navigate(urls.users.reviews.view.build({ id: assignment.id }))}
+                                                    onClick={() => navigate(routes.users.reviews.view.build({ id: assignment.id }))}
                                                 >
                                                     <Search />
                                                     View

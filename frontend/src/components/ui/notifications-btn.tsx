@@ -6,7 +6,7 @@ import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle, } from "@
 import { Popover, PopoverContent, PopoverTrigger, } from "@/components/ui/popover"
 import type { NotificationResponse } from "@/domain/notifications"
 import { cn } from "@/lib/utils"
-import { urls } from "@/routes/routes"
+import { routes } from "@/routes/routes"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { ArrowRight, Bell, BellOff, CheckCheck, MessageCircleCheck, MessageCircleReply, MoreHorizontal, RotateCw, Settings, Trash2 } from "lucide-react"
 import { Fragment } from "react"
@@ -263,7 +263,7 @@ export function NotificationsBell() {
 
                 <div className="border-t">
                     <Button variant="ghost" className="w-full justify-center text-xs" asChild>
-                        <Link to={urls.users.notifications}>
+                        <Link to={routes.users.notifications}>
                             View all notifications
                             <ArrowRight className="ml-2 size-4" />
                         </Link>

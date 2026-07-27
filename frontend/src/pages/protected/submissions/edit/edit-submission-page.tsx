@@ -11,13 +11,16 @@ import EditAbstractBody from '@/forms/wrappers/EditAbstractBody'
 import { useIsMobile } from '@/hooks/use-mobile'
 import { useScrollSpy } from '@/hooks/useScrollSpy'
 import { cn, } from '@/lib/utils'
-import { urls } from '@/routes/routes'
+import { routes } from '@/routes/routes'
 import type { AbstractSchema } from '@/schemas/abstracts/abstract-schemas'
 import { useQuery } from '@tanstack/react-query'
-import { CheckIcon, Gavel, LoaderCircleIcon, MailOpen, MessageSquareCode, RotateCw, TextQuote, UserPlus } from 'lucide-react'
+import { CheckIcon, Gavel, IdCard, LoaderCircleIcon, LucideFileEdit, MailOpen, MessageSquareCode, RotateCw, ScanText, TextQuote, UserPlus } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router'
-import BeforeSubmitPage from './BeforeSubmitPage'
+import BeforeSubmitPage from '../../BeforeSubmitPage'
+import { Spinner } from '@/components/ui/spinner'
+import { formatDate } from '@/utils/formatDate'
+import AbstractContentForm from '@/forms/submissions/abstract-content-form'
 
 
 function EditAbstractPage() {
@@ -36,7 +39,7 @@ function EditAbstractPage() {
 
     useEffect(() => {
         if (data?.status === 'submitted') {
-            navigate(urls.users.viewAbstracts)
+            navigate(routes.users.submissions.summary)
         }
     }, [data])
 
@@ -81,7 +84,7 @@ function EditAbstractPage() {
 
     const activeId = useScrollSpy(steps.map(s => s.id), {
         root: parentRef.current,
-        rootMargin: '-120px'
+        rootMargin: '-80px'
     });
 
     useEffect(() => {
@@ -109,48 +112,49 @@ function EditAbstractPage() {
             <div className={cn(
                 "h-full grid",
                 isMobile ? "grid-cols-1" : "sticky top-0 grid-cols-[1fr_340px]",
-
             )}>
-                <main id='main-container' className='h-full w-full overflow-y-auto no-scrollbar' ref={parentRef}>
 
-                    <div className='lg:sticky lg:top-0 border-b-2 p-8 z-100 bg-background'>
-                        <Breadcrumb>
-                            <BreadcrumbList>
-                                <BreadcrumbItem>
-                                    <BreadcrumbLink asChild>
-                                        <Link to={urls.users.profile}>
-                                            Dashboard
-                                        </Link>
-                                    </BreadcrumbLink>
-                                </BreadcrumbItem>
-                                <BreadcrumbSeparator />
-                                <BreadcrumbItem>
-                                    <BreadcrumbLink asChild>
-                                        <Link to={urls.users.viewAbstracts}>
-                                            Abstract Submissions
-                                        </Link>
-                                    </BreadcrumbLink>
-                                </BreadcrumbItem>
-                                <BreadcrumbSeparator />
-                                <BreadcrumbItem>
-                                    <BreadcrumbPage>Edit</BreadcrumbPage>
-                                </BreadcrumbItem>
-                            </BreadcrumbList>
-                        </Breadcrumb>
+                <main id='main-container' className='h-full w-full overflow-y-auto no-scrollbar bg-background' ref={parentRef}>
 
-                        <div>
-                            <CardTitle className='text-2xl'>
-                                Edit Abstract Submission
-                            </CardTitle>
+                    <div className='bg-background space-y-4 p-8 pb-4'>
+                        <div className='flex flex-col md:flex-row md:justify-between gap-5'>
+                            <div className="flex items-start gap-3">
+                                <div className="flex size-12 shrink-0 items-center justify-center rounded-lg bg-primary-light/10 border-2 border-primary-main/20 text-primary">
+                                    <LucideFileEdit className="text-primary-main stroke-2 size-8" />
+                                </div>
+
+                                <div>
+                                    <h1 className="text-2xl font-semibold">
+                                        Manage Users
+                                    </h1>
+                                    <p className="text-sm text-muted-foreground">
+                                        Search, filter and manage registered users.
+                                    </p>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
-                    <div className={cn(
-                        "p-2 md:p-4 lg:p-6",
-                        "space-y-4 md:space-y-8 lg:space-y-12",
-                        "bg-secondary"
-                    )}>
-                        <Card className='max-w-3xl w-full mx-auto' id='abstract-content'>
+                    <div className='sticky top-0 z-10 bg-background border-b-2 border-b-border space-y-0 px-8 py-4 tracking-wide'>
+                        <h3 className='font-medium'>Editing submission:</h3>
+                        <h4 className='text-xl leading-tight truncate' dangerouslySetInnerHTML={{ __html: data.title }}></h4>
+                        <p className='text-xs text-muted-foreground mt-2'>Last modification: {formatDate(data.last_update)}</p>
+                    </div>
+
+                    <div className={cn("p-2 md:p-4 lg:p-6 bg-secondary space-y-4 md:space-y-8 lg:space-y-12",)}>
+
+                        <Card className='max-w-4xl mx-auto w-full gap-0' id='abstract-content'>
+                            <CardContent className='space-y-5 md:py-5 md:px-10'>
+                                <CardTitle className="flex gap-3 items-center">
+                                    <ScanText className='text-primary-main' />
+                                    <h2 className='text-xl font-semibold'>Abstract Content</h2>
+                                </CardTitle>
+
+                                <EditAbstractBody />
+                            </CardContent>
+                        </Card>
+
+                        <Card className='max-w-3xl w-full mx-auto'>
                             <CardHeader>
                                 <div className="flex items-center gap-3">
                                     <div className="flex size-12 items-center justify-center rounded-lg bg-primary-light/10 border-2 border-primary-main/20 text-primary">

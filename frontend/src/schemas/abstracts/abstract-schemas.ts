@@ -165,9 +165,3 @@ export type AuthorSchema = z.infer<typeof authorSchema>
 export type AbstractFormValues = z.infer<typeof submitAbstractSchema>
 
 export type AuthorAffiliationSchema = z.infer<typeof authorAffiliationSchema>
-
-const countWords = (input: string, limit: number) => {
-    if (!input)
-        return true
-    return input.split(/\s+/).filter(Boolean).length <= limit
-}

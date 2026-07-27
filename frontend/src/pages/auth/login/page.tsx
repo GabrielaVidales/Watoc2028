@@ -4,7 +4,7 @@ import { Link, useLocation } from 'react-router'
 import { ClipboardSignature, CheckCircle2, SquareUserRound } from 'lucide-react'
 import { useHeader } from '@/contexts/HeaderContext'
 import { useEffect } from 'react'
-import { urls } from '@/routes/routes'
+import { routes } from '@/routes/routes'
 import LoginForm from '@/pages/auth/login/LoginForm'
 import { AnimatePresence, motion } from 'motion/react';
 import { InfoAlert } from '@/components/InfoAlert'
@@ -94,7 +94,7 @@ export default function LoginPage() {
 									</ul>
 								</div>
 
-								<Link to={urls.auth.register}>
+								<Link to={routes.auth.register}>
 									<Button variant='main' className='w-full py-5 text-xl font-bold gap-3 shadow-lg'>
 										Join WATOC now
 									</Button>

@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Link } from 'react-router'
-import { urls } from '@/routes/routes'
+import { routes } from '@/routes/routes'
 import SelectFeeForm from './select-fee-form'
 
 
@@ -23,14 +23,14 @@ export function SelectFeePage() {
                 'flex justify-between items-start bg-primary-light/20',
                 'px-10 py-3 mx-auto mt-auto bottom-0'
             )}>
-                <Link to={urls.users.confirmAssistance.start}>
+                <Link to={routes.users.confirmAssistance.start}>
                     <Button type='button'>
                         <ChevronLeft />
                         Back
                     </Button>
                 </Link>
 
-                <Link to={urls.users.confirmAssistance.dinner}>
+                <Link to={routes.users.confirmAssistance.dinner}>
                     <Button type='button'>
                         Next
                         <ChevronRight />

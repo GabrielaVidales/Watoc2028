@@ -1,6 +1,6 @@
 import z, { object } from "zod";
 import { affiliationSchema } from "./affiliation-schema";
-import { userSchema } from "./user-schemas";
+import { userSchema } from "../user-schemas";
 
 
 export const authorSchema = object({

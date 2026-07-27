@@ -2,7 +2,7 @@ import api from '@/clients/api';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import React, { useState } from 'react'
 import { Spinner } from './ui/spinner';
-import type { Affiliation } from '@/schemas/affiliation-schema';
+import type { Affiliation } from '@/schemas/abstracts/affiliation-schema';
 import { Button } from './ui/button';
 import { Edit, Plus, School2, Trash2, TriangleAlert } from 'lucide-react';
 import { cn } from '@/lib/utils';

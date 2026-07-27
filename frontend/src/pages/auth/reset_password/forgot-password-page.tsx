@@ -5,7 +5,7 @@ import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card'
 import { Field, FieldError, FieldLabel } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
 import { Spinner } from '@/components/ui/spinner'
-import { urls } from '@/routes/routes'
+import { routes } from '@/routes/routes'
 import { emailAddressForm, type EmailAddressFormValues } from '@/schemas/reset-password-schema'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { isAxiosError } from 'axios'
@@ -181,7 +181,7 @@ function ForgotPasswordPage() {
                         )}
                     </Button>
                     <Button asChild variant="link" className="text-sm">
-                        <Link to={urls.auth.login}>
+                        <Link to={routes.auth.login}>
                             <ArrowLeft className="h-4 w-4 mr-1 inline" />
                             Back to login
                         </Link>

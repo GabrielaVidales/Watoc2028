@@ -18,121 +18,24 @@ import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area'
 import { useDebounce } from 'use-debounce'
 import { InputGroup, InputGroupAddon, InputGroupInput } from '@/components/ui/input-group'
 import type { PaginatedResponse } from '@/domain/pagination'
+import { CustomFilter } from '@/components/custom/custom-filter'
 
 
 function ManageReviewsPage() {
     const [query, setQuery] = useState('')
     const [queryParams] = useDebounce(query, 300)
     const { data } = useQuery<UserSchema[]>({
-        queryKey: ['users', queryParams],
+        queryKey: ['reviewers', queryParams],
         queryFn: async () => {
-            await new Promise(r => setTimeout(r, 1000))
             const { data } = await api.get<UserSchema[]>(`/reviews/users${queryParams}`)
             return data
         }
     })
 
-
-    const filteredUsers = (data as any)?.results || []
-    console.log(filteredUsers);
-
-    const operators: FilterOperator[] = [
-        { value: "includes", label: "includes" },
-        { value: "excludes", label: "excludes" },
-    ]
-
-    const fields = useMemo<FilterFieldConfig[]>(() => [
-        {
-            key: 'roles',
-            label: 'Roles',
-            icon: <ShieldCheck className='size-3.5 shrink-0' />,
-            type: 'multiselect',
-            className: "w-[180px]",
-            placeholder: "Filter by role...",
-            defaultOperator: 'includes',
-            operators: operators,
-            options: [
-                { value: 'admin', label: 'Administrator', },
-                { value: 'reviewer', label: 'Reviewer', },
-                { value: 'participant', label: 'Participant', },
-            ]
-        },
-        {
-            key: 'email',
-            label: 'Email',
-            icon: <Mail className='size-3.5 shrink-0' />,
-            type: 'text',
-            className: "w-[200px]",
-            placeholder: "example@email.com",
-            operators: []
-        },
-        {
-            key: 'is_active',
-            label: 'Status',
-            icon: <CheckCircle2 className='size-3.5 shrink-0' />,
-            type: 'select',
-            className: "w-[180px]",
-            placeholder: "Select status...",
-            operators: [],
-            options: [
-                {
-                    label: 'Active',
-                    value: 'true',
-                    icon: <Circle className="size-3 shrink-0 fill-green-600 text-green-600" />
-                },
-                {
-                    label: 'Inactive',
-                    value: 'false',
-                    icon: <Circle className="size-3 shrink-0 fill-red-600 text-red-600" />
-                },
-            ]
-        },
-        {
-            key: 'first_name',
-            label: 'First name',
-            icon: <IdCard className='size-3.5 shrink-0' />,
-            type: 'text',
-            className: "w-[150px]",
-            operators: []
-        },
-        {
-            key: 'last_name',
-            label: 'Last name',
-            icon: <IdCard className='size-3.5 shrink-0' />,
-            type: 'text',
-            className: "w-[150px]",
-            operators: []
-        },
-        {
-            key: "creation_date",
-            label: "Creation Date",
-            icon: <CalendarIcon className="size-3.5 shrink-0" />,
-            type: "custom",
-            operators: [
-                { value: "is", label: "is" },
-                { value: "is_not", label: "is not" },
-                { value: "before", label: "before" },
-                { value: "after", label: "after" },
-            ],
-            customRenderer: ({ values, onChange }) => (
-                <CustomDateInput
-                    values={values}
-                    onChange={onChange}
-                />
-            ),
-        },
-    ], []);
+    const filteredUsers = (data as any) ?? []
 
     const [filters, setFilters] = useState<Filter[]>([])
 
-    const handleFiltersChange = useCallback((filters: Filter[]) => {
-        setFilters(filters)
-    }, [])
-
-    const applyFilters = () => {
-        const query = filtersToQuery(filters)
-        setQuery(query)
-    }
 
     useEffect(() => {
         const query = filtersToQuery(filters)
@@ -167,8 +70,8 @@ function ManageReviewsPage() {
         <div className='w-full h-full flex flex-col'>
             <div className='bg-background border-b-2 border-b-border p-8'>
                 <div className="flex items-center gap-3">
-                    <div className="flex size-14 shrink-0 items-center justify-center rounded-lg bg-primary-light/10 border-3 border-primary-main/20 text-primary">
-                        <UserSquare className="text-primary-main stroke-2 size-12" />
+                    <div className="flex size-12 shrink-0 items-center justify-center rounded-lg bg-primary-light/10 border-2 border-primary-main/20 text-primary">
+                        <UserSquare className="text-primary-main stroke-2 size-8" />
                     </div>
 
                     <div>
@@ -277,20 +180,19 @@ function ManageReviewsPage() {
                                         Filters
 
                                         {filters.length > 0 && (
-                                            <button
-                                                type="button"
+                                            <div
                                                 onClick={(e) => {
                                                     e.stopPropagation()
                                                     setFilters([])
                                                 }}
-                                                className="absolute right-1 top-1/2 -translate-y-1/2 rounded-sm p-1 opacity-0 transition-opacity group-hover:opacity-100 group-hover:bg-accent"
+                                                className="absolute right-1 top-1/2 -translate-y-1/2 rounded-sm p-1 opacity-0 transition-opacity group-hover:opacity-100 group-hover:bg-accent hover:text-destructive"
                                             >
                                                 <X className="size-3 opacity-0 transition-opacity group-hover:opacity-100" />
-                                            </button>
+                                            </div>
                                         )}
                                     </Button>
                                 </PopoverTrigger>
-                                <PopoverContent className="w-120">
+                                <PopoverContent className="w-120" align='end'>
                                     <div className="grid gap-2">
                                         <div className="flex justify-between">
                                             <div className='space-y-1'>
@@ -303,19 +205,9 @@ function ManageReviewsPage() {
                                             </Button>
                                         </div>
                                         <div className="grid gap-2">
-                                            <Filters
-                                                size='sm'
-                                                variant='default'
+                                            <CustomFilter
                                                 filters={filters}
-                                                fields={fields}
-                                                onChange={handleFiltersChange}
-                                                className='w-full'
-                                                trigger={
-                                                    <Button variant="default" size='sm'>
-                                                        <FilterIcon />
-                                                        Add Filter
-                                                    </Button>
-                                                }
+                                                setFilters={setFilters}
                                             />
                                         </div>
                                     </div>
@@ -439,7 +331,7 @@ type CustomRendererProps = {
     autoFocus?: boolean
 }
 
-function CustomDateInput({ values, onChange, autoFocus }: CustomRendererProps) {
+export function CustomDateInput({ values, onChange, autoFocus }: CustomRendererProps) {
     const value = Number(values?.[0])
     const date = value ? new Date(value) : undefined
 

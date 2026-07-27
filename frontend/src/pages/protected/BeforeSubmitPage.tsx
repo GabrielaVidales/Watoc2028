@@ -1,7 +1,7 @@
 import { AbstractData } from '@/components/AbstractData'
 import { useFetch } from '@/hooks/use-fetch'
 import { useMutation } from '@/hooks/use-mutation'
-import { urls } from '@/routes/routes'
+import { routes } from '@/routes/routes'
 import { abstractDeclarationSchema, type AbstractDeclarationValues } from '@/schemas/abstract-declaration-schema'
 import { abstractSchema, validateAuthorsSchema, type AbstractSchema, type AuthorSchema } from '@/schemas/abstracts/abstract-schemas'
 import { isAxiosError } from 'axios'
@@ -46,7 +46,7 @@ function BeforeSubmitPage() {
         try {
             const res = await mutate<any>('post', `/abstracts/submissions/${id}/submit/`)
             await fetchAbstract()
-            navigate(urls.users.viewAbstracts)
+            navigate(routes.users.submissions.summary)
             if (import.meta.env.DEV) {
                 console.log(res);
             }

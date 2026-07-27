@@ -9,7 +9,7 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { useAuth } from '@/contexts/AuthContext'
-import { urls } from '@/routes/routes'
+import { routes } from '@/routes/routes'
 import { ChevronDown } from 'lucide-react'
 import { Link } from 'react-router'
 
@@ -37,12 +37,12 @@ export function AvatarDropdown() {
             <DropdownMenuContent align="end" className="w-40">
                 <DropdownMenuGroup>
                     <DropdownMenuItem asChild>
-                        <Link to={urls.users.profile} className='cursor-pointer'>
+                        <Link to={routes.users.profile} className='cursor-pointer'>
                             Profile
                         </Link>
                     </DropdownMenuItem>
                     <DropdownMenuItem asChild>
-                        <Link to={urls.users.settings} className='cursor-pointer'>
+                        <Link to={routes.users.settings} className='cursor-pointer'>
                             Settings
                         </Link>
                     </DropdownMenuItem>

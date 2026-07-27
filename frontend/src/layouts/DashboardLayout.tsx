@@ -1,7 +1,7 @@
-import React, { useEffect, useRef } from 'react'
+import React, { Fragment, useEffect, useRef } from 'react'
 import { type LucideIcon, FileBadge, FileType2, PackageCheck, ChevronDown, Bell, Settings2, Settings } from "lucide-react"
-import { Link, Outlet, } from "react-router"
-import { urls } from "@/routes/routes"
+import { Link, Outlet, useLocation, } from "react-router"
+import { routes } from "@/routes/routes"
 import { useAuth } from "@/contexts/AuthContext"
 import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar"
 import { AppSidebar } from "@/components/app-sidebar"
@@ -15,7 +15,8 @@ import websocketDispatcher from '@/stores/websocket-dispatcher'
 import { toast } from 'sonner'
 import { timeAgo } from '@/utils/utils'
 import type { Notification } from '@/domain/notifications'
-import { ScrollArea } from '@/components/ui/scroll-area'
+import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from '@/components/ui/breadcrumb'
+import { useIsMobile } from '@/hooks/use-mobile'
 
 
 export function DropdownMenuAvatar() {
@@ -34,13 +35,13 @@ export function DropdownMenuAvatar() {
             <DropdownMenuContent align="end">
                 <DropdownMenuGroup>
                     <DropdownMenuItem asChild>
-                        <Link to={urls.users.profile}>
+                        <Link to={routes.users.profile}>
                             <BadgeCheckIcon />
                             Account
                         </Link>
                     </DropdownMenuItem>
                     <DropdownMenuItem asChild>
-                        <Link to={urls.users.settings}>
+                        <Link to={routes.users.settings}>
                             <Settings2 />
                             Settings
                         </Link>
@@ -132,7 +133,14 @@ function NotificationToast({ id, duration = 7000, notification }: { id: number |
 }
 
 
+
 function DashboardLayout() {
+    const isMobile = useIsMobile()
+
+    const location = useLocation().pathname
+        .split('/')
+        .filter(v => !!v && v !== 'user')
+
     const connect = useWebsocket(w => w.connect)
     const disconnect = useWebsocket(w => w.disconnect)
 
@@ -157,11 +165,39 @@ function DashboardLayout() {
             <AppSidebar />
 
             <SidebarInset className="min-h-screen overflow-hidden">
-                <header className="sticky top-0 z-50 border-b bg-card shrink-0">
-                    <div className='my-2 px-3 mx-auto flex flex-row justify-between items-center gap-6'>
-
-                        <div className='flex flex-row items-center sm:items-start gap-3 max-w-sm shrink-0'>
+                <header className="sticky top-0 z-50 border-b shrink-0 h-14 flex items-center">
+                    <div className='w-full px-3 mx-auto flex flex-row justify-between items-center gap-6'>
+                        <div className='flex flex-row items-center gap-8 shrink-0'>
                             <SidebarTrigger />
+
+                            {!isMobile && (
+                                <Breadcrumb>
+                                    <BreadcrumbList>
+                                        <BreadcrumbItem>
+                                            <BreadcrumbLink asChild>
+                                                <Link to={routes.users.profile}>
+                                                    Dashboard
+                                                </Link>
+                                            </BreadcrumbLink>
+                                        </BreadcrumbItem>
+
+                                        {location.map((segment, i) => (
+                                            <Fragment key={`${segment}-${i}`}>
+                                                <BreadcrumbSeparator />
+                                                <BreadcrumbItem className="capitalize">
+                                                    {i === location.length - 1 ? (
+                                                        <BreadcrumbPage>{segment.replace(/-/g, " ")}</BreadcrumbPage>
+                                                    ) : (
+                                                        <span className="text-muted-foreground">
+                                                            {segment.replace(/-/g, " ")}
+                                                        </span>
+                                                    )}
+                                                </BreadcrumbItem>
+                                            </Fragment>
+                                        ))}
+                                    </BreadcrumbList>
+                                </Breadcrumb>
+                            )}
                         </div>
 
                         <div className='flex flex-row items-center'>

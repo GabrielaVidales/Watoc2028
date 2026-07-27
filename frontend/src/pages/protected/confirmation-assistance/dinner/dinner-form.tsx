@@ -11,7 +11,7 @@ import { Controller, useForm } from 'react-hook-form'
 import React, { useEffect } from 'react'
 import { useRegistrationStore } from '@/data/store'
 import { useNavigate } from 'react-router'
-import { urls } from '@/routes/routes'
+import { routes } from '@/routes/routes'
 
 function DinnerForm() {
     const { handleSubmit, watch, getValues, reset, formState, control } = useForm({
@@ -52,7 +52,7 @@ function DinnerForm() {
     useEffect(() => {
         if (!useRegistrationStore.persist.hasHydrated) return
         if (!fee) {
-            navigate(urls.users.confirmAssistance.fee)
+            navigate(routes.users.confirmAssistance.fee)
             return
         }
         else if (dinner) {

@@ -17,7 +17,7 @@ import { useEffect } from 'react';
 import HomeLayout from './layouts/HomeLayout'
 import VisaRequirements from '@/pages/visa/VisaRequirements'
 import AuthLayout from './layouts/AuthLayout'
-import { urls } from './routes/routes'
+import { routes } from './routes/routes'
 import ConfirmationPage from './pages/protected/confirmation-assistance/page'
 import { SelectFeePage } from './pages/protected/confirmation-assistance/fee/page'
 import { SelectTourPage } from './pages/protected/confirmation-assistance/tour/page'
@@ -38,7 +38,7 @@ import ManageUsersPage from './pages/protected/administration/manage-users/manag
 import ReviewsList from './pages/protected/reviews/list/page'
 import ReviewAbstract from './pages/protected/reviews/view/page'
 import ManageReviewsPage from './pages/protected/administration/manage-reviews/manage-reviews'
-import EditAbstractPage from './pages/protected/EditAbstractPage'
+import EditAbstractPage from './pages/protected/submissions/edit/edit-submission-page'
 
 function App() {
 	const { pathname } = useLocation()
@@ -67,12 +67,12 @@ function App() {
 			</Route>
 
 			{/* Rutas sólo para usuarios no loggeados */}
-			<Route element={<GuestRoute redirectTo={urls.users.profile} />}>
+			<Route element={<GuestRoute redirectTo={routes.users.profile} />}>
 				<Route element={<AuthLayout />}>
-					<Route path={urls.auth.login} element={<LoginPage />} />
-					<Route path={urls.auth.register} element={<RegisterPage />} />
-					<Route path={urls.auth.forgotPassword} element={<ForgotPasswordPage />} />
-					<Route path={urls.auth.resetPassword} element={<CreatePasswordPage />} />
+					<Route path={routes.auth.login} element={<LoginPage />} />
+					<Route path={routes.auth.register} element={<RegisterPage />} />
+					<Route path={routes.auth.forgotPassword} element={<ForgotPasswordPage />} />
+					<Route path={routes.auth.resetPassword} element={<CreatePasswordPage />} />
 				</Route>
 			</Route>
 
@@ -81,11 +81,11 @@ function App() {
 					<Route element={<AuthLayout />}>
 						{/*  DEPRECAR ESTAS RUTAS POCO A POCO  */}
 						<Route element={<ProtectedRoute allowedRoles={['admin', 'participant']} />} >
-							<Route path={urls.users.confirmAssistance.start} element={<ConfirmationPage />} />
-							<Route path={urls.users.confirmAssistance.fee} element={<SelectFeePage />} />
-							<Route path={urls.users.confirmAssistance.dinner} element={<DinnerPage />} />
-							<Route path={urls.users.confirmAssistance.tour} element={<SelectTourPage />} />
-							<Route path={urls.users.confirmAssistance.payment} element={<ConfirmPaymentPage />} />
+							<Route path={routes.users.confirmAssistance.start} element={<ConfirmationPage />} />
+							<Route path={routes.users.confirmAssistance.fee} element={<SelectFeePage />} />
+							<Route path={routes.users.confirmAssistance.dinner} element={<DinnerPage />} />
+							<Route path={routes.users.confirmAssistance.tour} element={<SelectTourPage />} />
+							<Route path={routes.users.confirmAssistance.payment} element={<ConfirmPaymentPage />} />
 						</Route>
 					</Route>
 				</Route>
@@ -95,30 +95,30 @@ function App() {
 				<Route element={<DashboardLayout />}>
 
 					<Route element={<ProtectedRoute allowedRoles={['admin']} />} >
-						<Route path={urls.users.administration.manageUsers} element={<ManageUsersPage />} />
-						<Route path={urls.users.administration.manageReviewers} element={<ManageReviewsPage />} />
+						<Route path={routes.users.administration.manageUsers} element={<ManageUsersPage />} />
+						<Route path={routes.users.administration.manageReviewers} element={<ManageReviewsPage />} />
 					</Route>
 
 					<Route element={<ProtectedRoute allowedRoles={['reviewer']} />} >
-						<Route path={urls.users.reviews.list} element={<ReviewsList />} />
-						<Route path={urls.users.reviews.view.url} element={<ReviewAbstract />} />
+						<Route path={routes.users.reviews.list} element={<ReviewsList />} />
+						<Route path={routes.users.reviews.view.url} element={<ReviewAbstract />} />
 					</Route>
 
 					<Route element={<ProtectedRoute allowedRoles={['participant']} />} >
-						<Route path={urls.users.submissions.summary} element={<AbstractSubmissionsPage />} />
-						<Route path={urls.users.submissions.edit.url} element={<EditAbstractPage />} />
+						<Route path={routes.users.submissions.summary} element={<AbstractSubmissionsPage />} />
+						<Route path={routes.users.submissions.edit.url} element={<EditAbstractPage />} />
 					</Route>
 
 
 					{/* Rutas para todos los usuarios */}
-					<Route path={urls.users.profile} element={<UserDashboardPage />} />
-					<Route path={urls.users.settings} element={<SettingsPage />} />
-					<Route path={urls.users.notifications} element={<NotificationsPage />} />
+					<Route path={routes.users.profile} element={<UserDashboardPage />} />
+					<Route path={routes.users.settings} element={<SettingsPage />} />
+					<Route path={routes.users.notifications} element={<NotificationsPage />} />
 				</Route>
 				<Route path={'/test'} element={<TestPage />} />
 			</Route>
 
-			<Route path={urls.auth.verify} element={<VerifyEmailPage />} />
+			<Route path={routes.auth.verify} element={<VerifyEmailPage />} />
 
 			{/* Para rutas diferentes */}
 			<Route path='*' element={<NotFound />} />

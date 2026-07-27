@@ -13,7 +13,7 @@ import api from '@/clients/api';
 import { InputGroup, InputGroupAddon, InputGroupButton, InputGroupInput } from '@/components/ui/input-group';
 import { Spinner } from '@/components/ui/spinner';
 import { Separator } from '@/components/ui/separator';
-import { urls } from '@/routes/routes';
+import { routes } from '@/routes/routes';
 import { AnimatePresence, motion } from 'motion/react';
 import { InfoAlert } from '@/components/InfoAlert';
 import { isAxiosError } from 'axios';
@@ -62,7 +62,7 @@ export default function RegisterForm() {
     const onFormSubmit = handleSubmit(async (data) => {
         try {
             await api.post('/users/', data)
-            navigate(urls.auth.login, {
+            navigate(routes.auth.login, {
                 replace: true,
                 state: {
                     code: 'account-created',

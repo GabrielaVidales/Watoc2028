@@ -44,11 +44,11 @@ export default function RichTextEditor({ value, invalid, multiline = true, place
                 spellcheck: spellCheck ? "true" : "false",
                 maxlength: maxLength?.toString(),
                 class: cn(
-                    "ProseMirror w-full min-w-0 max-w-full bg-background p-3 text-sm outline-none max-w-none",
+                    "ProseMirror w-full min-w-0 max-w-full bg-background p-2 px-3 text-sm outline-none max-w-none",
                     "break-all",
                     "[&_p]:wrap-anywhere",
                     "[&_li]:wrap-anywhere",
-                    "[&_p]:my-2 [&_h1]:text-3xl [&_h1]:font-bold [&_h2]:text-2xl [&_h2]:font-bold",
+                    "[&_p]:my-0 [&_h1]:text-3xl [&_h1]:font-bold [&_h2]:text-2xl [&_h2]:font-bold",
                     "[&_ul]:list-disc [&_ul]:ml-6 [&_strong]:font-bold [&_em]:italic [&_u]:underline",
                     "before:text-muted-foreground before:content-[attr(data-placeholder)]",
                     "before:float-left before:h-0 before:pointer-events-none overflow-y-auto",

@@ -1,7 +1,7 @@
 import { Link } from 'react-router';
 import fieldPng from '../assets/field.png'
 import { Facebook, Instagram, Linkedin, Mail, X } from 'lucide-react';
-import { urls } from '@/routes/routes';
+import { routes } from '@/routes/routes';
 import logo from '@/assets/WatocPNGLogoBlank.png'
 import { cn } from '@/lib/utils';
 import { Button } from './ui/button';
@@ -11,7 +11,7 @@ const navigation = {
         { label: "What's WATOC?", href: '/watoc' },
         { label: 'Abstract Submission', href: '/abstract-submission' },
         { label: 'Visa Requirements', href: '/visa' },
-        { label: 'Registration', href: urls.auth.register },
+        { label: 'Registration', href: routes.auth.register },
     ],
     venue: [
         { label: 'Venue Information', href: '/venue' },

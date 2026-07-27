@@ -5,7 +5,7 @@ import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card'
 import { Field, FieldError, FieldLabel } from '@/components/ui/field'
 import { InputGroup, InputGroupAddon, InputGroupButton, InputGroupInput } from '@/components/ui/input-group'
 import { Spinner } from '@/components/ui/spinner'
-import { urls } from '@/routes/routes'
+import { routes } from '@/routes/routes'
 import { resetPasswordForm, type ResetPasswordFormValues } from '@/schemas/reset-password-schema'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { isAxiosError } from 'axios'
@@ -109,7 +109,7 @@ export function CreatePasswordForm() {
             if (res.data.detail) {
                 setMessage(res.data.detail)
                 setTimeout(()=>{
-                    navigate(urls.auth.login, {
+                    navigate(routes.auth.login, {
                         replace: true
                     })
                 }, 3000)
@@ -323,7 +323,7 @@ export function CreatePasswordForm() {
                         )}
                     </Button>
                     <Button asChild variant="link" className="text-sm">
-                        <Link to={urls.auth.login}>
+                        <Link to={routes.auth.login}>
                             <ArrowLeft className="h-4 w-4 mr-1 inline" />
                             Back to login
                         </Link>

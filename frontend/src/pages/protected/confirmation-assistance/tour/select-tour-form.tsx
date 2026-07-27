@@ -11,7 +11,7 @@ import { Card, CardAction, CardDescription, CardFooter, CardHeader, CardTitle, }
 import { Badge } from '@/components/ui/badge'
 import { Combobox, ComboboxChip, ComboboxChips, ComboboxChipsInput, ComboboxContent, ComboboxEmpty, ComboboxItem, ComboboxList, ComboboxValue, } from "@/components/ui/combobox"
 import { useNavigate } from 'react-router'
-import { urls } from '@/routes/routes'
+import { routes } from '@/routes/routes'
 import { Button } from '@/components/ui/button'
 import { useRegistrationStore } from '@/data/store'
 import { Spinner } from '@/components/ui/spinner'
@@ -39,10 +39,10 @@ export function SelectTourForm() {
     useEffect(() => {
         if (!useRegistrationStore.persist.hasHydrated) return
         if (!fee) {
-            navigate(urls.users.confirmAssistance.fee)
+            navigate(routes.users.confirmAssistance.fee)
             return
         } else if (!dinner) {
-            navigate(urls.users.confirmAssistance.dinner)
+            navigate(routes.users.confirmAssistance.dinner)
             return
         } else if (tour) {
             reset(tour)

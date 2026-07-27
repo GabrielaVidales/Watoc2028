@@ -18,7 +18,7 @@ import { SelectTourPage } from './tour/page'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { Link } from 'react-router'
 import { cn } from '@/lib/utils'
-import { urls } from '@/routes/routes'
+import { routes } from '@/routes/routes'
 
 
 function ConfirmationPage() {
@@ -38,14 +38,14 @@ function ConfirmationPage() {
                 'flex justify-between items-start bg-primary-light/20',
                 'px-10 py-3 mx-auto mt-auto bottom-0'
             )}>
-                <Link to={urls.users.profile}>
+                <Link to={routes.users.profile}>
                     <Button type='button'>
                         <ChevronLeft />
                         Back
                     </Button>
                 </Link>
 
-                <Link to={urls.users.confirmAssistance.fee}>
+                <Link to={routes.users.confirmAssistance.fee}>
                     <Button type='button'>
                         Next
                         <ChevronRight />

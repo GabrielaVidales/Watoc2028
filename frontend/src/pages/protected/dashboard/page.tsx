@@ -9,7 +9,7 @@ import { formatDate } from '@/utils/formatDate'
 import { useProfiles } from '@/hooks/use-profiles'
 import { renderHTMLString } from '@/utils/tsx_utils'
 import { useNavigate } from 'react-router'
-import { urls } from '@/routes/routes'
+import { routes } from '@/routes/routes'
 import { cn } from '@/lib/utils'
 import { AppStoreButton, PlayStoreButton } from '@/components/ui/play-store-button'
 
@@ -131,7 +131,7 @@ function UserDashboardPage() {
 
                                                     <TableCell className="text-right space-x-1">
                                                         {abstract.status === "draft" || abstract.status === "corrections" ? (
-                                                            <Button variant="link" size="icon-sm" className="text-foreground" onClick={() => navigate(urls.users.editAbstract.build({ id: abstract.id }))}>
+                                                            <Button variant="link" size="icon-sm" className="text-foreground" onClick={() => navigate(routes.users.editAbstract.build({ id: abstract.id }))}>
                                                                 <Edit className='size-5' />
                                                             </Button>
                                                         ) : null}
@@ -232,7 +232,7 @@ function UserDashboardPage() {
                             </div>
 
                             <div className="pt-2">
-                                <Button variant="outline" className="w-full text-sm font-medium" onClick={() => navigate(urls.users.settings)}>
+                                <Button variant="outline" className="w-full text-sm font-medium" onClick={() => navigate(routes.users.settings)}>
                                     <Edit2 />
                                     Edit profile
                                 </Button>

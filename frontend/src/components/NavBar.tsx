@@ -8,7 +8,7 @@ import { Item, ItemContent, } from "@/components/ui/item"
 import { Button } from './ui/button';
 import { useAuth } from '@/contexts/AuthContext';
 import { useScroll } from '@/hooks/use-scroll';
-import { urls } from '@/routes/routes';
+import { routes } from '@/routes/routes';
 import { cn } from '@/lib/utils';
 import logo from '../assets/WatocPNGLogo.png';
 
@@ -22,15 +22,15 @@ type Props = {
 const menuItems = [
     {
         label: 'Home',
-        url: urls.home.index
+        url: routes.home.index
     },
     {
         label: 'WATOC',
-        url: urls.home.watoc
+        url: routes.home.watoc
     },
     {
         label: 'Young WATOC',
-        url: urls.home.youngWatoc
+        url: routes.home.youngWatoc
     },
     {
         label: 'About',
@@ -63,7 +63,7 @@ const menuItems = [
     },
     {
         label: 'Contact',
-        url: urls.home.contact
+        url: routes.home.contact
     },
 ]
 
@@ -81,11 +81,11 @@ export default function NavBar({
         ...menuItems,
         user ? {
             label: 'Profile',
-            url: urls.users.profile,
+            url: routes.users.profile,
             submenus: [],
         } : {
             label: 'Registration',
-            url: urls.auth.login,
+            url: routes.auth.login,
             submenus: [],
         }
     ]
@@ -99,7 +99,7 @@ export default function NavBar({
         )}>
             <div className="max-w-7xl h-full flex justify-between items-center gap-3 mx-auto p-2">
                 <div className="flex justify-center absolute left-1/2 -translate-x-1/2 lg:static lg:left-auto lg:translate-x-0">
-                    <Link to={urls.home.index} className='relative'>
+                    <Link to={routes.home.index} className='relative'>
                         <img
                             src={logo}
                             alt="WATOC 2028 Logo"

@@ -5,18 +5,19 @@ import { InfoAlert } from '@/components/InfoAlert'
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger, } from "@/components/ui/alert-dialog"
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator, } from "@/components/ui/breadcrumb"
 import { Button } from '@/components/ui/button'
-import { Card, CardAction, CardDescription, CardFooter, CardHeader, CardTitle, } from "@/components/ui/card"
+import { Card, CardAction, CardContent, CardDescription, CardFooter, CardHeader, CardTitle, } from "@/components/ui/card"
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, } from "@/components/ui/dialog"
 import { Field, FieldDescription, FieldError, FieldLabel } from '@/components/ui/field'
 import { InputGroupText } from '@/components/ui/input-group'
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { InputGroup, InputGroupAddon, InputGroupInput, } from "@/components/ui/input-group"
 import { Separator } from '@/components/ui/separator'
 import { Spinner } from '@/components/ui/spinner'
 import { useAuth } from '@/contexts/AuthContext'
 import type { PaginatedResponse } from '@/domain/pagination'
 import { useFetch } from '@/hooks/use-fetch'
 import { cn } from '@/lib/utils'
-import { urls } from '@/routes/routes'
+import { routes } from '@/routes/routes'
 import type { AbstractDeclarationValues } from '@/schemas/abstract-declaration-schema'
 import { presentationTypes, type AbstractSchema, type AuthorSchema } from '@/schemas/abstracts/abstract-schemas'
 import { createAbstractSchema, type CreateAbstractFormValues } from '@/schemas/abstracts/create-abstract-schema'
@@ -25,11 +26,15 @@ import { renderHTMLString } from '@/utils/tsx_utils'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { isAxiosError } from 'axios'
-import { ArrowRight, CircleAlert, Download, Eye, FilePenLine, FileText, Pencil, Plus, Send, Trash2, TriangleAlert } from 'lucide-react'
+import { ArrowRight, Calendar, CircleAlert, Clock3, Download, Eye, FilePenLine, FileText, MoreVertical, Pencil, Plus, Search, Send, Trash2, TriangleAlert } from 'lucide-react'
 import { useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { Link, useNavigate } from 'react-router'
-import { PaginationController } from '../../notifications/page'
+import { PaginationController, SelectItemsPerPage } from '../../notifications/page'
+import { useDebounce } from 'use-debounce'
+import { Badge } from '@/components/ui/badge'
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
+
 
 function AbstractSubmissionPage() {
     const { user: user } = useAuth()
@@ -41,16 +46,20 @@ function AbstractSubmissionPage() {
 
     const [page, setPage] = useState(1)
     const [itemsPerPage, setItemsPerPage] = useState(5)
+    const [search, setSearch] = useState('')
+    const [query] = useDebounce(search, 250)
     const { data, isLoading } = useQuery<PaginatedResponse<AbstractSchema>>({
-        queryKey: ['abstracts', user.id, page, itemsPerPage],
+        queryKey: ['abstracts', user.id, page, itemsPerPage, query],
         placeholderData: keepPreviousData,
         queryFn: async () => {
             const { data } = await api.get<PaginatedResponse<AbstractSchema>>('/participants/profiles/submissions', {
                 params: {
                     page: page,
                     limit: itemsPerPage,
+                    title: query,
                 }
             })
+            console.log(data);
             return data
         }
     })
@@ -101,205 +110,216 @@ function AbstractSubmissionPage() {
         }
     }
 
+    const stats = [
+        { label: "Total", value: data?.meta.total_items ?? 0 },
+        { label: "Draft", value: data?.results.filter(x => x.status === "draft").length ?? 0 },
+        { label: "Submitted", value: data?.results.filter(x => x.status === "submitted").length ?? 0 },
+        { label: "Reviewed", value: 0 },
+    ] as const
+
+
     return (
         <div className='w-full h-full flex flex-col'>
-            <div className='bg-background border-b-2 border-b-border p-8'>
-                <Breadcrumb className='mb-8'>
-                    <BreadcrumbList>
-                        <BreadcrumbItem>
-                            <BreadcrumbLink asChild>
-                                <Link to={urls.users.profile}>
-                                    Dashboard
-                                </Link>
-                            </BreadcrumbLink>
-                        </BreadcrumbItem>
-                        <BreadcrumbSeparator />
-                        <BreadcrumbItem>
-                            <BreadcrumbPage>Abstract Submissions</BreadcrumbPage>
-                        </BreadcrumbItem>
-                    </BreadcrumbList>
-                </Breadcrumb>
+            <div className='bg-background border-b-2 border-b-border space-y-4 p-8'>
+              
+                <div className='flex flex-col md:flex-row md:justify-between gap-5'>
+                    <div className="flex items-start gap-3">
+                        <div className="flex size-12 shrink-0 items-center justify-center rounded-lg bg-primary-light/10 border-2 border-primary-main/20 text-primary">
+                            <FileText className="text-primary-main stroke-2 size-8" />
+                        </div>
 
-                <div className="flex items-center gap-3">
-                    <div className="flex size-14 shrink-0 items-center justify-center rounded-lg bg-primary-light/10 border-3 border-primary-main/20 text-primary">
-                        <FileText className="text-primary-main stroke-2 size-12" />
+                        <div>
+                            <h1 className="text-2xl font-semibold">
+                                Abstract Submissions
+                            </h1>
+                            <p className="text-sm text-muted-foreground">
+                                Manage your submissions
+                            </p>
+                        </div>
                     </div>
-
-                    <div>
-                        <h1 className="text-2xl font-semibold">
-                            Abstract Submissions
-                        </h1>
-                        <p className="text-sm text-muted-foreground">
-                            Manage your submissions
-                        </p>
-                    </div>
-                </div>
-            </div>
-
-            <fieldset disabled={isLoading || isPending} className='w-full space-y-5 p-3 md:p-5 xl:p-8'>
-                <div className='flex flex-col justify-end items-center gap-3 md:flex-row md:justify-between'>
-                    <h2 className='text-2xl font-semibold'>Abstract submission</h2>
-                    <Field orientation="horizontal" className="w-fit">
-                        <FieldLabel htmlFor="select-rows-per-page">Items per page</FieldLabel>
-                        <Select defaultValue="5" onValueChange={(value) => {
-                            const limit = Number(value)
-                            if (!isNaN(limit)) {
-                                setItemsPerPage(limit)
-                                setPage(1)
-                            }
-                        }}>
-                            <SelectTrigger className="w-20" id="select-rows-per-page">
-                                <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent align="start">
-                                <SelectGroup>
-                                    <SelectItem value="5">5</SelectItem>
-                                    <SelectItem value="10">10</SelectItem>
-                                    <SelectItem value="25">25</SelectItem>
-                                </SelectGroup>
-                            </SelectContent>
-                        </Select>
-                    </Field>
 
                     <CreateAbstractDialog />
                 </div>
 
-                <div className='grid grid-cols-1 gap-6 md:grid-cols-3 items-start'>
+                <div className="grid gap-4 md:grid-cols-4">
+                    {stats.map(({ label, value }) => (
+                        <Card key={label} className='py-3'>
+                            <CardContent>
+                                <p className="text-sm text-muted-foreground">{label}</p>
+                                <h2 className="text-3xl font-bold">{value}</h2>
+                            </CardContent>
+                        </Card>
+                    ))}
+                </div>
+            </div>
 
-                    <div className='md:col-span-2 space-y-4'>
-                        {isLoading && (
-                            <div>
-                                <Spinner />
+            <fieldset disabled={isLoading || isPending}>
+                <div className='grid grid-cols-1 md:grid-cols-[1fr_400px] items-stretch'>
+                    <div className='bg-card'>
+                        <div className="sticky top-0 bg-card flex flex-col gap-4 border-b p-4 md:flex-row md:items-center md:justify-between">
+                            <div className="flex gap-3">
+                                <InputGroup className="w-80">
+                                    <InputGroupInput
+                                        placeholder="Search abstracts..."
+                                        value={search}
+                                        onChange={e => setSearch(e.target.value)}
+                                    />
+                                    <InputGroupAddon>
+                                        <Search className="size-4" />
+                                    </InputGroupAddon>
+                                    <InputGroupAddon align="inline-end" className='text-xs'>
+                                        {data?.meta.total_items ?? 0} abstracts
+                                    </InputGroupAddon>
+                                </InputGroup>
                             </div>
-                        )}
 
-                        {data?.results.map((abstract) => (
-                            <Card key={abstract.id} className="group outline-2 outline-transparent hover:shadow-md hover:outline-primary-light transition-all duration-300 gap-3">
-                                <CardHeader className="flex flex-col items-stretch sm:flex-row sm:items-start sm:justify-between gap-4">
-                                    <div className='space-y-2'>
-                                        <CardTitle className="text-lg font-semibold leading-tight">
-                                            {abstract.title ? (
-                                                <div onClick={() => setActiveAbstract(abstract)} className="cursor-pointer hover:underline">
-                                                    {renderHTMLString(abstract.title)}
-                                                </div>
-                                            ) : (
-                                                <span className="flex items-center gap-2 text-destructive">
-                                                    <CircleAlert className="shrink-0 size-5" />
-                                                    Undefined title
-                                                </span>
-                                            )}
-                                        </CardTitle>
-                                        <CardDescription className="text-sm">
-                                            {presentationTypes?.find((p) => p.value === abstract.presentation_type)?.label || (
-                                                <span className="flex items-center gap-1 text-destructive">
-                                                    <CircleAlert className="size-3.5 shrink-0" />
-                                                    Presentation type not set
-                                                </span>
-                                            )}
-                                        </CardDescription>
-                                    </div>
-                                    <CardAction className='max-sm:hidden'>
-                                        <div className="flex items-center ml-auto gap-2">
-                                            <Button variant="outline" size="icon-lg" onClick={() => setActiveAbstract(abstract)}>
-                                                <Eye className='size-5' />
-                                            </Button>
+                            <div className="flex items-center gap-4">
+                                <SelectItemsPerPage
+                                    itemsPerPage={itemsPerPage}
+                                    setItemsPerPage={setItemsPerPage}
+                                />
+                            </div>
+                        </div>
 
-                                            {abstract.status !== 'submitted' && (
-                                                <Button variant="outline" size="icon-lg" onClick={() => navigate(urls.users.submissions.edit.build({ id: abstract.id }))}>
-                                                    <Pencil className="size-5" />
-                                                </Button>
-                                            )}
+                        <section className='p-3 md:p-5 xl:p-8 space-y-3'>
+                            {isLoading && (
+                                <div>
+                                    <Spinner />
+                                </div>
+                            )}
 
-                                            {abstract.status !== 'submitted' && (
-                                                <Button variant="outline" size="icon-lg" onClick={() => navigate(urls.users.submissions.edit.build({ id: abstract.id }) + '?action=submit')}>
-                                                    <Send className="size-5" />
-                                                </Button>
-                                            )}
+                            {data?.results.map((abstract) => (
+                                <Card key={abstract.id} className="group outline-2 outline-transparent hover:shadow-md hover:outline-primary-light transition-all duration-300 gap-3">
+                                    <CardHeader className="flex flex-row items-start justify-between gap-4">
+                                        <div className='space-y-2'>
+                                            <CardTitle className="text-base sm:text-lg font-semibold leading-tight">
+                                                {abstract.title ? (
+                                                    <div onClick={() => setActiveAbstract(abstract)} className="cursor-pointer hover:underline">
+                                                        {renderHTMLString(abstract.title)}
+                                                    </div>
+                                                ) : (
+                                                    <span className="flex items-center gap-2 text-destructive">
+                                                        <CircleAlert className="shrink-0 size-5" />
+                                                        Undefined title
+                                                    </span>
+                                                )}
+                                            </CardTitle>
 
-                                            <AlertDialog>
-                                                <AlertDialogTrigger asChild>
-                                                    <Button variant="outline" size="icon">
-                                                        <Trash2 className="size-4 text-destructive" />
-                                                    </Button>
-                                                </AlertDialogTrigger>
-                                                <AlertDialogContent size='sm'>
-                                                    <AlertDialogHeader>
-                                                        <AlertDialogTitle className="p-3 bg-destructive/10 rounded-full mb-2">
-                                                            <TriangleAlert className='size-8 text-destructive' />
-                                                        </AlertDialogTitle>
-                                                        <AlertDialogTitle>Delete Abstract?</AlertDialogTitle>
-                                                        <AlertDialogDescription>
-                                                            This action cannot be undone. The abstract will be
-                                                            permanently deleted.
-                                                        </AlertDialogDescription>
-                                                    </AlertDialogHeader>
-                                                    <AlertDialogFooter>
-                                                        <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                                        <AlertDialogAction variant='destructive' onClick={async () => await mutateAsync(abstract.id)}>
-                                                            {isPending ? <Spinner /> : <span>Delete</span>}
-                                                        </AlertDialogAction>
-                                                    </AlertDialogFooter>
-                                                </AlertDialogContent>
-                                            </AlertDialog>
+                                            <CardDescription className="text-sm">
+                                                <Badge variant="outline">
+                                                    {presentationTypes?.find((p) => p.value === abstract.presentation_type)?.label || (
+                                                        <span className="flex items-center gap-1 text-destructive">
+                                                            <CircleAlert className="size-3.5 shrink-0" />
+                                                            Presentation type not set
+                                                        </span>
+                                                    )}
+                                                </Badge>
+                                            </CardDescription>
                                         </div>
-                                    </CardAction>
-                                </CardHeader>
-                                <CardFooter className="flex flex-wrap items-center justify-between gap-2 pt-0">
-                                    <div className="text-xs text-muted-foreground space-y-1">
-                                        <p>Created: {formatDate(abstract.created_at)} | Last update: {formatDate(abstract.last_update)}</p>
-                                    </div>
+                                        <CardAction className='max-sm:hidde'>
+                                            <div className="flex items-center ml-auto gap-2">
+                                                <DropdownMenu>
+                                                    <DropdownMenuTrigger asChild>
+                                                        <Button size="icon" variant="ghost">
+                                                            <MoreVertical className="size-5" />
+                                                        </Button>
+                                                    </DropdownMenuTrigger>
 
-                                    <CardAction className='sm:hidden ml-auto'>
-                                        <div className="flex items-center ml-auto gap-2">
-                                            <Button variant="outline" size="icon-lg" onClick={() => setActiveAbstract(abstract)}>
-                                                <Eye className='size-5' />
-                                            </Button>
+                                                    <DropdownMenuContent align="end">
+                                                        <DropdownMenuItem onClick={() => setActiveAbstract(abstract)}>
+                                                            <Eye className="mr-2 size-4" />
+                                                            Preview
+                                                        </DropdownMenuItem>
 
-                                            {abstract.status !== 'submitted' && (
-                                                <Button variant="outline" size="icon-lg" onClick={() => navigate(urls.users.editAbstract.build({ id: abstract.id }))}>
-                                                    <Pencil className="size-5" />
-                                                </Button>
-                                            )}
+                                                        {abstract.status !== "submitted" && (
+                                                            <>
+                                                                <DropdownMenuItem
+                                                                    onClick={() =>
+                                                                        navigate(
+                                                                            routes.users.submissions.edit.build({
+                                                                                id: abstract.id,
+                                                                            })
+                                                                        )
+                                                                    }
+                                                                >
+                                                                    <Pencil className="mr-2 size-4" />
+                                                                    Edit
+                                                                </DropdownMenuItem>
 
-                                            {abstract.status !== 'submitted' && (
-                                                <Button variant="outline" size="icon-lg" onClick={() => navigate(urls.users.editAbstract.build({ id: abstract.id }) + '?action=submit')}>
-                                                    <Send className="size-5" />
-                                                </Button>
-                                            )}
+                                                                <DropdownMenuItem
+                                                                    onClick={() =>
+                                                                        navigate(
+                                                                            routes.users.submissions.edit.build({
+                                                                                id: abstract.id,
+                                                                            }) + "?action=submit"
+                                                                        )
+                                                                    }
+                                                                >
+                                                                    <Send className="mr-2 size-4" />
+                                                                    Submit
+                                                                </DropdownMenuItem>
+                                                            </>
+                                                        )}
 
-                                            <AlertDialog>
-                                                <AlertDialogTrigger asChild>
-                                                    <Button variant="outline" size="icon">
-                                                        <Trash2 className="size-4 text-destructive" />
-                                                    </Button>
-                                                </AlertDialogTrigger>
-                                                <AlertDialogContent size='sm'>
-                                                    <AlertDialogHeader>
-                                                        <AlertDialogTitle className="p-3 bg-destructive/10 rounded-full mb-2">
-                                                            <TriangleAlert className='size-8 text-destructive' />
-                                                        </AlertDialogTitle>
-                                                        <AlertDialogTitle>Delete Abstract?</AlertDialogTitle>
-                                                        <AlertDialogDescription>
-                                                            This action cannot be undone. The abstract will be
-                                                            permanently deleted.
-                                                        </AlertDialogDescription>
-                                                    </AlertDialogHeader>
-                                                    <AlertDialogFooter>
-                                                        <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                                        <AlertDialogAction variant='destructive' onClick={async () => await mutateAsync(abstract.id)}>
-                                                            {isPending ? <Spinner /> : <span>Delete</span>}
-                                                        </AlertDialogAction>
-                                                    </AlertDialogFooter>
-                                                </AlertDialogContent>
-                                            </AlertDialog>
+                                                        <DropdownMenuSeparator />
+
+                                                        <AlertDialog>
+                                                            <AlertDialogTrigger asChild>
+                                                                <DropdownMenuItem
+                                                                    className="text-destructive"
+                                                                    onSelect={(e) => e.preventDefault()}
+                                                                >
+                                                                    <Trash2 className="mr-2 size-4" />
+                                                                    Delete
+                                                                </DropdownMenuItem>
+                                                            </AlertDialogTrigger>
+
+                                                            <AlertDialogContent size="sm">
+                                                                <AlertDialogHeader>
+                                                                    <AlertDialogTitle className="mb-2 rounded-full bg-destructive/10 p-3">
+                                                                        <TriangleAlert className="size-8 text-destructive" />
+                                                                    </AlertDialogTitle>
+
+                                                                    <AlertDialogTitle>
+                                                                        Delete Abstract?
+                                                                    </AlertDialogTitle>
+
+                                                                    <AlertDialogDescription>
+                                                                        This action cannot be undone. The abstract will be permanently deleted.
+                                                                    </AlertDialogDescription>
+                                                                </AlertDialogHeader>
+
+                                                                <AlertDialogFooter>
+                                                                    <AlertDialogCancel>
+                                                                        Cancel
+                                                                    </AlertDialogCancel>
+
+                                                                    <AlertDialogAction
+                                                                        variant="destructive"
+                                                                        onClick={() => mutateAsync(abstract.id)}
+                                                                    >
+                                                                        {isPending ? <Spinner /> : "Delete"}
+                                                                    </AlertDialogAction>
+                                                                </AlertDialogFooter>
+                                                            </AlertDialogContent>
+                                                        </AlertDialog>
+
+                                                    </DropdownMenuContent>
+                                                </DropdownMenu>
+                                            </div>
+                                        </CardAction>
+                                    </CardHeader>
+
+                                    <CardFooter className="flex flex-wrap items-center justify-between gap-2 pt-0">
+                                        <div className="text-xs text-muted-foreground space-y-1">
+                                            <p>Created: {formatDate(abstract.created_at)} | Last update: {formatDate(abstract.last_update)}</p>
                                         </div>
-                                    </CardAction>
-                                </CardFooter>
-                            </Card>
-                        ))}
+                                    </CardFooter>
+                                </Card>
+                            ))}
+                        </section>
 
-
-                        <div>
+                        <div className='p-3 md:p-5 xl:p-8 space-y-3'>
                             {!isLoading && (
                                 <PaginationController
                                     page={page}
@@ -310,19 +330,20 @@ function AbstractSubmissionPage() {
                         </div>
                     </div>
 
-                    <div className='md:col-span-1 sticky top-6'>
+                    <div className='bg-card md:col-span-1 md:border-l p-3 md:p-5 xl:p-8'>
                         <InfoAlert
+                            className='sticky top-3 md:top-5 xl:top-8'
                             title="Abstract submission deadline: To be announced"
                             messages={[
                                 <p key="guideline-text">
                                     Please review our{" "}
-                                    <Link to={urls.home.abstractSubmission} className="inline-flex items-center gap-1 font-medium hover:underline focus:underline focus:outline-none">
+                                    <Link to={routes.home.abstractSubmission} className="inline-flex items-center gap-1 font-medium hover:underline focus:underline focus:outline-none">
                                         Abstract Submission Guideline
                                     </Link>{" "}
                                     before submitting.
                                 </p>,
                                 <div key="guideline-link" className="mt-1">
-                                    <Link to={urls.home.abstractSubmission} className="inline-flex items-center gap-2 text-sm font-medium text-primary hover:underline focus:underline focus:outline-none">
+                                    <Link to={routes.home.abstractSubmission} className="inline-flex items-center gap-2 text-sm font-medium text-primary hover:underline focus:underline focus:outline-none">
                                         <ArrowRight className="size-4" />
                                         View full guideline
                                     </Link>
@@ -415,7 +436,7 @@ export function CreateAbstractDialog() {
             }
         },
         onSuccess: (data) => {
-            navigate(urls.users.editAbstract.build({ id: data.id }))
+            navigate(routes.users.submissions.edit.build({ id: data.id }))
             queryClient.invalidateQueries({
                 queryKey: ['abstracts', user.id],
             })

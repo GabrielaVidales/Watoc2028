@@ -10,7 +10,7 @@ import { Link, NavLink } from 'react-router';
 import ChangePasswordForm from '@/forms/ChangePasswordForm';
 import EditUserForm from '@/forms/EditUserForm';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { urls } from '@/routes/routes';
+import { routes } from '@/routes/routes';
 import { useProfiles } from '@/hooks/use-profiles';
 import { InfoAlert } from '@/components/InfoAlert';
 
@@ -139,13 +139,13 @@ export default function UserProfile() {
 										messages={[
 											<p key="guideline-text">
 												Please review our{" "}
-												<Link to={urls.home.abstractSubmission} className="inline-flex items-center gap-1 font-medium hover:underline focus:underline focus:outline-none">
+												<Link to={routes.home.abstractSubmission} className="inline-flex items-center gap-1 font-medium hover:underline focus:underline focus:outline-none">
 													Abstract Submission Guideline
 												</Link>{" "}
 												before submitting.
 											</p>,
 											<div key="guideline-link" className="mt-1">
-												<Link to={urls.home.abstractSubmission} className="inline-flex items-center gap-2 text-sm font-medium text-primary hover:underline focus:underline focus:outline-none">
+												<Link to={routes.home.abstractSubmission} className="inline-flex items-center gap-2 text-sm font-medium text-primary hover:underline focus:underline focus:outline-none">
 													<ArrowRight className="size-4" />
 													View full guideline
 												</Link>
@@ -154,7 +154,7 @@ export default function UserProfile() {
 									/>
 
 									<Button className="w-full px-5 sm:w-auto font-bold rounded-full" asChild>
-										<NavLink to={urls.users.viewAbstracts}>
+										<NavLink to={routes.users.submissions.summary}>
 											View My Submissions
 										</NavLink>
 									</Button>

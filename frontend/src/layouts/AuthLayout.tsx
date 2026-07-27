@@ -1,7 +1,7 @@
 import { Link, Outlet } from 'react-router'
 import { Button } from '@/components/ui/button';
 import { ChevronsLeft, ClipboardList, FileText, IdCard, LogIn } from 'lucide-react';
-import { urls } from '@/routes/routes';
+import { routes } from '@/routes/routes';
 import { HeaderProvider, useHeader } from '@/contexts/HeaderContext';
 import React, { useEffect } from 'react'
 import Footer from '@/components/Footer'
@@ -11,12 +11,12 @@ import { useAuth } from '@/contexts/AuthContext';
 
 const guessRoutes = [
     {
-        url: urls.auth.login,
+        url: routes.auth.login,
         label: 'Login',
         icon: <LogIn className="size-5" />,
     },
     {
-        url: urls.auth.register,
+        url: routes.auth.register,
         label: 'Registration',
         icon: <ClipboardList className="size-5" />,
     },
@@ -24,12 +24,12 @@ const guessRoutes = [
 
 const authRoutes = [
     {
-        url: urls.users.profile,
+        url: routes.users.profile,
         label: 'My Profile',
         icon: <IdCard className="size-5" />,
     },
     {
-        url: urls.users.viewAbstracts,
+        url: routes.users.submissions.summary,
         label: 'My Submissions',
         icon: <FileText className="size-5" />,
     },
@@ -56,7 +56,7 @@ function AuthLayout() {
 
                 <div className='max-w-7xl min-h-14 my-2 px-3 mx-auto flex flex-col sm:flex-row justify-between items-center gap-6'>
                     <div className='flex flex-col items-center sm:items-start gap-3 max-w-sm shrink-0'>
-                        <Link to={urls.home.index} className="flex items-center h-full">
+                        <Link to={routes.home.index} className="flex items-center h-full">
                             <img
                                 alt="WATOC 2028 Logo"
                                 src={logo}
@@ -66,7 +66,7 @@ function AuthLayout() {
                     </div>
 
                     <div className='flex flex-col sm:flex-row items-center'>
-                        <Link to={urls.home.index} className="sm:flex">
+                        <Link to={routes.home.index} className="sm:flex">
                             <Button variant='ghost' className='flex items-center gap-2 text-white sm:text-base lg:text-lg hover:bg-white/10 hover:text-white transition-all font-medium px-4'>
                                 <ChevronsLeft className="size-6" />
                                 <span>Home</span>

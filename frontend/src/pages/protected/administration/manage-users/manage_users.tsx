@@ -22,7 +22,7 @@ import {
     BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb"
 import { Link } from 'react-router'
-import { urls } from '@/routes/routes'
+import { routes } from '@/routes/routes'
 import type { UserSchema } from '@/schemas/user-schemas'
 import {
     InputGroup,
@@ -94,7 +94,7 @@ function ManageUsersPage() {
                 <BreadcrumbList>
                     <BreadcrumbItem>
                         <BreadcrumbLink asChild>
-                            <Link to={urls.users.profile}>
+                            <Link to={routes.users.profile}>
                                 Dashboard
                             </Link>
                         </BreadcrumbLink>
