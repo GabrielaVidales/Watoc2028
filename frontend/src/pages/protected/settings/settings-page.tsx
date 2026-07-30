@@ -8,118 +8,141 @@ import ChangePasswordForm from '@/forms/ChangePasswordForm';
 import EditUserForm from '@/forms/EditUserForm';
 import { useProfiles } from '@/hooks/use-profiles';
 import { routes } from '@/routes/routes';
-import { Image, LockKeyhole, ShieldAlert, UserRoundPen } from "lucide-react";
+import { Check, Image, Info, LockKeyhole, Settings, ShieldAlert, ShieldCheck, UserRoundKey, UserRoundPen, X } from "lucide-react";
 import { Link } from 'react-router';
 import { NotificationSettings } from './components/notifications-settings-component';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { useMemo } from 'react';
 
 function SettingsPage() {
     const { user: user } = useAuth()
     const { profile } = useProfiles()
 
     return (
-        <div className='mx-auto w-full max-w-5xl flex flex-col gap-5'>
-    
-            <div className='space-y-3'>
-                <h1 className='text-2xl font-medium'>Account Settings</h1>
+        <div className='w-full h-full flex flex-col overflow-hidden'>
+            <div className='bg-background border-b-2 border-b-border space-y-4 p-8'>
+                <div className='flex flex-col md:flex-row md:justify-between gap-5'>
+                    <div className="flex items-start gap-3">
+                        <div className="flex size-12 shrink-0 items-center justify-center rounded-lg bg-primary-light/10 border-2 border-primary-main/20 text-primary">
+                            <Settings className="text-primary-main stroke-2 size-8" />
+                        </div>
+
+                        <div>
+                            <h1 className="text-2xl font-semibold">
+                                Account Settings
+                            </h1>
+                            <p className="text-sm text-muted-foreground">
+                                Manage your personal settings
+                            </p>
+                        </div>
+                    </div>
+
+                    {/* <Button variant="outline">
+                            <Settings2 />
+                            Preferences
+                        </Button> */}
+                </div>
             </div>
 
-            <Tabs defaultValue="account" className='space-y-5'>
-                <Card className='py-0'>
-                    <TabsList className='w-full justify-between overflow-x-auto overflow-y-hidden'>
-                        <TabsTrigger value="account" className="flex-1 gap-2">
-                            <UserRoundPen className="size-5" />
-                            <span className="hidden md:inline">Edit Account</span>
-                        </TabsTrigger>
+            <ScrollArea className="flex-1 min-h-0 bg-background">
+                <div className='p-2 sm:p-4 md:p-6 lg:p-8'>
+                    <Tabs defaultValue="account" className='space-y-4'>
+                        <TabsList>
+                            <TabsTrigger value="account" className="flex-1 gap-2">
+                                <UserRoundPen className="size-5" />
+                                <span className="hidden md:inline">Edit Account</span>
+                            </TabsTrigger>
 
-                        <TabsTrigger value="picture" className="flex-1 gap-2">
-                            <Image className="size-5" />
-                            <span className="hidden md:inline">Change Photo</span>
-                        </TabsTrigger>
+                            <TabsTrigger value="picture" className="flex-1 gap-2">
+                                <Image className="size-5" />
+                                <span className="hidden md:inline">Change Photo</span>
+                            </TabsTrigger>
 
-                        <TabsTrigger value="password" className="flex-1 gap-2">
-                            <LockKeyhole className="size-5" />
-                            <span className="hidden md:inline">Change Password</span>
-                        </TabsTrigger>
-                    </TabsList>
-                </Card>
-                <TabsContent value="account" className='w-full space-y-5'>
-                    <Card className='pt-0'>
-                        <CardHeader className='py-5 border-b'>
-                            <CardTitle className='text-xl font-medium'>Edit your profile data</CardTitle>
-                            <CardDescription>Update your personal details here</CardDescription>
-                        </CardHeader>
+                            <TabsTrigger value="password" className="flex-1 gap-2">
+                                <LockKeyhole className="size-5" />
+                                <span className="hidden md:inline">Change Password</span>
+                            </TabsTrigger>
+                        </TabsList>
+                        <TabsContent value="account" className='w-full space-y-5'>
+                            <Card className='pt-0'>
+                                <CardHeader className='py-5 border-b'>
+                                    <CardTitle className='text-xl font-medium'>Edit your profile data</CardTitle>
+                                    <CardDescription>Update your personal details here</CardDescription>
+                                </CardHeader>
 
-                        <CardContent className='px-10'>
-                            {profile ? (
-                                <EditUserForm defaultValues={{
-                                    ...user,
-                                    email: {
-                                        value: '',
-                                        confirm: ''
-                                    },
-                                    participant: {
-                                        affiliation: profile.participant.affiliation,
-                                        job_title: profile.participant.job_title,
-                                        field_of_study: profile.participant.field_of_study
-                                    }
-                                }} />
-                            ) : (
-                                <div className='w-full mx-auto text-center text-muted-foreground/50 p-5'>
-                                    <Spinner className='mx-auto size-10' />
-                                    <span>Loading...</span>
-                                </div>
-                            )}
-                        </CardContent>
-                    </Card>
-                </TabsContent>
+                                <CardContent className='px-10'>
+                                    {profile ? (
+                                        <EditUserForm defaultValues={{
+                                            ...user,
+                                            email: {
+                                                value: '',
+                                                confirm: ''
+                                            },
+                                            participant: {
+                                                affiliation: profile.participant.affiliation,
+                                                job_title: profile.participant.job_title,
+                                                field_of_study: profile.participant.field_of_study
+                                            }
+                                        }} />
+                                    ) : (
+                                        <div className='w-full mx-auto text-center text-muted-foreground/50 p-5'>
+                                            <Spinner className='mx-auto size-10' />
+                                            <span>Loading...</span>
+                                        </div>
+                                    )}
+                                </CardContent>
+                            </Card>
+                        </TabsContent>
 
-                <TabsContent value="picture" className='w-full space-y-5'>
-                    <Card className='pt-0'>
-                        <CardHeader className='py-5 border-b'>
-                            <CardTitle className='text-xl font-medium'>Notification Settings</CardTitle>
-                            <CardDescription>Manage your notifications</CardDescription>
-                        </CardHeader>
+                        <TabsContent value="picture" className='w-full space-y-5'>
+                            <Card className='pt-0'>
+                                <CardHeader className='py-5 border-b'>
+                                    <CardTitle className='text-xl font-medium'>Notification Settings</CardTitle>
+                                    <CardDescription>Manage your notifications</CardDescription>
+                                </CardHeader>
 
-                        <CardContent>
-                            <NotificationSettings />
-                        </CardContent>
-                    </Card>
-                </TabsContent>
+                                <CardContent>
+                                    <NotificationSettings />
+                                </CardContent>
+                            </Card>
+                        </TabsContent>
 
-                <TabsContent value="password" className='w-full space-y-5'>
-                    <Card className='pt-0'>
-                        <CardHeader className='py-5 border-b'>
-                            <CardTitle className='text-xl font-medium'>Change password</CardTitle>
-                        </CardHeader>
+                        <TabsContent value="password" className='w-full space-y-5'>
+                            <Card>
+                                <CardHeader>
+                                    <CardTitle className="flex gap-3 items-center">
+                                        <UserRoundKey className='text-primary-main' />
+                                        <h2 className='text-xl font-semibold'>Change Password</h2>
+                                    </CardTitle>
+                                </CardHeader>
 
-                        <CardContent>
-                            <div className='grid grid-cols-1 md:grid-cols-2 gap-5'>
-                                <ChangePasswordForm />
-                                <div>
-                                    <InfoAlert
-                                        className='shrink'
-                                        title='Password requirements'
-                                        messages={[
-                                            <ul className="relative list-disc list-inside space-y-0.5 w-full">
-                                                <li>At least 8 characters long</li>
-                                                <li>Contains uppercase and lowercase characters</li>
-                                                <li>Contains at least one number</li>
-                                                <li>Contains at least one special character</li>
-                                                <ShieldAlert className='absolute right-0 -top-4 text-primary-main size-25 opacity-20 mx-auto' />
-                                            </ul>
-                                        ]}
-
-                                    />
-                                </div>
-                            </div>
-                        </CardContent>
-                    </Card>
-                </TabsContent>
-            </Tabs>
+                                <CardContent>
+                                    <div className='grid grid-cols-1 md:grid-cols-2 gap-5'>
+                                        <div className='space-y-8'>
+                                            <InfoAlert
+                                                className='shrink'
+                                                title='Password requirements'
+                                                messages={[
+                                                    <ul className="relative list-disc list-inside space-y-0.5 w-full text-xs">
+                                                        <li>At least 8 characters long</li>
+                                                        <li>Contains uppercase and lowercase characters</li>
+                                                        <li>Contains at least one number</li>
+                                                        <li>Contains at least one special character</li>
+                                                        <ShieldAlert className='absolute right-0 -top-4 text-primary-main size-20 opacity-20' />
+                                                    </ul>
+                                                ]}
+                                            />
+                                            <ChangePasswordForm />
+                                        </div>
+                                    </div>
+                                </CardContent>
+                            </Card>
+                        </TabsContent>
+                    </Tabs>
+                </div>
+            </ScrollArea>
         </div>
     )
 }
 
 export default SettingsPage
-
-

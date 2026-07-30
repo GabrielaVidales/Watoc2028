@@ -1,26 +1,25 @@
 import api from '@/clients/api'
+import type { AbstractSchema } from '@/schemas/abstracts/abstract-schemas'
 import { Stepper, StepperDescription, StepperIndicator, StepperItem, StepperNav, StepperSeparator, StepperTitle, StepperTrigger, } from "@/components/reui/stepper"
 import ShowAffiliations from '@/components/ShowAffiliations'
 import ShowAuthorsComponent from '@/components/ShowAuthors'
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger, } from "@/components/ui/accordion"
-import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator, } from "@/components/ui/breadcrumb"
 import { Button } from '@/components/ui/button'
 import { Card, CardAction, CardContent, CardDescription, CardFooter, CardHeader, CardTitle, } from "@/components/ui/card"
-import AbstractDeclarations from '@/forms/submissions/AbstractDeclarationsForm'
+import AbstractDeclarations from '@/forms/submissions/abstract-declarations-form'
 import EditAbstractBody from '@/forms/wrappers/EditAbstractBody'
 import { useIsMobile } from '@/hooks/use-mobile'
 import { useScrollSpy } from '@/hooks/useScrollSpy'
 import { cn, } from '@/lib/utils'
 import { routes } from '@/routes/routes'
-import type { AbstractSchema } from '@/schemas/abstracts/abstract-schemas'
 import { useQuery } from '@tanstack/react-query'
-import { CheckIcon, Gavel, IdCard, Info, LoaderCircleIcon, LucideFileEdit, MailOpen, MessageSquareCode, RotateCw, ScanText, TextQuote, UserPlus } from 'lucide-react'
+import { CheckIcon, Info, LoaderCircleIcon, LucideFileEdit, MailOpen, MessageSquareCode, RotateCw, ScanText, School, UserPlus } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
-import { Link, useNavigate, useParams } from 'react-router'
+import { useNavigate, useParams } from 'react-router'
 import BeforeSubmitPage from '../../BeforeSubmitPage'
-import { Spinner } from '@/components/ui/spinner'
 import { formatDate } from '@/utils/formatDate'
-import AbstractContentForm from '@/forms/submissions/abstract-content-form'
+import AbstractPreviewData from './abstract-preview-data'
+import { Separator } from '@/components/ui/separator'
 
 
 function EditAbstractPage() {
@@ -68,6 +67,7 @@ function EditAbstractPage() {
             setCurrState(prev => prev + 1)
         }
     }
+    
     const previousStep = () => {
         console.log('Puta madre');
 
@@ -128,7 +128,7 @@ function EditAbstractPage() {
         <>
             <div className={cn(
                 "h-full grid",
-                isMobile ? "grid-cols-1" : "sticky top-0 grid-cols-[1fr_340px]",
+                isMobile ? "grid-cols-1" : "sticky top-0 lg:grid-cols-[1fr_400px] md:grid-cols-[1fr_300px] grid-cols-[1fr_260px]",
             )}>
 
                 <main id='main-container' className='h-full w-full overflow-y-auto no-scrollbar bg-background' ref={parentRef}>
@@ -158,7 +158,7 @@ function EditAbstractPage() {
                         <p className='text-xs text-muted-foreground mt-2'>Last modification: {formatDate(data.last_update)}</p>
                     </div>
 
-                    <div className={cn("p-2 md:p-4 lg:p-6 bg-secondary space-y-4 md:space-y-8 lg:space-y-12",)}>
+                    <div className={cn("p-2 md:p-4 lg:p-6 bg-secondary space-y-4 md:space-y-8 lg:space-y-12 mb-8",)}>
                         <Card className='max-w-4xl mx-auto w-full gap-0' id='abstract-content'>
                             <CardContent className='space-y-5 md:py-5 md:px-10'>
                                 <CardTitle className="flex gap-3 items-center">
@@ -171,6 +171,7 @@ function EditAbstractPage() {
                         </Card>
 
                         <Card className='max-w-4xl mx-auto w-full gap-0' id='abstract-authors'>
+
                             <CardContent className='space-y-5 md:py-5 md:px-10'>
                                 <CardTitle className="flex gap-3 items-center">
                                     <UserPlus className='text-primary-main' />
@@ -178,25 +179,29 @@ function EditAbstractPage() {
                                 </CardTitle>
 
                                 <ShowAuthorsComponent />
+                            </CardContent>
 
+                            <CardContent className='px-10'>
                                 <Accordion
                                     type="single"
                                     collapsible
-                                    className="rounded-lg border"
+                                    className="rounded-lg p-0"
                                 >
-                                    <AccordionItem value={'puta-madre'} className={cn(
-                                        "border-b px-4 last:border-b-2",
-                                        "group relative cursor-pointer border-2 border-border rounded-md transition-colors duration-300",
-                                        "hover:border-primary-light hover:shadow-sm",
+                                    <AccordionItem value={'item'} className={cn(
+                                        "group relative cursor-pointer rounded-md transition-colors duration-300",
                                     )}>
+
                                         <AccordionTrigger className="cursor-pointer text-base focus-visible:outline-none focus-visible:ring-0">
-                                            Manage affiliations
+                                            <CardTitle className="flex gap-3 items-center">
+                                                <School className='text-primary-main shrink-0' />
+                                                <h2 className='text-xl font-semibold'>Manage Affiliations</h2>
+                                            </CardTitle>
                                         </AccordionTrigger>
+
                                         <AccordionContent>
-
                                             <ShowAffiliations />
-
                                         </AccordionContent>
+
                                     </AccordionItem>
                                 </Accordion>
                             </CardContent>
@@ -213,18 +218,18 @@ function EditAbstractPage() {
                             </CardContent>
                         </Card>
 
-
-                        <Card className='max-w-3xl w-full mx-auto mb-20' id='abstract-review'>
-                            <CardContent>
-                                <div className="flex gap-3 items-center">
+                        <Card className='max-w-4xl mx-auto w-full gap-0' id='abstract-submit'>
+                            <CardContent className='space-y-5 md:py-5 md:px-10'>
+                                <CardTitle className="flex gap-3 items-center">
                                     <MessageSquareCode className='text-primary-main' />
                                     <h2 className='text-xl font-semibold'>Submission Review</h2>
-                                </div>
+                                </CardTitle>
 
-                                <BeforeSubmitPage />
+                                <AbstractPreviewData abstract={data} />
                             </CardContent>
-
                         </Card>
+
+                                    <Separator/>
                     </div>
                 </main>
 
@@ -305,6 +310,7 @@ function EditAbstractPage() {
                         </div>
                     </aside>
                 )}
+                
             </div>
         </>
     )

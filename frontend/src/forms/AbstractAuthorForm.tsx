@@ -25,6 +25,7 @@ import { useParams } from 'react-router'
 import { authorFormSchema, type AuthorFormSchema, type AuthorSchema } from '@/schemas/abstracts/author-schema'
 import type { PaginatedResponse } from '@/domain/pagination'
 import { SelectCommand } from '@/pages/test'
+import { notify } from '@/components/custom/notify'
 
 
 export function AuthorForm({ children }: React.PropsWithChildren) {
@@ -102,28 +103,44 @@ export function AuthorFormContent({ onSubmit, values }: Props) {
         setAffiliation(affiliation)
     }
 
+    
+
     const onFormSubmit = handleSubmit(async (data) => {
         try {
             if (data.id) {
-                const res = await api.patch(`/abstracts/authors/${data.id}/`, { ...data, abstract_id: 1 })
+                const res = await api.patch(`/abstracts/authors/${data.id}/`, { ...data, abstract_id: abstractId })
+
                 if (import.meta.env.DEV)
                     console.log(res);
+
+                notify.success('Saved successfully!', {
+                    description: 'Your changes have been saved.',
+                })
             } else {
-                const res = await api.post('/abstracts/authors/', { ...data, id: undefined, abstract_id: 1 })
+                const res = await api.post('/abstracts/authors/', { ...data, id: undefined, abstract_id: abstractId })
+
                 if (import.meta.env.DEV)
                     console.log(res);
+
+                notify.success('Created successfully!', {
+                    description: 'The record has been created.',
+                })
             }
 
-            reset(data)
-            onSubmit?.()
             queryClient.invalidateQueries({
                 queryKey: ['authors', abstractId],
             })
+
+            reset(data)
+            onSubmit?.()
         } catch (error) {
             if (isAxiosError(error)) {
                 if (import.meta.env.DEV) {
                     console.error(error.response);
                 }
+                notify.destructive('Something went wrong!', {
+                    description: error.response.data.errors?.email || 'Try again',
+                })
             }
         }
     }, async (data) => {

@@ -5,9 +5,9 @@ import { useAuth } from "@/contexts/AuthContext";
 import { routes } from "@/routes/routes";
 import { ArrowLeftFromLine, BadgeCheckIcon, Bell, Bot, ChevronDown, ChevronRight, ChevronUp, FileBadge, FileCheck, FileType2, LayoutDashboard, LayoutList, LogOut, MessageSquareDot, PackageCheck, Settings2, TableProperties, Users, type LucideIcon } from "lucide-react";
 import { Link, NavLink, useNavigate, } from "react-router";
-import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "./ui/collapsible";
-import { ScrollArea } from "./ui/scroll-area";
+import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "../ui/collapsible";
+import { ScrollArea } from "../ui/scroll-area";
 import { cn } from '@/lib/utils';
 
 
@@ -84,7 +84,7 @@ export function AppSidebar() {
     const style = 'border-r-2 bg-indigo-900 text-neutral-100 dark:border-indigo-900 dark:bg-indigo-950 dark:text-indigo-50'
 
     return (
-        <Sidebar>
+        <Sidebar collapsible='icon'>
             <SidebarHeader className={style}>
                 <TeamSwitcher />
             </SidebarHeader>

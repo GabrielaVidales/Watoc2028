@@ -140,7 +140,7 @@ export function CustomFilter({
             onChange={setFilters}
             className='w-full'
             trigger={
-                <Button variant="default" size='sm'>
+                <Button variant="default" size='xs'>
                     <FilterIcon />
                     Add Filter
                 </Button>

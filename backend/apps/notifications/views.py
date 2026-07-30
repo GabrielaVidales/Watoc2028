@@ -11,6 +11,8 @@ from config.permissions import HasCSRFToken
 from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
 from config.pagination import Pagination
+from django_filters.rest_framework import DjangoFilterBackend
+from apps.notifications.filters import NotificationFilter
 
 
 class NotificationViewSet(ModelViewSet):
@@ -18,6 +20,8 @@ class NotificationViewSet(ModelViewSet):
     serializer_class = NotificationSerializer
     permission_classes = [permissions.IsAuthenticated, HasCSRFToken]
     pagination_class = Pagination
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = NotificationFilter
 
     def list(self, request):
         """TODO: Esto es solo para testeo, eliminar después"""
@@ -35,6 +39,12 @@ class NotificationViewSet(ModelViewSet):
         user = request.user
         notifications = self.get_queryset().filter(recipient=user)
         unread_count = notifications.filter(is_read=False).count()
+        notifications = self.filter_queryset(notifications)
+        
+        
+        print("PARAMETROS RECIBIDOS:", request.query_params)
+        print("SQL REALMENTE EJECUTADO:", str(notifications.query))
+        
         page = self.paginate_queryset(notifications)
         serializer = self.get_serializer(page, many=True, context={"request": request})
         paginated = self.get_paginated_response(serializer.data)

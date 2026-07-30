@@ -1,10 +1,10 @@
 import React, { Fragment, useEffect, useRef } from 'react'
-import { type LucideIcon, FileBadge, FileType2, PackageCheck, ChevronDown, Bell, Settings2, Settings } from "lucide-react"
+import { type LucideIcon, FileBadge, FileType2, PackageCheck, ChevronDown, Bell, Settings2, Settings, Plus, PanelRight, PanelLeft, LayoutDashboard } from "lucide-react"
 import { Link, Outlet, useLocation, } from "react-router"
 import { routes } from "@/routes/routes"
 import { useAuth } from "@/contexts/AuthContext"
-import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar"
-import { AppSidebar } from "@/components/app-sidebar"
+import { RightSidebarTrigger, SidebarInset, SidebarProvider, SidebarTrigger, useSidebar } from "@/components/ui/sidebar"
+import { AppSidebar } from "@/components/custom/app-sidebar"
 import { BadgeCheckIcon, LogOutIcon, } from "lucide-react"
 import { Avatar, AvatarFallback, AvatarImage, } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
@@ -17,6 +17,8 @@ import { timeAgo } from '@/utils/utils'
 import type { Notification } from '@/domain/notifications'
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from '@/components/ui/breadcrumb'
 import { useIsMobile } from '@/hooks/use-mobile'
+import RightSidebar from '@/components/custom/right-sidebar'
+import { RightSidebarProvider, useRightSidebar } from '@/contexts/RightSidebarContext'
 
 
 export function DropdownMenuAvatar() {
@@ -132,14 +134,18 @@ function NotificationToast({ id, duration = 7000, notification }: { id: number |
     )
 }
 
+export function DashboardLayout() {
+    return (
+        <RightSidebarProvider>
+            <DashboardLayoutContent />
+        </RightSidebarProvider>
+    )
+}
 
 
-function DashboardLayout() {
-    const isMobile = useIsMobile()
 
-    const location = useLocation().pathname
-        .split('/')
-        .filter(v => !!v && v !== 'user')
+function DashboardLayoutContent() {
+    const { content, width, defaultOpen } = useRightSidebar()
 
     const connect = useWebsocket(w => w.connect)
     const disconnect = useWebsocket(w => w.disconnect)
@@ -160,59 +166,108 @@ function DashboardLayout() {
         return disconnect
     }, [])
 
+    const header = (
+        <header className="sticky top-0 z-50 border-b shrink-0 h-14 flex items-center bg-background">
+            <div className='w-full px-3 mx-auto flex flex-row justify-between items-center gap-6'>
+                <div className='flex flex-row items-center gap-8 shrink-0'>
+                    <SidebarTrigger />
+
+                    <DynamicBreadcrumb />
+                </div>
+                <div className='flex flex-row items-center'>
+                    <NotificationsBell />
+
+                    <DropdownMenuAvatar />
+                </div>
+            </div>
+        </header>
+    )
+
+
+    if (!content) {
+        return (
+            <SidebarProvider id='sidebar-provider'>
+                <AppSidebar />
+
+                <SidebarInset className="min-h-screen overflow-hidden">
+
+                    {header}
+
+                    <SidebarProvider
+                        style={{ "--sidebar-width": width, } as React.CSSProperties}
+                        defaultOpen={defaultOpen}
+                    >
+                        <SidebarInset className="min-h-screen overflow-hidden">
+                            <div className='no-scrollbar overflow-auto h-full bg-secondary'>
+                                <Outlet />
+                            </div>
+                        </SidebarInset>
+
+                        <RightSidebar />
+
+                    </SidebarProvider>
+                </SidebarInset>
+
+            </SidebarProvider>
+        )
+    }
+
     return (
-        <SidebarProvider id='sidebar-provider' className='overflow-y-scroll'>
+        <SidebarProvider id='sidebar-provider'>
             <AppSidebar />
 
             <SidebarInset className="min-h-screen overflow-hidden">
-                <header className="sticky top-0 z-50 border-b shrink-0 h-14 flex items-center">
-                    <div className='w-full px-3 mx-auto flex flex-row justify-between items-center gap-6'>
-                        <div className='flex flex-row items-center gap-8 shrink-0'>
-                            <SidebarTrigger />
-
-                            {!isMobile && (
-                                <Breadcrumb>
-                                    <BreadcrumbList>
-                                        <BreadcrumbItem>
-                                            <BreadcrumbLink asChild>
-                                                <Link to={routes.users.profile}>
-                                                    Dashboard
-                                                </Link>
-                                            </BreadcrumbLink>
-                                        </BreadcrumbItem>
-
-                                        {location.map((segment, i) => (
-                                            <Fragment key={`${segment}-${i}`}>
-                                                <BreadcrumbSeparator />
-                                                <BreadcrumbItem className="capitalize">
-                                                    {i === location.length - 1 ? (
-                                                        <BreadcrumbPage>{segment.replace(/-/g, " ")}</BreadcrumbPage>
-                                                    ) : (
-                                                        <span className="text-muted-foreground">
-                                                            {segment.replace(/-/g, " ")}
-                                                        </span>
-                                                    )}
-                                                </BreadcrumbItem>
-                                            </Fragment>
-                                        ))}
-                                    </BreadcrumbList>
-                                </Breadcrumb>
-                            )}
-                        </div>
-
-                        <div className='flex flex-row items-center'>
-                            <NotificationsBell />
-
-                            <DropdownMenuAvatar />
-                        </div>
-                    </div>
-                </header>
+                {header}
                 <div className='no-scrollbar overflow-auto h-full bg-secondary'>
                     <Outlet />
                 </div>
             </SidebarInset>
+
         </SidebarProvider>
     )
 }
 
 export default DashboardLayout
+
+
+function DynamicBreadcrumb() {
+    const isMobile = useIsMobile()
+
+    if (isMobile) {
+        return null
+    }
+
+    const location = useLocation().pathname
+        .split('/')
+        .filter(v => !!v && v !== 'user')
+
+    return (
+        <Breadcrumb>
+            <BreadcrumbList>
+                <BreadcrumbItem>
+                    <BreadcrumbLink asChild>
+                        <Link to={routes.users.profile}>
+                            Dashboard
+                        </Link>
+                    </BreadcrumbLink>
+                </BreadcrumbItem>
+
+                {location.map((segment, i) => (
+                    <Fragment key={`${segment}-${i}`}>
+                        <BreadcrumbSeparator />
+                        <BreadcrumbItem className="capitalize">
+                            {i === location.length - 1 ? (
+                                <BreadcrumbPage>{segment.replace(/-/g, " ")}</BreadcrumbPage>
+                            ) : (
+                                <span className="text-muted-foreground">
+                                    {segment.replace(/-/g, " ")}
+                                </span>
+                            )}
+                        </BreadcrumbItem>
+                    </Fragment>
+                ))}
+            </BreadcrumbList>
+        </Breadcrumb>
+    )
+}
+

@@ -12,6 +12,7 @@ import { ArrowRight, Bell, BellOff, CheckCheck, MessageCircleCheck, MessageCircl
 import { Fragment } from "react"
 import { Link, useNavigate } from "react-router"
 import { ScrollArea } from "./scroll-area"
+import NotificationItem from "@/pages/protected/notifications/notification-item-component"
 
 
 export function NotificationsBell() {
@@ -58,6 +59,18 @@ export function NotificationsBell() {
             refetch()
         },
     })
+
+    const onNotificationTapped = async () => {
+        // if (!notification.is_read) {
+        //     await mutation.mutateAsync({
+        //         id: notification.id,
+        //         is_read: true,
+        //     })
+        // }
+        // if (notification.target_url) {
+        //     navigate(notification.target_url || "#")
+        // }
+    }
 
     return (
         <Popover>
@@ -135,128 +148,9 @@ export function NotificationsBell() {
                         )}
 
                         <div className="space-y-1">
-                            {notifications?.map((notification) => {
-                                const actorName = notification.actor
-                                    ? `${notification.actor.first_name} ${notification.actor.last_name}`
-                                    : "System:";
-
-                                return (
-                                    <fieldset
-                                        disabled={isLoading || mutation.isPending || deleteMut.isPending}
-                                        key={notification.id}
-                                        className={cn(
-                                            "group relative cursor-pointer p-2 border-2 border-border rounded-md transition-colors duration-300",
-                                            "hover:border-primary-light hover:shadow-sm",
-                                            notification.is_read && "bg-muted-foreground/13"
-                                        )}
-                                    >
-                                        <div
-                                            onClick={async () => {
-                                                if (!notification.is_read) {
-                                                    await mutation.mutateAsync({
-                                                        id: notification.id,
-                                                        is_read: true,
-                                                    })
-                                                }
-                                                if (notification.target_url) {
-                                                    navigate(notification.target_url || "#")
-                                                }
-                                            }}
-                                            className="flex flex-1 items-center gap-3 min-w-0 pr-12 md:pr-0"
-                                        >
-                                            <div className="relative shrink-0">
-                                                <Avatar className="size-10 border shadow-sm">
-                                                    <AvatarImage src={notification.actor?.photo as string ?? null} />
-                                                    <AvatarFallback>
-                                                        {notification.actor ? (
-                                                            actorName
-                                                                .split(" ")
-                                                                .map((x) => x[0])
-                                                                .join("")
-                                                                .slice(0, 2)
-                                                        ) : (
-                                                            <Settings className="size-6" />
-                                                        )}
-                                                    </AvatarFallback>
-                                                </Avatar>
-
-                                                {!notification.is_read && (
-                                                    <span className="absolute right-0 top-0 size-2 rounded-full bg-destructive ring-2 ring-background" />
-                                                )}
-                                            </div>
-
-                                            <div className="min-w-0 flex-1 text-xs">
-                                                <p className="leading-relaxed wrap-anywhere pr-8 break-all">
-                                                    <span className="font-semibold">
-                                                        {actorName}
-                                                    </span>{" "}
-                                                    <span className="text-muted-foreground">
-                                                        {notification.message}
-                                                    </span>
-                                                </p>
-
-                                                <p className="text-xs text-muted-foreground">
-                                                    {new Date(notification.created_at).toLocaleString()}
-                                                </p>
-                                            </div>
-                                        </div>
-
-                                        <DropdownMenu>
-                                            <DropdownMenuTrigger asChild>
-                                                <Button variant="ghost" size="icon"
-                                                    //  className="shrink-0 opacity-0 transition-opacity group-hover:opacity-100"
-                                                    className={cn(
-                                                        "absolute top-2 right-2 shrink-0 transition-opacity",
-                                                        "opacity-100",
-                                                        "md:opacity-0 md:group-hover:opacity-100"
-                                                    )}
-                                                >
-                                                    <MoreHorizontal className="size-4" />
-                                                </Button>
-                                            </DropdownMenuTrigger>
-
-                                            <DropdownMenuContent className="w-40" align="end">
-                                                <DropdownMenuGroup>
-                                                    <DropdownMenuLabel className="text-xs text-muted-foreground">
-                                                        Actions
-                                                    </DropdownMenuLabel>
-
-                                                    <DropdownMenuItem
-                                                        onClick={() => {
-                                                            mutation.mutate({
-                                                                id: notification.id,
-                                                                is_read: !notification.is_read,
-                                                            })
-                                                        }}
-                                                    >
-                                                        {notification.is_read ? (
-                                                            <Fragment>
-                                                                <MessageCircleReply />
-                                                                <span>Mark as unread</span>
-                                                            </Fragment>
-                                                        ) : (
-                                                            <Fragment>
-                                                                <MessageCircleCheck />
-                                                                <span>Mark as read</span>
-                                                            </Fragment>
-                                                        )}
-                                                    </DropdownMenuItem>
-
-                                                    <DropdownMenuItem
-                                                        variant="destructive"
-                                                        onClick={() => {
-                                                            deleteMut.mutate(notification.id)
-                                                        }}
-                                                    >
-                                                        <Trash2 />
-                                                        <span>Delete</span>
-                                                    </DropdownMenuItem>
-                                                </DropdownMenuGroup>
-                                            </DropdownMenuContent>
-                                        </DropdownMenu>
-                                    </fieldset>
-                                );
-                            })}
+                            {notifications?.map((notification) => (
+                                <NotificationItem key={notification.id} notification={notification} />
+                            ))}
                         </div>
                     </ScrollArea>
                 </div>

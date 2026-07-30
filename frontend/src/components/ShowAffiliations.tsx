@@ -15,6 +15,9 @@ import { ScrollArea } from './ui/scroll-area';
 import AffiliationForm from '@/forms/AffiliationForm';
 import { toast } from 'sonner';
 import { isAxiosError } from 'axios';
+import type { PaginatedResponse } from '@/domain/pagination';
+import { useParams } from 'react-router';
+import { Avatar, AvatarFallback } from './ui/avatar';
 
 
 type Props = {
@@ -22,8 +25,9 @@ type Props = {
 }
 
 function ShowAffiliations({ onAffiliationClicked }: Props) {
+    const { id: abstractId } = useParams()
 
-    const { data: affiliations, isLoading, isError, isFetching, error, refetch } = useQuery<Affiliation[]>({
+    const { data, isLoading, isError, isFetching, error, refetch } = useQuery<PaginatedResponse<Affiliation>>({
         queryKey: ['affiliations'],
         queryFn: async () => {
             const { data } = await api.get('/abstracts/affiliations');
@@ -43,15 +47,18 @@ function ShowAffiliations({ onAffiliationClicked }: Props) {
             const { data } = await api.delete(`/abstracts/affiliations/${id}/`);
             return data;
         },
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['affiliations'] });
+        onSuccess: async () => {
+            await Promise.all([
+                queryClient.invalidateQueries({ queryKey: ['affiliations'] }),
+                queryClient.invalidateQueries({ queryKey: ['authors', abstractId], }),
+            ])
             setDeleteAffiliation(null)
             setOpen(false)
         },
         onError: (error) => {
             if (isAxiosError(error)) {
                 toast.error(error.response.data.errors.root)
-                if (import.meta.env.DEV){
+                if (import.meta.env.DEV) {
                     console.error(error.response.data.errors.root);
                 }
             }
@@ -66,6 +73,8 @@ function ShowAffiliations({ onAffiliationClicked }: Props) {
     )
 
     if (isError) return <p>Failed to load affiliations: {error.message}</p>;
+
+    const affiliations = data?.results ?? []
 
     if (affiliations?.length === 0) return (
         <Empty className="mx-auto h-full select-none">
@@ -116,7 +125,7 @@ function ShowAffiliations({ onAffiliationClicked }: Props) {
                 <DialogContent className='max-w-md w-full'>
                     <DialogHeader>
                         <DialogTitle>{edit !== null ? 'Edit Affiliation' : 'New Affiliation'}</DialogTitle>
-                        <DialogDescription>
+                        <DialogDescription className='max-sm:text-xs'>
                             {edit !== null
                                 ? 'Update the necessary fields below and save your changes.'
                                 : 'Fill out the form below to add a new affiliation to the list.'}
@@ -129,7 +138,7 @@ function ShowAffiliations({ onAffiliationClicked }: Props) {
                             onSubmitSuccess={() => { setOpenEdit(false); setEdit(null); }}
                         />
                     </ScrollArea>
-                    <DialogDescription className='border-t-2 pt-2'>
+                    <DialogDescription className='max-sm:text-[10px] text-xs pt-2'>
                         Note: The affiliations created here can be assigned to authors when adding them to an abstract submission.
                         Make sure each author is linked to the correct affiliation before submitting.
                     </DialogDescription>
@@ -147,23 +156,28 @@ function ShowAffiliations({ onAffiliationClicked }: Props) {
                     View, create, edit, or remove affiliation records for your organization.
                 </CardDescription>
                 <CardAction className='mt-auto'>
-                    <Button onClick={() => { setEdit(null); setOpenEdit(true) }}>
+                    <Button size='sm' onClick={() => { setEdit(null); setOpenEdit(true) }}>
                         <Plus />
                         Add affiliation
                     </Button>
                 </CardAction>
             </CardHeader>
 
-            <div className='space-y-2 p-1 sm:p-3  bg-slate-50 border-dashed border-3 rounded-lg'>
+            <div className='space-y-2'>
                 {affiliations?.length > 0 && affiliations.map((item, i) => (
                     <div
                         key={i}
                         className={cn(
                             'cursor-pointer p-3 border-2 border-border rounded-md transition-colors duration-300',
-                            'bg-background hover:border-primary-light hover:shadow-md',
-                            'flex flex-col items-start sm:flex-row sm:items-center justify-between'
+                            'bg-secondary hover:bg-background hover:border-primary-light hover:shadow-md',
+                            'flex flex-col gap-3 items-start sm:flex-row sm:items-center justify-between'
                         )}
                     >
+                        <Avatar className="size-10 shrink-0 border shadow-sm">
+                            <AvatarFallback>
+                                <School2 />
+                            </AvatarFallback>
+                        </Avatar>
                         <div>
                             <h4 className="font-medium">{item.institution}</h4>
                             <p className="text-muted-foreground text-sm">

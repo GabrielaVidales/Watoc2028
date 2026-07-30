@@ -75,8 +75,10 @@ function AbstractDeclarations() {
         }
     }, [declarationsData, reset])
 
+    const formName = 'abstract-declarations-form'
+
     return (
-        <form onSubmit={onFormSubmit} id='abstract-declarations-form' className='max-w-full space-y-8'>
+        <form onSubmit={onFormSubmit} id={formName} className='max-w-full space-y-8'>
             <fieldset disabled={isSubmitting} className='space-y-4'>
                 <Controller
                     name="confirm_accuracy"
@@ -210,7 +212,7 @@ function AbstractDeclarations() {
                         <Button
                             type="submit"
                             size={isMobile ? 'sm' : 'default'}
-                            form="abstract-submission-form"
+                            form={formName}
                             disabled={!isValid || !isDirty}
                         >
                             {isSubmitting ? (

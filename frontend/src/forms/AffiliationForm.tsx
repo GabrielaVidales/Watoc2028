@@ -11,6 +11,8 @@ import React from 'react'
 import api from '@/clients/api'
 import { isAxiosError } from 'axios'
 import { useAuth } from '@/contexts/AuthContext'
+import { useParams } from 'react-router'
+import { notify } from '@/components/custom/notify'
 
 type Props = {
     defaults?: Affiliation
@@ -18,45 +20,54 @@ type Props = {
 }
 
 function AffiliationForm({ defaults, onSubmitSuccess, id }: Props & React.HTMLProps<HTMLFormElement>) {
+    const { id: abstractId } = useParams()
+
     const { user: { id: userId } } = useAuth()
 
-    const { control, handleSubmit, reset, resetField, formState: { isDirty, isSubmitting } } = useForm({
+    const { control, handleSubmit, reset, formState: { isSubmitting } } = useForm({
         resolver: zodResolver(affiliationSchema),
         mode: 'onChange',
         defaultValues: {
             id: null,
             institution: '',
-            city: '',
             country: '',
-            ...defaults
+            city: '',
         },
     })
 
     const onFormSubmit = handleSubmit(async (data: Affiliation) => {
         const edit = (defaults !== null && defaults.id)
-        console.log(defaults, edit ? 'Editando' : 'Creando');
         if (edit) {
-            editMutation.mutate(data)
-        } else {
-            createMutation.mutate(data)
+            await editMutation.mutateAsync(data)
+            return
         }
+        await createMutation.mutateAsync(data)
         onSubmitSuccess?.()
     })
 
     React.useEffect(() => {
-        reset(defaults ? defaults : {
-            institution: '',
-            city: '',
-            country: '',
-        })
+        if (defaults) {
+            queueMicrotask(()=> {
+                reset({
+                    id: defaults.id,
+                    institution: defaults.institution,
+                    country: defaults.country,
+                    city: defaults.city,
+                })
+            })
+        }
     }, [defaults])
 
     const queryClient = useQueryClient()
 
     const createMutation = useMutation({
         mutationFn: async (data: Affiliation) => await api.post('/abstracts/affiliations/', { ...data, user_id: userId }),
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['affiliations'] });
+        onSuccess: async () => {
+            await Promise.all([
+                queryClient.invalidateQueries({ queryKey: ['affiliations'] }),
+                queryClient.invalidateQueries({ queryKey: ['authors', abstractId], }),
+            ])
+            notify.success('Affiliation created successfully!', { description: 'Your data have been saved.', })
         },
         onError: (error) => {
             if (isAxiosError(error)) {
@@ -65,15 +76,18 @@ function AffiliationForm({ defaults, onSubmitSuccess, id }: Props & React.HTMLPr
             }
         }
     })
-
 
     const editMutation = useMutation({
         mutationFn: async (data: Affiliation) => {
             const { id, ...values } = data
             await api.patch(`/abstracts/affiliations/${id}/`, values)
         },
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['affiliations'] });
+        onSuccess: async () => {
+            await Promise.all([
+                queryClient.invalidateQueries({ queryKey: ['affiliations'] }),
+                queryClient.invalidateQueries({ queryKey: ['authors', abstractId], }),
+            ])
+            notify.success('Affiliation edited successfully!', { description: 'Your changes have been saved.', })
         },
         onError: (error) => {
             if (isAxiosError(error)) {
@@ -83,10 +97,9 @@ function AffiliationForm({ defaults, onSubmitSuccess, id }: Props & React.HTMLPr
         }
     })
 
-
     return (
         <form id={id} onSubmit={onFormSubmit}>
-            <fieldset disabled={isSubmitting} className='px-1 space-y-3'>
+            <fieldset disabled={isSubmitting} className='px-1 space-y-1'>
                 <Controller
                     name={'institution'}
                     control={control}
@@ -102,7 +115,7 @@ function AffiliationForm({ defaults, onSubmitSuccess, id }: Props & React.HTMLPr
                             />
                             <div
                                 className={cn(
-                                    "overflow-hidden transition-all h-6 duration-200 ease-in-out",
+                                    "overflow-hidden transition-all h-5 duration-200 ease-in-out",
                                     fieldState.invalid ? " opacity-100" : " opacity-0"
                                 )}
                             >
@@ -113,7 +126,31 @@ function AffiliationForm({ defaults, onSubmitSuccess, id }: Props & React.HTMLPr
                 />
 
                 <Controller
-                    name={`country`}
+                    name={'city'}
+                    control={control}
+                    render={({ field, fieldState }) => (
+                        <Field data-invalid={fieldState.invalid}>
+                            <FieldLabel htmlFor={field.name}>City</FieldLabel>
+                            <Input
+                                {...field}
+                                id={field.name}
+                                aria-invalid={fieldState.invalid}
+                                autoComplete="off"
+                                maxLength={100}
+                            />
+                            <div
+                                className={cn(
+                                    "overflow-hidden transition-all h-5 duration-200 ease-in-out",
+                                    fieldState.invalid ? " opacity-100" : " opacity-0"
+                                )}
+                            >
+                                <FieldError errors={[fieldState.error]} />
+                            </div>
+                        </Field>
+                    )}
+                />
+                <Controller
+                    name={'country'}
                     control={control}
                     render={({ field, fieldState }) => (
                         <Field orientation="responsive" data-invalid={fieldState.invalid}>
@@ -145,7 +182,7 @@ function AffiliationForm({ defaults, onSubmitSuccess, id }: Props & React.HTMLPr
                             </Select>
                             <div
                                 className={cn(
-                                    "overflow-hidden transition-all h-6 duration-200 ease-in-out",
+                                    "overflow-hidden transition-all h-5 duration-200 ease-in-out",
                                     fieldState.invalid ? " opacity-100" : " opacity-0"
                                 )}
                             >
@@ -155,30 +192,6 @@ function AffiliationForm({ defaults, onSubmitSuccess, id }: Props & React.HTMLPr
                     )}
                 />
 
-                <Controller
-                    name={'city'}
-                    control={control}
-                    render={({ field, fieldState }) => (
-                        <Field data-invalid={fieldState.invalid}>
-                            <FieldLabel htmlFor={field.name}>City</FieldLabel>
-                            <Input
-                                {...field}
-                                id={field.name}
-                                aria-invalid={fieldState.invalid}
-                                autoComplete="off"
-                                maxLength={100}
-                            />
-                            <div
-                                className={cn(
-                                    "overflow-hidden transition-all h-6 duration-200 ease-in-out",
-                                    fieldState.invalid ? " opacity-100" : " opacity-0"
-                                )}
-                            >
-                                <FieldError errors={[fieldState.error]} />
-                            </div>
-                        </Field>
-                    )}
-                />
             </fieldset>
         </form>
     )

@@ -39,6 +39,7 @@ function PaginationItem({ ...props }: React.ComponentProps<"li">) {
 
 type PaginationLinkProps = {
   isActive?: boolean
+  text?: string
 } & Pick<React.ComponentProps<typeof Button>, "size"> &
   React.ComponentProps<"a">
 
@@ -66,6 +67,7 @@ function PaginationLink({
 }
 
 function PaginationPrevious({
+  text = 'Previous',
   className,
   ...props
 }: React.ComponentProps<typeof PaginationLink>) {
@@ -77,12 +79,13 @@ function PaginationPrevious({
       {...props}
     >
       <ChevronLeftIcon />
-      <span className="hidden sm:block">Previous</span>
+      <span className="hidden sm:block">{text}</span>
     </PaginationLink>
   )
 }
 
 function PaginationNext({
+  text = 'Next',
   className,
   ...props
 }: React.ComponentProps<typeof PaginationLink>) {
@@ -93,7 +96,7 @@ function PaginationNext({
       className={cn("gap-1 px-2.5 sm:pr-2.5", className)}
       {...props}
     >
-      <span className="hidden sm:block">Next</span>
+      <span className="hidden sm:block">{text}</span>
       <ChevronRightIcon />
     </PaginationLink>
   )

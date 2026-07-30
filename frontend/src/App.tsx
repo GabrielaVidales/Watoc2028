@@ -33,7 +33,7 @@ import CreatePasswordPage from './pages/auth/create_new_password/create-new-pass
 import AbstractSubmissionsPage from './pages/protected/submissions/summary/page'
 import UserDashboardPage from './pages/protected/dashboard/page'
 import TestPage from './pages/test'
-import NotificationsPage from './pages/protected/notifications/page'
+import NotificationsPage from './pages/protected/notifications/notifications-page'
 import ManageUsersPage from './pages/protected/administration/manage-users/manage_users'
 import ReviewsList from './pages/protected/reviews/list/page'
 import ReviewAbstract from './pages/protected/reviews/view/page'

@@ -4,7 +4,7 @@ import React, { useState } from 'react'
 import { Spinner } from './ui/spinner'
 import { cn } from '@/lib/utils'
 import { Button } from './ui/button'
-import { Edit, GripVertical, HardDriveDownload, Plus, Trash2, TriangleAlert, User2 } from 'lucide-react'
+import { Edit, GripVertical, HardDriveDownload, Plus, Trash2, TriangleAlert, User2, UserPlus, Users2 } from 'lucide-react'
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar'
 import { Sortable, SortableItem, SortableItemHandle, } from "@/components/reui/sortable"
 import { Field, FieldLabel } from './ui/field'
@@ -15,7 +15,7 @@ import { AlertDialog, AlertDialogCancel, AlertDialogContent, AlertDialogDescript
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from './ui/dialog'
 import { ScrollArea } from './ui/scroll-area'
 import { AuthorForm, AuthorFormContent } from '@/forms/AbstractAuthorForm'
-import { CardAction, CardDescription, CardHeader } from './ui/card'
+import { CardAction, CardContent, CardDescription, CardHeader } from './ui/card'
 import { useParams } from 'react-router'
 import type { AuthorSchema } from '@/schemas/abstracts/author-schema'
 
@@ -38,7 +38,7 @@ function ShowAuthorsComponent({ }: Props) {
         refetchOnWindowFocus: false,
         refetchOnReconnect: false,
         queryFn: async () => {
-            const { data } = await api<AuthorSchema[]>(`/abstracts/submissions/${abstractId}/authors`)
+            const { data } = await api.get<AuthorSchema[]>(`/abstracts/submissions/${abstractId}/authors`)
             return data
         }
     })
@@ -151,8 +151,13 @@ function ShowAuthorsComponent({ }: Props) {
                 </AlertDialogContent>
             </AlertDialog>
 
-            <Dialog open={openA} onOpenChange={() => { setOpenA(false); setEditAuthor(null); }}>
-                <DialogContent className='md:max-w-3xl w-full gap-0'>
+            <Dialog open={openA}
+                onOpenChange={() => {
+                    setOpenA(false);
+                    setEditAuthor(null);
+                }}
+            >
+                <DialogContent className='md:max-w-3xl w-full gap-0' onInteractOutside={(e) => e.preventDefault()}>
                     <DialogHeader>
                         <DialogTitle>{editAuthor !== null ? 'Edit Author' : 'Add a new author'}</DialogTitle>
                         <DialogDescription className='max-sm:text-xs'>
@@ -194,136 +199,176 @@ function ShowAuthorsComponent({ }: Props) {
                 <CardDescription>
                     Complete the details (full name, email, affiliation and country) of collaboration authors. You can include a maximum of 16 authors. Please indicate which of the authors will present the abstract.                 </CardDescription>
                 <CardAction>
-                    <Button onClick={() => { setEditAuthor(null); setOpenA(true) }}>
+                    <Button size='sm' onClick={() => { setEditAuthor(null); setOpenA(true) }}>
                         <Plus />
-                        Add author
+                        Add Author
                     </Button>
                 </CardAction>
             </CardHeader>
 
-            <Sortable
-                value={authors}
-                onValueChange={handleReorder}
-                getItemValue={getAuthorValue}
-                className='space-y-2 p-1 sm:p-3 bg-slate-50 border-dashed border-2 rounded-lg'
-            >
-                {authors?.map((author) => (
-                    <SortableItem
-                        key={author.id}
-                        value={String(author.id)}
-                        disabled={saveAuthorsMutation.isPending}
-                        className={cn(
-                            'relative p-3 border-2 border-border rounded-md transition-colors duration-300',
-                            'bg-background hover:border-primary-light hover:shadow-md',
-                            'flex flex-col gap-3',
-                            'md:flex-row md:items-center md:justify-between',
-                        )}
-                    >
-                        <SortableItemHandle
+            <CardContent className='px-0 py-4'>
+                <Sortable
+                    value={authors}
+                    onValueChange={handleReorder}
+                    getItemValue={getAuthorValue}
+                    className='space-y-1'
+                >
+                    {authors.length === 0 && (
+                        <div
                             className={cn(
-                                'text-muted-foreground',
-                                'absolute right-3 top-4',
-                                'md:static'
+                                'flex flex-col justify-start gap-3 p-4 min-h-15',
+                                'rounded-md border-2 border-dashed border-border bg-secondary/40'
                             )}
                         >
-                            <GripVertical />
-                        </SortableItemHandle>
+                            <div className='flex items-center gap-3 max-w-70 mx-auto'>
+                                <Avatar className="size-14 shrink-0 border shadow-sm">
+                                    <AvatarFallback variant='indigo'>
+                                        <Users2 className='size-6' />
+                                    </AvatarFallback>
+                                </Avatar>
 
-                        <Avatar className="size-10 shrink-0 border shadow-sm">
-                            <AvatarImage loading='lazy' src={author.related_user?.photo as string ?? null} />
-                            <AvatarFallback>
-                                {author.related_user_id ? (
-                                    author.related_user?.full_name
-                                        .split(" ")
-                                        .map((x) => x[0])
-                                        .join("")
-                                        .slice(0, 2)
-                                ) : <User2 />}
-                            </AvatarFallback>
-                        </Avatar>
+                                <div className='min-w-0 flex-1'>
+                                    <h4 className='font-medium'>No authors added yet</h4>
+                                    <p className='text-sm text-muted-foreground max-w-xs'>
+                                        Add at least one author and select the corresponding author.
+                                    </p>
+                                </div>
+                            </div>
 
-                        <div className="min-w-0 flex-1">
-                            <h4 className="min-w-0 truncate font-medium">
-                                {author.first_name} {author.last_name}{" "}
-                                <span className="block sm:inline break-all text-muted-foreground text-xs">
-                                    ({author.email})
-                                </span>
-                            </h4>
-
-                            <p className="text-sm text-muted-foreground break-all">
-                                {author.affiliation.institution} | {author.affiliation.city}, {author.affiliation.country}
-                            </p>
-                        </div>
-
-                        <div className="hidden md:flex items-center">
-                            <Field orientation="horizontal" className="items-center gap-2">
-                                <FieldLabel
-                                    htmlFor={`switch-${author.id}`}
-                                    className="text-xs cursor-pointer"
+                            <div className='mx-auto'>
+                                <Button
+                                    variant='outline'
+                                    size='sm'
+                                    className='shrink-0'
+                                    onClick={() => {
+                                        setEditAuthor(null)
+                                        setOpenA(true)
+                                    }}
                                 >
-                                    Corresponding author
-                                </FieldLabel>
-
-                                <Switch
-                                    id={`switch-${author.id}`}
-                                    checked={author.is_corresponding_author}
-                                    onCheckedChange={(bool) => handleSwitchValue(bool, author)}
-                                />
-                            </Field>
+                                    <UserPlus className='size-4' />
+                                    Add Author
+                                </Button>
+                            </div>
                         </div>
+                    )}
 
-                        <fieldset
+                    {authors?.map((author) => (
+                        <SortableItem
+                            key={author.id}
+                            value={String(author.id)}
+                            disabled={saveAuthorsMutation.isPending}
                             className={cn(
-                                "flex items-center justify-between border-t pt-3",
-                                "md:ml-auto md:border-l-2 md:border-t-0 md:pl-2 md:pt-0 md:justify-end md:gap-1"
+                                'relative p-2 border-2 border-border rounded-md transition-colors! duration-300',
+                                'bg-secondary hover:bg-background hover:border-primary-light hover:shadow-md',
+                                'md:flex-row md:items-center md:justify-between',
+                                'flex flex-col gap-3',
                             )}
                         >
-                            {/* Switch SOLO en mobile */}
-                            <div className="flex md:hidden items-center justify-between w-full pr-3 mr-3 border-r-2">
-                                <Field orientation="horizontal" className="items-start gap-2">
+                            <SortableItemHandle
+                                className={cn(
+                                    'text-muted-foreground',
+                                    'absolute right-3 top-4',
+                                    'md:static'
+                                )}
+                            >
+                                <GripVertical />
+                            </SortableItemHandle>
+
+                            <Avatar className="size-10 shrink-0 border shadow-sm">
+                                <AvatarImage loading='lazy' src={author.related_user?.photo as string ?? null} />
+                                <AvatarFallback>
+                                    {author.related_user_id ? (
+                                        author.related_user?.full_name
+                                            .split(" ")
+                                            .map((x) => x[0])
+                                            .join("")
+                                            .slice(0, 2)
+                                    ) : <User2 />}
+                                </AvatarFallback>
+                            </Avatar>
+
+                            <div className="min-w-0 flex-1 space-y-0">
+                                <h4 className="min-w-0 truncate font-medium">
+                                    {author.first_name} {author.last_name}{" "}
+                                </h4>
+                                <p className="block break-all text-muted-foreground text-xs">
+                                    {author.email}
+                                </p>
+                                <p className="text-sm text-muted-foreground break-all">
+                                    {author.affiliation.institution} | {author.affiliation.city}, {author.affiliation.country}
+                                </p>
+                            </div>
+
+                            <div className="hidden md:flex items-center">
+                                <Field orientation="horizontal" className="items-center gap-2">
                                     <FieldLabel
-                                        htmlFor={`switch-mobile-${author.id}`}
+                                        htmlFor={`switch-${author.id}`}
                                         className="text-xs cursor-pointer"
                                     >
                                         Corresponding author
                                     </FieldLabel>
 
                                     <Switch
-                                        size='sm'
-                                        id={`switch-mobile-${author.id}`}
+                                        id={`switch-${author.id}`}
                                         checked={author.is_corresponding_author}
                                         onCheckedChange={(bool) => handleSwitchValue(bool, author)}
                                     />
                                 </Field>
                             </div>
 
-                            <div className="flex items-center gap-1">
-                                <Button
-                                    variant="ghost"
-                                    size="icon-sm"
-                                    onClick={() => {
-                                        setEditAuthor(author)
-                                        setOpenA(true)
-                                    }}
-                                >
-                                    <Edit className="size-5 text-primary-main" />
-                                </Button>
+                            <fieldset
+                                className={cn(
+                                    "flex items-center justify-between border-t pt-3",
+                                    "md:ml-auto md:border-l-2 md:border-t-0 md:pl-2 md:pt-0 md:justify-end md:gap-1"
+                                )}
+                            >
+                                {/* Switch SOLO en mobile */}
+                                <div className="flex md:hidden items-center justify-between w-full pr-3 mr-3 border-r-2">
+                                    <Field orientation="horizontal" className="items-start gap-2">
+                                        <FieldLabel
+                                            htmlFor={`switch-mobile-${author.id}`}
+                                            className="text-xs cursor-pointer"
+                                        >
+                                            Corresponding author
+                                        </FieldLabel>
 
-                                <Button
-                                    variant="ghost"
-                                    size="icon-sm"
-                                    onClick={() => {
-                                        setDeleteAuthor(author)
-                                        setOpen(true)
-                                    }}
-                                >
-                                    <Trash2 className="size-5 text-destructive" />
-                                </Button>
-                            </div>
-                        </fieldset>
-                    </SortableItem>
-                ))}
-            </Sortable>
+                                        <Switch
+                                            size='sm'
+                                            id={`switch-mobile-${author.id}`}
+                                            checked={author.is_corresponding_author}
+                                            onCheckedChange={(bool) => handleSwitchValue(bool, author)}
+                                        />
+                                    </Field>
+                                </div>
+
+                                <div className="flex items-center gap-1">
+                                    <Button
+                                        variant="ghost"
+                                        size="icon-sm"
+                                        onClick={() => {
+                                            setEditAuthor(author)
+                                            setOpenA(true)
+                                        }}
+                                    >
+                                        <Edit className="size-5 text-primary-main" />
+                                    </Button>
+
+                                    <Button
+                                        variant="ghost"
+                                        size="icon-sm"
+                                        onClick={() => {
+                                            setDeleteAuthor(author)
+                                            setOpen(true)
+                                        }}
+                                    >
+                                        <Trash2 className="size-5 text-destructive" />
+                                    </Button>
+                                </div>
+                            </fieldset>
+                        </SortableItem>
+                    ))}
+                </Sortable>
+            </CardContent>
 
             <div className="sticky bottom-20 z-20">
                 <div className={cn(

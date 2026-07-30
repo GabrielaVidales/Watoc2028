@@ -1,13 +1,13 @@
+import React from 'react'
 import api from '@/clients/api';
-import type { NotificationResponse, Notification } from '@/domain/notifications';
 import { cn } from '@/lib/utils';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger, } from "@/components/ui/dropdown-menu"
-import { Link, useNavigate } from 'react-router';
-import React from 'react'
-import { CheckCheck, MessageCircleCheck, MessageCircleReply, MoreHorizontal, RotateCw, Settings, Settings2, Trash2 } from 'lucide-react';
+import { useNavigate } from 'react-router';
+import { MessageCircleCheck, MessageCircleReply, MoreHorizontal, Settings, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import type { Notification } from '@/domain/notifications';
 
 
 type Props = {
@@ -39,10 +39,21 @@ function NotificationItem({ notification }: Props) {
         },
     })
 
+    const onNotificationTapped = async () => {
+        if (!notification.is_read) {
+            await mutation.mutateAsync({
+                id: notification.id,
+                is_read: true,
+            })
+        }
+        if (notification.target_url) {
+            navigate(notification.target_url || "#")
+        }
+    }
 
     const actorName = notification.actor
         ? `${notification.actor.first_name} ${notification.actor.last_name}`
-        : "[System] —";
+        : "[System]";
 
     return (
         <fieldset
@@ -52,25 +63,12 @@ function NotificationItem({ notification }: Props) {
                 "group cursor-pointer p-3 border-2 border-border rounded-md transition-colors duration-300",
                 "hover:border-primary-light hover:shadow-sm",
                 "flex flex-col items-start md:flex-row md:items-center justify-between gap-3",
-                notification.is_read ? "bg-secondary" : 'bg-background'
+                notification.is_read ? "bg-card" : 'bg-secondary'
             )}
         >
-            <div
-                onClick={async () => {
-                    if (!notification.is_read) {
-                        await mutation.mutateAsync({
-                            id: notification.id,
-                            is_read: true,
-                        })
-                    }
-                    if (notification.target_url) {
-                        navigate(notification.target_url || "#")
-                    }
-                }}
-                className="flex flex-1 items-center gap-3 min-w-0"
-            >
+            <div onClick={onNotificationTapped} className="flex flex-1 items-start gap-3 min-w-0">
                 <div className="relative shrink-0">
-                    <Avatar className="size-11 border shadow-sm">
+                    <Avatar className="size-10 border shadow-sm">
                         <AvatarImage src={notification.actor?.photo as string ?? null} />
                         <AvatarFallback>
                             {notification.actor ? (
@@ -91,67 +89,77 @@ function NotificationItem({ notification }: Props) {
                 </div>
 
                 <div className="min-w-0 flex-1">
-                    <p className="text-sm leading-relaxed">
+                    <p className="text-[13px] leading-relaxed">
                         <span className="font-semibold">
                             {actorName}
                         </span>{" "}
-                        <span className="text-muted-foreground">
-                            {notification.message}
-                        </span>
+                        <span className="text-muted-foreground" dangerouslySetInnerHTML={{ __html: notification.message }} />
                     </p>
 
                     <p className="mt-1 text-xs text-muted-foreground">
                         {new Date(notification.created_at).toLocaleString()}
                     </p>
                 </div>
+
+                <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                        <Button
+                            variant="outline"
+                            size="icon-xs"
+                            className="shrink-0 opacity-0 transition-opacity group-hover:opacity-100"
+                            onClick={e => {
+                                e.preventDefault()
+                                e.stopPropagation()
+                            }}
+                        >
+                            <MoreHorizontal className="size-4" />
+                        </Button>
+                    </DropdownMenuTrigger>
+
+                    <DropdownMenuContent className="w-40" align="end">
+                        <DropdownMenuGroup>
+                            <DropdownMenuLabel className="text-xs text-muted-foreground">
+                                Actions
+                            </DropdownMenuLabel>
+
+                            <DropdownMenuItem
+                                onClick={(e) => {
+                                    e.preventDefault()
+                                    e.stopPropagation()
+                                    mutation.mutate({
+                                        id: notification.id,
+                                        is_read: !notification.is_read,
+                                    })
+                                }}
+                            >
+                                {notification.is_read ? (
+                                    <React.Fragment>
+                                        <MessageCircleReply />
+                                        <span>Mark as unread</span>
+                                    </React.Fragment>
+                                ) : (
+                                    <React.Fragment>
+                                        <MessageCircleCheck />
+                                        <span>Mark as read</span>
+                                    </React.Fragment>
+                                )}
+                            </DropdownMenuItem>
+
+                            <DropdownMenuItem
+                                variant="destructive"
+                                onClick={(e) => {
+                                    e.preventDefault()
+                                    e.stopPropagation()
+                                    deleteMut.mutate(notification.id)
+                                }}
+                            >
+                                <Trash2 />
+                                <span>Delete</span>
+                            </DropdownMenuItem>
+                        </DropdownMenuGroup>
+                    </DropdownMenuContent>
+                </DropdownMenu>
             </div>
-
-            <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" size="icon" className="shrink-0 opacity-0 transition-opacity group-hover:opacity-100">
-                        <MoreHorizontal className="size-4" />
-                    </Button>
-                </DropdownMenuTrigger>
-
-                <DropdownMenuContent className="w-40" align="end">
-                    <DropdownMenuGroup>
-                        <DropdownMenuLabel className="text-xs text-muted-foreground">
-                            Actions
-                        </DropdownMenuLabel>
-
-                        <DropdownMenuItem
-                            onClick={() => {
-                                mutation.mutate({
-                                    id: notification.id,
-                                    is_read: !notification.is_read,
-                                })
-                            }}
-                        >
-                            {notification.is_read ? (
-                                <React.Fragment>
-                                    <MessageCircleReply />
-                                    <span>Mark as unread</span>
-                                </React.Fragment>
-                            ) : (
-                                <React.Fragment>
-                                    <MessageCircleCheck />
-                                    <span>Mark as read</span>
-                                </React.Fragment>
-                            )}
-                        </DropdownMenuItem>
-
-                        <DropdownMenuItem
-                            variant="destructive"
-                            onClick={() => {
-                                deleteMut.mutate(notification.id)
-                            }}
-                        >
-                            <Trash2 />
-                            <span>Delete</span>
-                        </DropdownMenuItem>
-                    </DropdownMenuGroup>
-                </DropdownMenuContent>
-            </DropdownMenu>
         </fieldset>
     );
 }

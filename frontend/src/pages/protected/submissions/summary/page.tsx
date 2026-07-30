@@ -30,7 +30,7 @@ import { ArrowRight, Calendar, CircleAlert, Clock3, Download, Eye, FilePenLine, 
 import { useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { Link, useNavigate } from 'react-router'
-import { PaginationController, SelectItemsPerPage } from '../../notifications/page'
+import { PaginationController, SelectItemsPerPage } from '../../notifications/notifications-page'
 import { useDebounce } from 'use-debounce'
 import { Badge } from '@/components/ui/badge'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'

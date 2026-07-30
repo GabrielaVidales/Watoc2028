@@ -189,7 +189,6 @@ export const changePasswordSchema = z.object({
             .min(1, "Field required *")
             .max(100, 'Input too long')
     })
-        .default({ value: '', confirm: '' })
         .refine(data => data.value === data.confirm, {
             error: "Passwords do not match",
             path: ["confirm"]
@@ -197,7 +196,6 @@ export const changePasswordSchema = z.object({
     oldPassword: z.string()
         .min(1, 'Password required')
         .max(100, 'Input too long')
-        .default('')
 })
 
 export const editUserFormSchema = userSchema
@@ -230,3 +228,4 @@ export const editUserFormSchema = userSchema
 export type LoginFormValues = z.infer<typeof loginSchema>
 export type RegisterFormValues = z.infer<typeof registrationSchema>
 export type EditUserFormValues = z.infer<typeof editUserFormSchema>
+export type ChangePasswordFormValues = z.infer<typeof changePasswordSchema>

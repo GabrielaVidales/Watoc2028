@@ -1,4 +1,5 @@
 import api from '@/clients/api'
+import { notify } from '@/components/custom/notify'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -39,7 +40,35 @@ function TestPage() {
                 <Separator />
 
                 <CardContent>
-                    <ReviewAssignmentForm />
+                    <Button onClick={() => {
+                        const variants = ["default", "success", "warning", "destructive", "info"];
+                        variants.forEach((v) => {
+                            notify[v]('Something went wrong!!', {
+                                description: 'Chingada puta de mierda cagada.',
+                            })
+                        });
+                    }}>
+                        Toast
+                    </Button>
+
+                    <Button onClick={async () => {
+                        try {
+                            const results = await Promise.all([
+                                api.get('/users/session'),
+                                api.get('/users/session'),
+                                api.get('/users/session'),
+                                api.get('/users/session'),
+                                api.get('/users/session'),
+                            ]);
+
+                            console.log('✅ ¡Éxito! Todas las peticiones respondieron:', results);
+                        } catch (error) {
+                            console.error('❌ Una o más peticiones fallaron:', error);
+                        }
+
+                    }}>
+                        Test requests
+                    </Button>
                 </CardContent>
             </Card>
 

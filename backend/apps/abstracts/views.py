@@ -69,6 +69,7 @@ class AbstractView(ModelViewSet):
     def get_affiliations(self, request, pk=None):
         abstract = self.get_object()
         data = AuthorAffiliationSerializer(abstract.affiliations.all(), many=True)
+        # data = AuthorAffiliationSerializer([], many=True)
         return Response(data.data)
 
     @action(detail=True, methods=["get", "patch"], url_path="authors")
@@ -121,6 +122,7 @@ class AbstractView(ModelViewSet):
 
         serializer = AuthorSerializer(
             abstract.authors,
+            # [],
             many=True,
             context={"request": request},
         )

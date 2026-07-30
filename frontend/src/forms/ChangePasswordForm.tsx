@@ -5,15 +5,15 @@ import { Button } from '@/components/ui/button'
 import { Field, FieldError, FieldLabel } from '@/components/ui/field'
 import { InputGroup, InputGroupAddon, InputGroupButton, InputGroupInput } from '@/components/ui/input-group'
 import { Spinner } from '@/components/ui/spinner'
-import { changePasswordSchema } from '@/schemas/user-schemas'
+import { changePasswordSchema, type ChangePasswordFormValues } from '@/schemas/user-schemas'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { isAxiosError } from 'axios'
-import { Eye, EyeOff, Lock, LockOpen, Save } from 'lucide-react'
+import { Eye, EyeOff, KeyRound, Lock, LockOpen, Save } from 'lucide-react'
 import React from 'react'
 import { Controller, useForm } from 'react-hook-form'
 
 function ChangePasswordForm() {
-    const { handleSubmit, reset, setError, control, formState } = useForm({
+    const { handleSubmit, reset, setError, trigger, control, formState } = useForm<ChangePasswordFormValues>({
         resolver: zodResolver(changePasswordSchema),
         mode: 'onChange',
         defaultValues: {
@@ -24,10 +24,11 @@ function ChangePasswordForm() {
             }
         }
     })
-    const { isValid, isSubmitting, isSubmitSuccessful } = formState
+    const { isValid, isSubmitting, isSubmitSuccessful, isDirty } = formState
 
     const [showPassword, setShowPassword] = React.useState(false);
-    const toggleVisibility = () => setShowPassword((show) => !show);
+    const [showConfirmPassword, setShowConfirmPassword] = React.useState(false);
+    const toggleVisibility = (f: typeof setShowPassword) => f((show) => !show);
 
     const onFormSubmit = handleSubmit(async (data) => {
         try {
@@ -56,7 +57,7 @@ function ChangePasswordForm() {
 
     return (
         <form onSubmit={onFormSubmit}>
-            <fieldset className='space-y-3 flex flex-col gap-3' disabled={isSubmitting}>
+            <fieldset className='flex flex-col gap-8' disabled={isSubmitting}>
                 {isSubmitSuccessful && (
                     <InfoAlert
                         title='Success'
@@ -66,104 +67,128 @@ function ChangePasswordForm() {
                     />
                 )}
 
-                <Controller
-                    name="oldPassword"
-                    control={control}
-                    render={({ field, fieldState }) => (
-                        <Field data-invalid={fieldState.invalid} className='col-span-full'>
-                            <FieldLabel htmlFor={field.name}>Current password</FieldLabel>
-                            <InputGroup>
-                                <InputGroupInput
-                                    {...field}
-                                    id={field.name}
-                                    aria-invalid={fieldState.invalid}
-                                    autoComplete="off"
-                                    type='password'
-                                    placeholder="**********"
-                                />
-                                <InputGroupAddon align="inline-start">
-                                    {isValid ? <Lock /> : <LockOpen />}
-                                </InputGroupAddon>
-                            </InputGroup>
-                            {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-                        </Field>
-                    )}
-                />
-                <Controller
-                    name="password.value"
-                    control={control}
-                    render={({ field, fieldState }) => (
-                        <Field data-invalid={fieldState.invalid}>
-                            <FieldLabel htmlFor={field.name}>New password</FieldLabel>
-                            <InputGroup>
-                                <InputGroupInput
-                                    {...field}
-                                    id={field.name}
-                                    aria-invalid={fieldState.invalid}
-                                    autoComplete="off"
-                                    type={showPassword ? 'text' : 'password'}
-                                    placeholder="**********"
-                                />
-                                <InputGroupAddon align="inline-start">
-                                    {isValid ? <Lock /> : <LockOpen />}
-                                </InputGroupAddon>
-                                <InputGroupAddon align="inline-end">
-                                    <InputGroupButton
-                                        title='Show password'
-                                        size='icon-xs'
-                                        onClick={toggleVisibility}
-                                    >
-                                        {showPassword ?
-                                            <EyeOff className='shrink-0 size-5' /> :
-                                            <Eye className='shrink-0 size-5' />
-                                        }
-                                    </InputGroupButton>
-                                </InputGroupAddon>
-                            </InputGroup>
-                            {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-                        </Field>
-                    )}
-                />
-                <Controller
-                    name="password.confirm"
-                    control={control}
-                    render={({ field, fieldState }) => (
-                        <Field data-invalid={fieldState.invalid}>
-                            <FieldLabel htmlFor={field.name}>Confirm new password</FieldLabel>
-                            <InputGroup>
-                                <InputGroupInput
-                                    {...field}
-                                    id={field.name}
-                                    aria-invalid={fieldState.invalid}
-                                    autoComplete="off"
-                                    type={showPassword ? 'text' : 'password'}
-                                    placeholder="Re-type your new password"
-                                />
-                                <InputGroupAddon align="inline-start">
-                                    {isValid ? <Lock /> : <LockOpen />}
-                                </InputGroupAddon>
-                                <InputGroupAddon align="inline-end">
-                                    <InputGroupButton
-                                        title='Show password'
-                                        size='icon-xs'
-                                        onClick={toggleVisibility}
-                                    >
-                                        {showPassword ?
-                                            <EyeOff className='shrink-0 size-5' /> :
-                                            <Eye className='shrink-0 size-5' />
-                                        }
-                                    </InputGroupButton>
-                                </InputGroupAddon>
-                            </InputGroup>
-                            {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-                        </Field>
-                    )}
-                />
-
-                <PasswordStrengthMeter control={control} className='col-span-full' />
+                <div className='space-y-2'>
+                    <Controller
+                        name="oldPassword"
+                        control={control}
+                        render={({ field, fieldState }) => (
+                            <Field data-invalid={fieldState.invalid} >
+                                <FieldLabel htmlFor={field.name}>Current password</FieldLabel>
+                                <InputGroup>
+                                    <InputGroupInput
+                                        {...field}
+                                        id={field.name}
+                                        aria-invalid={fieldState.invalid}
+                                        autoComplete="off"
+                                        type='password'
+                                        maxLength={65}
+                                        placeholder="••••••••••••"
+                                    />
+                                    <InputGroupAddon align="inline-start">
+                                        {!isDirty || fieldState.invalid ? <LockOpen /> : <Lock className='text-primary-light' />}
+                                    </InputGroupAddon>
+                                </InputGroup>
+                                <div className='h-6'>
+                                    <FieldError errors={[fieldState.error]} />
+                                </div>
+                            </Field>
+                        )}
+                    />
+                    <Controller
+                        name="password.value"
+                        control={control}
+                        render={({ field, fieldState }) => (
+                            <Field data-invalid={fieldState.invalid}>
+                                <FieldLabel htmlFor={field.name}>New password</FieldLabel>
+                                <InputGroup>
+                                    <InputGroupInput
+                                        {...field}
+                                        id={field.name}
+                                        aria-invalid={fieldState.invalid}
+                                        autoComplete="off"
+                                        type={showPassword ? 'text' : 'password'}
+                                        placeholder="••••••••••••"
+                                        maxLength={65}
+                                        onChange={async (e) => {
+                                            field.onChange(e)
+                                            await trigger('password.confirm')
+                                        }}
+                                    />
+                                    <InputGroupAddon align="inline-start">
+                                        {!isDirty || fieldState.invalid ? <LockOpen /> : <Lock className='text-primary-light' />}
+                                    </InputGroupAddon>
+                                    <InputGroupAddon align="inline-end">
+                                        <InputGroupButton
+                                            title='Show password'
+                                            size='icon-xs'
+                                            onClick={() => toggleVisibility(setShowPassword)}
+                                        >
+                                            {showPassword ?
+                                                <EyeOff className='shrink-0 size-5' /> :
+                                                <Eye className='shrink-0 size-5' />
+                                            }
+                                        </InputGroupButton>
+                                    </InputGroupAddon>
+                                </InputGroup>
+                                <div className='h-6'>
+                                    <FieldError errors={[fieldState.error]} />
+                                </div>
+                            </Field>
+                        )}
+                    />
+                    <Controller
+                        name="password.confirm"
+                        control={control}
+                        render={({ field, fieldState }) => (
+                            <Field data-invalid={fieldState.invalid}>
+                                <FieldLabel htmlFor={field.name}>Confirm new password</FieldLabel>
+                                <InputGroup>
+                                    <InputGroupInput
+                                        {...field}
+                                        id={field.name}
+                                        aria-invalid={fieldState.invalid}
+                                        autoComplete="off"
+                                        type={showConfirmPassword ? 'text' : 'password'}
+                                        placeholder="Re-type your new password"
+                                        maxLength={65}
+                                        onChange={async (e) => {
+                                            field.onChange(e)
+                                            await trigger('password.value')
+                                        }}
+                                    />
+                                    <InputGroupAddon align="inline-start">
+                                        {!isDirty || fieldState.invalid ? <LockOpen /> : <Lock className='text-primary-light' />}
+                                    </InputGroupAddon>
+                                    <InputGroupAddon align="inline-end">
+                                        <InputGroupButton
+                                            title='Show password'
+                                            size='icon-xs'
+                                            onClick={() => toggleVisibility(setShowConfirmPassword)}
+                                        >
+                                            {showConfirmPassword ?
+                                                <EyeOff className='shrink-0 size-5' /> :
+                                                <Eye className='shrink-0 size-5' />
+                                            }
+                                        </InputGroupButton>
+                                    </InputGroupAddon>
+                                </InputGroup>
+                                <div className='h-6'>
+                                    <FieldError errors={[fieldState.error]} />
+                                </div>
+                            </Field>
+                        )}
+                    />
+                     <Field>
+                        <div className='flex items-center gap-2'>
+                            <KeyRound className='size-4' />
+                            <FieldLabel>Password strength</FieldLabel>
+                        </div>
+                        <PasswordStrengthMeter control={control} className='col-span-full' />
+                    </Field>
+                </div>
 
                 <div className='col-span-full flex justify-end'>
-                    <Button type='submit' className='px-10!' disabled={!isValid}>
+                    <Button type='submit' disabled={!isValid}>
                         {isSubmitting ? (
                             <Spinner data-icon="inline-start" />
                         ) : (

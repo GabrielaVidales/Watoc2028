@@ -155,9 +155,8 @@ class AuthorSerializer(serializers.ModelSerializer):
             errors["abstract"] = ["An abstract instance is required"]
         else:
             queryset = models.Author.objects.exclude(pk=attrs["id"]) if attrs.get("id", None) else models.Author.objects
-            email_duplicated = queryset.filter(abstract=abstract, email=email).exists()
-            if email_duplicated:
-                print(email)
+            email_duplicated = queryset.filter(abstract=abstract, email=email)
+            if email_duplicated.exists():
                 errors["email"] = ["Another author in this abstract already uses this email."]
 
         if attrs.get("affiliation"):
@@ -173,7 +172,7 @@ class AuthorSerializer(serializers.ModelSerializer):
                 errors["city"] = ["City is required, since no existing affiliation was provided"]
 
         if errors:
-            raise serializers.ValidationError(errors)
+            raise serializers.ValidationError({"errors": errors})
         return attrs
 
     @transaction.atomic
@@ -200,6 +199,15 @@ class AuthorSerializer(serializers.ModelSerializer):
             validated_data["affiliation"] = affiliation
 
         abstract = validated_data.get("abstract")
+        
+        MAX_AUTHORS = 16
+        authors_count = abstract.authors.count()
+        if authors_count >= MAX_AUTHORS:
+            raise serializers.ValidationError({"errors": {
+                'root': f'Maximum of authors is {MAX_AUTHORS}'
+            }})
+        
+        
         validated_data["order"] = abstract.authors.count() + 1
 
         instance = super().create(validated_data)

@@ -37,7 +37,7 @@ function VerifyPage() {
 
                 hasVerified.current = true;
 
-                await new Promise(resolve => setTimeout(resolve, 1000));
+                await new Promise(resolve => setTimeout(resolve, 300));
 
                 const response = await api.post<VerifyResponse>("/auth/verify-email/", { token });
 

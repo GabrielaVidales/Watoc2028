@@ -1,30 +1,34 @@
 import api from '@/clients/api';
-import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator, } from "@/components/ui/breadcrumb";
 import { Button } from '@/components/ui/button';
-import { Card, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Field, FieldLabel } from '@/components/ui/field';
 import { Pagination, PaginationContent, PaginationItem, PaginationNext, PaginationPrevious } from "@/components/ui/pagination";
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import type { Notification, NotificationResponse } from '@/domain/notifications';
-import { routes } from '@/routes/routes';
-import { keepPreviousData, useQuery } from '@tanstack/react-query';
-import { BellOff, CheckCheck, RotateCw, Settings2 } from 'lucide-react';
-import { useState } from 'react';
-import { Link } from 'react-router';
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import type { NotificationResponse } from '@/domain/notifications';
+import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { BellOff, BellRing, CheckCheck, RotateCw, Settings2 } from 'lucide-react';
+import { useState, type HTMLAttributes } from 'react';
 import NotificationItem from './notification-item-component';
+import { cn } from '@/lib/utils';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 function NotificationsPage() {
+    const isMobile = useIsMobile()
+
+    const queryClient = useQueryClient()
+
+    const [value, setValue] = useState('unread')
     const [page, setPage] = useState(1)
     const [itemsPerPage, setItemsPerPage] = useState(5)
     const { data, isLoading } = useQuery<NotificationResponse>({
-        queryKey: ['notifications', page, itemsPerPage],
+        queryKey: ['notifications', page, itemsPerPage, value],
         queryFn: async () => {
             const { data } = await api.get('/notifications/user/', {
                 params: {
                     page: page,
                     limit: itemsPerPage,
+                    is_read: value === 'unread' ? false : true
                 }
             });
             return data
@@ -32,56 +36,53 @@ function NotificationsPage() {
         placeholderData: keepPreviousData
     })
 
-    if (!data) {
-        return (
-            <div>
-                Loading...
-            </div>
-        )
+    const refetchNotifications = () => {
+        queryClient.invalidateQueries({
+            queryKey: ['notifications', page, itemsPerPage, value],
+        });
     }
 
-    const unread: Notification[] = []
-    const read: Notification[] = []
-    const { results } = data.notifications
-    results.forEach(n => n.is_read ? read.push(n) : unread.push(n))
+    const toggleAllMutation = useMutation({
+        mutationFn: async () => {
+            const { data } = await api.patch(`/notifications/toggle-all-read/`);
+            return data;
+        },
+        onSuccess: refetchNotifications,
+    })
+
+    const results = isLoading ? [] : data.notifications.results
 
     return (
-        <div className='w-full max-w-5xl mx-auto p-8'>
-            <Breadcrumb className='mb-8'>
-                <BreadcrumbList>
-                    <BreadcrumbItem>
-                        <BreadcrumbLink asChild>
-                            <Link to={routes.users.profile}>
-                                Dashboard
-                            </Link>
-                        </BreadcrumbLink>
-                    </BreadcrumbItem>
-                    <BreadcrumbSeparator />
-                    <BreadcrumbItem>
-                        <BreadcrumbPage>Notifications</BreadcrumbPage>
-                    </BreadcrumbItem>
-                </BreadcrumbList>
-            </Breadcrumb>
+        <div className='w-full h-full flex flex-col'>
+            <div className='bg-background border-b-2 border-b-border space-y-4 p-2 sm:p-4 md:p-6 lg:p-8'>
+                <div className='flex flex-col md:flex-row md:justify-between gap-5'>
+                    <div className="flex items-start gap-3">
+                        <div className="flex size-12 shrink-0 items-center justify-center rounded-lg bg-primary-light/10 border-2 border-primary-main/20 text-primary">
+                            <BellRing className="text-primary-main stroke-2 size-8" />
+                        </div>
 
-            <div className="mb-8 flex items-center justify-between">
-                <div className='space-y-2'>
-                    <CardTitle className='text-3xl'>Notifications</CardTitle>
-                    <CardDescription>
-                        Stay up to date with activity on your account.
-                    </CardDescription>
+                        <div>
+                            <h1 className="text-2xl font-semibold">
+                                Notifications
+                            </h1>
+                            <p className="text-sm text-muted-foreground">
+                                Manage your notifications
+                            </p>
+                        </div>
+                    </div>
+
+                    <Button variant="outline">
+                        <Settings2 />
+                        Preferences
+                    </Button>
                 </div>
-
-                <Button variant="outline">
-                    <Settings2 />
-                    Preferences
-                </Button>
             </div>
 
-            <Tabs defaultValue="unread" className="w-full">
-                <Card>
-                    <CardHeader>
-                        <div className="flex items-center justify-between border-b">
-                            <TabsList variant="line">
+            <div className='bg-background h-full p-2 sm:p-4 md:p-6 lg:p-8'>
+                <Tabs value={value} onValueChange={(setValue)} className="w-full max-w-5xl mx-auto">
+                    <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                            <TabsList variant="default">
                                 <TabsTrigger value="unread">
                                     Unread
                                 </TabsTrigger>
@@ -89,38 +90,40 @@ function NotificationsPage() {
                                 <TabsTrigger value="read">
                                     Read
                                 </TabsTrigger>
-
-                                <TabsTrigger value="all">
-                                    All
-                                </TabsTrigger>
                             </TabsList>
 
-                            <div className="flex gap-2">
+                            {/* <span className='text-sm'>{results.length} notifications</span> */}
+                        </div>
+
+                        <div className="flex gap-2">
+                            {!isMobile && (
                                 <SelectItemsPerPage
                                     itemsPerPage={itemsPerPage}
                                     setItemsPerPage={setItemsPerPage}
-
+                                    size='sm'
                                 />
+                            )}
 
-                                <Button size="sm" variant="outline">
-                                    <CheckCheck />
-                                    Mark all as read
-                                </Button>
+                            <Button size="sm" variant="outline" onClick={() => toggleAllMutation.mutate()}>
+                                <CheckCheck />
+                                Mark all as read
+                            </Button>
 
-                                <Button size="sm" variant="outline">
-                                    <RotateCw />
-                                </Button>
-                            </div>
-
+                            <Button size="icon-sm" variant="outline" onClick={refetchNotifications}>
+                                <RotateCw />
+                            </Button>
                         </div>
-                    </CardHeader>
+                    </div>
 
-                    <ScrollArea className='px-4 h-100 bg-secondary border-y'>
-                        <TabsContent value="unread" className='space-y-1 py-4'>
-                            {unread?.map((notification) =>
+                    <ScrollArea className='h-100 border-y bg-background'>
+                        <fieldset disabled={isLoading} className={cn(
+                            "space-y-2 py-4",
+                            isLoading ? 'pointer-events-none' : 'pointer-events-auto'
+                        )}>
+                            {results?.map((notification) =>
                                 <NotificationItem key={notification.id} notification={notification} />
                             )}
-                            {unread.length === 0 && (
+                            {results.length === 0 && (
                                 <div className="flex flex-col items-center justify-center text-center py-12 px-4 animate-in fade-in-50 duration-300">
                                     <div className="flex h-12 w-12 items-center justify-center rounded-full bg-muted">
                                         <BellOff className="h-6 w-6 text-muted-foreground" />
@@ -131,54 +134,18 @@ function NotificationsPage() {
                                     </p>
                                 </div>
                             )}
-                        </TabsContent>
-
-                        <TabsContent value="read" className='space-y-1 py-4'>
-                            {read?.map((notification) =>
-                                <NotificationItem key={notification.id} notification={notification} />
-                            )}
-                            {read.length === 0 && (
-                                <div className="flex flex-col items-center justify-center text-center py-12 px-4 animate-in fade-in-50 duration-300">
-                                    <div className="flex h-12 w-12 items-center justify-center rounded-full bg-muted">
-                                        <BellOff className="h-6 w-6 text-muted-foreground" />
-                                    </div>
-                                    <h3 className="mt-4 text-sm font-semibold tracking-tight">No notifications</h3>
-                                    <p className="mt-1 text-xs text-muted-foreground">
-                                        You're all caught up! You don't have any notifications right now.
-                                    </p>
-                                </div>
-                            )}
-                        </TabsContent>
-
-                        <TabsContent value="all" className='space-y-1 py-4'>
-                            {results?.map((notification) =>
-                                <NotificationItem key={notification.id} notification={notification} />
-                            )}
-                            {results.length === 0 && (
-                                <div className="flex flex-col items-center justify-center text-center py-12 px-4 animate-in fade-in-50 duration-300">
-                                    <div className="flex h-12 w-12 items-center justify-center rounded-full bg-muted">
-                                        <BellOff className="h-6 w-6 text-muted-foreground" />
-                                    </div>
-                                    <h3 className="mt-4 text-sm font-semibold tracking-tight">No notifications</h3>
-                                    <p className="mt-1 text-xs text-muted-foreground">
-                                        You're all caught up! You don't have any notifications right now.
-                                    </p>
-                                </div>
-                            )}
-                        </TabsContent>
+                        </fieldset>
                     </ScrollArea>
 
-                    <CardFooter>
-                        {!isLoading && (
-                            <PaginationController
-                                page={page}
-                                onPageChange={setPage}
-                                totalPages={data.notifications.meta.total_pages}
-                            />
-                        )}
-                    </CardFooter>
-                </Card>
-            </Tabs>
+                    {!isLoading && (
+                        <PaginationController
+                            page={page}
+                            onPageChange={setPage}
+                            totalPages={data.notifications.meta.total_pages}
+                        />
+                    )}
+                </Tabs>
+            </div>
         </div>
     )
 }
@@ -292,9 +259,15 @@ type SelectItemsPerPageProps = {
     itemsPerPage: number
     setItemsPerPage: (n: number) => void
     options?: number[]
-}
+    size?: "sm" | "default"
+} & HTMLAttributes<HTMLSelectElement>
 
-export function SelectItemsPerPage({ setItemsPerPage, itemsPerPage, options = [5, 10, 20] }: SelectItemsPerPageProps) {
+export function SelectItemsPerPage({
+    setItemsPerPage,
+    itemsPerPage,
+    options = [5, 10, 20],
+    size = 'default'
+}: SelectItemsPerPageProps) {
     return (
         <Field orientation="horizontal" className="w-fit">
             <FieldLabel htmlFor="select-rows-per-page">Items per page</FieldLabel>
@@ -304,17 +277,18 @@ export function SelectItemsPerPage({ setItemsPerPage, itemsPerPage, options = [5
                     setItemsPerPage(limit)
                 }
             }}>
-                <SelectTrigger className="w-20" id="select-rows-per-page">
+                <SelectTrigger size={size} className="w-18" id="select-rows-per-page">
                     <SelectValue />
                 </SelectTrigger>
                 <SelectContent align="start">
                     <SelectGroup>
-                    {options.map(item => (
-                        <SelectItem key={item} value={`${item}`}>{item}</SelectItem>
-                    ))}
+                        {options.map(item => (
+                            <SelectItem key={item} value={`${item}`}>{item}</SelectItem>
+                        ))}
                     </SelectGroup>
                 </SelectContent>
             </Select>
         </Field>
     )
 }
+
