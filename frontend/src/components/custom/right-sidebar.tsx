@@ -1,35 +1,27 @@
-import { RightSidebarTrigger, Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem, } from "@/components/ui/sidebar"
+import { RightSidebarTrigger, Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem, } from "@/components/ui/sidebar"
 import { useRightSidebar } from "@/contexts/RightSidebarContext"
-import { LayoutDashboard, Plus } from "lucide-react"
+import { cn } from "@/lib/utils"
+import { Plus } from "lucide-react"
 import React from 'react'
 
-type Props = {}
-
-function RightSidebar({ }: Props) {
-    const { content } = useRightSidebar()
+function RightSidebar() {
+    const { content, collapsible = 'icon', showTriggerButton = true } = useRightSidebar()
 
     return (
-        <Sidebar collapsible="icon" side='right'>
-            <SidebarHeader className="border-sidebar-border mt-14">
-                <SidebarMenu>
-                    <SidebarMenuItem>
-                        <RightSidebarTrigger />
-                    </SidebarMenuItem>
-                </SidebarMenu>
+        <Sidebar collapsible={collapsible} side='right'>
+            <SidebarHeader className={cn(
+                "border-sidebar-border",
+                showTriggerButton ? "mt-14" : "mt-10"
+            )}>
+                {showTriggerButton && (
+                    <SidebarMenu>
+                        <SidebarMenuItem>
+                            <RightSidebarTrigger />
+                        </SidebarMenuItem>
+                    </SidebarMenu>
+                )}
             </SidebarHeader>
-            <SidebarContent>
-                {content}
-            </SidebarContent>
-            <SidebarFooter>
-                <SidebarMenu>
-                    <SidebarMenuItem>
-                        <SidebarMenuButton>
-                            <Plus />
-                            <span>New Calendar</span>
-                        </SidebarMenuButton>
-                    </SidebarMenuItem>
-                </SidebarMenu>
-            </SidebarFooter>
+            {content}
         </Sidebar>
     )
 }

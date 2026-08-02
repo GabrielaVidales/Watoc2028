@@ -12,6 +12,8 @@ DEBUG = os.getenv("DEBUG", "False") == "True"
 SECRET_KEY = os.getenv("SECRET_KEY")
 
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+# Esto es para que reconozca las apps dentro de /apps/[projects]
 sys.path.insert(0, os.path.join(BASE_DIR, "apps"))
 
 ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS").split(",")

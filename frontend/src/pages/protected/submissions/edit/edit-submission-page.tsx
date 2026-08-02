@@ -13,13 +13,14 @@ import { useScrollSpy } from '@/hooks/useScrollSpy'
 import { cn, } from '@/lib/utils'
 import { routes } from '@/routes/routes'
 import { useQuery } from '@tanstack/react-query'
-import { CheckIcon, Info, LoaderCircleIcon, LucideFileEdit, MailOpen, MessageSquareCode, RotateCw, ScanText, School, UserPlus } from 'lucide-react'
+import { CheckIcon, ChevronLeft, Info, LoaderCircleIcon, LucideFileEdit, MailOpen, MessageSquareCode, PanelRight, PanelRightIcon, Plus, RotateCw, ScanText, School, UserPlus } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
-import { useNavigate, useParams } from 'react-router'
-import BeforeSubmitPage from '../../BeforeSubmitPage'
+import { Link, useNavigate, useParams } from 'react-router'
 import { formatDate } from '@/utils/formatDate'
 import AbstractPreviewData from './abstract-preview-data'
 import { Separator } from '@/components/ui/separator'
+import { useRightSidebar } from '@/contexts/RightSidebarContext'
+import { RightSidebarTrigger, SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarRail } from '@/components/ui/sidebar'
 
 
 function EditAbstractPage() {
@@ -67,7 +68,7 @@ function EditAbstractPage() {
             setCurrState(prev => prev + 1)
         }
     }
-    
+
     const previousStep = () => {
         console.log('Puta madre');
 
@@ -109,6 +110,124 @@ function EditAbstractPage() {
         setCurrState(getActiveId)
     }, [activeId])
 
+
+    const {
+        setRightSidebarContent,
+        clearRightSidebarContent,
+        setDefaultOpen,
+        setCollapsible,
+        setShowTriggerButton,
+    } = useRightSidebar()
+
+    useEffect(() => {
+        if (!data) {
+            return
+        }
+
+        setShowTriggerButton(false)
+        setCollapsible('icon')
+        setDefaultOpen(true)
+        setRightSidebarContent(
+            <>
+                <SidebarContent>
+                    <SidebarGroup>
+                        <SidebarGroupLabel>
+                            MAIN
+                        </SidebarGroupLabel>
+
+                        <SidebarGroupContent>
+                            <CardHeader>
+                                <div>
+                                    <CardTitle>
+                                        Status
+                                    </CardTitle>
+                                    <CardDescription>
+                                        Your submission status
+                                    </CardDescription>
+                                </div>
+                                <CardAction>
+                                    <div className='cursor-pointer flex flex-col justify-center items-center gap-1 h-14 bg-primary-main hover:bg-primary-light text-primary-contrast py-[1.5] px-3 rounded-lg'>
+                                        <MailOpen />
+                                        <span className='text-xs'>
+                                            {data.status.toUpperCase()}
+                                        </span>
+                                    </div>
+                                </CardAction>
+                            </CardHeader>
+                            <CardContent>
+                                <Stepper
+                                    onValueChange={onStepperChange}
+                                    value={currStep}
+                                    defaultValue={2}
+                                    className="h-full w-full py-6"
+                                    orientation="vertical"
+                                    indicators={{
+                                        completed: (
+                                            <CheckIcon className="size-3.5" />
+                                        ),
+                                        loading: (
+                                            <LoaderCircleIcon className="size-3.5 animate-spin" />
+                                        ),
+                                    }}
+                                >
+                                    <StepperNav>
+                                        {steps.map((step, index) => (
+                                            <StepperItem
+                                                key={index}
+                                                step={index + 1}
+                                                className="relative items-start not-last:flex-1"
+                                            >
+                                                <StepperTrigger className="items-start gap-2.5 pb-8 last:pb-0">
+                                                    <StepperIndicator>
+                                                        {index + 1}
+                                                    </StepperIndicator>
+                                                    <div className="mt-0.5 text-left">
+                                                        <StepperTitle className='text-sm'>{step.title}</StepperTitle>
+                                                        <StepperDescription className='text-xs'>{step.label}</StepperDescription>
+                                                    </div>
+                                                </StepperTrigger>
+                                                {index < steps.length - 1 && (
+                                                    <StepperSeparator className="group-data-[state=completed]/step:bg-primary absolute inset-y-0 top-7 left-3 -order-1 m-0 -translate-x-1/2 group-data-[orientation=vertical]/stepper-nav:h-[calc(100%-2rem)]" />
+                                                )}
+                                            </StepperItem>
+                                        ))}
+                                    </StepperNav>
+                                </Stepper>
+                            </CardContent>
+                            <CardContent className="text-sm text-muted-foreground">
+                                Your abstract is currently in draft. Once you click "Submit", it will move to the <strong>Review Process</strong>.
+                            </CardContent>
+                            <CardFooter className="justify-end gap-2">
+                                <Button variant="outline" onClick={previousStep}>Decline</Button>
+                                <Button
+                                    onClick={nextStep}
+                                    disabled={activeId !== 'abstract-review'}
+                                >
+                                    Accept
+                                </Button>
+                            </CardFooter>
+                        </SidebarGroupContent>
+                        <SidebarRail />
+                    </SidebarGroup>
+                </SidebarContent>
+                <SidebarFooter>
+                    <SidebarMenu>
+                        <SidebarMenuItem>
+                            <SidebarMenuButton asChild>
+                                <RightSidebarTrigger>
+                                    <PanelRightIcon />
+                                    <span className="sr-only">Toggle Sidebar</span>
+                                </RightSidebarTrigger>
+                            </SidebarMenuButton>
+                        </SidebarMenuItem>
+                    </SidebarMenu>
+                </SidebarFooter>
+            </>
+        )
+
+        return () => clearRightSidebarContent()
+    }, [data, currStep, activeId])
+
     if (!data) {
         return (
             <div className='w-full h-full flex flex-col justify-center items-center'>
@@ -128,13 +247,12 @@ function EditAbstractPage() {
         <>
             <div className={cn(
                 "h-full grid",
-                isMobile ? "grid-cols-1" : "sticky top-0 lg:grid-cols-[1fr_400px] md:grid-cols-[1fr_300px] grid-cols-[1fr_260px]",
+                isMobile ? "grid-cols-1" : "sticky top-0 ",
             )}>
-
                 <main id='main-container' className='h-full w-full overflow-y-auto no-scrollbar bg-background' ref={parentRef}>
+                    <div className='bg-background space-y-4 p-8'>
 
-                    <div className='bg-background space-y-4 p-8 pb-4'>
-                        <div className='flex flex-col md:flex-row md:justify-between gap-5'>
+                        <div className='flex flex-row md:justify-between gap-5'>
                             <div className="flex items-start gap-3">
                                 <div className="flex size-12 shrink-0 items-center justify-center rounded-lg bg-primary-light/10 border-2 border-primary-main/20 text-primary">
                                     <LucideFileEdit className="text-primary-main stroke-2 size-8" />
@@ -149,13 +267,30 @@ function EditAbstractPage() {
                                     </p>
                                 </div>
                             </div>
+
+                            {isMobile && (
+                                <RightSidebarTrigger />
+                            )}
                         </div>
                     </div>
 
-                    <div className='sticky top-0 z-10 bg-background border-b-2 border-b-border space-y-0 px-8 py-4 tracking-wide'>
-                        <h3 className='font-medium'>Editing submission:</h3>
-                        <h4 className='text-xl leading-tight truncate' dangerouslySetInnerHTML={{ __html: data.title }}></h4>
-                        <p className='text-xs text-muted-foreground mt-2'>Last modification: {formatDate(data.last_update)}</p>
+
+                    <div className='sticky top-0 z-10 bg-background border-b-2 border-b-border space-y-4 px-8 py-4 tracking-wide'>
+                        <div className="flex items-center gap-3">
+                            <Button size='icon-xs' variant='outline'>
+                                <ChevronLeft />
+                            </Button>
+
+                            <Link to={routes.users.submissions.summary} className="text-sm text-muted-foreground">
+                                Return to Submissions
+                            </Link>
+                        </div>
+
+                        <div>
+                            <h3 className='font-medium'>Editing submission:</h3>
+                            <h4 className='text-xl leading-tight truncate' dangerouslySetInnerHTML={{ __html: data.title }}></h4>
+                            <p className='text-xs text-muted-foreground mt-2'>Last modification: {formatDate(data.last_update)}</p>
+                        </div>
                     </div>
 
                     <div className={cn("p-2 md:p-4 lg:p-6 bg-secondary space-y-4 md:space-y-8 lg:space-y-12 mb-8",)}>
@@ -229,12 +364,12 @@ function EditAbstractPage() {
                             </CardContent>
                         </Card>
 
-                                    <Separator/>
+                        <Separator />
                     </div>
                 </main>
 
 
-                {!isMobile && (
+                {!isMobile && false && (
                     <aside className=" w-full border-t lg:border-t-0 lg:border-l bg-background">
                         <div className="py-6 lg:sticky lg:top-0 lg:h-screen lg:overflow-y-auto lg:py-8">
                             <CardHeader>
@@ -310,7 +445,7 @@ function EditAbstractPage() {
                         </div>
                     </aside>
                 )}
-                
+
             </div>
         </>
     )

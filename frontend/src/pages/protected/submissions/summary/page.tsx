@@ -34,6 +34,7 @@ import { PaginationController, SelectItemsPerPage } from '../../notifications/no
 import { useDebounce } from 'use-debounce'
 import { Badge } from '@/components/ui/badge'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
+import AbstractPreviewData from '../edit/abstract-preview-data'
 
 
 function AbstractSubmissionPage() {
@@ -121,7 +122,7 @@ function AbstractSubmissionPage() {
     return (
         <div className='w-full h-full flex flex-col'>
             <div className='bg-background border-b-2 border-b-border space-y-4 p-8'>
-              
+
                 <div className='flex flex-col md:flex-row md:justify-between gap-5'>
                     <div className="flex items-start gap-3">
                         <div className="flex size-12 shrink-0 items-center justify-center rounded-lg bg-primary-light/10 border-2 border-primary-main/20 text-primary">
@@ -358,42 +359,49 @@ function AbstractSubmissionPage() {
                     onOpenChange={(open) => !open && setActiveAbstract(null)}
                 >
                     {activeAbstract && (
-                        <DialogContent className="sm:max-w-2xl">
+                        <DialogContent className="sm:max-w-3xl">
                             <DialogHeader>
                                 <div className="flex items-center justify-between">
-                                    <div>
-                                        <DialogTitle className='text-xl font-bold tracking-tight'>
-                                            Abstract Preview
-                                        </DialogTitle>
-                                        <DialogDescription className="text-xs mt-0.5">
-                                            Review your paper formatting and declarations before submission.
-                                        </DialogDescription>
-                                    </div>
-                                </div>
-                                <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between p-3.5 border rounded-xl bg-muted/50 shadow-sm">
-                                    <div className="flex items-center gap-3">
-                                        <div className="p-2 bg-primary/10 rounded-lg text-primary shrink-0">
-                                            <FileText size={18} className="stroke-2" />
-                                        </div>
+
+                                    <CardTitle className="flex gap-3 items-center">
+                                        <FileText className='text-primary-main' />
                                         <div>
-                                            <p className="text-xs font-semibold text-foreground">PDF Compilation Available</p>
-                                            <p className="text-[11px] text-muted-foreground">Download to verify layout rules.</p>
+                                            <DialogTitle className='text-xl font-semibold tracking-tight'>
+                                                Abstract Preview
+                                            </DialogTitle>
+                                            <DialogDescription className="text-xs mt-0.5 font-normal">
+                                                Review your paper formatting and declarations before submission.
+                                            </DialogDescription>
                                         </div>
-                                    </div>
-                                    <Button
-                                        variant="secondary"
-                                        size="sm"
-                                        className="gap-1.5 h-8 font-medium text-xs shadow-sm shrink-0 w-full sm:w-auto justify-center"
-                                        onClick={() => handlePreview(activeAbstract.id, activeAbstract.title)}
-                                        disabled={!activeAbstract?.id}
-                                    >
-                                        <Download size={13} /> Download PDF
-                                    </Button>
+                                    </CardTitle>
                                 </div>
                             </DialogHeader>
 
-                            <div className="-mx-4 no-scrollbar max-h-[50vh] overflow-y-auto px-6 bg-muted p-4 border rounded-lg">
-                                <PreviewAbstractDialog id={activeAbstract?.id} />
+                            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between p-2 border rounded-xl bg-muted/50 shadow-sm">
+                                <div className="flex items-center gap-3">
+                                    <div className="p-2 bg-primary/10 rounded-lg text-primary shrink-0">
+                                        <FileText size={18} className="stroke-2" />
+                                    </div>
+                                    <div>
+                                        <p className="text-xs font-semibold text-foreground">PDF Compilation Available</p>
+                                        <p className="text-[11px] text-muted-foreground">Download to verify layout rules.</p>
+                                    </div>
+                                </div>
+                                <Button
+                                    variant="secondary"
+                                    size="sm"
+                                    className="gap-1.5 h-8 font-medium text-xs shadow-sm shrink-0 justify-center"
+                                    onClick={() => handlePreview(activeAbstract.id, activeAbstract.title)}
+                                    disabled={!activeAbstract?.id}
+                                >
+                                    <Download size={13} /> Download PDF
+                                </Button>
+                            </div>
+
+                            <div className="no-scrollbar max-h-[50vh] overflow-y-auto bg-muted border rounded-lg">
+                                <div className='p-2 md:p-4'>
+                                    <AbstractPreviewData abstract={activeAbstract} />
+                                </div>
                             </div>
 
                             <DialogFooter>

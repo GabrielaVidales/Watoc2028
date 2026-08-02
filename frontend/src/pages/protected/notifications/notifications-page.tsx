@@ -1,17 +1,18 @@
 import api from '@/clients/api';
 import { Button } from '@/components/ui/button';
 import { Field, FieldLabel } from '@/components/ui/field';
-import { Pagination, PaginationContent, PaginationItem, PaginationNext, PaginationPrevious } from "@/components/ui/pagination";
+import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination";
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import type { NotificationResponse } from '@/domain/notifications';
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { BellOff, BellRing, CheckCheck, RotateCw, Settings2 } from 'lucide-react';
+import { BellOff, BellRing, CheckCheck, ChevronsLeftIcon, ChevronsRightIcon, HashIcon, RotateCw, Settings2 } from 'lucide-react';
 import { useState, type HTMLAttributes } from 'react';
 import NotificationItem from './notification-item-component';
 import { cn } from '@/lib/utils';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { InputGroupAddon, InputGroupText } from '@/components/ui/input-group';
 
 function NotificationsPage() {
     const isMobile = useIsMobile()
@@ -175,6 +176,22 @@ export function PaginationController({
     return (
         <Pagination>
             <PaginationContent>
+
+                <PaginationItem>
+                    <PaginationLink
+                        title="Go to first page"
+                        aria-label="Go to first page"
+                        className={cn("gap-1 px-2.5 sm:pl-2.5")}
+                        size="icon"
+                        onClick={e => {
+                            e.preventDefault()
+                            onPageChange(1)
+                        }}
+                    >
+                        <ChevronsLeftIcon />
+                    </PaginationLink>
+                </PaginationItem>
+
                 <PaginationItem>
                     <PaginationPrevious
                         href="#"
@@ -187,28 +204,15 @@ export function PaginationController({
                 </PaginationItem>
 
                 <PaginationItem>
-                    {previousPage ? (
-                        <button
-                            type="button"
-                            className="h-9 min-w-9 px-3 border rounded-md text-sm hover:bg-accent"
-                            onClick={() => onPageChange(previousPage)}
-                        >
-                            {previousPage}
-                        </button>
-                    ) : (
-                        <div className="h-9 min-w-9 bg-muted rounded-md border" />
-                    )}
-                </PaginationItem>
-
-                <PaginationItem>
                     <Select
                         value={String(page)}
                         onValueChange={(value) =>
                             onPageChange(Number(value))
                         }
                     >
-                        <SelectTrigger className="w-16 h-9">
-                            <SelectValue />
+                        <SelectTrigger size='sm'>
+                            <HashIcon className='text-transparent'/>
+                            <SelectValue /> / {totalPages}
                         </SelectTrigger>
 
                         <SelectContent>
@@ -225,20 +229,6 @@ export function PaginationController({
                 </PaginationItem>
 
                 <PaginationItem>
-                    {nextPage ? (
-                        <button
-                            type="button"
-                            className="h-9 min-w-9 px-3 border rounded-md text-sm hover:bg-accent"
-                            onClick={() => onPageChange(nextPage)}
-                        >
-                            {nextPage}
-                        </button>
-                    ) : (
-                        <div className="h-9 min-w-9 bg-muted rounded-md border" />
-                    )}
-                </PaginationItem>
-
-                <PaginationItem>
                     <PaginationNext
                         href="#"
                         onClick={e => {
@@ -247,6 +237,23 @@ export function PaginationController({
                                 onPageChange(page + 1)
                         }}
                     />
+                </PaginationItem>
+
+                <PaginationItem>
+                    <PaginationItem>
+                        <PaginationLink
+                            title="Go to last page"
+                            aria-label="Go to last page"
+                            className={cn("gap-1 px-2.5 sm:pl-2.5")}
+                            size="icon"
+                            onClick={e => {
+                                e.preventDefault()
+                                onPageChange(totalPages)
+                            }}
+                        >
+                            <ChevronsRightIcon />
+                        </PaginationLink>
+                    </PaginationItem>
                 </PaginationItem>
             </PaginationContent>
         </Pagination>

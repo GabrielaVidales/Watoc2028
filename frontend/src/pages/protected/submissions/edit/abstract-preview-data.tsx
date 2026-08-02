@@ -14,21 +14,15 @@ type AbstractPreviewDataProps = {
 
 function AbstractPreviewData({ abstract, }: AbstractPreviewDataProps) {
     return (
-        <div className="space-y-6 max-w-4xl">
-            <div className="space-y-3">
-                <Badge variant="secondary" className="text-sm uppercase font-medium">
-                    Preview
-                </Badge>
+        <div className="space-y-4 max-w-4xl">
+            <h4
+                className="text-lg md:text-2xl font-semibold leading-snug tracking-tight text-foreground"
+                dangerouslySetInnerHTML={{ __html: abstract.title }}
+            />
 
-                <h4
-                    className="text-xl md:text-2xl font-semibold leading-snug tracking-tight text-foreground"
-                    dangerouslySetInnerHTML={{ __html: abstract.title }}
-                />
+            <AuthorsPreview authors={(abstract.authors as any) as AuthorSchema[]} />
 
-                <AuthorsPreview authors={(abstract.authors as any) as AuthorSchema[]} />
-            </div>
-
-            <Separator />
+            <Separator className='mb-4' />
 
             <div className="space-y-3">
                 <div className="flex items-center gap-2 text-sm font-semibold uppercase tracking-wider text-primary-main">
@@ -36,32 +30,29 @@ function AbstractPreviewData({ abstract, }: AbstractPreviewDataProps) {
                     <span>Content</span>
                 </div>
 
-                <ScrollArea className='h-50'>
+                <ScrollArea className='h-60 pr-2'>
                     <div
-                        className="prose prose-sm dark:prose-invert max-w-none text-foreground/90 leading-relaxed"
+                        className="text-xs sm:text-sm prose prose-sm dark:prose-invert max-w-none text-foreground/90 leading-relaxed"
                         dangerouslySetInnerHTML={{ __html: abstract.text }}
                     />
                 </ScrollArea>
             </div>
 
-            {abstract.references && (
-                <>
-                    <Separator />
-                    <div className="space-y-3">
-                        <div className="flex items-center gap-2 text-sm font-semibold uppercase tracking-wider text-primary-main">
-                            <Quote className="size-4" />
-                            <span>References</span>
-                        </div>
+            <Separator className='mb-4' />
 
-                        <ScrollArea className='h-40'>
-                            <div
-                                className="text-sm prose prose-xs dark:prose-invert max-w-none text-foreground/90 leading-relaxed"
-                                dangerouslySetInnerHTML={{ __html: abstract.references }}
-                            />
-                        </ScrollArea>
-                    </div>
-                </>
-            )}
+            <div className="space-y-3">
+                <div className="flex items-center gap-2 text-sm font-semibold uppercase tracking-wider text-primary-main">
+                    <Quote className="size-4" />
+                    <span>References</span>
+                </div>
+
+                <ScrollArea className='h-50'>
+                    <div
+                        className="text-xs sm:text-sm prose-p:mb-1 dark:prose-invert max-w-none text-foreground/90 leading-relaxed"
+                        dangerouslySetInnerHTML={{ __html: abstract.references }}
+                    />
+                </ScrollArea>
+            </div>
         </div>
     )
 }
@@ -124,7 +115,7 @@ function AuthorsPreview({ authors }: AuthorsPreviewProps) {
 
     const renderAffiliations = affiliations.map((aff, idx) => (
         <p key={aff.id} className="italic leading-tight">
-            <sup className="text-[10px] font-bold mr-1 not-italic">{idx + 1}</sup>
+            <sup className="text-[8px] sm:text-xs font-bold mr-1 not-italic">{idx + 1}</sup>
             {[aff.institution, aff.city, parseCountry(aff.country)]
                 .filter(Boolean)
                 .join(", ")}
@@ -132,7 +123,7 @@ function AuthorsPreview({ authors }: AuthorsPreviewProps) {
     ))
 
     return (
-        <div className='text-sm'>
+        <div className='text-xs sm:text-sm'>
             <div className="leading-relaxed">
                 {authorsLine}
             </div>

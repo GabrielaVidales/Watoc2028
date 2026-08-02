@@ -184,7 +184,7 @@ function DashboardLayoutContent() {
     )
 
 
-    if (!content) {
+    if (content) {
         return (
             <SidebarProvider id='sidebar-provider'>
                 <AppSidebar />

@@ -1,6 +1,6 @@
 import * as React from 'react';
-import { useAuth } from './AuthContext';
-import LoadingPage from './LoadingPage';
+import { useAuth } from '../AuthContext';
+import LoadingPage from '../LoadingPage';
 import { Navigate, Outlet } from 'react-router-dom';
 import type { UserRole } from '@/schemas/user-schemas';
 import { routes } from '@/routes/routes';

@@ -1,6 +1,10 @@
 import React, { createContext, useContext, useState, type ReactNode } from 'react'
 
 interface RightSidebarContextType {
+    showTriggerButton: boolean
+    setShowTriggerButton: (b: boolean) => void
+    collapsible: "icon" | "none" | "offcanvas"
+    setCollapsible: (value: "icon" | "none" | "offcanvas") => void
     defaultOpen: boolean
     setDefaultOpen: (b: boolean) => void
     width: string
@@ -14,11 +18,10 @@ const RightSidebarContext = createContext<RightSidebarContextType | undefined>(u
 
 export function RightSidebarProvider({ children }: { children: ReactNode }) {
     const [defaultOpen, setDefaultOpen] = useState(false)
-
+    const [showTriggerButton, setShowTriggerButton] = useState(false)
+    const [collapsible, setCollapsible] = useState<"icon" | "none" | "offcanvas">('icon')
     const [content, setContent] = useState<ReactNode | null>(null)
-
     const [width, setWidth] = useState<string>('20rem')
-
 
     const setRightSidebarContent = (newContent: ReactNode | null) => {
         setContent(newContent)
@@ -31,6 +34,10 @@ export function RightSidebarProvider({ children }: { children: ReactNode }) {
     return (
         <RightSidebarContext.Provider
             value={{
+                showTriggerButton,
+                setShowTriggerButton,
+                collapsible,
+                setCollapsible,
                 defaultOpen,
                 setDefaultOpen,
                 width,

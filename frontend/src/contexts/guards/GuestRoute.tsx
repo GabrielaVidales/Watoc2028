@@ -1,6 +1,6 @@
 import { Navigate, Outlet } from "react-router";
-import { useAuth } from "./AuthContext";
-import LoadingPage from "./LoadingPage";
+import { useAuth } from "../AuthContext";
+import LoadingPage from "../LoadingPage";
 
 export type GuestRouteProps = {
     redirectTo?: string
