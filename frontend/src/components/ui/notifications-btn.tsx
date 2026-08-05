@@ -1,18 +1,15 @@
 import api from "@/clients/api"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger, } from "@/components/ui/dropdown-menu"
 import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle, } from "@/components/ui/empty"
 import { Popover, PopoverContent, PopoverTrigger, } from "@/components/ui/popover"
 import type { NotificationResponse } from "@/domain/notifications"
 import { cn } from "@/lib/utils"
+import NotificationItem from "@/pages/protected/notifications/notification-item-component"
 import { routes } from "@/routes/routes"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
-import { ArrowRight, Bell, BellOff, CheckCheck, MessageCircleCheck, MessageCircleReply, MoreHorizontal, RotateCw, Settings, Trash2 } from "lucide-react"
-import { Fragment } from "react"
+import { ArrowRight, Bell, BellOff, CheckCheck, RotateCw } from "lucide-react"
 import { Link, useNavigate } from "react-router"
 import { ScrollArea } from "./scroll-area"
-import NotificationItem from "@/pages/protected/notifications/notification-item-component"
 
 
 export function NotificationsBell() {
@@ -24,7 +21,6 @@ export function NotificationsBell() {
         queryKey: ['notifications'],
         queryFn: async () => {
             const { data } = await api.get(`/notifications/user/`);
-            console.log(data);
             return data
         },
     })
@@ -93,7 +89,7 @@ export function NotificationsBell() {
                     )}
                 </Button>
             </PopoverTrigger>
-            <PopoverContent align="end" className="max-w-xs sm:max-w-sm md:max-w-md w-full md:w-100 max-sm:px-1">
+            <PopoverContent align="end" className="bg-secondary max-w-xs sm:max-w-sm md:max-w-md w-full md:w-100 max-sm:px-1">
                 <section className="flex flex-col sm:flex-row gap-2 items-center justify-between border-b px-0 pb-3">
                     <div>
                         <h4 className="font-semibold">Notifications</h4>

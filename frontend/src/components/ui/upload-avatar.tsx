@@ -1,16 +1,7 @@
-import {
-    formatBytes,
-    useFileUpload,
-    type FileWithPreview,
-} from "@/hooks/use-file-upload"
-import {
-    Alert,
-    AlertDescription,
-    AlertTitle,
-} from "@/components/ui/alert"
-
-import { cn } from "@/lib/utils"
+import { Alert, AlertDescription, AlertTitle, } from "@/components/ui/alert"
 import { Button } from "@/components/ui/button"
+import { formatBytes, useFileUpload, type FileWithPreview, } from "@/hooks/use-file-upload"
+import { cn } from "@/lib/utils"
 import { CircleAlertIcon, UserIcon, XIcon } from 'lucide-react'
 
 interface AvatarUploadProps {
@@ -18,7 +9,7 @@ interface AvatarUploadProps {
     className?: string
     onFileChange?: (file: FileWithPreview | null) => void
     defaultAvatar?: string
-    accept?:string
+    accept?: string
 }
 
 export function AvatarUpload({

@@ -2,12 +2,13 @@ type Status = "pending" | "accepted" | "declined" | "completed" | "cancelled"
 
 type ReviewAssignment = {
     id: number
-    status: Status
-    last_update: number
-    created_at: number
+    last_update_timestamp: number
+    created_at_timestamp: number
+    due_date_timestamp: number
     user: UserDetail
     abstract: AbstractDetail
     assigned_by: UserDetail
+    is_active: boolean
 }
 
 
@@ -32,7 +33,6 @@ interface AbstractDetail {
 
 
 export type {
-    ReviewAssignment,
-    AbstractDetail,
-    UserDetail
+    AbstractDetail, ReviewAssignment, UserDetail
 }
+

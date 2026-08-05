@@ -2,6 +2,7 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models
 from .managers import CustomUserManager
 from .text_choices import Nationality, PrefixType
+import os
 
 
 class User(AbstractUser):
@@ -35,7 +36,10 @@ class User(AbstractUser):
 
     @property
     def full_name(self):
-        return f"{self.first_name} {self.last_name}".strip() or self.email
+        middle_initial = f"{self.middle_name.strip()[0].upper()}." if self.middle_name and self.middle_name.strip() else ""
+        parts = [self.first_name, middle_initial, self.last_name]
+        full_name = " ".join(p.strip() for p in parts if p and p.strip())
+        return full_name
 
     @property
     def roles(self):

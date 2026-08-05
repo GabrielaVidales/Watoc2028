@@ -1,24 +1,23 @@
 import api from '@/clients/api'
-import { Filters, type Filter, type FilterFieldConfig, type FilterOperator } from '@/components/reui/filters'
+import { CustomUserFilter } from '@/components/custom/custom-filter'
+import { type Filter } from '@/components/reui/filters'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import type { UserSchema } from '@/schemas/user-schemas'
-import { CalendarIcon, CheckCircle2, FunnelXIcon, FilterIcon, IdCard, Mail, Search, ShieldCheck, X, MoreHorizontal, Plus, Circle, ListFilter, UserSquare, Users, UserCheck, UserRound, ClipboardCheck } from 'lucide-react'
-import React, { useCallback, useEffect, useMemo, useState } from 'react'
-import { format, } from "date-fns"
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { Calendar } from '@/components/ui/calendar'
 import { Card, CardAction, CardContent, CardDescription, CardHeader, CardTitle, } from "@/components/ui/card"
-import { useQuery } from '@tanstack/react-query'
-import { cn } from '@/lib/utils'
-import { Badge } from '@/components/ui/badge'
-import { formatDate } from '@/utils/formatDate'
-import { motion, AnimatePresence } from "motion/react"
-import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area'
-import { useDebounce } from 'use-debounce'
 import { InputGroup, InputGroupAddon, InputGroupInput } from '@/components/ui/input-group'
-import type { PaginatedResponse } from '@/domain/pagination'
-import { CustomFilter } from '@/components/custom/custom-filter'
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
+import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area'
+import { cn } from '@/lib/utils'
+import type { UserSchema } from '@/schemas/user-schemas'
+import { formatDate } from '@/utils/formatDate'
+import { useQuery } from '@tanstack/react-query'
+import { format, } from "date-fns"
+import { ClipboardCheck, FunnelXIcon, ListFilter, MoreHorizontal, Plus, Search, ShieldCheck, UserCheck, UserRound, UserSquare, Users, X } from 'lucide-react'
+import { AnimatePresence, motion } from "motion/react"
+import { useEffect, useState } from 'react'
+import { useDebounce } from 'use-debounce'
 
 
 function ManageReviewsPage() {
@@ -142,8 +141,8 @@ function ManageReviewsPage() {
                 </ScrollArea>
             </div>
 
-            <section className='flex-1 h-full'>
-                <div className='space-y-4 bg-card py-4 px-8 h-full'>
+            <section className='flex-1 h-full bg-secondary'>
+                <div className='space-y-4 py-4 px-8 h-full'>
                     <div className='flex justify-between'>
                         <div className="flex items-center gap-4">
                             <div>
@@ -205,7 +204,7 @@ function ManageReviewsPage() {
                                             </Button>
                                         </div>
                                         <div className="grid gap-2">
-                                            <CustomFilter
+                                            <CustomUserFilter
                                                 filters={filters}
                                                 setFilters={setFilters}
                                             />
@@ -322,6 +321,17 @@ export function filtersToQuery(filters: Filter[]) {
 export function filterToQuery(filter: Filter) {
     const mappedOperator = DJANGO_OPERATOR_MAP[filter.operator]
     return `${filter.field}${mappedOperator && '__'}${mappedOperator}=${filter.values.join(',')}`
+}
+
+export function filtersToQueryParams(filters: Filter[]) {
+    const queryParams = filters.reduce((lastValue, item) => {
+        const operator = DJANGO_OPERATOR_MAP[item.operator]
+        const fieldKey = `${item.field}${operator && '__'}${operator}`
+
+        lastValue[fieldKey] = item.values.join(',')
+        return lastValue
+    }, {})
+    return queryParams
 }
 
 

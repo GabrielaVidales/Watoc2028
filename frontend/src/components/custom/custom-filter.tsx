@@ -1,11 +1,11 @@
-import { useMemo, useRef } from "react"
-import { Filters, type Filter, type FilterFieldConfig, type FilterOperator, type FilterOption, } from "@/components/reui/filters"
-import { CalendarIcon, CheckCircle2, Circle, FilterIcon, IdCard, Mail, ShieldCheck, UsersIcon } from 'lucide-react'
-import { CustomDateInput } from "@/pages/protected/administration/manage-reviews/manage-reviews"
-import { Button } from "../ui/button"
-import type { UserSchema } from "@/schemas/user-schemas"
-import type { PaginatedResponse } from "@/domain/pagination"
 import api from "@/clients/api"
+import { Filters, type Filter, type FilterFieldConfig, type FilterOperator, type FilterOption, } from "@/components/reui/filters"
+import type { PaginatedResponse } from "@/domain/pagination"
+import { CustomDateInput } from "@/pages/protected/administration/manage-reviews/manage-reviews"
+import type { UserSchema } from "@/schemas/user-schemas"
+import { CalendarIcon, CheckCircle2, Circle, FilterIcon, IdCard, Mail, ShieldCheck, UsersIcon } from 'lucide-react'
+import { useMemo, useRef } from "react"
+import { Button } from "../ui/button"
 
 
 type CustomFilterProps = {
@@ -13,7 +13,7 @@ type CustomFilterProps = {
     setFilters?: (filters: Filter[]) => void
 }
 
-export function CustomFilter({
+export function CustomUserFilter({
     filters = [],
     setFilters = () => { },
 }: CustomFilterProps) {

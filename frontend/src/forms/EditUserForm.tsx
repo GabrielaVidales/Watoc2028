@@ -2,20 +2,21 @@ import api from '@/clients/api'
 import { InfoAlert } from '@/components/InfoAlert'
 import { Button } from '@/components/ui/button'
 import { CardTitle } from '@/components/ui/card'
-import { Field, FieldContent, FieldDescription, FieldError, FieldLabel, FieldTitle } from '@/components/ui/field'
+import { Field, FieldContent, FieldDescription, FieldError, FieldLabel } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Separator } from '@/components/ui/separator'
 import { Spinner } from '@/components/ui/spinner'
 import { AvatarUpload } from '@/components/ui/upload-avatar'
 import { useAuth } from '@/contexts/AuthContext'
+import { userPrefixes } from '@/domain/constants'
 import { useProfiles } from '@/hooks/use-profiles'
-import { editUserFormSchema, prefixes, type EditUserFormValues } from '@/schemas/user-schemas'
+import { editUserFormSchema, type EditUserFormValues } from '@/schemas/user-schemas'
 import { countries } from '@/utils/countriesInfo'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { isAxiosError } from 'axios'
-import { Building2, IdCard, Mail, Save, SquareUserRound, TextQuote } from 'lucide-react'
-import React, { useEffect } from 'react'
+import { Building2, IdCard, Mail, Save, SquareUserRound } from 'lucide-react'
+import { useEffect } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 
 type P = {
@@ -136,7 +137,7 @@ function EditUserForm({ defaultValues }: P) {
                                         <SelectValue placeholder="Choose..." />
                                     </SelectTrigger>
                                     <SelectContent position="item-aligned">
-                                        {prefixes.map(p => (
+                                        {userPrefixes.map(p => (
                                             <SelectItem value={p.value} key={p.value}>{p.label}</SelectItem>
                                         ))}
                                     </SelectContent>
@@ -328,7 +329,7 @@ function EditUserForm({ defaultValues }: P) {
                         control={control}
                         render={({ field, fieldState }) => (
                             <Field data-invalid={fieldState.invalid}>
-                                <FieldLabel htmlFor={field.name}>New Email <address></address></FieldLabel>
+                                <FieldLabel htmlFor={field.name}>New Email Address</FieldLabel>
                                 <Input
                                     {...field}
                                     id={field.name}

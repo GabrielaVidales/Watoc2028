@@ -1,28 +1,6 @@
-import { countries } from "@/utils/countriesInfo";
+import { countryCodes, userPrefixes, userRoles } from "@/domain/constants";
 import z from "zod";
 import { abstractSchema } from "./abstracts/abstract-schemas";
-
-
-const countriesArray = countries.map(country => country.value)
-
-export const prefixes = [
-    { value: "Miss", label: "Miss" },
-    { value: "Ms.", label: "Ms." },
-    { value: "Mrs.", label: "Mrs." },
-    { value: "Mr.", label: "Mr." },
-    { value: "Dr.", label: "Dr." },
-    { value: "Prof.", label: "Prof." },
-    { value: "Mx.", label: "Mx." },
-] as const;
-
-export const UserRole = {
-    Admin: 'admin',
-    Reviewer: 'reviewer',
-    Participant: 'participant',
-} as const;
-
-
-export type UserRole = (typeof UserRole)[keyof typeof UserRole];
 
 
 export const participantSchema = z.object({
@@ -64,24 +42,24 @@ export const userSchema = z.object({
         .max(100, "Input too long"),
     email: z.email('Please provide a valid email address')
         .max(100, 'Input too long'),
-
-    is_active: z.boolean()
-        .optional(),
     email_verified: z.boolean()
         .optional(),
-
-    prefix: z.enum(prefixes.map(p => p.value), 'Choose a valid option'),
+    is_active: z.boolean()
+        .optional(),
+    prefix: z.enum(userPrefixes.map(p => p.value), 'Choose a valid option'),
     pronouns: z.string().trim()
         .max(50, 'Too long')
         .optional(),
-    nationality: z.enum(countriesArray, 'Choose a valid option'),
+    nationality: z.enum(countryCodes, 'Choose a valid option'),
     city: z.string().trim()
         .min(1, "Please enter your city")
         .max(30, 'Input too long'),
     photo: z.union([z.instanceof(File), z.string()])
         .nullable()
         .optional(),
-    roles: z.array(z.enum(UserRole)),
+    photo_filename: z.string()
+        .optional(),
+    roles: z.array(z.enum(userRoles.map(r => r.value))),
     date_joined: z.coerce.date()
         .optional(),
     last_login: z.coerce.date()
@@ -99,77 +77,6 @@ export type ParticipantSchema = z.infer<typeof participantSchema>
 export type ReviewerSchema = z.infer<typeof reviewerSchema>
 
 
-// Formularios
-export const registrationSchema = userSchema
-    .extend(participantSchema.shape)
-    .omit({
-        id: true,
-        email: true,
-        photo: true,
-        roles: true,
-        abstracts: true,
-        full_name: true,
-        date_joined: true,
-        last_login: true,
-    })
-    .extend({
-        email: z.object({
-            value: z.email("Invalid email address")
-                .min(1, 'Field required *')
-                .max(100, 'Input too long'),
-            confirm: z.string()
-                .min(1, "You must confirm your email *")
-                .max(100, 'Input too long'),
-        })
-            .default({ value: '', confirm: '' })
-            .refine(data => data.value === data.confirm, {
-                error: 'Email does not match',
-                path: ['confirm']
-            }),
-
-        password: z.object({
-            value: z.string()
-                .min(8, "Minimum 8 characters")
-                .max(100, 'Input too long')
-                .regex(/[A-Z]/, "Must contain at least one uppercase letter")
-                .regex(/[a-z]/, "Must contain at least one lowercase letter")
-                .regex(/[0-9]/, "Must contain at least one digit")
-                .regex(/[^A-Za-z0-9]/, "Must contain one special character"),
-            confirm: z.string()
-                .min(1, "You must confirm your password *")
-                .max(100, 'Input too long')
-        })
-            .default({ value: '', confirm: '' })
-            .refine(data => data.value === data.confirm, {
-                error: "Passwords do not match",
-                path: ["confirm"]
-            }),
-    })
-    .transform(value => {
-        const { email, password, affiliation, job_title, field_of_study, ...rest } = value;
-        return {
-            ...rest,
-            email: email.value,
-            password: password.value,
-            participant: {
-                affiliation,
-                job_title,
-                field_of_study,
-            }
-        }
-    })
-
-
-export const loginSchema = z.object({
-    email: z.email('Please provide a valid email address')
-        .min(1, 'Email required')
-        .max(100, 'Input too long')
-        .default(''),
-    password: z.string()
-        .min(1, 'Password required')
-        .max(100, 'Input too long')
-        .default('')
-})
 
 
 export const profilePicSchema = z.object({
@@ -225,7 +132,7 @@ export const editUserFormSchema = userSchema
         full_name: true,
     })
 
-export type LoginFormValues = z.infer<typeof loginSchema>
-export type RegisterFormValues = z.infer<typeof registrationSchema>
+
+export type UserRole = 'admin' | 'reviewer' | 'participant';
 export type EditUserFormValues = z.infer<typeof editUserFormSchema>
 export type ChangePasswordFormValues = z.infer<typeof changePasswordSchema>

@@ -1,8 +1,3 @@
-import type React from "react"
-import { createContext, useCallback, useContext, useEffect, useId, useMemo, useRef, useState, } from "react"
-import { useRender } from "@base-ui/react/use-render"
-import { cva } from "class-variance-authority"
-import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { ButtonGroup, ButtonGroupText, } from "@/components/ui/button-group"
 import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuSub, DropdownMenuSubContent, DropdownMenuSubTrigger, DropdownMenuTrigger, } from "@/components/ui/dropdown-menu"
@@ -11,7 +6,12 @@ import { InputGroup, InputGroupAddon, InputGroupButton, InputGroupInput, InputGr
 import { Kbd } from "@/components/ui/kbd"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Tooltip, TooltipContent, TooltipTrigger, } from "@/components/ui/tooltip"
-import { AlertCircleIcon, XIcon, CheckIcon, PlusIcon, Search, FunnelXIcon, ChevronDown } from "lucide-react"
+import { cn } from "@/lib/utils"
+import { useRender } from "@base-ui/react/use-render"
+import { cva } from "class-variance-authority"
+import { AlertCircleIcon, CheckIcon, ChevronDown, PlusIcon, XIcon } from "lucide-react"
+import type React from "react"
+import { createContext, useCallback, useContext, useEffect, useId, useMemo, useRef, useState, } from "react"
 
 // i18n Configuration Interface
 export interface FilterI18nConfig {
@@ -1828,7 +1828,7 @@ export function Filters<T = unknown>({
     <FilterContext.Provider value={contextValue}>
       <div className={cn(filtersContainerVariants({ variant, size }), className)}>
 
-        <ScrollArea className="min-h-10 w-full rounded-md border bg-secondary">
+        <ScrollArea className="min-h-10 w-full">
           <div className="flex flex-wrap gap-2 p-2">
             {filters.map((filter) => {
               const field = fieldsMap[filter.field]

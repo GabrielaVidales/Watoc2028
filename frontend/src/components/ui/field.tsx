@@ -1,9 +1,9 @@
-import { useMemo } from "react"
 import { cva, type VariantProps } from "class-variance-authority"
+import { useMemo } from "react"
 
-import { cn } from "@/lib/utils"
 import { Label } from "@/components/ui/label"
 import { Separator } from "@/components/ui/separator"
+import { cn } from "@/lib/utils"
 import { AlertCircle } from "lucide-react"
 
 function FieldSet({ className, ...props }: React.ComponentProps<"fieldset">) {
@@ -187,8 +187,9 @@ function FieldError({
   className,
   children,
   errors,
+  size = 'sm',
   ...props
-}: React.ComponentProps<"div"> & {
+}: { size?: 'sm' | 'xs' } & React.ComponentProps<"div"> & {
   errors?: Array<{ message?: string } | undefined>
 }) {
   const content = useMemo(() => {
@@ -226,24 +227,20 @@ function FieldError({
     <div
       role="alert"
       data-slot="field-error"
-      className={cn("text-destructive text-sm font-normal flex gap-1 items-start", className)}
+      className={cn("text-destructive font-normal flex gap-1 items-start", size === 'sm' ? 'text-sm' : 'text-xs', className)}
       {...props}
     >
-      <AlertCircle className="size-4 mt-0.5 shrink-0"/>
+      <AlertCircle className={cn("shrink-0", size === 'sm' ? 'size-4 mt-0.5' : 'size-3.5')} />
       {content}
     </div>
   )
 }
 
 export {
-  Field,
-  FieldLabel,
-  FieldDescription,
+  Field, FieldContent, FieldDescription,
   FieldError,
-  FieldGroup,
-  FieldLegend,
+  FieldGroup, FieldLabel, FieldLegend,
   FieldSeparator,
-  FieldSet,
-  FieldContent,
-  FieldTitle,
+  FieldSet, FieldTitle
 }
+

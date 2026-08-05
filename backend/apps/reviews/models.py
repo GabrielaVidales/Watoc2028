@@ -60,6 +60,11 @@ class ReviewAssignment(models.Model):
     is_active = models.BooleanField(
         db_column="is_active",
     )
+    
+    def __str__(self):
+        title = self.abstract.get_plain_title()
+        truncated_title = (title[:32] + "...") if len(title) > 35 else title
+        return f'ReviewAssignment(abstract={truncated_title}, user={self.user.get_full_name()})'
 
 
 class Review(models.Model):

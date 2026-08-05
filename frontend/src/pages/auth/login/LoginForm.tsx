@@ -1,28 +1,31 @@
+import { InfoAlert } from '@/components/InfoAlert';
+import { Button } from '@/components/ui/button';
+import { Field, FieldError, FieldLabel } from '@/components/ui/field';
+import { InputGroup, InputGroupAddon, InputGroupButton, InputGroupInput } from '@/components/ui/input-group';
+import { Spinner } from '@/components/ui/spinner';
+import { cn } from '@/lib/utils';
+import { routes } from '@/routes/routes';
+import { loginSchema, type LoginFormValues } from '@/schemas/users/login-schema';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { isAxiosError } from 'axios';
+import { Eye, EyeOff, Lock, LogIn, Mail } from 'lucide-react';
+import { AnimatePresence, motion } from 'motion/react';
 import React from 'react';
-import { Controller, useForm } from 'react-hook-form'
-import { Mail, Lock, Eye, EyeOff, LogIn } from 'lucide-react';
+import { Controller, useForm } from 'react-hook-form';
 import { Link, useNavigate } from 'react-router';
 import { useAuth } from '../../../contexts/AuthContext';
-import { Field, FieldError, FieldLabel } from '@/components/ui/field';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { loginSchema, type LoginFormValues } from '@/schemas/user-schemas';
-import { InputGroup, InputGroupAddon, InputGroupButton, InputGroupInput } from '@/components/ui/input-group';
-import { Button } from '@/components/ui/button';
-import { Spinner } from '@/components/ui/spinner';
-import { isAxiosError } from 'axios';
-import { InfoAlert } from '@/components/InfoAlert';
-import { cn } from '@/lib/utils';
-import { AnimatePresence, motion } from 'motion/react';
-import { routes } from '@/routes/routes';
 
 export default function LoginForm() {
     const navigate = useNavigate()
     const { handleLogin } = useAuth()
 
-    const form = useForm({
+    const form = useForm<LoginFormValues>({
         resolver: zodResolver(loginSchema),
-        defaultValues: loginSchema.parse({}),
         mode: 'onChange',
+        defaultValues: {
+            email: '',
+            password: '',
+        },
     })
 
     const { isValid, isSubmitting, errors } = form.formState

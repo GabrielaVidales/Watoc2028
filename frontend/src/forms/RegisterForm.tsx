@@ -1,66 +1,64 @@
-import { Controller, useForm } from 'react-hook-form'
-import { useNavigate } from 'react-router'
-import { zodResolver } from '@hookform/resolvers/zod';
-import { prefixes, registrationSchema, type RegisterFormValues } from '@/schemas/user-schemas'
-import { countries } from '@/utils/countriesInfo'
-import { Field, FieldContent, FieldDescription, FieldError, FieldLabel, } from "@/components/ui/field"
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Eye, EyeOff, KeySquare, Lock, Send, User } from 'lucide-react';
-import PasswordStrengthMeter from '@/components/PasswordStrengthMeter';
 import api from '@/clients/api';
+import { notify } from '@/components/custom/notify';
+import PasswordStrengthMeter from '@/components/PasswordStrengthMeter';
+import { Button } from '@/components/ui/button';
+import { Field, FieldContent, FieldDescription, FieldError, FieldLabel, } from "@/components/ui/field";
+import { Input } from '@/components/ui/input';
 import { InputGroup, InputGroupAddon, InputGroupButton, InputGroupInput } from '@/components/ui/input-group';
-import { Spinner } from '@/components/ui/spinner';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Separator } from '@/components/ui/separator';
+import { Spinner } from '@/components/ui/spinner';
+import { userPrefixes } from '@/domain/constants';
 import { routes } from '@/routes/routes';
-import { AnimatePresence, motion } from 'motion/react';
-import { InfoAlert } from '@/components/InfoAlert';
+import { registrationSchema, type RegisterFormInputValues, type RegisterFormOutputValues } from '@/schemas/users/registration-schema';
+import { countries } from '@/utils/countriesInfo';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { isAxiosError } from 'axios';
-import { scrollToElement } from '@/lib/utils';
+import { Eye, EyeOff, KeyRoundIcon, KeySquare, Lock, LockOpenIcon, Send, UserSquare } from 'lucide-react';
 import { useMemo, useState } from 'react';
+import { Controller, useForm } from 'react-hook-form';
+import { useNavigate } from 'react-router';
 
-type TitleProps = {
-    icon: React.ElementType
-    title: string
-}
-
-const Title = ({ icon: Icon, title }: TitleProps) => {
-    return (
-        <div className='space-y-2'>
-            <div className='flex items-center gap-3'>
-                {Icon && (
-                    <div className="size-8 flex justify-center items-center shrink-0 rounded-full bg-primary-main">
-                        <Icon className='text-primary-contrast size-5' />
-                    </div>
-                )}
-                <div className='text-xl font-semibold w-full'>{title}</div>
-            </div>
-        </div>
-    )
-}
 
 export default function RegisterForm() {
     const navigate = useNavigate()
 
     const {
-        handleSubmit,
-        setError,
-        clearErrors,
-        trigger,
-        control,
-        formState: {
-            isValid,
-            isSubmitting,
-            errors,
+        handleSubmit, setError, clearErrors, trigger,
+        control, formState: {
+            isValid, isSubmitting,
+            errors, isDirty,
         }
-    } = useForm({
+    } = useForm<RegisterFormInputValues, any, RegisterFormOutputValues>({
         resolver: zodResolver(registrationSchema),
         mode: 'onChange',
+        defaultValues: {
+            password: {
+                value: 'Password123#',
+                confirm: 'Password123#',
+            },
+            nationality: 'MX',
+            city: 'asdsada',
+            email: {
+                confirm: 'asdasd@sadsa.sd',
+                value: 'asdasd@sadsa.sd',
+            },
+            affiliation: 'asdasd@sadsa.sd',
+            field_of_study: 'asdasd@sadsa.sd',
+            job_title: 'asdasd@sadsa.sd',
+            first_name: 'sadsads',
+            middle_name: 'adsads',
+            last_name: 'asdasd',
+            pronouns: 'asdas',
+        }
     })
 
     const onFormSubmit = handleSubmit(async (data) => {
         try {
+            if (import.meta.env.DEV) {
+                console.log(data);
+
+            }
             await api.post('/users/', data)
             navigate(routes.auth.login, {
                 replace: true,
@@ -76,40 +74,39 @@ export default function RegisterForm() {
         } catch (error) {
             if (isAxiosError(error)) {
                 if (import.meta.env.DEV) {
-                    console.log(error.response);
+                    console.log(errors);
                 }
-
                 const serverErrors = error.response.data
                 Object.keys(serverErrors).forEach((key) => {
-                    const fieldName = key as keyof RegisterFormValues
+                    const fieldName = key as keyof RegisterFormInputValues
                     const errorValue = serverErrors[fieldName]
-                    const schemaName =
-                        (fieldName === 'email') ? 'email.value' :
-                            (fieldName === 'password') ? 'password.value' : fieldName
+                    const schemaName = (fieldName === 'email') ?
+                        'email.value' : (fieldName === 'password') ?
+                            'password.value' : fieldName
                     setError(schemaName, {
                         type: "server",
                         message: errorValue
+                    }, {
+                        shouldFocus: true
                     })
-                })
-                setError('root', {
-                    message: 'Registration failed. Please check details and try again.',
-                    type: "custom",
+
+                    notify.destructive('Something went wrong!', {
+                        description: errorValue,
+                    })
                 })
 
             } else {
-                setError('root', {
-                    message: 'Connection failed. Please try again later.',
-                    type: "custom",
+                notify.destructive('Something went wrong!', {
+                    description: 'Connection failed. Please try again later.',
                 })
-                if (import.meta.env.DEV) {
-                    console.log(error);
-                }
             }
         }
     })
 
     const [showPassword, setShowPassword] = useState(false);
-    const toggleVisibility = () => setShowPassword((show) => !show);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+    const toggleVisibility = (f: typeof setShowPassword) => f((show) => !show);
+
 
     const countryItems = useMemo(() => countries.map(c => (
         <SelectItem value={c.value as string} key={c.value}>
@@ -123,36 +120,14 @@ export default function RegisterForm() {
 
     return (
         <form id='registration-form' onSubmit={onFormSubmit} onInput={() => clearErrors('root')}>
-            <AnimatePresence>
-                {errors.root && (
-                    <motion.div
-                        initial={{ opacity: 0, y: -10, height: 0 }}
-                        animate={{ opacity: 1, y: 0, height: 'auto' }}
-                        exit={{ opacity: 0, y: -10, height: 0 }}
-                        onAnimationComplete={() => {
-                            if (errors.root) {
-                                scrollToElement('registration-form', 175)
-                            }
-                        }}
-                        className="mb-4"
-                    >
-                        <InfoAlert
-                            variant='destructive'
-                            messages={[
-                                <span className='text-red-950'>
-                                    {errors.root.message}
-                                </span>
-                            ]}
-                            title='Server responded with an error:'
-                        />
-                    </motion.div>
-                )}
-            </AnimatePresence>
             <fieldset className='space-y-5' disabled={isSubmitting}>
                 <div className='flex flex-col gap-5'>
-                    <Title title='Personal Information' icon={User} />
+                    <div className="flex gap-3 items-center">
+                        <UserSquare className='text-primary-main' />
+                        <h2 className='text-xl font-semibold'>Personal Information</h2>
+                    </div>
 
-                    <div className='grid grid-cols-1 sm:grid-cols-3 gap-5 justify-start items-start'>
+                    <div className='grid grid-cols-1 sm:grid-cols-2 gap-5 justify-start items-start'>
                         <Controller
                             name="prefix"
                             control={control}
@@ -176,7 +151,7 @@ export default function RegisterForm() {
                                             <SelectValue placeholder="Choose..." />
                                         </SelectTrigger>
                                         <SelectContent position="item-aligned">
-                                            {prefixes.map(p => (
+                                            {userPrefixes.map(p => (
                                                 <SelectItem value={p.value} key={p.value}>{p.label}</SelectItem>
                                             ))}
                                         </SelectContent>
@@ -199,6 +174,26 @@ export default function RegisterForm() {
                                         id={field.name}
                                         aria-invalid={fieldState.invalid}
                                         placeholder="First name"
+                                        autoComplete="off"
+                                    />
+                                    {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                                </Field>
+                            )}
+                        />
+                        <Controller
+                            name="middle_name"
+                            control={control}
+                            defaultValue=''
+                            render={({ field, fieldState }) => (
+                                <Field data-invalid={fieldState.invalid}>
+                                    <FieldLabel htmlFor={field.name}>
+                                        Middle name
+                                    </FieldLabel>
+                                    <Input
+                                        {...field}
+                                        id={field.name}
+                                        aria-invalid={fieldState.invalid}
+                                        placeholder="Midle name"
                                         autoComplete="off"
                                     />
                                     {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
@@ -345,7 +340,10 @@ export default function RegisterForm() {
                 </div>
 
                 <div className='flex flex-col gap-5 py-5'>
-                    <Title title='Account details' icon={KeySquare} />
+                    <div className="flex gap-3 items-center">
+                        <KeySquare className='text-primary-main' />
+                        <h2 className='text-xl font-semibold'>Account details</h2>
+                    </div>
 
                     <div className='grid grid-cols-1 sm:grid-cols-1 gap-5'>
                         <Controller
@@ -360,7 +358,9 @@ export default function RegisterForm() {
                                     <Input
                                         {...field}
                                         id={field.name}
-                                        onInput={() => trigger('email.confirm')}
+                                        onInput={() => queueMicrotask(async () => {
+                                            await trigger('email.confirm')
+                                        })}
                                         aria-invalid={fieldState.invalid}
                                         autoComplete="off"
                                         type='email'
@@ -384,6 +384,9 @@ export default function RegisterForm() {
                                         {...field}
                                         id={field.name}
                                         aria-invalid={fieldState.invalid}
+                                        onInput={() => queueMicrotask(async () => {
+                                            await trigger('email.value')
+                                        })}
                                         autoComplete="off"
                                         placeholder="Re-type your email"
                                     />
@@ -395,34 +398,35 @@ export default function RegisterForm() {
 
                     <Separator />
 
-                    <div className='grid grid-cols-1 sm:grid-cols-1 gap-5'>
+                    <div className='grid grid-cols-1 sm:grid-cols-1 gap-1'>
                         <Controller
                             name="password.value"
                             control={control}
-                            defaultValue=''
                             render={({ field, fieldState }) => (
                                 <Field data-invalid={fieldState.invalid}>
-                                    <FieldLabel htmlFor={field.name}>
-                                        Password <div className="text-destructive">*</div>
-                                    </FieldLabel>
+                                    <FieldLabel htmlFor={field.name}>New password</FieldLabel>
                                     <InputGroup>
                                         <InputGroupInput
                                             {...field}
                                             id={field.name}
-                                            onInput={() => trigger('password.confirm')}
                                             aria-invalid={fieldState.invalid}
                                             autoComplete="off"
                                             type={showPassword ? 'text' : 'password'}
-                                            placeholder="**********"
+                                            placeholder="••••••••••••"
+                                            maxLength={65}
+                                            onChange={async (e) => {
+                                                field.onChange(e)
+                                                await trigger('password.confirm')
+                                            }}
                                         />
                                         <InputGroupAddon align="inline-start">
-                                            <Lock />
+                                            {!isDirty || fieldState.invalid ? <LockOpenIcon /> : <Lock className='text-primary-light' />}
                                         </InputGroupAddon>
                                         <InputGroupAddon align="inline-end">
                                             <InputGroupButton
-                                                title='toggle-visibility'
+                                                title='Show password'
                                                 size='icon-xs'
-                                                onClick={toggleVisibility}
+                                                onClick={() => toggleVisibility(setShowPassword)}
                                             >
                                                 {showPassword ?
                                                     <EyeOff className='shrink-0 size-5' /> :
@@ -431,42 +435,66 @@ export default function RegisterForm() {
                                             </InputGroupButton>
                                         </InputGroupAddon>
                                     </InputGroup>
-                                    {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-                                    <PasswordStrengthMeter control={control} className='mt-2' />
+                                    <div className='h-6'>
+                                        <FieldError errors={[fieldState.error]} />
+                                    </div>
                                 </Field>
                             )}
                         />
                         <Controller
                             name="password.confirm"
                             control={control}
-                            defaultValue=''
                             render={({ field, fieldState }) => (
                                 <Field data-invalid={fieldState.invalid}>
-                                    <FieldLabel htmlFor={field.name}>
-                                        Confirm password <div className="text-destructive">*</div>
-                                    </FieldLabel>
+                                    <FieldLabel htmlFor={field.name}>Confirm new password</FieldLabel>
                                     <InputGroup>
                                         <InputGroupInput
                                             {...field}
                                             id={field.name}
                                             aria-invalid={fieldState.invalid}
                                             autoComplete="off"
-                                            type={showPassword ? 'text' : 'password'}
-                                            placeholder="Re-type your password"
+                                            type={showConfirmPassword ? 'text' : 'password'}
+                                            placeholder="Re-type your new password"
+                                            maxLength={65}
+                                            onChange={async (e) => {
+                                                field.onChange(e)
+                                                await trigger('password.value')
+                                            }}
                                         />
                                         <InputGroupAddon align="inline-start">
-                                            <Lock />
+                                            {!isDirty || fieldState.invalid ? <LockOpenIcon /> : <Lock className='text-primary-light' />}
+                                        </InputGroupAddon>
+                                        <InputGroupAddon align="inline-end">
+                                            <InputGroupButton
+                                                title='Show password'
+                                                size='icon-xs'
+                                                onClick={() => toggleVisibility(setShowConfirmPassword)}
+                                            >
+                                                {showConfirmPassword ?
+                                                    <EyeOff className='shrink-0 size-5' /> :
+                                                    <Eye className='shrink-0 size-5' />
+                                                }
+                                            </InputGroupButton>
                                         </InputGroupAddon>
                                     </InputGroup>
-                                    {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                                    <div className='h-6'>
+                                        <FieldError errors={[fieldState.error]} />
+                                    </div>
                                 </Field>
                             )}
                         />
+                        <Field>
+                            <div className='flex items-center gap-2'>
+                                <KeyRoundIcon className='size-4' />
+                                <FieldLabel>Password strength</FieldLabel>
+                            </div>
+                            <PasswordStrengthMeter control={control} className='col-span-full' />
+                        </Field>
                     </div>
                 </div>
 
-                <div className='flex flex-col items-center gap-3 w-full'>
-                    <Button type='submit' className='p-5 text-xl' disabled={!isValid}>
+                <div className='flex justify-end'>
+                    <Button type='submit' disabled={!isValid}>
                         {isSubmitting ? (
                             <Spinner data-icon="inline-start" />
                         ) : (

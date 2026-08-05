@@ -1,11 +1,11 @@
-import * as React from "react"
 import { Avatar as AvatarPrimitive } from "radix-ui"
+import * as React from "react"
 
 import { cn } from "@/lib/utils"
 import { cva, type VariantProps } from "class-variance-authority"
 
 const avatarFallbackVariants = cva(
-  "flex size-full items-center justify-center rounded-full text-sm group-data-[size=sm]/avatar:text-xs",
+  "flex size-full items-center justify-center text-sm group-data-[size=sm]/avatar:text-xs",
   {
     variants: {
       variant: {
@@ -145,10 +145,7 @@ function AvatarGroupCount({
 }
 
 export {
-  Avatar,
-  AvatarImage,
-  AvatarFallback,
-  AvatarBadge,
-  AvatarGroup,
-  AvatarGroupCount,
+  Avatar, AvatarBadge, AvatarFallback, AvatarGroup,
+  AvatarGroupCount, AvatarImage
 }
+

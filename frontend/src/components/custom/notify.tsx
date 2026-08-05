@@ -1,7 +1,7 @@
-import { CheckCircle2, AlertTriangle, XCircle, Info, type LucideIcon, X, } from "lucide-react"
-import { toast } from "sonner"
 import { cn } from "@/lib/utils"
+import { AlertTriangle, CheckCircle2, Info, type LucideIcon, X, XCircle, } from "lucide-react"
 import type React from "react"
+import { toast } from "sonner"
 
 type Variant = "default" | "success" | "warning" | "destructive" | "info"
 
@@ -9,6 +9,7 @@ type NotifyOptions = {
     description?: string | React.ReactNode
     duration?: number
     action?: { onClick: () => void }
+    className?: string
 }
 
 const variants: Record<
@@ -17,8 +18,8 @@ const variants: Record<
 > = {
     default: {
         icon: Info,
-        box: "bg-slate-200 border-slate-300 border-l-slate-600 border-l-8 rounded-sm dark:bg-slate-900 dark:border-slate-700",
-        icono: "text-slate-700 dark:text-slate-300",
+        box: "bg-slate-100 border-slate-200 border-l-slate-500 border-l-8 rounded-sm dark:bg-slate-900 dark:border-slate-700",
+        icono: "text-slate-600 dark:text-slate-300",
         button: "hover:bg-slate-500/10",
     },
     success: {
@@ -29,8 +30,8 @@ const variants: Record<
     },
     warning: {
         icon: AlertTriangle,
-        box: "bg-amber-200 border-amber-300 border-l-amber-600 border-l-8 rounded-sm dark:bg-amber-950 dark:border-amber-800",
-        icono: "text-amber-700 dark:text-amber-400",
+        box: "bg-amber-100 border-amber-200 border-l-amber-500 border-l-8 rounded-sm dark:bg-amber-950 dark:border-amber-800",
+        icono: "text-amber-500 dark:text-amber-400",
         button: "hover:bg-amber-600/10",
     },
     destructive: {
@@ -54,7 +55,7 @@ function isString(value: React.ReactNode): value is string {
 function show(
     variant: Variant,
     title: string,
-    { description, duration = 4000, action }: NotifyOptions = {}
+    { description, duration = 4000, action, className }: NotifyOptions = {}
 ) {
     const { icon: Icon, box, icono, button } = variants[variant]
 
@@ -64,14 +65,14 @@ function show(
                 role={variant === "destructive" ? "alert" : "status"}
                 className={cn(
                     "flex w-full items-center gap-3 rounded-lg border-3 p-2 shadow-md",
-                    "md:w-90 md:min-h-18 text-foreground",
-                    box
+                    "md:max-w-100 md:min-h-18 text-foreground",
+                    box, className
                 )}
             >
-                <Icon className={cn("mt-0.5 size-10 shrink-0", icono)} />
+                <Icon className={cn("mt-0.5 size-7 shrink-0", icono)} />
 
-                <div className="flex-1 text-xs font-medium">
-                    <p className="text-sm font-bold leading-none mb-1">{title}</p>
+                <div className="flex-1 text-xs">
+                    <p className="text-sm font-medium leading-none mb-1">{title}</p>
 
                     {isString(description) ? (
                         <p className="text-sm opacity-80">{description}</p>

@@ -1,5 +1,4 @@
 from pathlib import Path
-from datetime import timedelta
 from dotenv import load_dotenv
 import os, sys
 
@@ -27,13 +26,31 @@ CSRF_COOKIE_HTTPONLY = False
 CSRF_COOKIE_SAMESITE = "Lax"
 
 COOKIE_SECURE = os.getenv("SESSION_COOKIE_SECURE", "False") == "True"
-SESSION_COOKIE_SECURE = os.getenv("SESSION_COOKIE_SECURE", "False") == "True"
 
 CORS_ALLOW_ALL_ORIGINS = DEBUG
 CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOWED_ORIGINS = os.getenv("CORS_ALLOWED_ORIGINS", "").split(",")
 
 AUTH_USER_MODEL = "users.User"
+
+AUTH_PASSWORD_VALIDATORS = [
+    {
+        "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
+    },
+    {
+        "NAME": "django.contrib.auth.password_validation.CommonPasswordValidator",
+    },
+    {
+        "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",
+    },
+    {
+        "NAME": "users.validators.PasswordValidator",
+    },
+]
+
+AUTHENTICATION_BACKENDS = [
+    "django.contrib.auth.backends.ModelBackend",
+]
 
 # Application definition
 INSTALLED_APPS = [
@@ -64,56 +81,6 @@ INSTALLED_APPS = [
     "admin_honeypot",
     "drf_spectacular",
 ]
-
-REST_FRAMEWORK = {
-    "DEFAULT_AUTHENTICATION_CLASSES": (
-        "config.authentication.CustomJWTAuthentication",
-        "rest_framework.authentication.SessionAuthentication",
-    ),
-    "DEFAULT_THROTTLE_CLASSES": [
-        "rest_framework.throttling.AnonRateThrottle",  # Para usuarios no logueados
-        "rest_framework.throttling.UserRateThrottle",  # Para usuarios logueados
-        "utils.throttles.DailyAnonThrottle",
-    ],
-    "DEFAULT_THROTTLE_RATES": {
-        "anon": "60/minute",
-        "anon_daily": "300/day",
-        "user": "2000/day",  # 1000 peticiones por día para usuarios
-    },
-    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
-}
-
-SPECTACULAR_SETTINGS = {
-    "TITLE": "WATOC 2028 Backend",
-    "DESCRIPTION": "Official backend of WATOC 2028, the triennial congress of the World Association of Theoretical and Computational Chemists, hosted in Mérida, Yucatán, Mexico.",
-    "VERSION": "1.0.0",
-    "SECURITY": [
-        {
-            "BearerAuth": [],
-        }
-    ],
-    "COMPONENTS": {
-        "securitySchemes": {
-            "BearerAuth": {
-                "type": "http",
-                "scheme": "bearer",
-                "bearerFormat": "JWT",
-            }
-        }
-    },
-}
-
-SIMPLE_JWT = {
-    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=15),
-    "REFRESH_TOKEN_LIFETIME": timedelta(days=7),
-    "ROTATE_REFRESH_TOKENS": True,
-    "BLACKLIST_AFTER_ROTATION": True,
-    "ALGORITHM": "HS256",
-    "SIGNING_KEY": SECRET_KEY,
-    "VERIFYING_KEY": None,
-    "USER_ID_FIELD": "id",
-    "USER_ID_CLAIM": "user_id",
-}
 
 MIDDLEWARE = [
     "config.middleware.ClientOriginMiddleware",
@@ -148,6 +115,7 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = "config.wsgi.application"
+
 ASGI_APPLICATION = "config.asgi.application"
 
 DATABASES = {
@@ -166,24 +134,6 @@ DATABASES = {
 }
 
 
-# Password validation
-# PasswordValidator implementa validaciones personalizadas
-AUTH_PASSWORD_VALIDATORS = [
-    {
-        "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
-    },
-    {
-        "NAME": "django.contrib.auth.password_validation.CommonPasswordValidator",
-    },
-    {
-        "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",
-    },
-    {
-        "NAME": "users.validators.PasswordValidator",
-    },
-]
-
-
 # Internationalization
 
 LANGUAGE_CODE = "en-us"
@@ -194,8 +144,9 @@ USE_I18N = True
 
 USE_TZ = True
 
+MEDIA_URL = "/media/"
 
-# Static files (CSS, JavaScript, Images)
+MEDIA_ROOT = BASE_DIR / "media"
 
 STATIC_URL = "static/"
 
@@ -210,24 +161,8 @@ STORAGES = {
     },
 }
 
-# Ruta en la cual se guardarán las imagenes de usuario
-MEDIA_URL = "/media/"
-MEDIA_ROOT = BASE_DIR / "media"
 
-# Para el envío de los datos de contact_request a una cuenta
-EMAIL_BACKEND = os.getenv("EMAIL_BACKEND")
-EMAIL_HOST = os.getenv("EMAIL_HOST")
-EMAIL_PORT = os.getenv("EMAIL_PORT")
-EMAIL_USE_TLS = os.getenv("EMAIL_USE_TLS")
-EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER")
-EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")
-DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL")
-
-
-AUTHENTICATION_BACKENDS = [
-    "django.contrib.auth.backends.ModelBackend",
-]
-SESSION_COOKIE_SECURE = False
+SESSION_COOKIE_SECURE = os.getenv("SESSION_COOKIE_SECURE", "False") == "True"
 SESSION_EXPIRE_AT_BROWSER_CLOSE = False
 SESSION_SAVE_EVERY_REQUEST = True
 SESSION_ENGINE = "django.contrib.sessions.backends.db"
@@ -235,130 +170,14 @@ SESSION_ENGINE = "django.contrib.sessions.backends.db"
 
 STRIPE_SECRET_KEY = os.getenv("STRIPE_SECRET_KEY", "invalid key")
 STRIPE_PUBLISHABLE_KEY = os.getenv("STRIPE_PUBLISHABLE_KEY", "invalid key")
+
 DOMAIN = os.getenv("DOMAIN", "invalid domain")
 
-# celery -A config worker -l info -P solo
-CELERY_BROKER_URL = "redis://127.0.0.1:6379/0"
-CELERY_RESULT_BACKEND = "redis://127.0.0.1:6379/0"
-CELERY_ACCEPT_CONTENT = ["json"]
-CELERY_TASK_SERIALIZER = "json"
 
-CHANNEL_LAYERS = {
-    "default": {
-        "BACKEND": "channels_redis.core.RedisChannelLayer",
-        "CONFIG": {
-            "hosts": [("127.0.0.1", 6379)],
-        },
-    },
-}
+from config.settings_modules.channel_settings import *
+from config.settings_modules.email_settings import *
+from config.settings_modules.rest_framework_settings import *
+from config.settings_modules.logging_settings import *
 
-LOG_DIR = os.path.join(BASE_DIR, "logs")
-if not os.path.exists(LOG_DIR):
-    os.makedirs(LOG_DIR)
-
-LOGGING = {
-    "version": 1,
-    "disable_existing_loggers": False,
-    # Formato de los logs
-    "formatters": {
-        "verbose": {
-            "format": "{levelname} {asctime} {module} {process:d} {thread:d} {message}",
-            "style": "{",
-        },
-        "simple": {
-            "format": "{levelname} {asctime} {message}",
-            "style": "{",
-        },
-        "detailed": {
-            "format": "[{levelname}] {asctime} — {message}",
-            "style": "{",
-        },
-    },
-    # Handlers (dónde se envían los logs)
-    "handlers": {
-        # Console output
-        "console": {
-            "class": "logging.StreamHandler",
-            "formatter": "simple",
-            "level": "DEBUG",
-        },
-        # Archivo general
-        "file": {
-            "class": "logging.handlers.RotatingFileHandler",
-            "filename": os.path.join(LOG_DIR, "django.log"),
-            "maxBytes": 1024 * 1024 * 10,  # 10 MB
-            "backupCount": 5,
-            "formatter": "verbose",
-            "level": "INFO",
-            "encoding": "utf-8",
-        },
-        # Archivo solo para errores
-        "error_file": {
-            "class": "logging.handlers.RotatingFileHandler",
-            "filename": os.path.join(LOG_DIR, "errors.log"),
-            "maxBytes": 1024 * 1024 * 10,
-            "backupCount": 5,
-            "formatter": "verbose",
-            "level": "ERROR",
-            "encoding": "utf-8",
-        },
-        # Archivo específico para password reset
-        "password_reset_file": {
-            "class": "logging.handlers.RotatingFileHandler",
-            "filename": os.path.join(LOG_DIR, "password_reset.log"),
-            "maxBytes": 1024 * 1024 * 5,  # 5 MB
-            "backupCount": 3,
-            "formatter": "detailed",
-            "level": "INFO",
-            "encoding": "utf-8",
-        },
-        # Archivo específico para logs de abstracts
-        "abstracts_file": {
-            "class": "logging.handlers.RotatingFileHandler",
-            "filename": os.path.join(LOG_DIR, "abstracts.log"),
-            "maxBytes": 1024 * 1024 * 5,  # 5 MB
-            "backupCount": 3,
-            "formatter": "detailed",
-            "level": "INFO",
-            "encoding": "utf-8",
-        },
-        # Archivo específico para logs de notificaciones
-        "notifications_file": {
-            "class": "logging.handlers.RotatingFileHandler",
-            "filename": os.path.join(LOG_DIR, "notifications.log"),
-            "maxBytes": 1024 * 1024 * 5,  # 5 MB
-            "backupCount": 3,
-            "formatter": "detailed",
-            "level": "INFO",
-            "encoding": "utf-8",
-        },
-    },
-    "loggers": {
-        # Logger raíz
-        "": {
-            "handlers": ["console"],
-            "level": "INFO",
-        },
-        # Django interno
-        "django": {
-            "handlers": ["console", "file"],
-            "level": "INFO",
-            "propagate": False,
-        },
-        "apps.users": {
-            "handlers": ["console", "file"],
-            "level": "INFO",
-            "propagate": False,
-        },
-        "apps.abstracts": {
-            "handlers": ["abstracts_file"],
-            "level": "INFO",
-            "propagate": False,
-        },
-        "apps.notifications": {
-            "handlers": ["notifications_file"],
-            "level": "INFO",
-            "propagate": True,
-        },
-    },
-}
+SIMPLE_JWT = get_simple_jwt_settings(SECRET_KEY)
+LOGGING = get_logging_settigns(BASE_DIR)

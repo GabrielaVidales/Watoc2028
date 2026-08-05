@@ -6,7 +6,7 @@ const assignmentSchema = z.object({
     abstract: z.any().nullable(),
     assigned_by: z.any().nullable(),
     is_active: z.boolean(),
-    due_date: z.date().nullable(),
+    due_date: z.date('Required').nullable(),
 })
     .transform((data, ctx) => {
         if (!data.due_date){

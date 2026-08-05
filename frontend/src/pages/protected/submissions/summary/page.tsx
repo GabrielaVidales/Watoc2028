@@ -1,16 +1,16 @@
 import api from '@/clients/api'
 import { AbstractData } from '@/components/AbstractData'
+import { PaginationController, SelectItemsPerPage } from '@/components/custom/pagination-controller'
 import RichTextEditor, { countWordsFromHTML } from '@/components/EnrichedTextArea'
 import { InfoAlert } from '@/components/InfoAlert'
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger, } from "@/components/ui/alert-dialog"
-import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator, } from "@/components/ui/breadcrumb"
+import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardAction, CardContent, CardDescription, CardFooter, CardHeader, CardTitle, } from "@/components/ui/card"
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, } from "@/components/ui/dialog"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import { Field, FieldDescription, FieldError, FieldLabel } from '@/components/ui/field'
-import { InputGroupText } from '@/components/ui/input-group'
-import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { InputGroup, InputGroupAddon, InputGroupInput, } from "@/components/ui/input-group"
+import { InputGroup, InputGroupAddon, InputGroupInput, InputGroupText } from '@/components/ui/input-group'
 import { Separator } from '@/components/ui/separator'
 import { Spinner } from '@/components/ui/spinner'
 import { useAuth } from '@/contexts/AuthContext'
@@ -26,14 +26,11 @@ import { renderHTMLString } from '@/utils/tsx_utils'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { isAxiosError } from 'axios'
-import { ArrowRight, Calendar, CircleAlert, Clock3, Download, Eye, FilePenLine, FileText, MoreVertical, Pencil, Plus, Search, Send, Trash2, TriangleAlert } from 'lucide-react'
+import { ArrowRight, CircleAlert, Download, Eye, FilePenLine, FileText, MoreVertical, Pencil, Plus, Search, Send, Trash2, TriangleAlert } from 'lucide-react'
 import { useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { Link, useNavigate } from 'react-router'
-import { PaginationController, SelectItemsPerPage } from '../../notifications/notifications-page'
 import { useDebounce } from 'use-debounce'
-import { Badge } from '@/components/ui/badge'
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import AbstractPreviewData from '../edit/abstract-preview-data'
 
 
@@ -120,9 +117,8 @@ function AbstractSubmissionPage() {
 
 
     return (
-        <div className='w-full h-full flex flex-col'>
-            <div className='bg-background border-b-2 border-b-border space-y-4 p-8'>
-
+        <article className='w-full h-full flex flex-col'>
+            <header className='bg-background border-b-2 border-b-border space-y-4 p-8'>
                 <div className='flex flex-col md:flex-row md:justify-between gap-5'>
                     <div className="flex items-start gap-3">
                         <div className="flex size-12 shrink-0 items-center justify-center rounded-lg bg-primary-light/10 border-2 border-primary-main/20 text-primary">
@@ -152,7 +148,7 @@ function AbstractSubmissionPage() {
                         </Card>
                     ))}
                 </div>
-            </div>
+            </header>
 
             <fieldset disabled={isLoading || isPending}>
                 <div className='grid grid-cols-1 md:grid-cols-[1fr_400px] items-stretch'>
@@ -413,7 +409,7 @@ function AbstractSubmissionPage() {
                     )}
                 </Dialog>
             </fieldset>
-        </div>
+        </article>
     )
 }
 

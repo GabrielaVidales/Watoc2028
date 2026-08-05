@@ -1,18 +1,15 @@
 import api from '@/clients/api';
+import { PaginationController, SelectItemsPerPage } from '@/components/custom/pagination-controller';
 import { Button } from '@/components/ui/button';
-import { Field, FieldLabel } from '@/components/ui/field';
-import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination";
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import type { NotificationResponse } from '@/domain/notifications';
-import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { BellOff, BellRing, CheckCheck, ChevronsLeftIcon, ChevronsRightIcon, HashIcon, RotateCw, Settings2 } from 'lucide-react';
-import { useState, type HTMLAttributes } from 'react';
-import NotificationItem from './notification-item-component';
-import { cn } from '@/lib/utils';
 import { useIsMobile } from '@/hooks/use-mobile';
-import { InputGroupAddon, InputGroupText } from '@/components/ui/input-group';
+import { cn } from '@/lib/utils';
+import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { BellOff, BellRing, CheckCheck, RotateCw, Settings2 } from 'lucide-react';
+import { useState } from 'react';
+import NotificationItem from './notification-item-component';
 
 function NotificationsPage() {
     const isMobile = useIsMobile()
@@ -79,7 +76,7 @@ function NotificationsPage() {
                 </div>
             </div>
 
-            <div className='bg-background h-full p-2 sm:p-4 md:p-6 lg:p-8'>
+            <div className='bg-secondary h-full p-2 sm:p-4 md:p-6 lg:p-8'>
                 <Tabs value={value} onValueChange={(setValue)} className="w-full max-w-5xl mx-auto">
                     <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
@@ -92,8 +89,6 @@ function NotificationsPage() {
                                     Read
                                 </TabsTrigger>
                             </TabsList>
-
-                            {/* <span className='text-sm'>{results.length} notifications</span> */}
                         </div>
 
                         <div className="flex gap-2">
@@ -116,7 +111,7 @@ function NotificationsPage() {
                         </div>
                     </div>
 
-                    <ScrollArea className='h-100 border-y bg-background'>
+                    <ScrollArea className='h-100 border-y pr-3'>
                         <fieldset disabled={isLoading} className={cn(
                             "space-y-2 py-4",
                             isLoading ? 'pointer-events-none' : 'pointer-events-auto'
@@ -152,150 +147,4 @@ function NotificationsPage() {
 }
 
 export default NotificationsPage
-
-
-
-type PaginationControllerProps = {
-    page: number
-    totalPages: number
-    onPageChange: (page: number) => void
-}
-
-export function PaginationController({
-    onPageChange,
-    totalPages,
-    page,
-}: PaginationControllerProps) {
-    const previousPage = page > 1 ? page - 1 : null
-    const nextPage = page < totalPages ? page + 1 : null
-    const pages = Array.from(
-        { length: totalPages },
-        (_, i) => i + 1
-    )
-
-    return (
-        <Pagination>
-            <PaginationContent>
-
-                <PaginationItem>
-                    <PaginationLink
-                        title="Go to first page"
-                        aria-label="Go to first page"
-                        className={cn("gap-1 px-2.5 sm:pl-2.5")}
-                        size="icon"
-                        onClick={e => {
-                            e.preventDefault()
-                            onPageChange(1)
-                        }}
-                    >
-                        <ChevronsLeftIcon />
-                    </PaginationLink>
-                </PaginationItem>
-
-                <PaginationItem>
-                    <PaginationPrevious
-                        href="#"
-                        onClick={e => {
-                            e.preventDefault()
-                            if (page > 1)
-                                onPageChange(page - 1)
-                        }}
-                    />
-                </PaginationItem>
-
-                <PaginationItem>
-                    <Select
-                        value={String(page)}
-                        onValueChange={(value) =>
-                            onPageChange(Number(value))
-                        }
-                    >
-                        <SelectTrigger size='sm'>
-                            <HashIcon className='text-transparent'/>
-                            <SelectValue /> / {totalPages}
-                        </SelectTrigger>
-
-                        <SelectContent>
-                            {pages.map((item) => (
-                                <SelectItem
-                                    key={item}
-                                    value={String(item)}
-                                >
-                                    {item}
-                                </SelectItem>
-                            ))}
-                        </SelectContent>
-                    </Select>
-                </PaginationItem>
-
-                <PaginationItem>
-                    <PaginationNext
-                        href="#"
-                        onClick={e => {
-                            e.preventDefault()
-                            if (page < totalPages)
-                                onPageChange(page + 1)
-                        }}
-                    />
-                </PaginationItem>
-
-                <PaginationItem>
-                    <PaginationItem>
-                        <PaginationLink
-                            title="Go to last page"
-                            aria-label="Go to last page"
-                            className={cn("gap-1 px-2.5 sm:pl-2.5")}
-                            size="icon"
-                            onClick={e => {
-                                e.preventDefault()
-                                onPageChange(totalPages)
-                            }}
-                        >
-                            <ChevronsRightIcon />
-                        </PaginationLink>
-                    </PaginationItem>
-                </PaginationItem>
-            </PaginationContent>
-        </Pagination>
-    )
-}
-
-
-
-type SelectItemsPerPageProps = {
-    itemsPerPage: number
-    setItemsPerPage: (n: number) => void
-    options?: number[]
-    size?: "sm" | "default"
-} & HTMLAttributes<HTMLSelectElement>
-
-export function SelectItemsPerPage({
-    setItemsPerPage,
-    itemsPerPage,
-    options = [5, 10, 20],
-    size = 'default'
-}: SelectItemsPerPageProps) {
-    return (
-        <Field orientation="horizontal" className="w-fit">
-            <FieldLabel htmlFor="select-rows-per-page">Items per page</FieldLabel>
-            <Select defaultValue="10" value={`${itemsPerPage}`} onValueChange={(value) => {
-                const limit = Number(value)
-                if (!isNaN(limit)) {
-                    setItemsPerPage(limit)
-                }
-            }}>
-                <SelectTrigger size={size} className="w-18" id="select-rows-per-page">
-                    <SelectValue />
-                </SelectTrigger>
-                <SelectContent align="start">
-                    <SelectGroup>
-                        {options.map(item => (
-                            <SelectItem key={item} value={`${item}`}>{item}</SelectItem>
-                        ))}
-                    </SelectGroup>
-                </SelectContent>
-            </Select>
-        </Field>
-    )
-}
 

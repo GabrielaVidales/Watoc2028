@@ -40,17 +40,12 @@ class NotificationViewSet(ModelViewSet):
         notifications = self.get_queryset().filter(recipient=user)
         unread_count = notifications.filter(is_read=False).count()
         notifications = self.filter_queryset(notifications)
-        
-        
-        print("PARAMETROS RECIBIDOS:", request.query_params)
-        print("SQL REALMENTE EJECUTADO:", str(notifications.query))
-        
-        page = self.paginate_queryset(notifications)
-        serializer = self.get_serializer(page, many=True, context={"request": request})
-        paginated = self.get_paginated_response(serializer.data)
+        paginated_queryset = self.paginate_queryset(notifications)
+        serializer = self.get_serializer(paginated_queryset, many=True, context={"request": request})
+        paginated_response = self.get_paginated_response(serializer.data)
         return Response(
             {
-                "notifications": paginated.data,
+                "notifications": paginated_response.data,
                 "unread_count": unread_count,
             }
         )

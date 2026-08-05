@@ -1,4 +1,5 @@
 from apps.participants.serializers import ParticipantSerializer
+from apps.participants.models import Participant
 from django.contrib.auth import password_validation
 from django.core import exceptions
 from django.contrib.auth import get_user_model
@@ -6,7 +7,7 @@ from django.db import transaction
 from rest_framework import serializers
 from datetime import datetime
 from . import models, validators
-import bleach
+import bleach, os
 
 User = get_user_model()
 
@@ -28,6 +29,7 @@ class UserSerializer(serializers.ModelSerializer):
             "nationality",
             "city",
             "photo",
+            "photo_filename",
             "full_name",
             "roles",
             "last_login",
@@ -44,29 +46,24 @@ class UserSerializer(serializers.ModelSerializer):
                 "validators": [validators.valid_name],
                 "allow_blank": False,
             },
-            "email": {
-                "allow_blank": False,
-            },
-            "city": {
-                "allow_blank": False,
-            },
             "password": {"write_only": True},
             "photo": {"required": False},
         }
 
+    participant = ParticipantSerializer(write_only=True, required=False)
     photo = serializers.SerializerMethodField()
-
+    photo_filename = serializers.SerializerMethodField()
     data = serializers.SerializerMethodField()
 
     def get_data(self, user):
         data = {}
         user_is_participant = user.groups.filter(name="participant").exists()
-        if user_is_participant and hasattr(user,'participant'):
-            data['participant'] = ParticipantSerializer(user.participant).data
-            
+        if user_is_participant and hasattr(user, "participant"):
+            data["participant"] = ParticipantSerializer(user.participant).data
+
         user_is_reviewer = user.groups.filter(name="reviewer").exists()
         if user_is_reviewer:
-            data['reviewer'] = 'user.review_assignments'
+            data["reviewer"] = "user.review_assignments"
 
         return data
 
@@ -84,6 +81,11 @@ class UserSerializer(serializers.ModelSerializer):
             return f"{photo_url}?t={timestamp}"
         except Exception:
             return None
+
+    def get_photo_filename(self, user):
+        if user.photo and user.photo.name:
+            return os.path.basename(user.photo.name)
+        return ""
 
     def validate_first_name(self, value):
         return bleach.clean(value, [], [])
@@ -109,15 +111,13 @@ class UserSerializer(serializers.ModelSerializer):
     @transaction.atomic
     def create(self, validated_data):
         participant_data = validated_data.pop("participant", None)
+
         email = validated_data.pop("email", None)
         password = validated_data.pop("password", None)
-
         user = User.objects.create_user(email=email, password=password, **validated_data)
 
-        participant_serializer = ParticipantSerializer(data=participant_data)
-        if participant_serializer.is_valid(raise_exception=True):
-            p_instance = participant_serializer.save(user=user)
-            models.Dinner.objects.create(participant=p_instance)
+        if participant_data is not None:
+            Participant.objects.create(user=user, **participant_data)
 
         return user
 
@@ -127,10 +127,13 @@ class UserSerializer(serializers.ModelSerializer):
 
         user = super().update(instance, validated_data)
 
-        p_instance = user.participant
-        participant_serializer = ParticipantSerializer(p_instance, data=participant_data, partial=True)
-        if participant_serializer.is_valid(raise_exception=True):
-            p_instance = participant_serializer.save(user=user)
+        if participant_data is not None:
+            participant_serializer = ParticipantSerializer(
+                user.participant,
+                data=participant_data,
+                partial=True,
+            )
+            participant_serializer.is_valid(raise_exception=True)
+            participant_serializer.save(user=user)
 
         return user
-

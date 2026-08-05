@@ -1,6 +1,6 @@
 from rest_framework import permissions, status
 from rest_framework.decorators import action
-from rest_framework.filters import SearchFilter
+from rest_framework.filters import SearchFilter, OrderingFilter
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.response import Response
 from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
@@ -10,6 +10,7 @@ from django.contrib.auth import get_user_model
 from .serializers import UserSerializer, ParticipantSerializer
 from config.permissions import HasCSRFToken
 from config.pagination import Pagination
+from config.services import is_redis_available
 from .tasks import send_email_confirmation_email
 import logging
 
@@ -22,10 +23,11 @@ class UserView(ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
     parser_classes = (MultiPartParser, FormParser, JSONParser)
-    filter_backends = [SearchFilter]
+    filter_backends = [SearchFilter, OrderingFilter]
     search_fields = ["first_name", "last_name", "email"]
     pagination_class = Pagination
-    
+    ordering_fields = ["id", "date_joined", "first_name", "last_name", "email"]
+    ordering = ["date_joined"]
 
     def get_permissions(self):
         if self.action == "create" or self.action == "session":
@@ -35,7 +37,9 @@ class UserView(ModelViewSet):
     def perform_create(self, serializer):
         user = serializer.save(email_verified=False)
         # TODO: añadir un transaction.on_commit
-        send_email_confirmation_email.delay(user.id)
+        if is_redis_available():
+            send_email_confirmation_email.delay(user.id)
+
 
     @action(detail=False, methods=["get"], url_path="session")
     @method_decorator(ensure_csrf_cookie)
@@ -120,4 +124,3 @@ class UserView(ModelViewSet):
             {"detail": "Password changed successfully."},
             status=status.HTTP_200_OK,
         )
-

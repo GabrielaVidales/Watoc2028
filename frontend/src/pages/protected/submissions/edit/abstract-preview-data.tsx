@@ -17,10 +17,10 @@ function AbstractPreviewData({ abstract, }: AbstractPreviewDataProps) {
         <div className="space-y-4 max-w-4xl">
             <h4
                 className="text-lg md:text-2xl font-semibold leading-snug tracking-tight text-foreground"
-                dangerouslySetInnerHTML={{ __html: abstract.title }}
+                dangerouslySetInnerHTML={{ __html: abstract?.title || 'Not set' }}
             />
 
-            <AuthorsPreview authors={(abstract.authors as any) as AuthorSchema[]} />
+            <AuthorsPreview authors={(abstract?.authors as any || []) as AuthorSchema[]} />
 
             <Separator className='mb-4' />
 
@@ -33,7 +33,7 @@ function AbstractPreviewData({ abstract, }: AbstractPreviewDataProps) {
                 <ScrollArea className='h-60 pr-2'>
                     <div
                         className="text-xs sm:text-sm prose prose-sm dark:prose-invert max-w-none text-foreground/90 leading-relaxed"
-                        dangerouslySetInnerHTML={{ __html: abstract.text }}
+                        dangerouslySetInnerHTML={{ __html: abstract?.text || 'Not set' }}
                     />
                 </ScrollArea>
             </div>
@@ -49,7 +49,7 @@ function AbstractPreviewData({ abstract, }: AbstractPreviewDataProps) {
                 <ScrollArea className='h-50'>
                     <div
                         className="text-xs sm:text-sm prose-p:mb-1 dark:prose-invert max-w-none text-foreground/90 leading-relaxed"
-                        dangerouslySetInnerHTML={{ __html: abstract.references }}
+                        dangerouslySetInnerHTML={{ __html: abstract?.references || 'Not set' }}
                     />
                 </ScrollArea>
             </div>

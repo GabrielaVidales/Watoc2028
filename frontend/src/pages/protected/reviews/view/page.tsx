@@ -14,6 +14,8 @@ import React from 'react'
 import { useParams } from 'react-router'
 import ReviewForm from '@/forms/ReviewForm'
 import { ScrollArea } from '@/components/ui/scroll-area'
+import AbstractPreviewData from '../../submissions/edit/abstract-preview-data'
+import type { AbstractSchema } from '@/schemas/abstracts/abstract-schemas'
 
 function ReviewAbstract() {
     const { id } = useParams()
@@ -26,6 +28,16 @@ function ReviewAbstract() {
         }
     })
 
+    const { data: abstract, isLoading: isAbstractLoading } = useQuery<AbstractSchema>({
+        queryKey: ['review', 'abstract', assignment?.abstract?.id],
+        queryFn: async () => {
+            if (!assignment) return null
+            const { data } = await api.get<AbstractSchema>(`/abstracts/submissions/${assignment.abstract.id}/`)
+            return data
+        }
+    })
+
+
     if (isLoading) {
         return (
             <div>
@@ -35,8 +47,18 @@ function ReviewAbstract() {
         )
     }
 
-    // const abstract = d
 
+
+    if (isAbstractLoading) {
+        return (
+            <div>
+                <Spinner />
+                <span>Fetching data...</span>
+            </div>
+        )
+    }
+
+    console.log(abstract);
 
 
 
@@ -44,7 +66,7 @@ function ReviewAbstract() {
         <div className="lg:sticky lg:top-0 h-full grid grid-cols-1 lg:grid-cols-[1fr_480px]">
 
             <main id='main-container' className='h-full w-full overflow-y-auto no-scrollbar'>
-                <div className='lg:sticky lg:top-0 border-b-2 p-8 z-100'>
+                <div className='lg:sticky lg:top-0 border-b-2 p-8 z-100 bg-background'>
 
                     <div>
                         <CardTitle className='text-2xl'>
@@ -53,27 +75,29 @@ function ReviewAbstract() {
                     </div>
                 </div>
 
+                <div className='lg:sticky lg:top-0 border-b-2 p-8'>
+                    <AbstractPreviewData abstract={abstract} />
+                </div>
+
             </main>
 
             <aside className=" w-full border-t lg:border-t-0 lg:border-l-2 bg-card dark:border-l-input">
                 <div className="py-6 space-y-6 lg:sticky lg:top-0 lg:h-screen lg:overflow-y-auto lg:py-8 lg:space-y-8">
                     <CardHeader>
-                        <div className="flex items-center gap-3 w-full">
+                        <div className="flex items-start gap-3 w-full">
 
-                            <div className="flex size-10 items-center justify-center rounded-lg bg-primary-light/10 border-2 border-primary-main/20 text-primary">
-                                <TextQuote className="text-primary-main stroke-[2.5] size-7" />
+                            <div className="flex size-10 mt-2 shrink-0 items-center justify-center rounded-lg bg-primary-light/10 border-2 border-primary-main/20 text-primary">
+                                <TextQuote className="shrink-0 text-primary-main stroke-[2.5] size-7" />
                             </div>
 
-                            <div>
+                            <div className='min-w-0'>
                                 <CardDescription className='text-xs font-medium tracking-wider uppercase'>
                                     Reviewing submission
                                 </CardDescription>
-                                <CardTitle className='text-xl'>
-                                    {assignment.abstract.title}
-                                </CardTitle>
+                                <CardTitle className='text-xl' dangerouslySetInnerHTML={{ __html: assignment.abstract.title }} />
                             </div>
-
                         </div>
+
                         <ButtonGroup className='ml-auto'>
                             <Button variant="outline" size='sm'>
                                 <PDFIcon className='size-5' />
@@ -97,10 +121,9 @@ function ReviewAbstract() {
                         </ButtonGroup>
                     </CardHeader>
 
-                    <ScrollArea className='h-110 border-y bg-secondary'>
+                    <ScrollArea className='h-100 border-y bg-secondary'>
                         <CardContent className="text-sm text-muted-foreground py-4">
                             <ReviewForm />
-
                         </CardContent>
                     </ScrollArea>
 

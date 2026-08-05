@@ -1,18 +1,15 @@
 import { InfoAlert } from '@/components/InfoAlert';
-import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator, } from "@/components/ui/breadcrumb";
+import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, } from "@/components/ui/card";
+import { ScrollArea } from '@/components/ui/scroll-area';
 import { Spinner } from '@/components/ui/spinner';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAuth } from '@/contexts/AuthContext';
 import ChangePasswordForm from '@/forms/ChangePasswordForm';
 import EditUserForm from '@/forms/EditUserForm';
 import { useProfiles } from '@/hooks/use-profiles';
-import { routes } from '@/routes/routes';
-import { Check, Image, Info, LockKeyhole, Settings, ShieldAlert, ShieldCheck, UserRoundKey, UserRoundPen, X } from "lucide-react";
-import { Link } from 'react-router';
+import { Image, LockKeyhole, Settings, Settings2Icon, ShieldAlert, UserRoundKey, UserRoundPen } from "lucide-react";
 import { NotificationSettings } from './components/notifications-settings-component';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { useMemo } from 'react';
 
 function SettingsPage() {
     const { user: user } = useAuth()
@@ -37,10 +34,10 @@ function SettingsPage() {
                         </div>
                     </div>
 
-                    {/* <Button variant="outline">
-                            <Settings2 />
-                            Preferences
-                        </Button> */}
+                    <Button variant="outline">
+                        <Settings2Icon />
+                        Preferences
+                    </Button>
                 </div>
             </div>
 

@@ -1,13 +1,13 @@
-import React from 'react'
 import api from '@/clients/api';
-import { cn } from '@/lib/utils';
-import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger, } from "@/components/ui/dropdown-menu"
-import { useNavigate } from 'react-router';
-import { MessageCircleCheck, MessageCircleReply, MoreHorizontal, Settings, Trash2 } from 'lucide-react';
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from '@/components/ui/button';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger, } from "@/components/ui/dropdown-menu";
 import type { Notification } from '@/domain/notifications';
+import { cn } from '@/lib/utils';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { MessageCircleCheck, MessageCircleReply, MoreHorizontal, Settings, Trash2 } from 'lucide-react';
+import React from 'react';
+import { useNavigate } from 'react-router';
 
 
 type Props = {
@@ -63,7 +63,7 @@ function NotificationItem({ notification }: Props) {
                 "group cursor-pointer p-3 border-2 border-border rounded-md transition-colors duration-300",
                 "hover:border-primary-light hover:shadow-sm",
                 "flex flex-col items-start md:flex-row md:items-center justify-between gap-3",
-                notification.is_read ? "bg-card" : 'bg-secondary'
+                notification.is_read ? "bg-secondary" : 'bg-card'
             )}
         >
             <div onClick={onNotificationTapped} className="flex flex-1 items-start gap-3 min-w-0">
