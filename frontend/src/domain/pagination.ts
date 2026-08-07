@@ -1,3 +1,5 @@
+import type { Filter } from "@/components/reui/filters";
+
 export interface PaginatedResponse<T> {
     meta: {
         page: number;
@@ -12,4 +14,11 @@ export interface PaginatedResponse<T> {
         previous: string | null;
     };
     results: T[];
+}
+
+export interface PaginatedRequest {
+    page?: number,
+    filters?: Filter[],
+    itemsPerPage?: number
+    search?: string
 }

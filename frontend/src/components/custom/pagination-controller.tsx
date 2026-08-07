@@ -17,6 +17,8 @@ export function PaginationController({
     totalPages,
     page,
 }: PaginationControllerProps) {
+    const isFirstPage = page <= 1
+    const isLastPage = page >= totalPages
     const pages = Array.from(
         { length: totalPages },
         (_, i) => i + 1
@@ -28,13 +30,19 @@ export function PaginationController({
 
                 <PaginationItem>
                     <PaginationLink
+                        href="#"
+                        aria-disabled={isFirstPage}
                         title="Go to first page"
                         aria-label="Go to first page"
-                        className={cn("gap-1 px-2.5 sm:pl-2.5")}
+                        tabIndex={isFirstPage ? -1 : 0}
+                        className={cn(
+                            "gap-1 px-2.5 sm:pl-2.5",
+                            isFirstPage && "pointer-events-none opacity-50"
+                        )}
                         size="icon"
                         onClick={e => {
                             e.preventDefault()
-                            onPageChange(1)
+                            if (!isFirstPage) onPageChange(1)
                         }}
                     >
                         <ChevronsLeftIcon />
@@ -44,10 +52,14 @@ export function PaginationController({
                 <PaginationItem>
                     <PaginationPrevious
                         href="#"
-                        onClick={e => {
+                        aria-disabled={isFirstPage}
+                        tabIndex={isFirstPage ? -1 : 0}
+                        className={cn(
+                            isFirstPage && "pointer-events-none opacity-50"
+                        )}
+                        onClick={(e) => {
                             e.preventDefault()
-                            if (page > 1)
-                                onPageChange(page - 1)
+                            if (!isFirstPage) onPageChange(page - 1)
                         }}
                     />
                 </PaginationItem>
@@ -80,23 +92,33 @@ export function PaginationController({
                 <PaginationItem>
                     <PaginationNext
                         href="#"
-                        onClick={e => {
+                        aria-disabled={isLastPage}
+                        tabIndex={isLastPage ? -1 : 0}
+                        className={cn(
+                            isLastPage && "pointer-events-none opacity-50"
+                        )}
+                        onClick={(e) => {
                             e.preventDefault()
-                            if (page < totalPages)
-                                onPageChange(page + 1)
+                            if (!isLastPage) onPageChange(page + 1)
                         }}
                     />
                 </PaginationItem>
 
                 <PaginationItem>
                     <PaginationLink
+                        href="#"
+                        aria-disabled={isLastPage}
+                        tabIndex={isLastPage ? -1 : 0}
                         title="Go to last page"
                         aria-label="Go to last page"
-                        className={cn("gap-1 px-2.5 sm:pl-2.5")}
+                        className={cn(
+                            "gap-1 px-2.5 sm:pl-2.5",
+                            isLastPage && "pointer-events-none opacity-50"
+                        )}
                         size="icon"
-                        onClick={e => {
+                        onClick={(e) => {
                             e.preventDefault()
-                            onPageChange(totalPages)
+                            if (!isLastPage) onPageChange(totalPages)
                         }}
                     >
                         <ChevronsRightIcon />

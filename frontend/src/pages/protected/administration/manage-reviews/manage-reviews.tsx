@@ -1,69 +1,50 @@
-import api from '@/clients/api'
 import { CustomUserFilter } from '@/components/custom/custom-filter'
+import { PaginationController } from '@/components/custom/pagination-controller'
 import { type Filter } from '@/components/reui/filters'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { Calendar } from '@/components/ui/calendar'
-import { Card, CardAction, CardContent, CardDescription, CardHeader, CardTitle, } from "@/components/ui/card"
+import { Card, CardAction, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
+import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import { InputGroup, InputGroupAddon, InputGroupInput } from '@/components/ui/input-group'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
-import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area'
-import { cn } from '@/lib/utils'
-import type { UserSchema } from '@/schemas/user-schemas'
+import { Separator } from '@/components/ui/separator'
+import { Spinner } from '@/components/ui/spinner'
+import { Tooltip, TooltipContent, TooltipTrigger, } from "@/components/ui/tooltip"
+import type { PaginatedRequest, PaginatedResponse } from '@/domain/pagination'
+import type { ReviewAssignment } from '@/domain/reviews'
+import DialogReviewAssignmentForm from '@/forms/reviews/dialog-assignment-form'
+import ReviewAssignmentForm from '@/forms/reviews/review-assignment-form'
+import { getAllAssignments } from '@/services/administration/review-services'
 import { formatDate } from '@/utils/formatDate'
 import { useQuery } from '@tanstack/react-query'
-import { format, } from "date-fns"
-import { ClipboardCheck, FunnelXIcon, ListFilter, MoreHorizontal, Plus, Search, ShieldCheck, UserCheck, UserRound, UserSquare, Users, X } from 'lucide-react'
-import { AnimatePresence, motion } from "motion/react"
-import { useEffect, useState } from 'react'
+import { CalendarDaysIcon, EyeIcon, FunnelXIcon, InfoIcon, ListFilter, MoreHorizontal, Plus, Search, UserSquare, X } from 'lucide-react'
+import { motion } from "motion/react"
+import { useMemo, useState } from 'react'
 import { useDebounce } from 'use-debounce'
 
 
 function ManageReviewsPage() {
-    const [query, setQuery] = useState('')
-    const [queryParams] = useDebounce(query, 300)
-    const { data } = useQuery<UserSchema[]>({
-        queryKey: ['reviewers', queryParams],
-        queryFn: async () => {
-            const { data } = await api.get<UserSchema[]>(`/reviews/users${queryParams}`)
-            return data
-        }
+    const [filters, setFilters] = useState<Filter[]>([])
+    const [search, setSearch] = useState('')
+    const [page, setPage] = useState(1)
+    const [itemsPerPage, setItemsPerPage] = useState(10)
+    const [debouncedSearch] = useDebounce(search, 500)
+
+    const requestParams = useMemo<PaginatedRequest>(() => ({
+        filters,
+        page,
+        itemsPerPage,
+        search: debouncedSearch,
+    }), [filters, page, itemsPerPage, debouncedSearch]);
+
+    const { data: pageResults, isLoading } = useQuery<PaginatedResponse<ReviewAssignment>>({
+        queryKey: ['reviewers', requestParams],
+        queryFn: async () => await getAllAssignments(requestParams)
     })
 
-    const filteredUsers = (data as any) ?? []
-
-    const [filters, setFilters] = useState<Filter[]>([])
-
-
-    useEffect(() => {
-        const query = filtersToQuery(filters)
-        setQuery(query)
-    }, [filters])
-
-
-    const colorClasses = {
-        blue: {
-            border: "border-t-blue-700",
-            text: "text-blue-700",
-            fill: "fill-blue-700",
-        },
-        green: {
-            border: "border-t-green-700",
-            text: "text-green-700",
-            fill: "fill-green-700",
-        },
-        red: {
-            border: "border-t-red-700",
-            text: "text-red-700",
-            fill: "fill-red-700",
-        },
-        amber: {
-            border: "border-t-amber-700",
-            text: "text-amber-700",
-            fill: "fill-amber-700",
-        },
-    } as const
+    const [selected, setSelected] = useState<number>(-1)
+    const [open, setOpen] = useState(false)
 
     return (
         <div className='w-full h-full flex flex-col'>
@@ -82,72 +63,15 @@ function ManageReviewsPage() {
                         </p>
                     </div>
                 </div>
-
-                <ScrollArea className='flex justify-between gap-5 mt-8 w-full'>
-                    <div className="flex w-max space-x-4">
-                        {[
-                            {
-                                color: "blue",
-                                title: "Total Users",
-                                count: 19,
-                                Icon: Users,
-                            },
-                            {
-                                color: "green",
-                                title: "Active Users",
-                                count: 15,
-                                Icon: UserCheck,
-                            },
-                            {
-                                color: "amber",
-                                title: "Administrators",
-                                count: 2,
-                                Icon: ShieldCheck,
-                            },
-                            {
-                                color: "blue",
-                                title: "Participants",
-                                count: 10,
-                                Icon: UserRound,
-                            },
-                            {
-                                color: "green",
-                                title: "Reviewers",
-                                count: 7,
-                                Icon: ClipboardCheck,
-                            },
-                        ].map((item) => {
-                            const c = colorClasses[item.color]
-
-                            return (
-                                <Card key={item.title} className={cn("w-55 shrink-0 border-t-6 py-4 gap-0", c.border)}>
-                                    <CardHeader className="items-center">
-                                        <CardAction className="order-first">
-                                            <item.Icon className={cn("size-5", c.text, c.fill)} />
-                                        </CardAction>
-                                        <CardTitle>{item.title}</CardTitle>
-                                    </CardHeader>
-
-                                    <CardContent>
-                                        <CardDescription className={cn("text-3xl font-bold", c.text)}>
-                                            {item.count}
-                                        </CardDescription>
-                                    </CardContent>
-                                </Card>
-                            )
-                        })}
-                    </div>
-                    <ScrollBar orientation="horizontal" />
-                </ScrollArea>
             </div>
 
-            <section className='flex-1 h-full bg-secondary'>
-                <div className='space-y-4 py-4 px-8 h-full'>
+            <section className='flex-1 h-full bg-secondary p-2 md:p-6'>
+                <div className='space-y-4 h-full'>
                     <div className='flex justify-between'>
                         <div className="flex items-center gap-4">
                             <div>
                                 <p className="text-sm font-medium">
-                                    {filteredUsers?.length ?? 0} users found
+                                    {/* {filteredUsers?.length ?? 0} users found */}
                                 </p>
 
                                 <p className="text-xs text-muted-foreground">
@@ -166,7 +90,11 @@ function ManageReviewsPage() {
 
                         <div className='flex gap-2'>
                             <InputGroup className="max-w-xs">
-                                <InputGroupInput placeholder="Search..." />
+                                <InputGroupInput
+                                    value={search}
+                                    onChange={e => setSearch(e.target.value)}
+                                    placeholder="Search..."
+                                />
                                 <InputGroupAddon>
                                     <Search />
                                 </InputGroupAddon>
@@ -220,72 +148,48 @@ function ManageReviewsPage() {
                         </div>
                     </div>
 
-                    <div>
-                        <AnimatePresence>
-                            {filteredUsers?.map((user, index) => (
-                                <motion.div
-                                    key={user.id}
-                                    initial={{ opacity: 0, x: -10, scale: 0.98 }}
-                                    animate={{ opacity: 1, x: 0, scale: 1 }}
-                                    exit={{ opacity: 0, x: 10, scale: 0.98 }}
-                                    transition={{
-                                        duration: 0.4,
-                                        delay: index * 0.1,
-                                        ease: "easeOut",
+                    <DialogReviewAssignmentForm
+                        onClose={() => {
+                            setSelected(null)
+                            setOpen(false)
+                        }}
+                        assignment={selected}
+                        setOpen={setOpen}
+                        open={open}
+                    />
+
+                    <section className="flex flex-wrap items-stretch gap-3">
+                        {pageResults?.results.map((assignment, i) => (
+                            <motion.div
+                                key={assignment.id}
+                                className="w-full max-w-sm flex"
+                                initial={{ opacity: 0, x: 12, scale: 0.98 }}
+                                animate={{ opacity: 1, x: 0, scale: 1 }}
+                                exit={{ opacity: 0, x: -12, scale: 0.98 }}
+                                transition={{ duration: 0.3, ease: "easeOut", delay: i * 0.1 }}
+                            >
+                                <ReviewAssignmentComponent
+                                    onAssignmentSelected={a => {
+                                        if (selected === a.id) {
+                                            setSelected(null)
+                                            setOpen(false)
+                                            return
+                                        }
+                                        setSelected(a.id)
+                                        setOpen(true)
                                     }}
-                                >
-                                    <Card
-                                        className={cn(
-                                            "border-l-6 border-l-primary-dark w-full py-3 rounded-l-none!",
-                                            "group cursor-pointer outline-2 outline-transparent rounded-md transition-colors duration-300",
-                                            "hover:outline-primary-light hover:shadow-sm",
-                                        )}
-                                    >
-                                        <CardContent className="flex items-center gap-4">
-                                            <Avatar className="size-16 shrink-0 shadow-md border-3 bg-card">
-                                                <AvatarImage src={user.photo as string || undefined} />
-                                                <AvatarFallback className='text-xl'>
-                                                    {user.full_name
-                                                        ?.split(" ")
-                                                        .map((x) => x[0])
-                                                        .join("")
-                                                        .slice(0, 2)}
-                                                </AvatarFallback>
-                                            </Avatar>
+                                    assignment={assignment}
+                                />
+                            </motion.div>
+                        ))}
+                    </section>
 
-                                            <div className="min-w-0 flex-1">
-                                                <div className="flex items-center gap-2">
-                                                    <h3 className="truncate font-medium text-lg text-primary-main">
-                                                        {user.full_name}
-                                                    </h3>
-
-                                                    <Badge
-                                                        variant={user.is_active ? "success" : "destructive"}
-                                                        className="h-5 px-2 text-[10px]"
-                                                    >
-                                                        {user.is_active ? "Active" : "Inactive"}
-                                                    </Badge>
-                                                </div>
-
-                                                <p className="truncate text-sm font-medium text-muted-foreground">
-                                                    {user.email}
-                                                </p>
-
-                                                <p className="mt-1 text-xs text-muted-foreground">
-                                                    Joined {formatDate(user.date_joined)} • Last login {formatDate(user.last_login)}
-                                                </p>
-                                            </div>
-
-                                            <div className="flex items-center gap-1">
-                                                <Button variant="ghost" size="icon-lg">
-                                                    <MoreHorizontal className="size-6" />
-                                                </Button>
-                                            </div>
-                                        </CardContent>
-                                    </Card>
-                                </motion.div>
-                            ))}
-                        </AnimatePresence>
+                    <div>
+                        <PaginationController
+                            onPageChange={setPage}
+                            page={page}
+                            totalPages={pageResults ? pageResults.meta.total_pages : 0}
+                        />
                     </div>
                 </div>
             </section>
@@ -297,98 +201,125 @@ export default ManageReviewsPage
 
 
 
-export const DJANGO_OPERATOR_MAP = {
-    is: '',                 // Equal / Se deja tal cual =
-    is_not: 'ne',              // Not equal / Excluir fecha u opción
-    contains: 'icontains',    // Búsqueda parcial (case-insensitive)
-    equals: 'exact',          // Coincidencia exacta estricta
-    includes: 'in',           // Búsqueda en una lista de opciones
-    excludes: 'not_in',    // Excluir elementos de una lista
-    startsWith: 'istartswith',// Inicia con (case-insensitive)
-    endsWith: 'iendswith',    // Termina con (case-insensitive)
-    greaterThan: 'gt',        // >
-    lessThan: 'lt',            // <
-    before: 'lt',          // Menor que (fechas)
-    after: 'gt',           // Mayor que (fechas)
-};
-
-
-export function filtersToQuery(filters: Filter[]) {
-    const queryUrl = filters.map(f => filterToQuery(f)).join('&')
-    return `${queryUrl && '/?'}${queryUrl}`;
+type ReviewAssignmentComponentProps = {
+    assignment: ReviewAssignment
+    onAssignmentSelected?: (a: ReviewAssignment) => void
 }
 
-export function filterToQuery(filter: Filter) {
-    const mappedOperator = DJANGO_OPERATOR_MAP[filter.operator]
-    return `${filter.field}${mappedOperator && '__'}${mappedOperator}=${filter.values.join(',')}`
-}
+export function ReviewAssignmentComponent({ assignment, onAssignmentSelected }: ReviewAssignmentComponentProps) {
+    const now = Date.now();
+    const remaining = assignment.due_date_timestamp - now;
 
-export function filtersToQueryParams(filters: Filter[]) {
-    const queryParams = filters.reduce((lastValue, item) => {
-        const operator = DJANGO_OPERATOR_MAP[item.operator]
-        const fieldKey = `${item.field}${operator && '__'}${operator}`
+    const days = Math.floor(remaining / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((remaining / (1000 * 60 * 60)) % 24);
+    const minutes = Math.floor((remaining / (1000 * 60)) % 60);
 
-        lastValue[fieldKey] = item.values.join(',')
-        return lastValue
-    }, {})
-    return queryParams
-}
+    const remainingText = remaining <= 0 ?
+        "Expired" : `${days}d ${hours}h ${minutes}m remaining`;
 
-
-type CustomRendererProps = {
-    values: unknown[]
-    onChange: (values: unknown[]) => void
-    autoFocus?: boolean
-}
-
-export function CustomDateInput({ values, onChange, autoFocus }: CustomRendererProps) {
-    const value = Number(values?.[0])
-    const date = value ? new Date(value) : undefined
-
-    const [isOpen, setIsOpen] = useState(false)
-
-    useEffect(() => {
-        if (autoFocus) {
-            const timer = setTimeout(() => setIsOpen(true), 400)
-            return () => clearTimeout(timer)
-        }
-    }, [autoFocus])
-
-    const handleSelect = (selectedDate: Date | undefined) => {
-        if (selectedDate) {
-            const iso = Number(selectedDate)
-            onChange([iso])
-            setIsOpen(false)
-        }
-    }
-
-    const handleCancel = () => {
-        setIsOpen(false)
-    }
-
-    const displayText = date ? format(date, "PPP") : "Select a date"
+    const badgeVariant = (
+        remaining <= 0 ?
+            "destructive" : remaining < 1000 * 60 * 60 * 24 ?
+                "warning" : "success"
+    ) as "success" | "warning" | "destructive"
 
     return (
-        <Popover open={isOpen} onOpenChange={setIsOpen}>
-            <PopoverTrigger asChild>
-                <div className='flex items-center font-normal'>
-                    {/* <CalendarIcon className="mr-2 h-4 w-4" /> */}
-                    {displayText}
+        <Card key={assignment.id} className="h-full w-full overflow-hidden transition-shadow hover:shadow-md gap-0">
+            <CardHeader>
+                <div className="flex items-start gap-2">
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                            <InfoIcon className="mt-1 stroke-3 size-4 shrink-0 text-primary-main dark:text-foreground" />
+                        </TooltipTrigger>
+                        <TooltipContent>
+                            <p className="text-xs w-full truncate">Assigned by:</p>
+                            <p className="font-medium">{assignment.assigned_by.full_name}</p>{" "}
+                            <p className='text-[10px]'>{assignment.assigned_by.email}</p>
+
+                            <Separator className='my-2' />
+
+                            <p>Created: {formatDate(new Date(assignment.created_at_timestamp))}</p>
+                            <p>Updated: {formatDate(new Date(assignment.last_update_timestamp))}</p>
+                        </TooltipContent>
+                    </Tooltip>
+                    <CardTitle
+                        className="line-clamp-2 max-sm:text-sm text-lg leading-tight"
+                        dangerouslySetInnerHTML={{
+                            __html: assignment.abstract.title,
+                        }}
+                    />
                 </div>
-            </PopoverTrigger>
-            <PopoverContent className="w-auto p-0" align="start" sideOffset={8}>
-                <Calendar
-                    mode="single"
-                    selected={date}
-                    onSelect={handleSelect}
-                />
-                <div className="border-border flex items-center justify-end gap-1.5 border-t p-3">
-                    <Button variant="outline" onClick={handleCancel}>
-                        Cancel
-                    </Button>
-                    <Button onClick={() => setIsOpen(false)}>Apply</Button>
+
+                <CardAction>
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <Button
+                                variant="ghost"
+                                size="icon"
+                            >
+                                <MoreHorizontal className="size-5" />
+                            </Button>
+                        </DropdownMenuTrigger>
+
+                        <DropdownMenuContent className="w-40" align="end">
+                            <DropdownMenuGroup>
+                                <DropdownMenuLabel className="text-xs text-muted-foreground">
+                                    Actions
+                                </DropdownMenuLabel>
+
+                                <DropdownMenuItem
+                                    onClick={() => {
+                                        onAssignmentSelected(assignment)
+                                    }}
+                                // onClick={() => navigate(routes.users.reviews.view.build({ id: assignment.id }))}
+                                >
+                                    <EyeIcon />
+                                    <span>View detail</span>
+                                </DropdownMenuItem>
+                            </DropdownMenuGroup>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
+                </CardAction>
+            </CardHeader>
+
+            <CardContent>
+                <CardDescription className="border-b pb-3 mb-3 flex flex-wrap items-center gap-2 text-xs">
+                    <div className="flex items-center gap-1.5">
+                        <CalendarDaysIcon className="size-3.5" />
+                        <span>
+                            Due date: {formatDate(new Date(assignment.due_date_timestamp))}
+                        </span>
+                    </div>
+
+                    <Badge
+                        variant={badgeVariant}
+                        className="h-5 text-[10px] ml-auto"
+                    >
+                        {remainingText}
+                    </Badge>
+                </CardDescription>
+
+                <div className='text-left font-normal flex gap-2 items-center'>
+                    <Avatar className="size-8 shrink-0 border shadow-sm">
+                        <AvatarImage loading='lazy' src={assignment.user.photo as string ?? null} />
+                        <AvatarFallback>
+                            <span className='text-xs leading-0'>
+                                {assignment.user.full_name
+                                    .split(" ")
+                                    .map((x) => x[0])
+                                    .join("")
+                                    .slice(0, 2)
+                                }
+                            </span>
+                        </AvatarFallback>
+                    </Avatar>
+                    <div className="truncate">
+                        <p className="max-sm:text-[10px] text-xs text-muted-foreground">Assigned to</p>
+                        <p className="max-sm:text-xs text-sm truncate font-medium" title={assignment.user.full_name}>{assignment.user.full_name}</p>
+                        <p className='max-sm:text-[10px] text-xs truncate text-muted-foreground'>{assignment.user.email}</p>
+                    </div>
                 </div>
-            </PopoverContent>
-        </Popover>
+            </CardContent>
+        </Card>
     )
 }

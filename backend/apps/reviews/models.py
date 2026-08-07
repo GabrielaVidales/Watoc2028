@@ -1,4 +1,5 @@
 from django.db import models
+from django.db.models import Q
 from django.contrib.auth import get_user_model
 from apps.abstracts.models import Abstract
 
@@ -21,7 +22,12 @@ class ReviewAssignment(models.Model):
             models.UniqueConstraint(
                 fields=["user", "abstract"],
                 name="unique_user_abstract_review_assignment",
-            )
+            ),
+            models.UniqueConstraint(
+                fields=["abstract"],
+                condition=Q(is_active=True),
+                name="unique_active_review_assignment_per_abstract",
+            ),
         ]
 
     user = models.ForeignKey(
@@ -60,11 +66,11 @@ class ReviewAssignment(models.Model):
     is_active = models.BooleanField(
         db_column="is_active",
     )
-    
+
     def __str__(self):
         title = self.abstract.get_plain_title()
         truncated_title = (title[:32] + "...") if len(title) > 35 else title
-        return f'ReviewAssignment(abstract={truncated_title}, user={self.user.get_full_name()})'
+        return f"ReviewAssignment(abstract={truncated_title}, user={self.user.get_full_name()})"
 
 
 class Review(models.Model):

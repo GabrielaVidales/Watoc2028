@@ -40,6 +40,8 @@ class RelatedUserSerializer(serializers.ModelSerializer):
 
 
 class AbstractSerializer(serializers.ModelSerializer):
+    user = serializers.SerializerMethodField()
+    
     class Meta:
         model = Abstract
         fields = [
@@ -49,7 +51,11 @@ class AbstractSerializer(serializers.ModelSerializer):
             "created_at",
             "last_update",
             "last_review_at",
+            "user",
         ]
+        
+    def get_user(self, instance):
+        return RelatedUserSerializer(instance.user, context=self.context).data
 
 
 class ReviewAssignmentSerializer(serializers.ModelSerializer):
@@ -100,6 +106,10 @@ class ReviewAssignmentSerializer(serializers.ModelSerializer):
 
     def get_last_update_timestamp(self, obj):
         return int(obj.last_update.timestamp() * 1000)
+
+
+
+
 
     @transaction.atomic
     def create(self, validated_data):

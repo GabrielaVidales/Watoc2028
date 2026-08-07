@@ -1,13 +1,40 @@
 import api from "@/clients/api";
 import { notify } from "@/components/custom/notify";
+import type { PaginatedRequest, PaginatedResponse } from "@/domain/pagination";
 import type { ReviewAssignment } from "@/domain/reviews";
 import type { AssignmentFormOutput } from "@/schemas/reviews/review-assignment-schema";
+import { filtersToQueryParams } from "@/utils/filter-operations";
+
+async function getAllAssignments(requestData: PaginatedRequest = {}) {
+    const { data } = await api.get<PaginatedResponse<ReviewAssignment>>('/reviews/assignments/', {
+        params: {
+            page: requestData.page,
+            limit: requestData.itemsPerPage,
+            search: requestData.search,
+            ...filtersToQueryParams(requestData.filters),
+        }
+    })
+    return data
+}
+
+
+async function getAssignment(id: number) {
+    const { data } = await api.get<ReviewAssignment>(`/reviews/assignments/${id}/`);
+    return data;
+}
 
 
 async function createAssignment(data: AssignmentFormOutput): Promise<ReviewAssignment> {
     const { data: responseData } = await api.post('/reviews/assignments/', data);
     return responseData;
 }
+
+
+async function updateAssignment(data: AssignmentFormOutput): Promise<ReviewAssignment> {
+    const { data: responseData } = await api.patch(`/reviews/assignments/${data.id}/`, data);
+    return responseData;
+}
+
 
 
 // Truncar títulos largos
@@ -36,14 +63,34 @@ function notifyAssignmentCreated(assignment: ReviewAssignment) {
                 The submission{" "}
                 <span className='font-medium'>"{title}"</span>{" "}
                 was successfully assigned to{" "}
-                <span className='font-medium'>{assignment.user.full_name}</span>
+                <span className='font-medium'>{assignment.user.full_name}</span>.
+            </span>
+        ),
+    })
+}
+
+function notifyAssignmentUpdated(assignment: ReviewAssignment) {
+    const title = getTruncatedTitle(assignment.abstract.title)
+    notify.success('Review Assignment updated!', {
+        className: 'md:w-110 md:max-w-110',
+        description: (
+            <span>
+                The submission{" "}
+                <span className='font-medium'>"{title}"</span>{" "}
+                assigned to{" "}
+                <span className='font-medium'>{assignment.user.full_name}</span>{" "}
+                was successfully updated.
             </span>
         ),
     })
 }
 
 export {
+    getAssignment,
+    getAllAssignments,
     createAssignment,
-    notifyAssignmentCreated
+    updateAssignment,
+    notifyAssignmentCreated,
+    notifyAssignmentUpdated,
 };
 

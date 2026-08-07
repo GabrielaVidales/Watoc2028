@@ -39,6 +39,7 @@ import ReviewsList from './pages/protected/reviews/list/page'
 import ReviewAbstract from './pages/protected/reviews/view/page'
 import ManageReviewsPage from './pages/protected/administration/manage-reviews/manage-reviews'
 import EditAbstractPage from './pages/protected/submissions/edit/edit-submission-page'
+import LoginLayout from './layouts/LoginLayout'
 
 function App() {
 	const { pathname } = useLocation()
@@ -68,7 +69,7 @@ function App() {
 
 			{/* Rutas sólo para usuarios no loggeados */}
 			<Route element={<GuestRoute redirectTo={routes.users.profile} />}>
-				<Route element={<AuthLayout />}>
+				<Route element={<LoginLayout />}>
 					<Route path={routes.auth.login} element={<LoginPage />} />
 					<Route path={routes.auth.register} element={<RegisterPage />} />
 					<Route path={routes.auth.forgotPassword} element={<ForgotPasswordPage />} />

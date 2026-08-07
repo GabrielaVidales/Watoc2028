@@ -7,6 +7,7 @@ import { cn } from '@/lib/utils'
 import { addDays, format } from 'date-fns'
 import { CalendarIcon, ChevronDownIcon, Clock2Icon } from 'lucide-react'
 import React, { type ButtonHTMLAttributes } from 'react'
+import type { Matcher } from 'react-day-picker'
 
 
 type DateDayPreset = {
@@ -16,7 +17,8 @@ type DateDayPreset = {
 
 
 type DateTimePopoverProps = {
-    value: Date
+    disableDates?: Matcher | Matcher[]
+    value?: Date
     onChange?: (...event: any[]) => void
     presets?: DateDayPreset[]
 } & Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'value' | 'onChange'>
@@ -26,6 +28,8 @@ export function DateTimePopover({
     value,
     onChange,
     presets = [],
+    disableDates,
+    className,
     ...rest
 }: DateTimePopoverProps) {
     const [timeZone, setTimeZone] = React.useState<string | undefined>(undefined)
@@ -75,7 +79,8 @@ export function DateTimePopover({
                     variant="outline"
                     className={cn(
                         "group w-full justify-between font-normal",
-                        !value && "text-muted-foreground"
+                        !value && "text-muted-foreground",
+                        className,
                     )}
                 >
                     <span className="flex items-center gap-2 group-aria-invalid:text-destructive">
@@ -98,6 +103,7 @@ export function DateTimePopover({
                         month={currentMonth}
                         onMonthChange={setCurrentMonth}
                         fixedWeeks
+                        disabled={disableDates}
                         className="border-r p-3"
                         classNames={{
                             today: "bg-primary/15 text-primary rounded-md",

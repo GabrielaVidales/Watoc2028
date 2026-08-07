@@ -1,11 +1,13 @@
 import api from "@/clients/api"
 import { Filters, type Filter, type FilterFieldConfig, type FilterOperator, type FilterOption, } from "@/components/reui/filters"
 import type { PaginatedResponse } from "@/domain/pagination"
-import { CustomDateInput } from "@/pages/protected/administration/manage-reviews/manage-reviews"
 import type { UserSchema } from "@/schemas/user-schemas"
+import { format } from "date-fns"
 import { CalendarIcon, CheckCircle2, Circle, FilterIcon, IdCard, Mail, ShieldCheck, UsersIcon } from 'lucide-react'
-import { useMemo, useRef } from "react"
+import { useEffect, useMemo, useRef, useState } from "react"
 import { Button } from "../ui/button"
+import { Calendar } from "../ui/calendar"
+import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover"
 
 
 type CustomFilterProps = {
@@ -146,5 +148,65 @@ export function CustomUserFilter({
                 </Button>
             }
         />
+    )
+}
+
+
+
+type CustomRendererProps = {
+    values: unknown[]
+    onChange: (values: unknown[]) => void
+    autoFocus?: boolean
+}
+
+export function CustomDateInput({ values, onChange, autoFocus }: CustomRendererProps) {
+    const value = Number(values?.[0])
+    const date = value ? new Date(value) : undefined
+
+    const [isOpen, setIsOpen] = useState(false)
+
+    useEffect(() => {
+        if (autoFocus) {
+            const timer = setTimeout(() => setIsOpen(true), 400)
+            return () => clearTimeout(timer)
+        }
+    }, [autoFocus])
+
+    const handleSelect = (selectedDate: Date | undefined) => {
+        if (selectedDate) {
+            const iso = Number(selectedDate)
+            onChange([iso])
+            setIsOpen(false)
+        }
+    }
+
+    const handleCancel = () => {
+        setIsOpen(false)
+    }
+
+    const displayText = date ? format(date, "PPP") : "Select a date"
+
+    return (
+        <Popover open={isOpen} onOpenChange={setIsOpen}>
+            <PopoverTrigger asChild>
+                <div className='flex items-center font-normal'>
+                    {/* <CalendarIcon className="mr-2 h-4 w-4" /> */}
+                    {displayText}
+                </div>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0" align="start" sideOffset={8}>
+                <Calendar
+                    mode="single"
+                    selected={date}
+                    onSelect={handleSelect}
+                />
+                <div className="border-border flex items-center justify-end gap-1.5 border-t p-3">
+                    <Button variant="outline" onClick={handleCancel}>
+                        Cancel
+                    </Button>
+                    <Button onClick={() => setIsOpen(false)}>Apply</Button>
+                </div>
+            </PopoverContent>
+        </Popover>
     )
 }

@@ -22,11 +22,11 @@ import type { PaginatedResponse } from '@/domain/pagination'
 import { AdminEditUserForm } from '@/forms/admin/users/admin-edit-user-form'
 import { cn } from '@/lib/utils'
 import type { UserSchema } from '@/schemas/user-schemas'
+import { filtersToQueryParams } from '@/utils/filter-operations'
 import { useQuery } from '@tanstack/react-query'
 import { EditIcon, FunnelXIcon, ListFilter, MoreHorizontalIcon, PlusIcon, Search, Trash2Icon, Users2, X } from 'lucide-react'
 import React from 'react'
 import { useDebounce } from 'use-debounce'
-import { filtersToQueryParams } from '../manage-reviews/manage-reviews'
 
 
 

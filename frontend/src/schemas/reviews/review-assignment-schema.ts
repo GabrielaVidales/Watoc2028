@@ -1,16 +1,19 @@
 import z from "zod";
 
+const tomorrow = new Date()
+tomorrow.setHours(24, 0, 0, 0)
 
 const assignmentSchema = z.object({
+    id: z.number().optional(),
     user: z.any().nullable(),
     abstract: z.any().nullable(),
     assigned_by: z.any().nullable(),
     is_active: z.boolean(),
-    due_date: z.date('Required').nullable(),
+    due_date: z.date('Required').nullable()
 })
     .transform((data, ctx) => {
-        if (!data.due_date){
-          ctx.addIssue({
+        if (!data.due_date) {
+            ctx.addIssue({
                 code: "custom",
                 message: "Invalid date",
                 path: ["due_date"],
@@ -34,7 +37,7 @@ const assignmentSchema = z.object({
         }
 
         if (!data.assigned_by || !data?.assigned_by.id) {
-            
+
             ctx.addIssue({
                 code: "custom",
                 message: "Select a valid user",
@@ -43,6 +46,7 @@ const assignmentSchema = z.object({
         }
 
         return {
+            id: data.id as number,
             user_id: data.user?.id as number,
             abstract_id: data.abstract?.id as number,
             assigned_by_id: data.assigned_by?.id as number,
