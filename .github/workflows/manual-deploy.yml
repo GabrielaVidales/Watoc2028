@@ -49,7 +49,13 @@ jobs:
     name: Deploy project in VPS
     needs: build_and_test
     runs-on: ubuntu-latest
-    environment: ${{ github.event.inputs.environment }}
+    env:
+      VPS_HOST: ${{ github.event.inputs.environment == 'prod' && secrets.PROD_VPS_HOST || secrets.DEV_VPS_HOST }}
+      VPS_USER: ${{ github.event.inputs.environment == 'prod' && secrets.PROD_VPS_USER || secrets.DEV_VPS_USER }}
+      VPS_SSH_KEY: ${{ github.event.inputs.environment == 'prod' && secrets.PROD_VPS_SSH_KEY || secrets.DEV_VPS_SSH_KEY }}
+      FRONTEND_DEPLOY_PATH: ${{ github.event.inputs.environment == 'prod' && secrets.PROD_FRONTEND_DEPLOY_PATH || secrets.DEV_FRONTEND_DEPLOY_PATH }}
+      BACKEND_PROJECT_PATH: ${{ github.event.inputs.environment == 'prod' && secrets.PROD_BACKEND_PROJECT_PATH || secrets.DEV_BACKEND_PROJECT_PATH }}
+      DJANGO_SERVICE_NAME: ${{ github.event.inputs.environment == 'prod' && secrets.PROD_DJANGO_SERVICE_NAME || secrets.DEV_DJANGO_SERVICE_NAME }}
  
     steps:
       - uses: actions/checkout@v4
@@ -81,7 +87,7 @@ jobs:
           host: ${{ secrets.VPS_HOST }}
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.VPS_SSH_KEY }}
-          port: ${{ secrets.VPS_PORT || 22 }}
+          port: 22
           source: "frontend/dist/*"
           target: ${{ secrets.FRONTEND_DEPLOY_PATH }}
           strip_components: 2
@@ -93,7 +99,7 @@ jobs:
           host: ${{ secrets.VPS_HOST }}
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.VPS_SSH_KEY }}
-          port: ${{ secrets.VPS_PORT || 22 }}
+          port: 22
           timeout: 10m
           command_timeout: 10m
           script: |
