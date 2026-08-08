@@ -37,6 +37,13 @@ jobs:
       uses: actions/setup-python@v5
       with:
         python-version: ${{ matrix.python-version }}
+      
+    - name: Install Cairo C dependencies
+      if: ${{ github.event.inputs.target == 'all' || github.event.inputs.target == 'backend' }}
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y libcairo2-dev pkg-config python3-dev
+
     - name: Install Dependencies
       if: ${{ github.event.inputs.target == 'all' || github.event.inputs.target == 'backend' }}
       run: |
