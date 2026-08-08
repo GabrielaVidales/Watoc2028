@@ -1,0 +1,121 @@
+name: WATOC 2028 CI/CD Pipeline
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Entorno que se va a desplegar'
+        required: true
+        default: 'dev'
+        type: choice
+        options:
+          - dev
+          - prod
+      target:
+        description: '¿Qué deseas desplegar?'
+        required: true
+        default: 'all'
+        type: choice
+        options:
+          - all
+          - backend
+          - frontend
+
+jobs:
+  build_and_test:
+    name: Build & Run Unit Tests (Django) 
+    runs-on: ubuntu-latest
+    strategy:
+      max-parallel: 4
+      matrix:
+        python-version: [3.12]
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up Python ${{ matrix.python-version }}
+      if: ${{ github.event.inputs.target == 'all' || github.event.inputs.target == 'backend' }}
+      uses: actions/setup-python@v5
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install Dependencies
+      if: ${{ github.event.inputs.target == 'all' || github.event.inputs.target == 'backend' }}
+      run: |
+        cd backend
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        python manage.py test
+
+  deploy:
+    name: Deploy project in VPS
+    needs: build_and_test
+    runs-on: ubuntu-latest
+    environment: ${{ github.event.inputs.environment }}
+ 
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install pnpm
+        if: ${{ github.event.inputs.target == 'all' || github.event.inputs.target == 'frontend' }}
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - name: Setup Node.js
+        if: ${{ github.event.inputs.target == 'all' || github.event.inputs.target == 'frontend' }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: 'pnpm'
+          cache-dependency-path: 'frontend/pnpm-lock.yaml'
+
+      - name: Compile React
+        if: ${{ github.event.inputs.target == 'all' || github.event.inputs.target == 'frontend' }}
+        run: |
+          cd frontend
+          pnpm install --frozen-lockfile
+          pnpm build
+
+      - name: Copy dist to VPS
+        if: ${{ github.event.inputs.target == 'all' || github.event.inputs.target == 'frontend' }}
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          port: ${{ secrets.VPS_PORT || 22 }}
+          source: "frontend/dist/*"
+          target: ${{ secrets.FRONTEND_DEPLOY_PATH }}
+          strip_components: 2
+
+      - name: Deploy backend
+        if: ${{ github.event.inputs.target == 'all' || github.event.inputs.target == 'backend' }}
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          port: ${{ secrets.VPS_PORT || 22 }}
+          timeout: 10m
+          command_timeout: 10m
+          script: |
+            set -e
+            
+            echo ">>> Actualizando Django en [${{ github.event.inputs.environment }}]..."
+            
+            cd ${{ secrets.BACKEND_PROJECT_PATH }}
+            git pull origin ${{ github.ref_name }}
+            
+            cd backend
+            source venv/bin/activate
+            pip install -r requirements.txt
+            python manage.py migrate
+            python manage.py collectstatic --noinput
+
+            sudo systemctl restart ${{ secrets.DJANGO_SERVICE_NAME }}
+            
+            echo ">>> Despliegue en ${{ github.event.inputs.environment }} finalizado con éxito."
+            
+
+
+
+
+            
