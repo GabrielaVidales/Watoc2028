@@ -116,9 +116,9 @@ function App() {
 					<Route path={routes.users.settings} element={<SettingsPage />} />
 					<Route path={routes.users.notifications} element={<NotificationsPage />} />
 				</Route>
-				<Route path={'/test'} element={<TestPage />} />
 			</Route>
 
+			<Route path={'/test'} element={<TestPage />} />
 			<Route path={routes.auth.verify} element={<VerifyEmailPage />} />
 
 			{/* Para rutas diferentes */}

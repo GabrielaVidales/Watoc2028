@@ -43,7 +43,7 @@ class CustomTokenObtainPairView(TokenObtainPairView):
                     {
                         "errors": {
                             "email": ["This email is not registered for WATOC 2028."],
-                            "root": ["Authentication failed. Please check details and try again."],
+                            "root": ["Authentication failed!"],
                         }
                     },
                     status=status.HTTP_401_UNAUTHORIZED,
@@ -56,7 +56,7 @@ class CustomTokenObtainPairView(TokenObtainPairView):
                         {
                             "errors": {
                                 "password": ["Incorrect password. Please verify your credentials."],
-                                "root": ["Authentication failed. Please check your details and try again."],
+                                "root": ["Authentication failed!"],
                             }
                         },
                         status=status.HTTP_401_UNAUTHORIZED,
@@ -66,7 +66,7 @@ class CustomTokenObtainPairView(TokenObtainPairView):
                     return Response(
                         {
                             "errors": {
-                                "root": ["Authentication failed. Please try again."],
+                                "root": ["Something went wrong!"],
                             }
                         },
                         status=status.HTTP_401_UNAUTHORIZED,

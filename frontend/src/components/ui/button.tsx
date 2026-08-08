@@ -10,7 +10,7 @@ const buttonVariants = cva(
     variants: {
       variant: {
         default: "bg-primary text-primary-foreground hover:bg-primary/80 active:bg-primary/90",
-        main: "bg-primary-main text-primary-foreground hover:bg-primary-main/80 active:bg-primary-main/90",
+        main: "bg-primary-main text-primary-foreground hover:bg-primary-main/80 active:bg-primary-main/90 dark:text-foreground",
         success: "bg-green-600 text-white hover:bg-green-700 active:bg-green-800 focus-visible:ring-green-500/20 dark:bg-green-500 dark:hover:bg-green-600 dark:active:bg-green-700",
         warning: "bg-amber-500 text-black hover:bg-amber-600 active:bg-amber-700 focus-visible:ring-amber-500/20 dark:bg-amber-400 dark:text-black dark:hover:bg-amber-500 dark:active:bg-amber-600",
         destructive: "bg-destructive text-white hover:bg-destructive/60 focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40 dark:bg-destructive/60 active:bg-destructive/80",

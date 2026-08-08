@@ -1,4 +1,3 @@
-import { InfoAlert } from '@/components/InfoAlert';
 import { Button } from '@/components/ui/button';
 import { Field, FieldError, FieldLabel } from '@/components/ui/field';
 import { InputGroup, InputGroupAddon, InputGroupButton, InputGroupInput } from '@/components/ui/input-group';
@@ -7,19 +6,23 @@ import { cn } from '@/lib/utils';
 import { routes } from '@/routes/routes';
 import { loginSchema, type LoginFormValues } from '@/schemas/users/login-schema';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { isAxiosError } from 'axios';
 import { Eye, EyeOff, Lock, LogIn, Mail } from 'lucide-react';
-import { AnimatePresence, motion } from 'motion/react';
 import React from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { Link, useNavigate } from 'react-router';
 import { useAuth } from '../../../contexts/AuthContext';
+import { useMutation } from '@tanstack/react-query';
+import { notify } from '@/components/custom/notify';
+import { handleApiFormError } from '@/services/common';
 
 export default function LoginForm() {
     const navigate = useNavigate()
     const { handleLogin } = useAuth()
 
-    const form = useForm<LoginFormValues>({
+    const [showPassword, setShowPassword] = React.useState(false);
+    const toggleVisibility = () => setShowPassword((show) => !show);
+
+    const { setError, clearErrors, handleSubmit, control, formState: { isDirty, isSubmitting } } = useForm<LoginFormValues>({
         resolver: zodResolver(loginSchema),
         mode: 'onChange',
         defaultValues: {
@@ -28,73 +31,23 @@ export default function LoginForm() {
         },
     })
 
-    const { isValid, isSubmitting, errors } = form.formState
-    const { setError, clearErrors, handleSubmit } = form
 
     const onFormSubmit = handleSubmit(async (data) => {
-        try {
-            await handleLogin(data.email.toLowerCase(), data.password)
-            navigate('/user/profile', { replace: true })
-        } catch (error) {
-            if (isAxiosError(error)) {
-                if (error.response.data.message) {
-                    setError('root', {
-                        message: error.response.data.message,
-                        type: "400",
-                    })
-                }
-                const serverErrors = error.response.data.errors
-                if (serverErrors) {
-                    Object.keys(serverErrors).forEach((key) => {
-                        const fieldName = key as keyof LoginFormValues
-                        const errorValue = serverErrors[fieldName]
-                        const message = Array.isArray(errorValue) ? errorValue.join('. ') : errorValue
-                        setError(fieldName, {
-                            type: "server",
-                            message: message
-                        }, { shouldFocus: true })
-                    })
-                }
-            } else {
-                setError('root', {
-                    message: 'Connection failed. Please try again later.',
-                    type: "400",
-                })
-            }
-        }
+        await post.mutateAsync(data)
     })
 
-    const [showPassword, setShowPassword] = React.useState(false);
-    const toggleVisibility = () => setShowPassword((show) => !show);
+    const post = useMutation({
+        mutationFn: async (data: LoginFormValues) => await handleLogin(data.email.toLowerCase(), data.password),
+        onSuccess: () => navigate(routes.users.profile, { replace: true }),
+        onError: (error) => handleApiFormError(error, setError, notify, clearErrors),
+    })
 
     return (
-        <form onSubmit={onFormSubmit} onInput={() => clearErrors('root')}>
-            <AnimatePresence>
-                {errors.root && (
-                    <motion.div
-                        key='error'
-                        initial={{ opacity: 0, y: -10, height: 0 }}
-                        animate={{ opacity: 1, y: 0, height: 'auto' }}
-                        exit={{ opacity: 0, y: -10, height: 0 }}
-                        className="mb-4"
-                    >
-                        <InfoAlert
-                            variant='destructive'
-                            messages={[
-                                <span className='text-red-950'>
-                                    {errors.root.message}
-                                </span>
-                            ]}
-                            title='Server responded with an error:'
-                        />
-                    </motion.div>
-                )}
-            </AnimatePresence>
-
-            <fieldset disabled={isSubmitting} className='space-y-5'>
+        <form onSubmit={onFormSubmit} onInput={() => clearErrors('root')} noValidate>
+            <fieldset disabled={isSubmitting} className='space-y-3'>
                 <Controller
                     name="email"
-                    control={form.control}
+                    control={control}
                     render={({ field, fieldState }) => (
                         <Field data-invalid={fieldState.invalid}>
                             <FieldLabel htmlFor={field.name}>Email</FieldLabel>
@@ -113,13 +66,13 @@ export default function LoginForm() {
                                     <Mail />
                                 </InputGroupAddon>
                             </InputGroup>
-                            {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                            <FieldError allocateLayout size='xs' errors={[fieldState.error]} />
                         </Field>
                     )}
                 />
                 <Controller
                     name="password"
-                    control={form.control}
+                    control={control}
                     render={({ field, fieldState }) => (
                         <Field data-invalid={fieldState.invalid}>
                             <FieldLabel htmlFor={field.name}>Password</FieldLabel>
@@ -148,22 +101,27 @@ export default function LoginForm() {
                                     </InputGroupButton>
                                 </InputGroupAddon>
                             </InputGroup>
-                            {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                            <FieldError allocateLayout size='xs' errors={[fieldState.error]} />
                         </Field>
                     )}
                 />
 
                 <div className='flex justify-end'>
-                    <Link to={routes.auth.forgotPassword} className='w-fit text-primary-main hover:text-primary-light active:text-primary-dark'>
+                    <Link to={routes.auth.forgotPassword} className={cn(
+                        "text-sm underline underline-offset-3 text-primary-main",
+                        "hover:text-primary-light hover:decoration-double active:text-primary-dark"
+                    )}>
                         Forgot password?
                     </Link>
                 </div>
 
                 <div className='flex justify-center w-full'>
-                    <Button type='submit' variant='main'
-                        className='w-40 p-5 text-xl'
+                    <Button
+                        className='rounded-full px-4!'
+                        type='submit'
+                        variant='main'
                         data-icon="inline-start"
-                        disabled={!isValid}
+                        disabled={!isDirty}
                     >
                         {isSubmitting ? (
                             <Spinner data-icon="inline-start" />

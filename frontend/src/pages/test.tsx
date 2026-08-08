@@ -5,8 +5,12 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Separator } from '@/components/ui/separator'
 import ReviewAssignmentForm from '@/forms/reviews/review-assignment-form'
+import { routes } from '@/routes/routes'
+import { useNavigate } from 'react-router'
 
 function TestPage() {
+    const navigate = useNavigate()
+
     return (
         <div className='max-w-xl mx-auto w-full space-y-4 py-4'>
 
@@ -49,6 +53,31 @@ function TestPage() {
 
                     }}>
                         Test refresh token
+                    </Button>
+
+                    <Button onClick={() => {
+                        navigate(routes.auth.login, {
+                            state: {
+                                code: 'account-created',
+                                title: 'Verify your email address',
+                                email: 'data@email.com',
+                                description:
+                                    "We've sent a new verification link to your email address. Please check your inbox and spam folder."
+                            }
+                        })
+
+                        const email = "data@email.com"
+                        notify.success('Verify your email address', {
+                            description: (
+                                <span>
+                                    We've sent a new verification link to your email address{" "}
+                                    <span className='font-bold'>{email}</span>.{" "}
+                                    Please check your inbox and spam folder.
+                                </span>
+                            )
+                        })
+                    }}>
+                        Nav state
                     </Button>
                 </CardContent>
 

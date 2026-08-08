@@ -1,109 +1,89 @@
 import { Button } from '@/components/ui/button'
-import { Card, CardContent } from "@/components/ui/card"
+import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
 import { Link, useLocation } from 'react-router'
 import { ClipboardSignature, CheckCircle2, SquareUserRound } from 'lucide-react'
-import { useHeader } from '@/contexts/HeaderContext'
-import { useEffect } from 'react'
 import { routes } from '@/routes/routes'
 import LoginForm from '@/pages/auth/login/LoginForm'
 import { AnimatePresence, motion } from 'motion/react';
 import { InfoAlert } from '@/components/InfoAlert'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Separator } from '@/components/ui/separator'
 
 
 export default function LoginPage() {
-	const location = useLocation()
-
-	const { setTitle } = useHeader()
-
-	useEffect(() => {
-		setTitle('Sign Up to Attend WATOC 2028')
-	}, [setTitle])
-
-	useEffect(() => {
-		if (location.state) {
-			window.scrollTo(0, 0);
-		}
-	}, [location.state]);
-
 	return (
-		<section className='md:p-9 bg-fixed space-y-5'>
-			<Card className='max-w-xl md:max-w-2xl: lg:max-w-6xl mx-auto shadow-xl border overflow-hidden gap-0 p-0'>
-				<CardContent className='p-0'>
-					<div className='flex flex-col lg:flex-row items-stretch'>
-						<section className='flex-1 p-6 py-12 bg-white'>
-							<div className='max-w-sm mx-auto space-y-6'>
-								<div className='space-y-2 text-center flex flex-col items-center justify-center'>
-									<div className="size-15 flex justify-center items-center rounded-full bg-primary-main">
-										<SquareUserRound className='size-10 text-primary-contrast' />
-									</div>
-									<h2 className='text-2xl font-semibold'>Welcome back</h2>
-									<div className='h-1 w-12 mx-auto bg-primary-main rounded-full' />
+		<Tabs defaultValue="login" className='mx-auto w-full h-full flex justify-center items-start'>
+			<Card className='max-w-md w-full mx-auto shadow-xl pb-12'>
+				<CardHeader>
+					<TabsList variant="line" defaultValue='login' defaultChecked>
+						<TabsTrigger value="login">Login</TabsTrigger>
+						<TabsTrigger value="register">Register</TabsTrigger>
+					</TabsList>
+				</CardHeader>
+
+				<CardContent className='flex flex-col items-stretch'>
+					<TabsContent value="login" className='w-full'>
+						<div className='w-full max-w-xs mx-auto space-y-6'>
+
+							<div className='space-y-2 text-center flex flex-col items-center justify-center'>
+								<div className="size-14 flex justify-center items-center rounded-full bg-primary-main">
+									<SquareUserRound className='size-8 text-primary-contrast' />
 								</div>
-								<AnimatePresence>
-									{location.state?.code == 'account-created' && (
-										<motion.div
-											key='success'
-											initial={{ opacity: 0, y: -10, height: 0 }}
-											animate={{ opacity: 1, y: 0, height: 'auto' }}
-											exit={{ opacity: 0, y: -10, height: 0 }}
-											className="mb-4"
-										>
-											<InfoAlert
-												variant='success'
-												title={location.state.title}
-												messages={[
-													location.state.description
-												]}
-											/>
-										</motion.div>
-									)}
-								</AnimatePresence>
-								<LoginForm />
+								<h2 className='text-2xl font-semibold'>Welcome back to</h2>
+
+								<div className='h-1 w-12 mx-auto bg-primary-main rounded-full' />
 							</div>
-						</section>
 
-						<div className='w-full h-px lg:w-px lg:h-auto bg-slate-200 shrink-0' />
+							<LoginForm />
+						</div>
+					</TabsContent>
 
-						<section className='flex-1 p-6 py-12 bg-indigo-50/50'>
-							<div className='max-w-sm mx-auto h-full flex flex-col space-y-8'>
-								<div className='space-y-6'>
-									<div className='space-y-2 text-center flex flex-col items-center justify-center'>
-										<div className="size-15 flex justify-center items-center rounded-full bg-primary-main">
-											<ClipboardSignature className='size-10 text-primary-contrast' />
-										</div>
-										<h2 className='text-2xl font-semibold text-slate-900'>Not registered yet?</h2>
-										<div className='h-1 w-12 mx-auto bg-primary-main rounded-full' />
-										<p className='text-muted-foreground pt-2'>
-											Register to attend the congress and manage your participation in WATOC 2028.
-										</p>
-									</div>
+					<TabsContent value="register" className='w-full'>
+						<div className='w-full max-w-sm mx-auto space-y-6'>
 
-									<ul className='space-y-4'>
-										<li className='flex items-start gap-3 text-slate-700'>
-											<CheckCircle2 className='w-5 h-5 text-primary shrink-0 mt-0.5' />
-											<span className='text-sm font-medium'>Official registration and technical sessions</span>
-										</li>
-										<li className='flex items-start gap-3 text-slate-700'>
-											<CheckCircle2 className='w-5 h-5 text-primary shrink-0 mt-0.5' />
-											<span className='text-sm font-medium'>Abstract submission for oral presentations and posters</span>
-										</li>
-										<li className='flex items-start gap-3 text-slate-700'>
-											<CheckCircle2 className='w-5 h-5 text-primary shrink-0 mt-0.5' />
-											<span className='text-sm font-medium'>Certificates of attendance and participation</span>
-										</li>
-									</ul>
+							<div className='space-y-2 text-center flex flex-col items-center justify-center'>
+								<div className="size-14 flex justify-center items-center rounded-full bg-primary-main">
+									<ClipboardSignature className='size-8 text-primary-contrast' />
 								</div>
-
-								<Link to={routes.auth.register}>
-									<Button variant='main' className='w-full py-5 text-xl font-bold gap-3 shadow-lg'>
-										Join WATOC now
-									</Button>
-								</Link>
+								<h2 className='text-2xl font-semibold text-foreground'>Not registered yet?</h2>
+								<div className='h-1 w-12 mx-auto bg-primary-main rounded-full' />
+								<p className='text-muted-foreground pt-2 text-sm'>
+									Register to attend the congress and manage your participation in WATOC 2028.
+								</p>
 							</div>
-						</section>
-					</div>
+
+							<ul className='space-y-3 text-sm'>
+								<li className='flex items-center gap-3 text-foreground'>
+									<CheckCircle2 className='w-5 h-5 text-primary shrink-0' />
+									<span className='font-medium'>Official registration and technical sessions</span>
+								</li>
+								<li className='flex items-center gap-3 text-foreground'>
+									<CheckCircle2 className='w-5 h-5 text-primary shrink-0' />
+									<span className='font-medium'>Abstract submission for oral presentations and posters</span>
+								</li>
+								<li className='flex items-center gap-3 text-foreground'>
+									<CheckCircle2 className='w-5 h-5 text-primary shrink-0' />
+									<span className='font-medium'>Certificates of attendance and participation</span>
+								</li>
+							</ul>
+
+							<Link to={routes.auth.register}>
+								<Button variant='main' className='w-full py-5 text-xl font-bold gap-3 shadow-lg'>
+									Join WATOC now
+								</Button>
+							</Link>
+						</div>
+					</TabsContent>
 				</CardContent>
+
+				<Separator />
+
+				<CardFooter>
+					<p className='max-w-xs mx-auto text-center text-xs text-muted-foreground'>
+						By creating an account or logging in, you agree to the current Terms of Service and Privacy Policy
+					</p>
+				</CardFooter>
 			</Card>
-		</section>
+		</Tabs>
 	)
 }

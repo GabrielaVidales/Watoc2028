@@ -111,13 +111,15 @@ class UserSerializer(serializers.ModelSerializer):
     @transaction.atomic
     def create(self, validated_data):
         participant_data = validated_data.pop("participant", None)
-
         email = validated_data.pop("email", None)
         password = validated_data.pop("password", None)
+
+        # Esto dispara un signal para crear el profile de manera síncrona
         user = User.objects.create_user(email=email, password=password, **validated_data)
 
+        # Después actualiza el profile si hay participant data
         if participant_data is not None:
-            Participant.objects.create(user=user, **participant_data)
+            Participant.objects.filter(user=user).update(**participant_data)
 
         return user
 

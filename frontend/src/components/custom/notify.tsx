@@ -1,3 +1,4 @@
+import { useIsMobile } from "@/hooks/use-mobile"
 import { cn } from "@/lib/utils"
 import { AlertTriangle, CheckCircle2, Info, type LucideIcon, X, XCircle, } from "lucide-react"
 import type React from "react"
@@ -10,6 +11,8 @@ type NotifyOptions = {
     duration?: number
     action?: { onClick: () => void }
     className?: string
+    onDismiss?: () => void
+    onAutoClose?: () => void
 }
 
 const variants: Record<
@@ -55,7 +58,7 @@ function isString(value: React.ReactNode): value is string {
 function show(
     variant: Variant,
     title: string,
-    { description, duration = 4000, action, className }: NotifyOptions = {}
+    { description, duration = 4000, action, onDismiss, onAutoClose, className }: NotifyOptions = {}
 ) {
     const { icon: Icon, box, icono, button } = variants[variant]
 
@@ -64,9 +67,12 @@ function show(
             <div
                 role={variant === "destructive" ? "alert" : "status"}
                 className={cn(
-                    "flex w-full items-center gap-3 rounded-lg border-3 p-2 shadow-md",
-                    "md:max-w-100 md:min-h-18 text-foreground",
-                    box, className
+                    "flex items-center gap-3 rounded-lg border-3 p-2 shadow-md",
+                    "w-[calc(100vw-2rem)] max-w-89",
+                    "md:w-100 md:max-w-100 md:min-h-18",
+                    "text-foreground",
+                    box,
+                    className
                 )}
             >
                 <Icon className={cn("mt-0.5 size-7 shrink-0", icono)} />
@@ -99,6 +105,8 @@ function show(
         {
             duration,
             position: 'top-center',
+            onDismiss: onDismiss,
+            onAutoClose: onAutoClose,
         }
     )
 }

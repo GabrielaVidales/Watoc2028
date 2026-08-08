@@ -10,15 +10,56 @@ import { Separator } from '@/components/ui/separator';
 import { Spinner } from '@/components/ui/spinner';
 import { userPrefixes } from '@/domain/constants';
 import { routes } from '@/routes/routes';
+import type { UserSchema } from '@/schemas/user-schemas';
 import { registrationSchema, type RegisterFormInputValues, type RegisterFormOutputValues } from '@/schemas/users/registration-schema';
+import { handleApiFormError } from '@/services/common';
 import { countries } from '@/utils/countriesInfo';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useMutation } from '@tanstack/react-query';
 import { isAxiosError } from 'axios';
 import { Eye, EyeOff, KeyRoundIcon, KeySquare, Lock, LockOpenIcon, Send, UserSquare } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router';
 
+
+const defaultValues = import.meta.env.DEV ? {
+    password: {
+        value: 'Password123#',
+        confirm: 'Password123#',
+    },
+    nationality: 'MX',
+    city: 'asdsada',
+    email: {
+        confirm: 'asdasd@sadsa.sd',
+        value: 'asdasd@sadsa.sd',
+    },
+    affiliation: 'asdasd@sadsa.sd',
+    field_of_study: 'asdasd@sadsa.sd',
+    job_title: 'asdasd@sadsa.sd',
+    first_name: 'sadsads',
+    middle_name: 'adsads',
+    last_name: 'asdasd',
+    pronouns: 'asdas',
+} : {
+    password: {
+        value: '',
+        confirm: '',
+    },
+    nationality: '',
+    city: '',
+    email: {
+        confirm: '',
+        value: '',
+    },
+    affiliation: '',
+    field_of_study: '',
+    job_title: '',
+    first_name: '',
+    middle_name: '',
+    last_name: '',
+    pronouns: '',
+}
 
 export default function RegisterForm() {
     const navigate = useNavigate()
@@ -32,46 +73,24 @@ export default function RegisterForm() {
     } = useForm<RegisterFormInputValues, any, RegisterFormOutputValues>({
         resolver: zodResolver(registrationSchema),
         mode: 'onChange',
-        defaultValues: {
-            password: {
-                value: 'Password123#',
-                confirm: 'Password123#',
-            },
-            nationality: 'MX',
-            city: 'asdsada',
-            email: {
-                confirm: 'asdasd@sadsa.sd',
-                value: 'asdasd@sadsa.sd',
-            },
-            affiliation: 'asdasd@sadsa.sd',
-            field_of_study: 'asdasd@sadsa.sd',
-            job_title: 'asdasd@sadsa.sd',
-            first_name: 'sadsads',
-            middle_name: 'adsads',
-            last_name: 'asdasd',
-            pronouns: 'asdas',
-        }
+        defaultValues,
     })
 
-    const onFormSubmit = handleSubmit(async (data) => {
-        try {
-            if (import.meta.env.DEV) {
-                console.log(data);
-
-            }
-            await api.post('/users/', data)
-            navigate(routes.auth.login, {
-                replace: true,
-                state: {
-                    code: 'account-created',
-                    title: 'Verify your email address',
-                    email: data.email,
-                    description:
-                        "We've sent a new verification link to your email address. Please check your inbox and spam folder."
-                }
+    const post = useMutation({
+        mutationFn: async (data: RegisterFormOutputValues) => await api.post<UserSchema>('/users/', data),
+        onSuccess: ({ data }) => {
+            navigate(routes.auth.login, { replace: true })
+            notify.success('Verify your email address', {
+                description: (
+                    <span>
+                        We've sent a new verification link to your email address{" "}
+                        <span className='font-bold'>{data.email}</span>.{" "}
+                        Please check your inbox and spam folder.
+                    </span>
+                )
             })
-
-        } catch (error) {
+        },
+        onError: (error) => {
             if (isAxiosError(error)) {
                 if (import.meta.env.DEV) {
                     console.log(errors);
@@ -100,7 +119,11 @@ export default function RegisterForm() {
                     description: 'Connection failed. Please try again later.',
                 })
             }
-        }
+        },
+    })
+
+    const onFormSubmit = handleSubmit(async (data) => {
+        await post.mutateAsync(data)
     })
 
     const [showPassword, setShowPassword] = useState(false);

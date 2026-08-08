@@ -1,5 +1,5 @@
 import { cva, type VariantProps } from "class-variance-authority"
-import { useMemo } from "react"
+import { useMemo, useRef } from "react"
 
 import { Label } from "@/components/ui/label"
 import { Separator } from "@/components/ui/separator"
@@ -188,8 +188,9 @@ function FieldError({
   children,
   errors,
   size = 'sm',
+  allocateLayout,
   ...props
-}: { size?: 'sm' | 'xs' } & React.ComponentProps<"div"> & {
+}: { size?: 'sm' | 'xs', allocateLayout?: boolean } & React.ComponentProps<"div"> & {
   errors?: Array<{ message?: string } | undefined>
 }) {
   const content = useMemo(() => {
@@ -219,19 +220,54 @@ function FieldError({
     )
   }, [children, errors])
 
-  if (!content) {
-    return null
+  const lastContent = useRef(content)
+  if (content) {
+    lastContent.current = content
   }
 
+  if (!allocateLayout) {
+    if (!content) {
+      return null
+    }
+
+    return (
+      <div
+        role="alert"
+        data-slot="field-error"
+        className={cn(
+          "text-destructive font-normal flex gap-1 items-start",
+          size === 'sm' ? 'text-sm' : 'text-xs',
+          className
+        )}
+        {...props}
+      >
+        <AlertCircle className={cn("shrink-0", size === 'sm' ? 'size-4 mt-0.5' : 'size-3.5')} />
+        {content}
+      </div>
+    )
+  }
   return (
     <div
-      role="alert"
-      data-slot="field-error"
-      className={cn("text-destructive font-normal flex gap-1 items-start", size === 'sm' ? 'text-sm' : 'text-xs', className)}
-      {...props}
+      data-slot="field-error-wrapper"
+      data-visible={content ? "true" : "false"}
+      aria-hidden={!content}
+      className={cn(
+        "grid transition-all duration-200 ease-out motion-reduce:transition-none",
+        content ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"
+      )}
     >
-      <AlertCircle className={cn("shrink-0", size === 'sm' ? 'size-4 mt-0.5' : 'size-3.5')} />
-      {content}
+      <div className="overflow-hidden">
+
+        <div
+          role="alert"
+          data-slot="field-error"
+          className={cn("text-destructive font-normal flex gap-1 items-start", size === 'sm' ? 'text-sm' : 'text-xs', className)}
+          {...props}
+        >
+          <AlertCircle className={cn("shrink-0", size === 'sm' ? 'size-4 mt-0.5' : 'size-3.5')} />
+          {content ?? lastContent.current}
+        </div>
+      </div>
     </div>
   )
 }
