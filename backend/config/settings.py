@@ -8,7 +8,7 @@ load_dotenv()
 # Utilizar os.getenv() para utilizar las variables
 DEBUG = os.getenv("DEBUG", "False") == "True"
 
-SECRET_KEY = os.getenv("SECRET_KEY")
+SECRET_KEY = os.getenv("SECRET_KEY", "insecure-secret-key")
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
