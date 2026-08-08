@@ -67,6 +67,7 @@ jobs:
           source: "frontend/dist/*"
           target: ${{ secrets.FRONTEND_DEPLOY_PATH }}
           strip_components: 2
+          debug: true
 
       - name: Deploy backend
         if: ${{ github.event.inputs.target == 'all' || github.event.inputs.target == 'backend' }}
