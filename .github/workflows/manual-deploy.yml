@@ -51,8 +51,14 @@ jobs:
 
       - name: Compile React
         if: ${{ github.event.inputs.target == 'all' || github.event.inputs.target == 'frontend' }}
+        env:
+          VITE_API_URL: ${{ github.event.inputs.environment == 'prod' && secrets.PROD_VITE_API_URL || secrets.DEV_VITE_API_URL }}
+    
         run: |
           cd frontend
+          
+          echo "VITE_API_URL=${VITE_API_URL}" > .env.production
+          
           pnpm install --frozen-lockfile
           pnpm build
 
