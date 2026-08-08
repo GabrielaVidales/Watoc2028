@@ -30,7 +30,7 @@ jobs:
       VPS_USER: ${{ github.event.inputs.environment == 'prod' && secrets.PROD_VPS_USER || secrets.DEV_VPS_USER }}
       VPS_SSH_KEY: ${{ github.event.inputs.environment == 'prod' && secrets.PROD_VPS_SSH_KEY || secrets.DEV_VPS_SSH_KEY }}
       FRONTEND_DEPLOY_PATH: ${{ github.event.inputs.environment == 'prod' && secrets.PROD_FRONTEND_DEPLOY_PATH || secrets.DEV_FRONTEND_DEPLOY_PATH }}
-      BACKEND_PROJECT_PATH: ${{ github.event.inputs.environment == 'prod' && secrets.PROD_BACKEND_PROJECT_PATH || secrets.DEV_BACKEND_PROJECT_PATH }}
+      PROJECT_PATH: ${{ github.event.inputs.environment == 'prod' && secrets.PROD_PROJECT_PATH || secrets.DEV_PROJECT_PATH }}
       DJANGO_SERVICE_NAME: ${{ github.event.inputs.environment == 'prod' && secrets.PROD_DJANGO_SERVICE_NAME || secrets.DEV_DJANGO_SERVICE_NAME }}
  
     steps:
@@ -77,6 +77,7 @@ jobs:
           username: ${{ env.VPS_USER }}
           key: ${{ env.VPS_SSH_KEY }}
           port: 22
+          debug: true
           timeout: 10m
           command_timeout: 10m
           script: |
@@ -84,7 +85,7 @@ jobs:
             
             echo ">>> Actualizando Django en [${{ github.event.inputs.environment }}]..."
             
-            cd ${{ env.BACKEND_PROJECT_PATH }}
+            cd ${{ env.PROJECT_PATH }}
             git pull origin ${{ github.ref_name }}
             
             cd backend
