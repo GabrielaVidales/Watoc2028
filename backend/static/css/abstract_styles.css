@@ -30,10 +30,7 @@
 header#cabecera {
     position: running(cabecera);
 
-    // margin: 0 -1in;
     padding-top: 0cm;
-    // padding-left: 1cm;
-    // padding-right: 1cm;
     padding-bottom: 0;
 
     width: 100vw;
@@ -44,8 +41,6 @@ header#cabecera {
 
 footer#foot {
     position: running(pie);
-
-    // background-color: rgba(255, 188, 101, 0.5);
 
     margin: 0 -1in;
     padding-top: 0cm;
@@ -74,7 +69,7 @@ footer#foot {
 .header-logo {
     display: inline-block;
     vertical-align: middle;
-    width: 2.8in !important;
+    width: 2in !important;
     height: auto !important;
 }
 
@@ -90,54 +85,38 @@ header#cabecera div span {
 }
 
 
-
-body {
-    font-family: "Times New Roman", Times, serif;
-
-    // font-family: "Libertinus Serif", "STIX Two Text", serif;
-    // font-family: "Times New Roman", Times, serif;
-    /* Fuente clásica científica */
-    line-height: 1.5;
+body,
+h1,
+h2,
+p {
+    font-family: Georgia, serif;
     color: #1a1a1a;
-    margin: 0;
+    margin: 0 0 2mm 0;
     padding: 0;
 }
 
-
 .title {
-    font-size: 16pt;
-    font-weight: bold;
+    font-size: 14pt;
+    font-weight: 600;
     text-align: center;
-    margin-bottom: 0.5cm;
-    line-height: 1.2;
+    margin: 0 0 2mm 0;
+    line-height: 1;
 }
 
 .subtitle {
-    font-size: 12pt;
-    font-weight: bold;
-    text-transform: uppercase;
-    line-height: 1.2;
-}
-
-.text {
     font-size: 11pt;
-    text-align: justify;
-    hyphens: auto;
-    line-height: 1.5;
-    overflow-wrap: anywhere;
+    font-weight: 600;
+    text-transform: uppercase;
+    margin: 4mm 0 1mm 0;
+    line-height: 1;
 }
 
+.text,
 .references {
     font-size: 10pt;
     text-align: justify;
     hyphens: auto;
-    line-height: 1.5;
+    line-height: 1;
     overflow-wrap: anywhere;
-}
-
-.keywords {
-    font-size: 11pt;
-    /* Punto intermedio pro */
-    text-align: justify;
-    line-height: 1.2;
+    margin: 0;
 }

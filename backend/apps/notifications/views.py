@@ -70,7 +70,6 @@ class NotificationViewSet(ModelViewSet):
 
         notification.is_read = is_read
         notification.save(update_fields=["is_read"])
-        serializer = self.get_serializer(notification)
         return Response(status=status.HTTP_204_NO_CONTENT)
 
     @action(detail=False, methods=["patch"], url_path="toggle-all-read")

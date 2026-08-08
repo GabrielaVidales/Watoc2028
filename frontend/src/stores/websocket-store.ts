@@ -3,21 +3,21 @@ import { create } from "zustand";
 
 
 type WebSocketState = {
-    connected: boolean
-    connect: () => void;
-    disconnect: () => void;
-    send: (data: unknown) => void;
-}
+    connected: Record<string, boolean>;
+    connect: (socketUri?: string) => void;
+    disconnect: (socketUri?: string) => void;
+    send: (socketUri: string, data: unknown) => void;
+};
 
-let socket: WebSocket | null = null;
-let reconnectTimer: number | null = null;
-let reconnectAttempts = 0;
+let sockets = new Map<string, WebSocket>()
+const reconnectTimers = new Map<string, number>();
+const reconnectAttempts = new Map<string, number>();
 
 const MAX_DELAY = 30_000;
 
 const useWebsocket = create<WebSocketState>((set, get) => ({
-    connected: false,
-    connect() {
+    connected: {},
+    connect(socketUri = 'api/socket/') {
         if (import.meta.env.VITE_USE_WEBSOCKETS !== 'true') {
             if (import.meta.env.VITE_DEBUG) {
                 console.log(`[WebSocket] - Websocket disabled`)
@@ -25,34 +25,69 @@ const useWebsocket = create<WebSocketState>((set, get) => ({
             return
         }
 
-        socket = new WebSocket('ws://127.0.0.1:8000/ws/api/socket/')
+        const existingSocket = sockets.get(socketUri);
+        if (existingSocket && (
+            existingSocket.OPEN || existingSocket.CONNECTING
+        )) {
+            return
+        }
+
+        const socket = new WebSocket(`ws://127.0.0.1:8000/ws/${socketUri}`)
+
+        sockets.set(socketUri, socket);
 
         socket.onopen = (ev: Event) => {
             if (import.meta.env.VITE_DEBUG) {
                 console.log(`[WebSocket] - Open: ${ev.timeStamp}`)
             }
-            set({ connected: true })
-            reconnectAttempts = 0
+
+            set(state => ({
+                connected: {
+                    ...state.connected,
+                    socketUri: true,
+                }
+            }))
+            reconnectAttempts.set(socketUri, 0)
         }
 
         socket.onclose = (ev: CloseEvent) => {
             if (import.meta.env.VITE_DEBUG) {
-                console.log(`[WebSocket] - CloseEvent QUEE?: ${ev.reason}`)
+                console.log(`[WebSocket] - Closed: ${ev.reason}`)
             }
-            set({ connected: false })
+            set(state => ({
+                connected: {
+                    ...state.connected,
+                    socketUri: false,
+                }
+            }))
 
+            if (sockets.get(socketUri) === socket) {
+                sockets.delete(socketUri);
+            }
+
+            const attempts = reconnectAttempts.get(socketUri) ?? 0;
             const delay = Math.min(
-                1000 * Math.pow(2, reconnectAttempts),
+                1000 * Math.pow(2, attempts),
                 MAX_DELAY,
             )
 
-            reconnectTimer = window.setTimeout(() => {
+            reconnectAttempts.set(
+                socketUri,
+                attempts + 1,
+            );
+
+            const timer = window.setTimeout(() => {
                 if (import.meta.env.VITE_DEBUG) {
                     console.log('[WebSocket] - Reconectar');
                 }
 
-                get().connect()
+                get().connect(socketUri)
             }, delay);
+
+            reconnectTimers.set(
+                socketUri,
+                timer,
+            );
         }
 
         socket.onmessage = (evt) => {
@@ -66,16 +101,36 @@ const useWebsocket = create<WebSocketState>((set, get) => ({
             }
         };
     },
-    disconnect() {
-        if (reconnectTimer) {
-            clearTimeout(reconnectTimer);
+    disconnect(socketUri = 'api/socket/') {
+        const timer = reconnectTimers.get(socketUri);
+
+        if (timer !== undefined) {
+            clearTimeout(timer);
+            reconnectTimers.delete(socketUri);
         }
-        socket?.close();
-        socket = null;
-        set({ connected: false });
+
+        reconnectAttempts.delete(socketUri);
+
+        const socket = sockets.get(socketUri);
+
+        if (socket) {
+            socket.close();
+            sockets.delete(socketUri);
+        }
+
+        set(state => ({
+            connected: {
+                ...state.connected,
+                [socketUri]: false,
+            },
+        }));
     },
-    send(data) {
-        if (socket?.readyState !== WebSocket.OPEN) return;
+    send(socketUri, data) {
+        const socket = sockets.get(socketUri);
+
+        if (socket?.readyState !== WebSocket.OPEN) {
+            return;
+        }
 
         socket.send(JSON.stringify(data));
     },

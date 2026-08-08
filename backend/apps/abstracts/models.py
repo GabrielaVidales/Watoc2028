@@ -1,11 +1,7 @@
 from django.db import models
 from django.contrib.auth import get_user_model
-from .text_choices import (
-    Nationality,
-    AbstractPresentation,
-    AbstactStatus,
-)
-import html, bleach
+from .text_choices import Nationality, AbstractPresentation, AbstactStatus
+import html, bleach, uuid, hashlib, json
 
 User = get_user_model()
 
@@ -78,6 +74,23 @@ class Abstract(models.Model):
         clean_title = bleach.clean(unescaped_title, [], strip=True)
         return clean_title
 
+    def get_hash(self):
+        data = {
+            "title": self.title,
+            "content": self.text,
+            "references": self.references,
+            "authors": list(self.authors.values_list("id", flat=True)),
+            "presentation_type": self.get_presentation_type_display(),
+        }
+        serialized = json.dumps(
+            data,
+            sort_keys=True,
+            default=str,
+            separators=(",", ":"),
+        )
+        hash = hashlib.sha256(serialized.encode("utf-8"))
+        return hash.hexdigest()
+
     def __str__(self):
         title = self.get_plain_title()
         truncated_title = (title[:47] + "...") if len(title) > 50 else title
@@ -116,7 +129,7 @@ class Affiliation(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return f"{self.institution}, {self.city}, {self.country})"
+        return f"{self.institution}, {self.city}, {self.get_country_display()})"
 
 
 class Author(models.Model):
@@ -206,3 +219,42 @@ class AbstractDeclaration(models.Model):
         verbose_name="No AI Tools Used",
         help_text="I herewith confirm that the abstract was prepared without using the aid of AI tools (such as, but not limited to, ChatGPT).",
     )
+
+
+class PDFGenerationJob(models.Model):
+    class Status(models.TextChoices):
+        PENDING = "pending"
+        GENERATING = "generating"
+        COMPLETED = "completed"
+        FAILED = "failed"
+
+    id = models.UUIDField(
+        primary_key=True,
+        default=uuid.uuid4,
+        editable=False,
+    )
+    abstract = models.ForeignKey(
+        Abstract,
+        on_delete=models.CASCADE,
+        related_name="pdf_generation_jobs",
+    )
+    content_hash = models.CharField(
+        max_length=64,
+    )
+    status = models.CharField(
+        max_length=20,
+        choices=Status.choices,
+        default=Status.PENDING,
+    )
+
+    file = models.FileField(
+        upload_to="generated/",
+        null=True,
+        blank=True,
+    )
+    error = models.TextField(
+        null=True,
+        blank=True,
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    completed_at = models.DateTimeField(null=True, blank=True)

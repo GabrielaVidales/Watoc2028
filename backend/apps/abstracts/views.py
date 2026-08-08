@@ -1,5 +1,6 @@
 from rest_framework import permissions, status
 from rest_framework.viewsets import ModelViewSet
+from rest_framework.views import APIView
 from rest_framework.filters import SearchFilter
 from rest_framework.request import Request
 from rest_framework.response import Response
@@ -12,13 +13,81 @@ from django.conf import settings
 from django.http import HttpResponse
 from config.pagination import Pagination
 from apps.abstracts.filters import AbstractSearchFilter
-from .models import Affiliation, Abstract, Author, AbstactStatus, AbstractDeclaration, AbstractPresentation
-from .serializers import AffiliationSerializer, AbstractSerializer, AuthorSerializer, AbstractDeclarationSerializer
+from config.services import is_redis_available
+from .tasks import generate_abstract_pdf
+from .models import Affiliation, Abstract, Author, AbstactStatus, AbstractDeclaration, AbstractPresentation, PDFGenerationJob
+from .serializers import AffiliationSerializer, AbstractSerializer, AuthorSerializer, AbstractDeclarationSerializer, PDFGenerationJobSerializer
 import os, logging, html
 
 User = get_user_model()
 
 logger = logging.getLogger("users")
+
+
+class PDFGenerationViewSet(ModelViewSet):
+    # permission_classes = [permissions.IsAuthenticated]
+    queryset = PDFGenerationJob.objects.all()
+    serializer_class = PDFGenerationJobSerializer
+
+    def create(self, request: Request):
+        force_param = request.query_params.get('force', None)
+        force = force_param in ['true', '1', 'yes']
+
+        abstract_id = request.data.get("abstract_id", None)
+
+        abstract = Abstract.objects.filter(id=abstract_id).first()
+        if abstract is None:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
+        existing_job = self.queryset.filter(abstract=abstract).first()
+        if existing_job is not None and not force:
+
+            new_hash = abstract.get_hash()
+            last_hash = existing_job.content_hash
+            
+            same_hash = new_hash == last_hash
+            is_completed = existing_job.status == existing_job.Status.COMPLETED
+
+            if same_hash and is_completed:
+                serializer = self.serializer_class(existing_job)
+                return Response(serializer.data)
+
+
+        if is_redis_available():
+            job = PDFGenerationJob.objects.create(
+                abstract=abstract,
+                content_hash=abstract.get_hash(),
+            )
+            serializer = self.serializer_class(job)
+
+            if is_redis_available():
+                generate_abstract_pdf.delay(f"{job.id}")
+
+            return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
+
+        return Response(status=status.HTTP_400_BAD_REQUEST)
+
+    def get(self, request: Request):
+        job_id = request.data.get("abstract_id", None)
+        job = self.queryset.filter(id=job_id)
+
+        if job.exists():
+            return Response(
+                {
+                    "job_id": str(job.id),
+                    "status": job.status,
+                },
+                status=status.HTTP_202_ACCEPTED,
+            )
+
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+    @action(detail=True, methods=["get"], url_path="download")
+    def download(self, request: Request, pk=None):
+        job = self.get_object()
+        response = HttpResponse(job.file, content_type="application/pdf")
+        response["Content-Disposition"] = f'attachment; filename="{job.abstract.get_plain_title()}.pdf"'
+        return response
 
 
 class AffiliationViewSet(ModelViewSet):

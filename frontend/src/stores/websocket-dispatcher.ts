@@ -14,12 +14,18 @@ class WebSocketDispatcher {
         const handler = this.handlers.get(message.type)
         if (!handler) {
             if (import.meta.env.VITE_DEBUG) {
-                console.warn(`Handler not found for: ${message.type}`);
+                console.warn(`Handler not found for: ${message?.type}`, message);
             }
             return
         }
 
         handler(message.message)
+    }
+
+    unregister(key: string) {
+        if (this.handlers.has(key)) {
+            this.handlers.delete(key)
+        }
     }
 
 }

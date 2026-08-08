@@ -8,6 +8,30 @@ import bleach
 User = get_user_model()
 
 
+class PDFGenerationJobSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.PDFGenerationJob
+        fields = [
+            "id",
+            "abstract",
+            "content_hash",
+            "status",
+            "file",
+            "error",
+            "created_at",
+            "completed_at",
+        ]
+        read_only_fields = [
+            "id",
+            "status",
+            "content_hash",
+            "file",
+            "error",
+            "created_at",
+            "completed_at",
+        ]
+
+
 class AffiliationSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField(required=False)
     user_id = serializers.PrimaryKeyRelatedField(
@@ -199,15 +223,12 @@ class AuthorSerializer(serializers.ModelSerializer):
             validated_data["affiliation"] = affiliation
 
         abstract = validated_data.get("abstract")
-        
+
         MAX_AUTHORS = 16
         authors_count = abstract.authors.count()
         if authors_count >= MAX_AUTHORS:
-            raise serializers.ValidationError({"errors": {
-                'root': f'Maximum of authors is {MAX_AUTHORS}'
-            }})
-        
-        
+            raise serializers.ValidationError({"errors": {"root": f"Maximum of authors is {MAX_AUTHORS}"}})
+
         validated_data["order"] = abstract.authors.count() + 1
 
         instance = super().create(validated_data)
