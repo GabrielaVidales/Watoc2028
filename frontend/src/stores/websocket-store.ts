@@ -13,6 +13,7 @@ let sockets = new Map<string, WebSocket>()
 const reconnectTimers = new Map<string, number>();
 const reconnectAttempts = new Map<string, number>();
 
+const WEBSOCKET_URL = import.meta.env.VITE_WS_URL
 const MAX_DELAY = 30_000;
 
 const useWebsocket = create<WebSocketState>((set, get) => ({
@@ -32,7 +33,7 @@ const useWebsocket = create<WebSocketState>((set, get) => ({
             return
         }
 
-        const socket = new WebSocket(`ws://127.0.0.1:8000/ws/${socketUri}`)
+        const socket = new WebSocket(`${WEBSOCKET_URL}${socketUri}`)
 
         sockets.set(socketUri, socket);
 

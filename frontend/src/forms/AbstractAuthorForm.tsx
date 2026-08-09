@@ -437,11 +437,7 @@ export function AuthorFormContent({ abstractId, onSubmit, values }: Props) {
                                     <Select
                                         name={field.name}
                                         value={field.value}
-                                        onValueChange={puta => {
-                                            console.log('OJALA TE VIOLEN PUTA', puta);
-
-                                            field.onChange(puta)
-                                        }}
+                                        onValueChange={field.onChange}
                                     >
                                         <SelectTrigger
                                             id="form-select-nationality"
