@@ -7,7 +7,6 @@ logger = logging.getLogger(__name__)
 
 
 def is_redis_available():
-    print(logger.name)
     try:
         client = Redis.from_url(
             settings.CELERY_BROKER_URL,

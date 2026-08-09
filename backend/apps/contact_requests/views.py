@@ -22,7 +22,6 @@ class ContactRequestListCreateView(generics.ListCreateAPIView):
 
     @transaction.atomic
     def post(self, request):
-        print(request.data)
         serializer = self.get_serializer(data=request.data)
         if serializer.is_valid():
             instance: ContactRequest = serializer.save()

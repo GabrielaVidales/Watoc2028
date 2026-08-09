@@ -4,6 +4,15 @@ import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectVa
 import { cn } from '@/lib/utils';
 import { ChevronsLeftIcon, ChevronsRightIcon, HashIcon, } from 'lucide-react';
 import { type HTMLAttributes } from 'react';
+import {
+    Popover,
+    PopoverContent,
+    PopoverDescription,
+    PopoverHeader,
+    PopoverTitle,
+    PopoverTrigger,
+} from "@/components/ui/popover"
+import { Button } from '../ui/button';
 
 
 type PaginationControllerProps = {
@@ -65,7 +74,33 @@ export function PaginationController({
                 </PaginationItem>
 
                 <PaginationItem>
-                    <Select
+                    <Popover>
+                        <PopoverTrigger asChild>
+                            <Button variant='outline' size='sm' className='font-normal'>
+                                <span>{page} / {totalPages}</span>
+                            </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className='w-14 p-1'>
+                            <div className="flex flex-col">
+                                {pages.map((item) => (
+                                    <Button
+                                    key={item}
+                                        size='xs'
+                                        variant='ghost'
+                                        className='w-full text-sm font-normal'
+                                        onClick={() => onPageChange(item)}
+                                    >
+                                        {item}
+                                    </Button>
+                                ))}
+                            </div>
+                            {/* <PopoverHeader>
+                                <PopoverTitle>Title</PopoverTitle>
+                                <PopoverDescription>Description text here.</PopoverDescription>
+                            </PopoverHeader> */}
+                        </PopoverContent>
+                    </Popover>
+                    {/* <Select
                         value={String(page)}
                         onValueChange={(value) =>
                             onPageChange(Number(value))
@@ -86,7 +121,7 @@ export function PaginationController({
                                 </SelectItem>
                             ))}
                         </SelectContent>
-                    </Select>
+                    </Select> */}
                 </PaginationItem>
 
                 <PaginationItem>

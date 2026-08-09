@@ -67,7 +67,7 @@ function show(
             <div
                 role={variant === "destructive" ? "alert" : "status"}
                 className={cn(
-                    "flex items-center gap-3 rounded-lg border-3 p-2 shadow-md",
+                    "flex items-center gap-3 rounded-lg border-3 p-2 mx-auto shadow-md",
                     "w-[calc(100vw-2rem)] max-w-89",
                     "md:w-100 md:max-w-100 md:min-h-18",
                     "text-foreground",

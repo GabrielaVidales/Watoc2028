@@ -4,20 +4,21 @@ import React, { useState } from 'react'
 import { Spinner } from './ui/spinner'
 import { cn } from '@/lib/utils'
 import { Button } from './ui/button'
-import { Edit, GripVertical, HardDriveDownload, Plus, Trash2, TriangleAlert, User2, UserPlus, Users2 } from 'lucide-react'
+import { Edit, GripVertical, Plus, RotateCw, Trash2, TriangleAlert, Upload, User2, UserPlus, Users2 } from 'lucide-react'
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar'
 import { Sortable, SortableItem, SortableItemHandle, } from "@/components/reui/sortable"
 import { Field, FieldLabel } from './ui/field'
 import { Switch } from './ui/switch'
-import { isAxiosError } from 'axios'
+import { AxiosError, isAxiosError } from 'axios'
 import { InfoAlert } from './InfoAlert'
 import { AlertDialog, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from './ui/alert-dialog'
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from './ui/dialog'
 import { ScrollArea } from './ui/scroll-area'
 import { AuthorForm, AuthorFormContent } from '@/forms/AbstractAuthorForm'
-import { CardAction, CardContent, CardDescription, CardHeader } from './ui/card'
-import { useParams } from 'react-router'
+import { CardContent, CardDescription, CardHeader, CardTitle } from './ui/card'
 import type { AuthorSchema } from '@/schemas/abstracts/author-schema'
+import { saveAbstractAuthors, type SaveAbstractAuthorsParams } from '@/services/submissions/author-services'
+import { notify } from './custom/notify'
 
 
 type APIError = {
@@ -26,12 +27,12 @@ type APIError = {
 }
 
 type Props = {
+    abstractId: number | string
     onAuthorEdit?: (a: AuthorSchema) => void | Promise<void>
     onAuthorDelete?: (a: AuthorSchema) => void | Promise<void>
 }
 
-function ShowAuthorsComponent({ }: Props) {
-    const { id: abstractId } = useParams()
+function ShowAuthorsComponent({ abstractId }: Props) {
 
     const { data } = useQuery({
         queryKey: ['authors', abstractId],
@@ -45,27 +46,25 @@ function ShowAuthorsComponent({ }: Props) {
 
     const queryClient = useQueryClient()
 
-    const saveAuthorsMutation = useMutation({
-        mutationFn: async (authors: AuthorSchema[]) => {
-            const data = {
-                authors: authors.map(a => ({ ...a, affiliation_id: a.affiliation.id, }))
-            }
-            const { data: response } = await api.patch(`/abstracts/submissions/${abstractId}/authors/`, data)
-            return response
-        },
+    const saveAuthorsMutation = useMutation<AuthorSchema[], AxiosError, SaveAbstractAuthorsParams>({
+        mutationFn: saveAbstractAuthors,
         onSuccess: () => {
-            setErrors({ root: null, authors: null, })
+            notify.success('Information saved successfully!', {
+                description: 'Your submission author information was changed.'
+            })
             queryClient.invalidateQueries({
                 queryKey: ["authors", abstractId]
             })
         },
         onError: (error) => {
-            if (isAxiosError(error)) {
-                setErrors(error.response?.data.errors)
-
-                if (import.meta.env.DEV) {
-                    console.error(error.response?.data)
-                }
+            const errors = (error.response.data as any).errors as APIError
+            if (import.meta.env.DEV) {
+                console.error(error.response.data)
+            }
+            if (errors.root) {
+                notify.destructive('Something went wrong!', {
+                    description: errors.root.join(". "),
+                })
             }
         }
     })
@@ -78,15 +77,12 @@ function ShowAuthorsComponent({ }: Props) {
         onSuccess: () => {
             setOpen(false)
             setDeleteAuthor(null)
-            setErrors({ root: null, authors: null, })
             queryClient.invalidateQueries({
                 queryKey: ["authors", abstractId]
             })
         },
         onError: (error) => {
             if (isAxiosError(error)) {
-                setErrors(error.response?.data.errors)
-
                 if (import.meta.env.DEV) {
                     console.error(error.response?.data)
                 }
@@ -100,11 +96,6 @@ function ShowAuthorsComponent({ }: Props) {
     const [openA, setOpenA] = useState(false)
     const [editAuthor, setEditAuthor] = useState<AuthorSchema>(null)
 
-    const [errors, setErrors] = useState<APIError>({
-        root: null,
-        authors: null,
-    })
-
     const [authors, setAuthors] = React.useState<AuthorSchema[]>([])
     const getAuthorValue = (a: AuthorSchema) => `${a.id}`
     const handleReorder = (a: AuthorSchema[]) => setAuthors(a)
@@ -114,20 +105,16 @@ function ShowAuthorsComponent({ }: Props) {
             is_corresponding_author: author.id === ref.id ? value : false
         }))
         setAuthors(next)
-        setErrors({
-            root: null,
-            authors: null,
-        })
     }
 
-    React.useEffect(() => { if (data) setAuthors(data) }, [data])
+    React.useEffect(() => { setAuthors(data ? data : []) }, [data])
 
     if (!data) {
         return <Spinner />
     }
 
     return (
-        <div className='max-w-full'>
+        <div className='max-w-full space-y-4'>
             <AlertDialog open={open} onOpenChange={(v) => { setDeleteAuthor(null); setOpen(v) }}>
                 <AlertDialogContent size='sm'>
                     <AlertDialogHeader>
@@ -168,7 +155,7 @@ function ShowAuthorsComponent({ }: Props) {
                     </DialogHeader>
                     <ScrollArea className="-mx-4 my-1 border-y overflow-y-auto px-4 overflow-visible max-sm:max-h-[40dvh] max-ms:max-h-[50dvh] max-h-[60dvh]">
                         <AuthorForm>
-                            <AuthorFormContent values={editAuthor} onSubmit={() => {
+                            <AuthorFormContent abstractId={abstractId} values={editAuthor} onSubmit={() => {
                                 setOpenA(false);
                                 setEditAuthor(null);
                             }} />
@@ -187,26 +174,23 @@ function ShowAuthorsComponent({ }: Props) {
                 </DialogContent>
             </Dialog>
 
-            {errors?.root && (
-                <InfoAlert
-                    variant='destructive'
-                    title="An error occurred while processing your request."
-                    messages={errors.root}
-                />
-            )}
-
             <CardHeader className='px-0'>
+                <CardTitle className="flex gap-3 items-center">
+                    <UserPlus className='text-primary-main' />
+                    <h2 className='text-xl font-semibold'>Authors List</h2>
+                </CardTitle>
                 <CardDescription>
-                    Complete the details (full name, email, affiliation and country) of collaboration authors. You can include a maximum of 16 authors. Please indicate which of the authors will present the abstract.                 </CardDescription>
-                <CardAction>
-                    <Button size='sm' onClick={() => { setEditAuthor(null); setOpenA(true) }}>
-                        <Plus />
-                        Add Author
-                    </Button>
-                </CardAction>
+                    Complete the details (full name, email, affiliation and country) of collaboration authors. You can include a maximum of 16 authors. Please indicate which of the authors will present the abstract.
+                </CardDescription>
             </CardHeader>
 
-            <CardContent className='px-0 py-4'>
+
+            <Button size='sm' onClick={() => { setEditAuthor(null); setOpenA(true) }}>
+                <Plus />
+                Add Author
+            </Button>
+
+            <CardContent className='px-0'>
                 <Sortable
                     value={authors}
                     onValueChange={handleReorder}
@@ -217,7 +201,7 @@ function ShowAuthorsComponent({ }: Props) {
                         <div
                             className={cn(
                                 'flex flex-col justify-start gap-3 p-4 min-h-15',
-                                'rounded-md border-2 border-dashed border-border bg-secondary/40'
+                                'rounded-md border-2 border-dashed border-border'
                             )}
                         >
                             <div className='flex items-center gap-3 max-w-70 mx-auto'>
@@ -259,7 +243,7 @@ function ShowAuthorsComponent({ }: Props) {
                             disabled={saveAuthorsMutation.isPending}
                             className={cn(
                                 'relative p-2 border-2 border-border rounded-md transition-colors! duration-300',
-                                'bg-secondary hover:bg-background hover:border-primary-light hover:shadow-md',
+                                'active:border-primary-light hover:shadow-sm',
                                 'md:flex-row md:items-center md:justify-between',
                                 'flex flex-col gap-3',
                             )}
@@ -288,13 +272,13 @@ function ShowAuthorsComponent({ }: Props) {
                             </Avatar>
 
                             <div className="min-w-0 flex-1 space-y-0">
-                                <h4 className="min-w-0 truncate font-medium">
+                                <h4 className="truncate font-medium text-sm">
                                     {author.first_name} {author.last_name}{" "}
                                 </h4>
-                                <p className="block break-all text-muted-foreground text-xs">
+                                <p className="truncate text-xs text-muted-foreground">
                                     {author.email}
                                 </p>
-                                <p className="text-sm text-muted-foreground break-all">
+                                <p className="truncate text-xs text-muted-foreground">
                                     {author.affiliation.institution} | {author.affiliation.city}, {author.affiliation.country}
                                 </p>
                             </div>
@@ -370,39 +354,33 @@ function ShowAuthorsComponent({ }: Props) {
                 </Sortable>
             </CardContent>
 
-            <div className="sticky bottom-20 z-20">
-                <div className={cn(
-                    "ml-auto flex w-fit items-center gap-3 rounded-xl border px-4 py-3 shadow-md",
-                    (data === authors) ? 'bg-background/90' : 'bg-background'
-                )}>
-                    {data === authors ? (
-                        <span className="text-sm text-muted-foreground">
-                            No unsaved changes
-                        </span>
-                    ) : (
-                        <span className="text-sm text-muted-foreground">
-                            You have unsaved changes
-                        </span>
-                    )}
+            <div className={"flex w-fit items-center gap-3 ml-auto"}>
+                <Button
+                    type='button'
+                    variant='outline'
+                    onClick={() => setAuthors(data ? data : [])}
+                    disabled={data === authors || saveAuthorsMutation.isPending}
+                >
+                    <RotateCw className='text-muted-foreground' /> Reset
+                </Button>
 
-                    <Button
-                        type="button"
-                        onClick={() => saveAuthorsMutation.mutate(authors)}
-                        disabled={data === authors || saveAuthorsMutation.isPending}
-                    >
-                        {saveAuthorsMutation.isPending ? (
-                            <>
-                                <Spinner />
-                                <span>Saving...</span>
-                            </>
-                        ) : (
-                            <>
-                                <HardDriveDownload />
-                                <span>Save</span>
-                            </>
-                        )}
-                    </Button>
-                </div>
+                <Button
+                    type="button"
+                    onClick={() => saveAuthorsMutation.mutate({ abstractId, authors })}
+                    disabled={data === authors || saveAuthorsMutation.isPending}
+                >
+                    {saveAuthorsMutation.isPending ? (
+                        <>
+                            <Spinner />
+                            <span>Saving...</span>
+                        </>
+                    ) : (
+                        <>
+                            <Upload />
+                            <span>Save Changes</span>
+                        </>
+                    )}
+                </Button>
             </div>
         </div >
     )

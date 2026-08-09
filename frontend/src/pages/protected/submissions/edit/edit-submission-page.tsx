@@ -7,7 +7,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger, } from "@
 import { Button } from '@/components/ui/button'
 import { Card, CardAction, CardContent, CardDescription, CardFooter, CardHeader, CardTitle, } from "@/components/ui/card"
 import AbstractDeclarations from '@/forms/submissions/abstract-declarations-form'
-import EditAbstractBody from '@/forms/wrappers/EditAbstractBody'
+import AbstractContentForm from '@/forms/submissions/edit-abstract-body'
 import { useIsMobile } from '@/hooks/use-mobile'
 import { useScrollSpy } from '@/hooks/useScrollSpy'
 import { cn, } from '@/lib/utils'
@@ -287,7 +287,7 @@ function EditAbstractPage() {
                         </div>
 
                         <div>
-                            <h3 className='font-medium'>Editing submission:</h3>
+                            <h3 className='font-medium text-muted-foreground'>Editing submission:</h3>
                             <h4 className='text-xl leading-tight truncate' dangerouslySetInnerHTML={{ __html: data.title }}></h4>
                             <p className='text-xs text-muted-foreground mt-2'>Last modification: {formatDate(data.last_update)}</p>
                         </div>
@@ -301,19 +301,14 @@ function EditAbstractPage() {
                                     <h2 className='text-xl font-semibold'>Abstract Content</h2>
                                 </CardTitle>
 
-                                <EditAbstractBody />
+                                <AbstractContentForm abstractId={data ? data.id : null} />
                             </CardContent>
                         </Card>
 
                         <Card className='max-w-4xl mx-auto w-full gap-0' id='abstract-authors'>
 
                             <CardContent className='space-y-5 md:py-5 md:px-10'>
-                                <CardTitle className="flex gap-3 items-center">
-                                    <UserPlus className='text-primary-main' />
-                                    <h2 className='text-xl font-semibold'>Authors List</h2>
-                                </CardTitle>
-
-                                <ShowAuthorsComponent />
+                                <ShowAuthorsComponent abstractId={data ? data.id : null} />
                             </CardContent>
 
                             <CardContent className='px-10'>

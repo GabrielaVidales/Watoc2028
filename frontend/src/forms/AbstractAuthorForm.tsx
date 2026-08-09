@@ -18,7 +18,6 @@ import { isAxiosError } from 'axios'
 import { Mail, Plus, School } from 'lucide-react'
 import React from 'react'
 import { Controller, FormProvider, useForm, useFormContext } from 'react-hook-form'
-import { useParams } from 'react-router'
 
 
 export function AuthorForm({ children }: React.PropsWithChildren) {
@@ -49,13 +48,12 @@ export function AuthorForm({ children }: React.PropsWithChildren) {
 
 
 type Props = {
+    abstractId?: number | string
     values?: AuthorSchema
     onSubmit?: () => void
 }
 
-export function AuthorFormContent({ onSubmit, values }: Props) {
-    const { id: abstractId } = useParams()
-
+export function AuthorFormContent({ abstractId, onSubmit, values }: Props) {
     const queryClient = useQueryClient()
 
     const { control, setValue, handleSubmit, getValues, reset, formState: { isSubmitting } } = useFormContext<AuthorFormSchema>()
@@ -78,9 +76,6 @@ export function AuthorFormContent({ onSubmit, values }: Props) {
 
     const [affiliation, setAffiliation] = React.useState<Affiliation>(null)
     const handleAffiliationSelected = (affiliation: Affiliation | null) => {
-        console.log(affiliation);
-
-
         if (affiliation === null) {
             setValue('affiliation_id', null)
             setValue('institution', '')
@@ -96,9 +91,14 @@ export function AuthorFormContent({ onSubmit, values }: Props) {
         setAffiliation(affiliation)
     }
 
-    
-
     const onFormSubmit = handleSubmit(async (data) => {
+        if (!abstractId) {
+            notify.destructive('Something went wrong!', {
+                description: 'No abstract submission is set to save author information.'
+            })
+            return
+        }
+
         try {
             if (data.id) {
                 const res = await api.patch(`/abstracts/authors/${data.id}/`, { ...data, abstract_id: abstractId })
@@ -145,7 +145,7 @@ export function AuthorFormContent({ onSubmit, values }: Props) {
 
     React.useEffect(() => {
         if (values) {
-            setTimeout(() => {
+            requestAnimationFrame(() => {
                 reset({
                     ...values,
                     affiliation_id: values.affiliation?.id || null,
@@ -177,7 +177,7 @@ export function AuthorFormContent({ onSubmit, values }: Props) {
                         photo: values.related_user.photo,
                     })
                 }
-            }, 100)
+            })
         }
     }, [values, setAffiliation, setUser, reset])
 
@@ -258,7 +258,7 @@ export function AuthorFormContent({ onSubmit, values }: Props) {
                         />
                     </Field>
 
-                    <fieldset className='space-y-5' disabled={Boolean(user)}>
+                    <fieldset className='space-y-5 mb-5' disabled={Boolean(user)}>
                         <Controller
                             name={`first_name`}
                             control={control}
@@ -326,28 +326,29 @@ export function AuthorFormContent({ onSubmit, values }: Props) {
                                 </Field>
                             )}
                         />
-                        <Controller
-                            name="is_corresponding_author"
-                            control={control}
-                            render={({ field, fieldState }) => (
-                                <Field orientation="horizontal" data-invalid={fieldState.invalid} className='justify-between'>
-                                    <FieldContent>
-                                        <FieldLabel htmlFor="form-rhf-switch-twoFactor">
-                                            Mark as corresponding author
-                                        </FieldLabel>
-                                        {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-                                    </FieldContent>
-                                    <Switch
-                                        id="form-rhf-switch-twoFactor"
-                                        name={field.name}
-                                        checked={field.value}
-                                        onCheckedChange={field.onChange}
-                                        aria-invalid={fieldState.invalid}
-                                    />
-                                </Field>
-                            )}
-                        />
                     </fieldset>
+
+                    <Controller
+                        name="is_corresponding_author"
+                        control={control}
+                        render={({ field, fieldState }) => (
+                            <Field orientation="horizontal" data-invalid={fieldState.invalid} className='justify-between'>
+                                <FieldContent>
+                                    <FieldLabel htmlFor="form-rhf-switch-twoFactor">
+                                        Mark as corresponding author
+                                    </FieldLabel>
+                                    {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                                </FieldContent>
+                                <Switch
+                                    id="form-rhf-switch-twoFactor"
+                                    name={field.name}
+                                    checked={field.value}
+                                    onCheckedChange={field.onChange}
+                                    aria-invalid={fieldState.invalid}
+                                />
+                            </Field>
+                        )}
+                    />
                 </div>
 
                 <div className="space-y-3 border-t pt-6 md:pt-0 md:border-t-0 md:border-l-2 md:pl-6">

@@ -109,8 +109,6 @@ class ReviewAssignmentSerializer(serializers.ModelSerializer):
 
 
 
-
-
     @transaction.atomic
     def create(self, validated_data):
         print(validated_data)

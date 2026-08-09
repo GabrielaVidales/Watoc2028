@@ -19,6 +19,7 @@ from .models import Affiliation, Abstract, Author, AbstactStatus, AbstractDeclar
 from .serializers import AffiliationSerializer, AbstractSerializer, AuthorSerializer, AbstractDeclarationSerializer, PDFGenerationJobSerializer
 import os, logging, html
 
+
 User = get_user_model()
 
 logger = logging.getLogger("users")
@@ -30,9 +31,7 @@ class PDFGenerationViewSet(ModelViewSet):
     serializer_class = PDFGenerationJobSerializer
 
     def create(self, request: Request):
-        force_param = request.query_params.get('force', None)
-        force = force_param in ['true', '1', 'yes']
-
+        
         abstract_id = request.data.get("abstract_id", None)
 
         abstract = Abstract.objects.filter(id=abstract_id).first()
@@ -40,14 +39,15 @@ class PDFGenerationViewSet(ModelViewSet):
             return Response(status=status.HTTP_404_NOT_FOUND)
 
         existing_job = self.queryset.filter(abstract=abstract).first()
-        if existing_job is not None and not force:
-
+        if existing_job is not None:
+            # si existe hay que comprobar que el abstract no ha cambiado
             new_hash = abstract.get_hash()
             last_hash = existing_job.content_hash
             
             same_hash = new_hash == last_hash
             is_completed = existing_job.status == existing_job.Status.COMPLETED
 
+            # si el abstract no ha cambiado desde la última generación, devolverla
             if same_hash and is_completed:
                 serializer = self.serializer_class(existing_job)
                 return Response(serializer.data)
@@ -181,8 +181,7 @@ class AbstractView(ModelViewSet):
                     }
                 )
 
-            rows_affected = Author.objects.bulk_update(authors, ["order", "is_corresponding_author"])
-            print(f"Rows affected: {rows_affected}")
+            Author.objects.bulk_update(authors, ["order", "is_corresponding_author"])
 
             authors.sort(key=lambda x: x.order)
 

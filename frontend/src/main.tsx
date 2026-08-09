@@ -7,6 +7,7 @@ import { Toaster } from './components/ui/sonner.jsx'
 import './index.css'
 import { ThemeProvider } from './components/theme-provider.jsx'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { TooltipProvider } from './components/ui/tooltip.jsx'
 
 const queryClient = new QueryClient()
 
@@ -16,7 +17,9 @@ createRoot(document.getElementById('root')).render(
     <AuthProvider>
       <BrowserRouter>
         <ThemeProvider>
-          <App />
+          <TooltipProvider>
+            <App />
+          </TooltipProvider>
         </ThemeProvider>
         <Toaster />
       </BrowserRouter>

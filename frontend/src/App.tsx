@@ -40,6 +40,7 @@ import ReviewAbstract from './pages/protected/reviews/view/page'
 import ManageReviewsPage from './pages/protected/administration/manage-reviews/manage-reviews'
 import EditAbstractPage from './pages/protected/submissions/edit/edit-submission-page'
 import LoginLayout from './layouts/LoginLayout'
+import TestAbstractFeaturePage from './pages/test/test-abstract-feature-page'
 
 function App() {
 	const { pathname } = useLocation()
@@ -119,6 +120,7 @@ function App() {
 			</Route>
 
 			<Route path={'/test'} element={<TestPage />} />
+			<Route path={'/test/pdf'} element={<TestAbstractFeaturePage />} />
 			<Route path={routes.auth.verify} element={<VerifyEmailPage />} />
 
 			{/* Para rutas diferentes */}

@@ -1,57 +1,59 @@
 import api from '@/clients/api'
 import RichTextEditor, { countWordsFromHTML } from '@/components/EnrichedTextArea'
 import { Button } from '@/components/ui/button'
-import { Field, FieldDescription, FieldError, FieldLabel } from '@/components/ui/field'
-import { InputGroupText } from '@/components/ui/input-group'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Spinner } from '@/components/ui/spinner'
-import { useIsMobile } from '@/hooks/use-mobile'
+import { InputGroupText } from '@/components/ui/input-group'
+import { Field, FieldDescription, FieldError, FieldLabel } from '@/components/ui/field'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { createSubmission, updateSubmission, type UpdateParams } from '@/services/submissions/submission-services'
 import { abstractSchema, presentationTypes, type AbstractSchema } from '@/schemas/abstracts/abstract-schemas'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { isAxiosError } from 'axios'
-import { RotateCcw } from 'lucide-react'
+import { AxiosError, isAxiosError } from 'axios'
+import { RotateCcw, Upload } from 'lucide-react'
 import { Fragment, useEffect, } from 'react'
 import { Controller, useForm } from 'react-hook-form'
-import { useParams } from 'react-router'
 import { toast } from 'sonner'
 import { cn } from '@/lib/utils'
 
 type AbstractFormProps = {
-    abstract?: AbstractSchema,
+    abstractId?: number | null,
 }
 
-function EditAbstractBody({ }: AbstractFormProps) {
-    const { id } = useParams()
-
-    const isMobile = useIsMobile()
-
+function AbstractContentForm({ abstractId = null }: AbstractFormProps) {
     const queryClient = useQueryClient()
 
     const { data: abstract } = useQuery<AbstractSchema>({
         refetchOnWindowFocus: false,
-        queryKey: ['abstract', id],
+        queryKey: ['abstract', abstractId],
         queryFn: async () => {
-            const { data } = await api.get(`/abstracts/submissions/${id}/`)
+            const { data } = await api.get(`/abstracts/submissions/${abstractId}/`)
             return data
         },
+        enabled: abstractId !== null,
     })
 
-    const saveMutation = useMutation({
-        mutationFn: async (data: AbstractSchema) => {
-            const { data: response } = await api.patch(`/abstracts/submissions/${id}/`, data)
-            return response
-        },
-        onSuccess: () => queryClient.invalidateQueries({ queryKey: ['abstract', id] }),
-        onError: error => {
-            if (isAxiosError(error)) {
-                if (import.meta.env.DEV) {
-                    console.error(error.response.data);
-                }
-            } else if (import.meta.env.DEV) {
-                console.error(error);
+    const onError = (error: Error) => {
+        if (isAxiosError(error)) {
+            if (import.meta.env.DEV) {
+                console.error(error.response.data);
             }
+        } else if (import.meta.env.DEV) {
+            console.error(error);
         }
+    }
+
+    const createMut = useMutation<AbstractSchema, AxiosError, AbstractSchema>({
+        mutationFn: createSubmission,
+        onSuccess: () => queryClient.invalidateQueries({ queryKey: ['abstracts',], exact: false, }),
+        onError: onError,
+
+    })
+
+    const updateMut = useMutation<AbstractSchema, AxiosError, UpdateParams>({
+        mutationFn: updateSubmission,
+        onSuccess: () => queryClient.invalidateQueries({ queryKey: ['abstract', abstractId] }),
+        onError: onError,
     })
 
     const { control, handleSubmit, reset, formState: { isDirty, isSubmitting, isValid } } = useForm({
@@ -67,7 +69,13 @@ function EditAbstractBody({ }: AbstractFormProps) {
 
     const onFormSubmit = handleSubmit(
         async (data) => {
-            await saveMutation.mutateAsync(data)
+            if (abstractId === null) {
+                await createMut.mutateAsync(data)
+                toast.info('Submission created successfully!', { position: 'top-center', dismissible: true })
+                reset()
+                return
+            }
+            await updateMut.mutateAsync({ id: abstractId, data })
             toast.info('Submission saved successfully!', { position: 'top-center', dismissible: true })
         },
         async (data) => {
@@ -78,26 +86,83 @@ function EditAbstractBody({ }: AbstractFormProps) {
     )
 
     useEffect(() => {
+        if (abstractId === null) {
+            reset({
+                presentation_type: null,
+                references: '',
+                title: '',
+                text: '',
+            }, {
+                keepValues: false
+            })
+
+            return
+        }
+
         if (abstract) {
             reset({
                 presentation_type: abstract.presentation_type,
                 title: abstract.title,
                 references: abstract.references,
                 text: abstract.text,
-            },)
+            })
         }
+
     }, [abstract])
 
     return (
         <form onSubmit={onFormSubmit} id='abstract-submission-form' className='space-y-5'>
             <fieldset disabled={isSubmitting} className='space-y-8'>
                 <Controller
+                    name="title"
+                    control={control}
+                    render={({ field, fieldState }) => (
+                        <Field data-invalid={fieldState.invalid} className='w-full'>
+                            <FieldLabel className="text-lg" htmlFor={field.name}>Abstract title</FieldLabel>
+                            <FieldDescription className='max-sm:text-xs'>
+                                Provide a concise, descriptive title (maximum 20 words). Please do not include author names, affiliations, or other identifying information.
+                            </FieldDescription>
+                            <RichTextEditor
+                                {...field}
+                                title='Abstract title'
+                                invalid={fieldState.invalid}
+                                id={field.name}
+                                addonsOptions={{
+                                    bold: false,
+                                    italic: false,
+                                    underline: false,
+                                }}
+                                multiline={false}
+                                autoComplete="off"
+                                autoCorrect="off"
+                                spellCheck="false"
+                                className="wrap-anywhere text-xl"
+                                maxLength={3500}
+                                footer={
+                                    <InputGroupText className={'w-full min-h-5 flex flex-col-reverse gap-0 md:flex-row'}>
+                                        {fieldState.invalid ? (
+                                            <FieldError errors={[fieldState.error]} />
+                                        ) : (
+                                            <FieldLabel htmlFor={field.name} className={cn(
+                                                'font-normal ml-auto',
+                                                (fieldState.invalid || countWordsFromHTML(field.value || "") > 20) && 'text-destructive'
+                                            )}>
+                                                {countWordsFromHTML(field.value || "")}/20 words
+                                            </FieldLabel>
+                                        )}
+                                    </InputGroupText>
+                                }
+                            />
+                        </Field>
+                    )}
+                />
+                <Controller
                     name="presentation_type"
                     defaultValue='oral'
                     control={control}
                     render={({ field, fieldState }) => (
                         <Field orientation="responsive" data-invalid={fieldState.invalid}>
-                            <FieldLabel htmlFor="presentationType">Presentation Format</FieldLabel>
+                            <FieldLabel className="text-lg" htmlFor="presentationType">Presentation Format</FieldLabel>
                             <Select
                                 name={field.name}
                                 value={field.value}
@@ -125,49 +190,11 @@ function EditAbstractBody({ }: AbstractFormProps) {
                     )}
                 />
                 <Controller
-                    name="title"
-                    control={control}
-                    render={({ field, fieldState }) => (
-                        <Field data-invalid={fieldState.invalid} className='w-full'>
-                            <FieldLabel htmlFor={field.name}>Abstract title</FieldLabel>
-                            <FieldDescription className='max-sm:text-xs'>
-                                Provide a concise, descriptive title (maximum 10 words). Please do not include author names, affiliations, or other identifying information.
-                            </FieldDescription>
-                            <RichTextEditor
-                                {...field}
-                                title='Abstract title'
-                                invalid={fieldState.invalid}
-                                id={field.name}
-                                multiline={false}
-                                autoComplete="off"
-                                autoCorrect="off"
-                                spellCheck="false"
-                                className="wrap-anywhere text-xl"
-                                maxLength={3500}
-                                footer={
-                                    <InputGroupText className={'w-full min-h-5 flex flex-col-reverse gap-0 md:flex-row'}>
-                                        {fieldState.invalid ? (
-                                            <FieldError errors={[fieldState.error]} />
-                                        ) : (
-                                            <FieldLabel htmlFor={field.name} className={cn(
-                                                'font-normal ml-auto',
-                                                (fieldState.invalid || countWordsFromHTML(field.value || "") > 10) && 'text-destructive'
-                                            )}>
-                                                {countWordsFromHTML(field.value || "")}/10 words
-                                            </FieldLabel>
-                                        )}
-                                    </InputGroupText>
-                                }
-                            />
-                        </Field>
-                    )}
-                />
-                <Controller
                     name="text"
                     control={control}
                     render={({ field, fieldState }) => (
                         <Field data-invalid={fieldState.invalid}>
-                            <FieldLabel htmlFor={field.name}>Abstract text</FieldLabel>
+                            <FieldLabel className="text-lg" htmlFor={field.name}>Abstract text</FieldLabel>
                             <FieldDescription className='max-sm:text-xs'>
                                 Abstract text must not exceed 300 words. Abstracts must be writter in English and not contain any information about the presenters or the institutions involves, this is to facilitate the review process.
                             </FieldDescription>
@@ -204,7 +231,7 @@ function EditAbstractBody({ }: AbstractFormProps) {
                     control={control}
                     render={({ field, fieldState }) => (
                         <Field data-invalid={fieldState.invalid}>
-                            <FieldLabel htmlFor={field.name}>References</FieldLabel>
+                            <FieldLabel className="text-lg" htmlFor={field.name}>References</FieldLabel>
                             <FieldDescription className='max-sm:text-xs'>
                                 References are required, and must not exceed 150 words.
                             </FieldDescription>
@@ -237,50 +264,37 @@ function EditAbstractBody({ }: AbstractFormProps) {
                     )}
                 />
 
-                <div className={cn(
-                    "sticky select-none",
-                    isMobile ? 'bottom-5' : "bottom-20",
-                )}>
-                    <div className={cn(
-                        "ml-auto flex flex-col-reverse w-60 items-center gap-2 rounded-xl border p-3 shadow-md bg-card",
-                        (!isDirty && !isSubmitting) ? 'opacity-70' : 'opacity-100', 'hover:opacity-100',
-                    )}>
-                        <span className="text-xs text-muted-foreground">
-                            {!isDirty && !isSubmitting ? "No unsaved changes" : "You have unsaved changes"}
-                        </span>
+                <div className={"flex w-fit items-center gap-3 ml-auto"}>
+                    <Button
+                        type='button'
+                        variant='outline'
+                        onClick={() => reset()}
+                        disabled={!isDirty || isSubmitting}
+                    >
+                        <RotateCcw className='text-muted-foreground' /> Reset
+                    </Button>
 
-                        <div className='flex justify-between items-center gap-5'>
-                            <Button
-                                type="submit"
-                                size={isMobile ? 'sm' : 'default'}
-                                form="abstract-submission-form"
-                                disabled={!isValid || !isDirty}
-                            >
-                                {isSubmitting ? (
-                                    <Fragment >
-                                        <Spinner />
-                                        <span>Saving...</span>
-                                    </Fragment>
-                                ) : (
-                                    <span>Save</span>
-                                )}
-                            </Button>
-
-                            <Button
-                                type='button'
-                                size={isMobile ? 'sm' : 'default'}
-                                variant='outline'
-                                onClick={() => reset()}
-                                disabled={!isDirty || isSubmitting}
-                            >
-                                <RotateCcw className='text-muted-foreground' /> Reset
-                            </Button>
-                        </div>
-                    </div>
+                    <Button
+                        type="submit"
+                        form="abstract-submission-form"
+                        disabled={!isValid || !isDirty}
+                    >
+                        {isSubmitting ? (
+                            <Fragment>
+                                <Spinner />
+                                <span>Saving...</span>
+                            </Fragment>
+                        ) : (
+                            <Fragment>
+                                <Upload />
+                                <span>Save Submission</span>
+                            </Fragment>
+                        )}
+                    </Button>
                 </div>
             </fieldset>
         </form>
     )
 }
 
-export default EditAbstractBody
+export default AbstractContentForm

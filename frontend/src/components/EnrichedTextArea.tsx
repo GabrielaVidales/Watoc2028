@@ -15,9 +15,25 @@ import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 import { useEffect, type ReactNode } from "react"
 
+type AddonsOptions = {
+    bold?: boolean
+    underline?: boolean
+    italic?: boolean
+    sup?: boolean
+    sub?: boolean
+}
+
+const defaultAddons: AddonsOptions = {
+    bold: true,
+    italic: true,
+    sub: true,
+    sup: true,
+    underline: true
+}
 
 type RichTextEditorProps = {
     value?: string
+    addonsOptions?: AddonsOptions
     invalid?: boolean,
     footer?: ReactNode
     multiline?: boolean
@@ -25,7 +41,30 @@ type RichTextEditorProps = {
     onBlur?: () => void
 } & React.ComponentProps<"textarea">
 
-export default function RichTextEditor({ value, invalid, multiline = true, placeholder, onBlur, footer, disabled, className, onChange, maxLength, autoComplete, autoCorrect, spellCheck, name, id }: RichTextEditorProps) {
+export default function RichTextEditor({
+    value,
+    addonsOptions,
+    invalid,
+    multiline = true,
+    placeholder,
+    onBlur,
+    footer,
+    disabled,
+    className,
+    onChange,
+    maxLength,
+    autoComplete,
+    autoCorrect,
+    spellCheck,
+    name,
+    id,
+}: RichTextEditorProps) {
+
+    const addonsConfig: AddonsOptions = {
+        ...defaultAddons,
+        ...addonsOptions,
+    }
+
     const editor = useEditor({
         editorProps: {
             handleKeyDown({ }, event) {
@@ -59,17 +98,15 @@ export default function RichTextEditor({ value, invalid, multiline = true, place
         extensions: [
             History,
             Document.extend({
-                // content: 'block+'
                 content: multiline ? "block+" : "inline*",
             }),
             ...(multiline ? [Paragraph] : []),
-            // Paragraph,
             Text,
-            ExtensionBold,
-            ExtensionItalic,
-            Underline,
-            Subscript,
-            Superscript,
+            (addonsConfig.bold && ExtensionBold),
+            (addonsConfig.italic && ExtensionItalic),
+            (addonsConfig.underline && Underline),
+            (addonsConfig.sub && Subscript),
+            (addonsConfig.sup && Superscript),
             Placeholder.configure({
                 placeholder: placeholder || '',
                 emptyEditorClass: "is-editor-empty",
@@ -105,7 +142,6 @@ export default function RichTextEditor({ value, invalid, multiline = true, place
             aria-invalid={invalid}
             className={cn(
                 "group/editor relative w-full min-w-0 overflow-hidden rounded-md border border-input bg-background shadow-xs transition-[color,box-shadow] outline-none",
-
                 "focus-within:border-primary-light",
                 "focus-within:ring-primary-light/50",
                 "focus-within:ring-[3px]",
@@ -115,35 +151,35 @@ export default function RichTextEditor({ value, invalid, multiline = true, place
             )}
         >
             <div className={cn("flex items-center gap-2 border-b bg-muted/40 p-1")}>
-                <ToolbarButton
-                    onClick={() => editor.chain().focus().toggleBold().run()}
-                >
-                    <Bold className="h-4 w-4" />
-                </ToolbarButton>
+                {addonsConfig.bold && (
+                    <ToolbarButton onClick={() => editor.chain().focus().toggleBold().run()}>
+                        <Bold className="h-4 w-4" />
+                    </ToolbarButton>
+                )}
 
-                <ToolbarButton
-                    onClick={() => editor.chain().focus().toggleItalic().run()}
-                >
-                    <Italic className="h-4 w-4" />
-                </ToolbarButton>
+                {addonsConfig.italic && (
+                    <ToolbarButton onClick={() => editor.chain().focus().toggleItalic().run()}>
+                        <Italic className="h-4 w-4" />
+                    </ToolbarButton>
+                )}
 
-                <ToolbarButton
-                    onClick={() => editor.chain().focus().toggleUnderline().run()}
-                >
-                    <UnderlineIcon className="h-4 w-4" />
-                </ToolbarButton>
+                {addonsConfig.underline && (
+                    <ToolbarButton onClick={() => editor.chain().focus().toggleUnderline().run()}>
+                        <UnderlineIcon className="h-4 w-4" />
+                    </ToolbarButton>
+                )}
 
-                <ToolbarButton
-                    onClick={() => editor.chain().focus().toggleSubscript().run()}
-                >
-                    X₂
-                </ToolbarButton>
+                {addonsConfig.sub && (
+                    <ToolbarButton onClick={() => editor.chain().focus().toggleSubscript().run()}>
+                        X₂
+                    </ToolbarButton>
+                )}
 
-                <ToolbarButton
-                    onClick={() => editor.chain().focus().toggleSuperscript().run()}
-                >
-                    X²
-                </ToolbarButton>
+                {addonsConfig.sup && (
+                    <ToolbarButton onClick={() => editor.chain().focus().toggleSuperscript().run()}>
+                        X²
+                    </ToolbarButton>
+                )}
             </div>
 
             <EditorContent editor={editor} className="tiptap w-full min-w-0 max-w-full" />

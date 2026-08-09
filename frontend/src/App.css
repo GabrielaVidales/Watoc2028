@@ -16,6 +16,10 @@
   pointer-events: none;
 }
 
+.ProseMirror div {
+  display: inline;
+}
+
 .ProseMirror {
   font-variant-numeric: lining-nums tabular-nums;
   letter-spacing: -0.011em;

@@ -71,7 +71,7 @@ export const abstractSchema = z.object({
 
     title: z.string()
         .min(1, "Please enter the abstract title")
-        .refine((val) => countWordsFromHTML(val) <= 10, "The abstract title must not exceed 10 words."),
+        .refine((val) => countWordsFromHTML(val) <= 20, "The abstract title must not exceed 20 words."),
 
     presentation_type: z.enum(presentationTypes.map(v => v.value), 'Opción no válida'),
 

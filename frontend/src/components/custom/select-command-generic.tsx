@@ -107,7 +107,7 @@ export function SelectCommand<T>({
                     variant="outline"
                     role="combobox"
                     className={cn(
-                        "w-80 justify-between relative pr-7!",
+                        "w-full justify-between relative pr-7!",
                         className,
                     )}
                 >

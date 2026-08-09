@@ -1,86 +1,22 @@
+from asgiref.sync import async_to_sync
 from celery import shared_task
-from django.conf import settings
-from django.contrib.auth import get_user_model
-from django.utils import timezone
+from channels.layers import get_channel_layer
 from django.core.files.base import ContentFile
-from django.template.loader import render_to_string
+from django.utils import timezone
+
 from apps.abstracts.models import Abstract, PDFGenerationJob
 from apps.abstracts.serializers import PDFGenerationJobSerializer
-from asgiref.sync import async_to_sync
-from channels.layers import get_channel_layer
-import html, os
+from apps.abstracts.services.reportlab import build_abstract_pdf
 
-User = get_user_model()
+import time
 
 
-@shared_task
-def generate_abstract_pdf(job_id):
-    job = PDFGenerationJob.objects.get(id=job_id)
-    print(job.content_hash)
-
-    channel_layer = get_channel_layer()
-    group = f"pdf_job_{job_id}"
-
-    context = get_abstract_context(job.abstract)
-    from weasyprint import HTML, CSS
-
-    try:
-        # Antes de empezar se guarda el job como GENERANDO...
-        job.status = PDFGenerationJob.Status.GENERATING
-        job.save(update_fields=["status"])
-
-        html_string = render_to_string("abstract_template.html", context)
-        path_to_css = os.path.join(settings.BASE_DIR, "static", "css", "abstract_styles.css")
-        path_to_static = os.path.join(settings.BASE_DIR, "static")
-        html_file = HTML(string=html_string, base_url=path_to_static)
-
-        pdf_bytes = html_file.write_pdf(stylesheets=[CSS(filename=path_to_css)])
-        pdf_file = ContentFile(pdf_bytes)
-
-        job.file.save(
-            name=f'{context["file_title"]}.pdf',
-            content=pdf_file,
-            save=False,
-        )
-        job.status = PDFGenerationJob.Status.COMPLETED
-        job.completed_at = timezone.now()
-        job.save()
-
-        serializer = PDFGenerationJobSerializer(job)
-        # Notificar por websocket
-        async_to_sync(channel_layer.group_send)(
-            group,
-            {
-                "type": "pdf_status",
-                "message": serializer.data,
-            },
-        )
-        return f"OK! Abstract PDF successfully generated!"
-
-    except Exception as exc:
-
-        job.status = PDFGenerationJob.Status.FAILED
-        job.error = str(exc)
-
-        job.save()
-
-        serializer = PDFGenerationJobSerializer(job)
-        # Si falla notificar por websocket
-        async_to_sync(channel_layer.group_send)(
-            group,
-            {
-                "type": "pdf_status",
-                "message": serializer.data,
-            },
-        )
-        raise
-
-
-def get_abstract_context(abstract: Abstract):
+def get_abstract_context(abstract: Abstract) -> dict:
     authors_data = []
     affiliations_set = {}
     unique_affiliations = []
 
+    # Se asume que abstract fue recuperado con prefetch_related('authors__affiliation')
     counter = 1
     for author in abstract.authors.all():
         aff = author.affiliation
@@ -94,20 +30,67 @@ def get_abstract_context(abstract: Abstract):
                 }
             )
             counter += 1
+
+        initial = f"{author.first_name[:1]}." if author.first_name else ""
         authors_data.append(
             {
-                "full_name": f"{author.first_name[0]}. {author.last_name}",
+                "full_name": f"{initial} {author.last_name}".strip(),
                 "aff_index": affiliations_set.get(aff_id),
             }
         )
 
-    abstract.title = html.unescape(abstract.title)
-    abstract.text = html.unescape(abstract.text)
-    abstract.references = html.unescape(abstract.references)
-
     return {
         "file_title": abstract.get_plain_title(),
-        "abstract": abstract,
+        "title_html": abstract.title or "",
+        "text_html": abstract.text or "",
+        "references_html": abstract.references or "",
         "authors_list": authors_data,
         "affiliations_list": unique_affiliations,
     }
+
+
+def _notify_job_status(job: PDFGenerationJob, group: str, channel_layer):
+    serializer = PDFGenerationJobSerializer(job)
+    async_to_sync(channel_layer.group_send)(
+        group,
+        {
+            "type": "pdf_status",
+            "message": serializer.data,
+        },
+    )
+
+
+@shared_task
+def generate_abstract_pdf(job_id: int):
+    job = PDFGenerationJob.objects.select_related("abstract").get(id=job_id)
+    abstract = Abstract.objects.prefetch_related("authors__affiliation").get(id=job.abstract_id)
+
+    channel_layer = get_channel_layer()
+    group = f"pdf_job_{job_id}"
+
+    try:
+        job.status = PDFGenerationJob.Status.GENERATING
+        job.save(update_fields=["status"])
+        
+        context = get_abstract_context(abstract)
+        pdf_bytes = build_abstract_pdf(context)
+
+        job.file.save(
+            name=f"{context['file_title']}.pdf",
+            content=ContentFile(pdf_bytes),
+            save=False,
+        )
+        job.status = PDFGenerationJob.Status.COMPLETED
+        job.completed_at = timezone.now()
+        job.save()
+
+        _notify_job_status(job, group, channel_layer)
+        return "OK! Abstract PDF successfully generated!"
+
+    except Exception as exc:
+        job.status = PDFGenerationJob.Status.FAILED
+        job.error = str(exc)
+        job.save(update_fields=["status", "error"])
+
+        _notify_job_status(job, group, channel_layer)
+        raise
