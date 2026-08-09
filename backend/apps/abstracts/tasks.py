@@ -50,20 +50,29 @@ def get_abstract_context(abstract: Abstract) -> dict:
 
 
 def _notify_job_status(job, group, channel_layer):
-    print("CHANNEL LAYER:", channel_layer, flush=True)
-    print("GROUP:", group, flush=True)
+    print("🔥 CHANNEL LAYER:", channel_layer, flush=True)
+    print("🔥 CHANNEL LAYER CLASS:", type(channel_layer), flush=True)
+
+    if hasattr(channel_layer, "hosts"):
+        print("🔥 CHANNEL LAYER HOSTS:", channel_layer.hosts, flush=True)
+
+    print("🔥 GROUP:", group, flush=True)
 
     serializer = PDFGenerationJobSerializer(job)
 
+    event = {
+        "type": "pdf_status",
+        "message": serializer.data,
+    }
+
+    print("🔥 EVENT:", event, flush=True)
+
     async_to_sync(channel_layer.group_send)(
         group,
-        {
-            "type": "pdf_status",
-            "message": serializer.data,
-        },
+        event,
     )
 
-    print("GROUP SEND DONE", flush=True)
+    print("🔥 GROUP SEND TERMINÓ", flush=True)
 
 
 @shared_task
