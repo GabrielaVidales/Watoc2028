@@ -1,7 +1,5 @@
 from channels.generic.websocket import AsyncJsonWebsocketConsumer
 from channels.db import database_sync_to_async
-from apps.abstracts.models import PDFGenerationJob
-from apps.abstracts.serializers import PDFGenerationJobSerializer
 
 
 class PDFGenerationConsumer(AsyncJsonWebsocketConsumer):
@@ -20,6 +18,8 @@ class PDFGenerationConsumer(AsyncJsonWebsocketConsumer):
 
         job = await self.get_job()
         if job is not None:
+            from apps.abstracts.serializers import PDFGenerationJobSerializer
+            
             serializer = PDFGenerationJobSerializer(job)
             print(f"INITIAL STATUS: {serializer.data}")
             
@@ -45,6 +45,7 @@ class PDFGenerationConsumer(AsyncJsonWebsocketConsumer):
 
     @database_sync_to_async
     def get_job(self):
+        from apps.abstracts.models import PDFGenerationJob
         try:
             return PDFGenerationJob.objects.get(id=self.job_id)
         except PDFGenerationJob.DoesNotExist:
