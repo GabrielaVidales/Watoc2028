@@ -49,9 +49,12 @@ def get_abstract_context(abstract: Abstract) -> dict:
     }
 
 
-def _notify_job_status(job: PDFGenerationJob, group: str, channel_layer):
-    print(group)
+def _notify_job_status(job, group, channel_layer):
+    print("CHANNEL LAYER:", channel_layer, flush=True)
+    print("GROUP:", group, flush=True)
+
     serializer = PDFGenerationJobSerializer(job)
+
     async_to_sync(channel_layer.group_send)(
         group,
         {
@@ -59,6 +62,8 @@ def _notify_job_status(job: PDFGenerationJob, group: str, channel_layer):
             "message": serializer.data,
         },
     )
+
+    print("GROUP SEND DONE", flush=True)
 
 
 @shared_task
