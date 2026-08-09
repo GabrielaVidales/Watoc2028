@@ -61,13 +61,14 @@ def _notify_job_status(job: PDFGenerationJob, group: str, channel_layer):
 
 
 @shared_task
-def generate_abstract_pdf(job_id: int):
+def generate_abstract_pdf(job_id: str):
     job = PDFGenerationJob.objects.select_related("abstract").get(id=job_id)
     abstract = Abstract.objects.prefetch_related("authors__affiliation").get(id=job.abstract_id)
-
+    
     channel_layer = get_channel_layer()
     group = f"pdf_job_{job_id}"
 
+    print(f"Job ID: {job_id} | Group: {group}")
     try:
         print('Generando PDF')
         job.status = PDFGenerationJob.Status.GENERATING
