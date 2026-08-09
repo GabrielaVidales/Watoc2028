@@ -81,24 +81,6 @@ function TestAbstractFeaturePage() {
         }
     })
 
-    useEffect(() => {
-        console.log('QUEEE??');
-        
-        const puta = new WebSocket(
-            `ws://127.0.0.1:8000/ws/pdf/d74d8641-e01c-40e4-8842-698333c33428/`
-        )
-
-        puta.onopen = (e) => {
-            console.log('TEST OPEN: ', e)
-        }
-        
-        puta.onmessage=(e) => {
-            console.log('TEST MESSAGE: ', e)
-        }
-
-
-    }, [])
-
     return (
         <div className='bg-slate-50 relative min-h-dvh lg:h-screen'>
             <div className='w-full mx-auto min-h-dvh lg:h-full'>

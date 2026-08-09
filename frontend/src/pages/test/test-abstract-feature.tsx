@@ -36,9 +36,6 @@ function TestAbstractFeature({ abstractId }: TestAbstractFeatureProps) {
     const [cachedFile, setCachedFile] = useState<Blob | null>(null)
     const [jobUri, setJobUri] = useState<string | null>(null)
 
-    console.log("DEbug: ",DEBUG);
-    
-
     useEffect(() => {
         setJob(null)
         setCachedFile(null)
@@ -53,7 +50,9 @@ function TestAbstractFeature({ abstractId }: TestAbstractFeatureProps) {
     useEffect(() => {
         if (!jobUri || !job) return
 
+        console.log("Conneted to: " + jobUri);
         connect(jobUri)
+
 
         const wsEventName = `pdf.status.${job.id}`
 
