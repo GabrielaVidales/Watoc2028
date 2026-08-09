@@ -7,13 +7,19 @@ class PDFGenerationConsumer(AsyncJsonWebsocketConsumer):
         self.job_id = self.scope["url_route"]["kwargs"]["job_id"]
         self.group_name = f"pdf_job_{self.job_id}"
 
+        print("WS CONNECT:", self.job_id)
+        print("WS GROUP:", self.group_name)
+        print("WS CHANNEL:", self.channel_name)
+
         await self.channel_layer.group_add(
             self.group_name,
             self.channel_name,
         )
-        
+
+        print("WS GROUP ADD OK")
+
         await self.accept()
-        
+
         await self.send(text_data="Hello")
 
     async def disconnect(self, code):
