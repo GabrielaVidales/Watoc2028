@@ -17,6 +17,7 @@ import { useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { useNavigate } from 'react-router'
 import { createSubmission } from '@/services/submissions/submission-services'
+import { DEBUG } from '@/lib/constants'
 
 
 type CreateAbstractDialogProps = {
@@ -41,7 +42,7 @@ export function CreateAbstractDialog({ redirect = true, ...rest }: CreateAbstrac
     const { mutateAsync: createAbstractAsync, isPending } = useMutation<AbstractSchema, AxiosError, CreateAbstractFormValues>({
         mutationFn: createSubmission,
         onError: error => {
-            if (import.meta.env.DEV) {
+            if (DEBUG) {
                 console.log(error.response.data)
             }
         },

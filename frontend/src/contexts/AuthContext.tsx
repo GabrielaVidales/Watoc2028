@@ -1,6 +1,7 @@
 import { createContext, type PropsWithChildren, useContext, useEffect, useState } from "react";
 import api, { guestApi } from "../clients/api";
 import type { ParticipantSchema, ReviewerSchema, UserSchema } from "@/schemas/user-schemas";
+import { DEBUG } from "@/lib/constants";
 
 
 export type UserProfile = {
@@ -37,12 +38,12 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
         setIsLoading(true);
         try {
             const res = await api.get('/users/session/');
-            if (import.meta.env.DEV) {
+            if (DEBUG) {
                 console.log(res.data);
             }
             setUser(res.data.anonymous ? null : res.data.user);
         } catch (error) {
-            if (import.meta.env.DEV) {
+            if (DEBUG) {
                 console.log(error.response);
             }
             setUser(null);
@@ -66,7 +67,7 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
             const res = await api.get<UserProfile>('/users/profile/');
             return res.data
         } catch (error) {
-            if (import.meta.env.DEV) {
+            if (DEBUG) {
                 console.log(error.response);
             }
             return {}

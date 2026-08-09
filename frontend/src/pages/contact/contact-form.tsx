@@ -17,6 +17,7 @@ import { AnimatePresence, motion } from 'motion/react'
 import { InfoAlert } from '@/components/InfoAlert'
 import { Spinner } from '@/components/ui/spinner'
 import { toSnakeCase } from '@/lib/utils'
+import { DEBUG } from '@/lib/constants'
 
 
 function ContactForm() {
@@ -45,13 +46,13 @@ function ContactForm() {
         if (isSubmitting || isSubmitSuccessful) return
         try {
             const response = await api.post('/contact/', toSnakeCase(validData))
-            if (import.meta.env.DEV) {
+            if (DEBUG) {
                 console.log(response);
             }
 
         } catch (error) {
             if (isAxiosError(error)) {
-                if (import.meta.env.DEV) {
+                if (DEBUG) {
                     console.log(error.response)
                 }
                 if (error.response.data.message) {

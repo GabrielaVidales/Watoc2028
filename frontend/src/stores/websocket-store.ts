@@ -98,7 +98,7 @@ const useWebsocket = create<WebSocketState>((set, get) => ({
 
         socket.onerror = (evt) => {
             if (import.meta.env.VITE_DEBUG) {
-                console.error(`[WebSocket] - Error: ${evt.type}`);
+                console.error(`[WebSocket] - Error`, evt);
             }
         };
     },

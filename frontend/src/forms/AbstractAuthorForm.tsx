@@ -7,6 +7,7 @@ import { Field, FieldContent, FieldError, FieldLabel } from '@/components/ui/fie
 import { InputGroup, InputGroupAddon, InputGroupInput } from '@/components/ui/input-group'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Switch } from '@/components/ui/switch'
+import { DEBUG } from '@/lib/constants'
 import { cn } from '@/lib/utils'
 import type { Affiliation } from '@/schemas/abstracts/affiliation-schema'
 import { authorFormSchema, type AuthorFormSchema, type AuthorSchema } from '@/schemas/abstracts/author-schema'
@@ -103,7 +104,7 @@ export function AuthorFormContent({ abstractId, onSubmit, values }: Props) {
             if (data.id) {
                 const res = await api.patch(`/abstracts/authors/${data.id}/`, { ...data, abstract_id: abstractId })
 
-                if (import.meta.env.DEV)
+                if (DEBUG)
                     console.log(res);
 
                 notify.success('Saved successfully!', {
@@ -112,7 +113,7 @@ export function AuthorFormContent({ abstractId, onSubmit, values }: Props) {
             } else {
                 const res = await api.post('/abstracts/authors/', { ...data, id: undefined, abstract_id: abstractId })
 
-                if (import.meta.env.DEV)
+                if (DEBUG)
                     console.log(res);
 
                 notify.success('Created successfully!', {
@@ -128,7 +129,7 @@ export function AuthorFormContent({ abstractId, onSubmit, values }: Props) {
             onSubmit?.()
         } catch (error) {
             if (isAxiosError(error)) {
-                if (import.meta.env.DEV) {
+                if (DEBUG) {
                     console.error(error.response);
                 }
                 notify.destructive('Something went wrong!', {
@@ -137,7 +138,7 @@ export function AuthorFormContent({ abstractId, onSubmit, values }: Props) {
             }
         }
     }, async (data) => {
-        if (import.meta.env.DEV) {
+        if (DEBUG) {
             console.error(data, getValues());
         }
     })

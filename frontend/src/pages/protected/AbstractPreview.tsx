@@ -3,6 +3,7 @@ import { AbstractData } from '@/components/AbstractData'
 import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
 import { useFetch } from '@/hooks/use-fetch'
+import { DEBUG } from '@/lib/constants'
 import { routes } from '@/routes/routes'
 import { type AbstractDeclarationValues } from '@/schemas/abstract-declaration-schema'
 import { type AbstractSchema, type AuthorSchema } from '@/schemas/abstracts/abstract-schemas'
@@ -30,7 +31,7 @@ function AbstractPreview({ }: Props) {
             link.setAttribute('download', `${name.replaceAll(" ", "_")}_preview.pdf`);
             link.click();
         } catch (error) {
-            if (import.meta.env.DEV) {
+            if (DEBUG) {
                 if (isAxiosError(error)) {
                     console.log(error.response.data);
                 }

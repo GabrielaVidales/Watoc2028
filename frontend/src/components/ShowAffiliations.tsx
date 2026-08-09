@@ -18,6 +18,7 @@ import { isAxiosError } from 'axios';
 import type { PaginatedResponse } from '@/domain/pagination';
 import { useParams } from 'react-router';
 import { Avatar, AvatarFallback } from './ui/avatar';
+import { DEBUG } from '@/lib/constants';
 
 
 type Props = {
@@ -58,7 +59,7 @@ function ShowAffiliations({ onAffiliationClicked }: Props) {
         onError: (error) => {
             if (isAxiosError(error)) {
                 toast.error(error.response.data.errors.root)
-                if (import.meta.env.DEV) {
+                if (DEBUG) {
                     console.error(error.response.data.errors.root);
                 }
             }

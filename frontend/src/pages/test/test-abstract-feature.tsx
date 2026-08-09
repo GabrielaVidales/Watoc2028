@@ -9,6 +9,7 @@ import { FileDown, InfoIcon } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { Tooltip, TooltipContent, TooltipTrigger, } from "@/components/ui/tooltip"
 import { isAxiosError } from 'axios'
+import { DEBUG } from '@/lib/constants'
 
 
 type PDFGenerationJob = {
@@ -34,6 +35,9 @@ function TestAbstractFeature({ abstractId }: TestAbstractFeatureProps) {
     const [job, setJob] = useState<PDFGenerationJob | null>(null)
     const [cachedFile, setCachedFile] = useState<Blob | null>(null)
     const [jobUri, setJobUri] = useState<string | null>(null)
+
+    console.log("DEbug: ",DEBUG);
+    
 
     useEffect(() => {
         setJob(null)
@@ -87,7 +91,7 @@ function TestAbstractFeature({ abstractId }: TestAbstractFeatureProps) {
         }
 
         try {
-            const { data } = await api.post<PDFGenerationJob>('/abstracts/jobs/', {
+            const { data } = await api.post<PDFGenerationJob>('/abstracts/jobs/?force=1', {
                 abstract_id: abstractId
             })
 

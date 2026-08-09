@@ -1,5 +1,5 @@
 from channels.generic.websocket import AsyncJsonWebsocketConsumer
-
+import json
 
 class PDFGenerationConsumer(AsyncJsonWebsocketConsumer):
 
@@ -11,8 +11,10 @@ class PDFGenerationConsumer(AsyncJsonWebsocketConsumer):
             self.group_name,
             self.channel_name,
         )
-
+        
         await self.accept()
+        
+        await self.send(text_data="Hello")
 
     async def disconnect(self, code):
         await self.channel_layer.group_discard(

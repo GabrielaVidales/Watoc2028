@@ -34,6 +34,7 @@ import { useDebounce } from 'use-debounce'
 import AbstractPreviewData from '../edit/abstract-preview-data'
 import { createSubmission, deleteSubmission } from '@/services/submissions/submission-services'
 import { CreateAbstractDialog } from '@/forms/submissions/abstract-create-dialog'
+import { DEBUG } from '@/lib/constants'
 
 
 function AbstractSubmissionPage() {
@@ -72,11 +73,11 @@ function AbstractSubmissionPage() {
         },
         onError: (error) => {
             if (isAxiosError(error)) {
-                if (import.meta.env.DEV) {
+                if (DEBUG) {
                     console.log(error.response.data);
                 }
             } else {
-                if (import.meta.env.DEV) {
+                if (DEBUG) {
                     console.log(error);
                 }
             }
@@ -99,7 +100,7 @@ function AbstractSubmissionPage() {
             link.setAttribute('download', `${textoPlano}_preview.pdf`);
             link.click();
         } catch (error) {
-            if (import.meta.env.DEV) {
+            if (DEBUG) {
                 if (isAxiosError(error)) {
                     console.log(error.response.data);
                 }

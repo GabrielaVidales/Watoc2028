@@ -22,7 +22,7 @@ import os, logging, html
 
 User = get_user_model()
 
-logger = logging.getLogger("users")
+logger = logging.getLogger("abstracts")
 
 
 class PDFGenerationViewSet(ModelViewSet):
@@ -31,6 +31,8 @@ class PDFGenerationViewSet(ModelViewSet):
     serializer_class = PDFGenerationJobSerializer
 
     def create(self, request: Request):
+        force_param = request.query_params.get('force', None)
+        force = force_param in ['true', '1'] 
         
         abstract_id = request.data.get("abstract_id", None)
 
@@ -39,7 +41,7 @@ class PDFGenerationViewSet(ModelViewSet):
             return Response(status=status.HTTP_404_NOT_FOUND)
 
         existing_job = self.queryset.filter(abstract=abstract).first()
-        if existing_job is not None:
+        if existing_job is not None and not force:
             # si existe hay que comprobar que el abstract no ha cambiado
             new_hash = abstract.get_hash()
             last_hash = existing_job.content_hash
@@ -52,7 +54,7 @@ class PDFGenerationViewSet(ModelViewSet):
                 serializer = self.serializer_class(existing_job)
                 return Response(serializer.data)
 
-
+        logger.info("generando PDF")
         if is_redis_available():
             job = PDFGenerationJob.objects.create(
                 abstract=abstract,

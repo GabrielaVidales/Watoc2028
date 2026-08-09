@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button'
 import { Field, FieldError, FieldLabel } from '@/components/ui/field'
 import { InputGroup, InputGroupAddon, InputGroupButton, InputGroupInput } from '@/components/ui/input-group'
 import { Spinner } from '@/components/ui/spinner'
+import { DEBUG } from '@/lib/constants'
 import { changePasswordSchema, type ChangePasswordFormValues } from '@/schemas/user-schemas'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { isAxiosError } from 'axios'
@@ -36,7 +37,7 @@ function ChangePasswordForm() {
                 oldPassword: data.oldPassword,
                 newPassword: data.password.value
             })
-            if (import.meta.env.DEV) {
+            if (DEBUG) {
                 console.log(res);
             }
             reset()

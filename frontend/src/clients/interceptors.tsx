@@ -1,3 +1,4 @@
+import { DEBUG } from "@/lib/constants";
 import axios, { isAxiosError, type AxiosInstance, type InternalAxiosRequestConfig } from "axios";
 import Cookies from "js-cookie";
 
@@ -23,7 +24,7 @@ async function refreshToken() {
             headers: { "X-CSRFToken": Cookies.get("csrftoken") ?? "" },
         })
             .then(() => {
-                if (import.meta.env.DEV) {
+                if (DEBUG) {
                     console.log("Access token refreshed");
                 }
             })

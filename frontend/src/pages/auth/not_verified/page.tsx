@@ -5,6 +5,7 @@ import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card'
 import api from '@/clients/api';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from "sonner"
+import { DEBUG } from '@/lib/constants';
 
 
 function VerifyYourEmailPage() {
@@ -25,12 +26,12 @@ function VerifyYourEmailPage() {
     const resendEmail = async () => {
         try {
             const response = await api.post('/users/resend-verification-email/')
-            if (import.meta.env.DEV){
+            if (DEBUG){
                 console.log(response);
             }
             toast(`We've sent a new verification link to ${email}. Please check your inbox and spam folder.`)
         } catch (error) {
-            if (import.meta.env.DEV) {
+            if (DEBUG) {
                 console.log(error);
             }
             toast(`Email couldn't be sended. Please try again.`)

@@ -9,6 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Separator } from '@/components/ui/separator';
 import { Spinner } from '@/components/ui/spinner';
 import { userPrefixes } from '@/domain/constants';
+import { DEBUG } from '@/lib/constants';
 import { routes } from '@/routes/routes';
 import type { UserSchema } from '@/schemas/user-schemas';
 import { registrationSchema, type RegisterFormInputValues, type RegisterFormOutputValues } from '@/schemas/users/registration-schema';
@@ -23,7 +24,7 @@ import { Controller, useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router';
 
 
-const defaultValues = import.meta.env.DEV ? {
+const defaultValues = DEBUG ? {
     password: {
         value: 'Password123#',
         confirm: 'Password123#',
@@ -92,7 +93,7 @@ export default function RegisterForm() {
         },
         onError: (error) => {
             if (isAxiosError(error)) {
-                if (import.meta.env.DEV) {
+                if (DEBUG) {
                     console.log(errors);
                 }
                 const serverErrors = error.response.data

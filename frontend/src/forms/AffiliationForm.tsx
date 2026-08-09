@@ -13,6 +13,7 @@ import { isAxiosError } from 'axios'
 import { useAuth } from '@/contexts/AuthContext'
 import { useParams } from 'react-router'
 import { notify } from '@/components/custom/notify'
+import { DEBUG } from '@/lib/constants'
 
 type Props = {
     defaults?: Affiliation
@@ -71,7 +72,7 @@ function AffiliationForm({ defaults, onSubmitSuccess, id }: Props & React.HTMLPr
         },
         onError: (error) => {
             if (isAxiosError(error)) {
-                if (import.meta.env.DEV)
+                if (DEBUG)
                     console.error(error.response.data);
             }
         }
@@ -91,7 +92,7 @@ function AffiliationForm({ defaults, onSubmitSuccess, id }: Props & React.HTMLPr
         },
         onError: (error) => {
             if (isAxiosError(error)) {
-                if (import.meta.env.DEV)
+                if (DEBUG)
                     console.error(error.response.data);
             }
         }

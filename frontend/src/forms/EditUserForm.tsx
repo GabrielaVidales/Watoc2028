@@ -11,6 +11,7 @@ import { AvatarUpload } from '@/components/ui/upload-avatar'
 import { useAuth } from '@/contexts/AuthContext'
 import { userPrefixes } from '@/domain/constants'
 import { useProfiles } from '@/hooks/use-profiles'
+import { DEBUG } from '@/lib/constants'
 import { editUserFormSchema, type EditUserFormValues } from '@/schemas/user-schemas'
 import { countries } from '@/utils/countriesInfo'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -72,7 +73,7 @@ function EditUserForm({ defaultValues }: P) {
             await fetchUser()
             await fetchProfile()
         } catch (error) {
-            if (import.meta.env.DEV) {
+            if (DEBUG) {
                 if (isAxiosError(error)) {
                     console.log(error.response.data);
                 }

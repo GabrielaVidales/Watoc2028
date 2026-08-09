@@ -6,6 +6,7 @@ import { Button } from "./ui/button"
 import { CircleUserRound, Plus, Search, SearchX } from "lucide-react"
 import {  CommandDialog, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList, CommandShortcut, } from "@/components/ui/command"
 import { useDebounce } from "use-debounce"
+import { DEBUG } from "@/lib/constants"
 
 export type UserSearchInputProps = {
     delay?: number
@@ -33,7 +34,7 @@ export function UserSearchInput({
             const res = await api.get(`users?search=${trimmedInput}`)
             setUsers(res.data)
         } catch (err) {
-            if (import.meta.env.DEV) {
+            if (DEBUG) {
                 console.error(err)
             }
         }

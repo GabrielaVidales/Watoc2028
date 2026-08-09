@@ -41,6 +41,7 @@ import ManageReviewsPage from './pages/protected/administration/manage-reviews/m
 import EditAbstractPage from './pages/protected/submissions/edit/edit-submission-page'
 import LoginLayout from './layouts/LoginLayout'
 import TestAbstractFeaturePage from './pages/test/test-abstract-feature-page'
+import { DEBUG } from './lib/constants'
 
 function App() {
 	const { pathname } = useLocation()
@@ -78,7 +79,7 @@ function App() {
 				</Route>
 			</Route>
 
-			{import.meta.env.DEV && (
+			{DEBUG && (
 				<Route element={<ProtectedRoute allowedRoles={['admin', 'participant', 'reviewer']} />} >
 					<Route element={<AuthLayout />}>
 						{/*  DEPRECAR ESTAS RUTAS POCO A POCO  */}

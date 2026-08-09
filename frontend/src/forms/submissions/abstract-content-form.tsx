@@ -1,4 +1,5 @@
 import api from '@/clients/api'
+import { DEBUG } from '@/lib/constants'
 import { editAbstractSchema, type EditAbstractFormValues } from '@/schemas/abstracts/edit-abstract-schema'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
@@ -42,10 +43,10 @@ function AbstractContentForm({ }: Props) {
         onSuccess: () => queryClient.invalidateQueries({ queryKey: ['abstract', id] }),
         onError: error => {
             if (isAxiosError(error)) {
-                if (import.meta.env.DEV) {
+                if (DEBUG) {
                     console.error(error.response.data);
                 }
-            } else if (import.meta.env.DEV) {
+            } else if (DEBUG) {
                 console.error(error);
             }
         }
@@ -56,7 +57,7 @@ function AbstractContentForm({ }: Props) {
             await saveMutation.mutateAsync(data)
         },
         async (data) => {
-            if (import.meta.env.DEV) {
+            if (DEBUG) {
                 console.error(data)
             }
         }

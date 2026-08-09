@@ -6,6 +6,7 @@ import { Item } from '@/components/ui/item'
 import { Spinner } from '@/components/ui/spinner'
 import { Switch } from '@/components/ui/switch'
 import { useIsMobile } from '@/hooks/use-mobile'
+import { DEBUG } from '@/lib/constants'
 import { cn } from '@/lib/utils'
 import { abstractDeclarationSchema, declarationsLabels, type AbstractDeclarationValues, } from '@/schemas/abstract-declaration-schema'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -35,12 +36,12 @@ function AbstractDeclarations() {
     const patchMutation = useMutation({
         mutationFn: async (data: AbstractDeclarationValues) => {
             const res = await api.patch(`/abstracts/submissions/${id}/declarations/`, data)
-            if (import.meta.env.DEV) {
+            if (DEBUG) {
                 console.log('Success:', res.data);
             }
         },
         onError: (error) => {
-            if (import.meta.env.DEV) {
+            if (DEBUG) {
                 if (isAxiosError(error)) {
                     console.log(error.response);
                 }

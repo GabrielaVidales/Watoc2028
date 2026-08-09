@@ -15,6 +15,7 @@ import { Fragment, useEffect, } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import { cn } from '@/lib/utils'
+import { DEBUG } from '@/lib/constants'
 
 type AbstractFormProps = {
     abstractId?: number | null,
@@ -35,10 +36,10 @@ function AbstractContentForm({ abstractId = null }: AbstractFormProps) {
 
     const onError = (error: Error) => {
         if (isAxiosError(error)) {
-            if (import.meta.env.DEV) {
+            if (DEBUG) {
                 console.error(error.response.data);
             }
-        } else if (import.meta.env.DEV) {
+        } else if (DEBUG) {
             console.error(error);
         }
     }
@@ -79,7 +80,7 @@ function AbstractContentForm({ abstractId = null }: AbstractFormProps) {
             toast.info('Submission saved successfully!', { position: 'top-center', dismissible: true })
         },
         async (data) => {
-            if (import.meta.env.DEV) {
+            if (DEBUG) {
                 console.error(data)
             }
         }

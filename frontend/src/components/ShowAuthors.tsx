@@ -19,6 +19,7 @@ import { CardContent, CardDescription, CardHeader, CardTitle } from './ui/card'
 import type { AuthorSchema } from '@/schemas/abstracts/author-schema'
 import { saveAbstractAuthors, type SaveAbstractAuthorsParams } from '@/services/submissions/author-services'
 import { notify } from './custom/notify'
+import { DEBUG } from '@/lib/constants'
 
 
 type APIError = {
@@ -58,7 +59,7 @@ function ShowAuthorsComponent({ abstractId }: Props) {
         },
         onError: (error) => {
             const errors = (error.response.data as any).errors as APIError
-            if (import.meta.env.DEV) {
+            if (DEBUG) {
                 console.error(error.response.data)
             }
             if (errors.root) {
@@ -83,7 +84,7 @@ function ShowAuthorsComponent({ abstractId }: Props) {
         },
         onError: (error) => {
             if (isAxiosError(error)) {
-                if (import.meta.env.DEV) {
+                if (DEBUG) {
                     console.error(error.response?.data)
                 }
             }
