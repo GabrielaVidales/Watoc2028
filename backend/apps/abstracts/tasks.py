@@ -103,7 +103,16 @@ def generate_abstract_pdf(job_id: str):
         job.save()
 
         print('Respondiendo por websocket')
-        _notify_job_status(job, group, channel_layer)
+        # _notify_job_status(job, group, channel_layer)
+        serializer = PDFGenerationJobSerializer(job)
+        event = {
+            "type": "pdf_status",
+            "message": serializer.data,
+        }
+        async_to_sync(channel_layer.group_send)(
+                group,
+                event,
+            )
         return "OK! Abstract PDF successfully generated!"
 
     except Exception as exc:
