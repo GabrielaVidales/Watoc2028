@@ -81,15 +81,17 @@ function TestAbstractFeaturePage() {
     })
 
     return (
-        <div className='bg-slate-50 relative h-screen'>
-            <div className='w-full mx-auto h-full'>
-                <section className='grid grid-cols-[1fr_400px] h-full overflow-hidden'>
+        <div className='bg-slate-50 relative min-h-dvh lg:h-screen'>
+            <div className='w-full mx-auto min-h-dvh lg:h-full'>
+                {/* 1 columna en mobile → 2 columnas fijas en desktop */}
+                <section className='grid grid-cols-1 lg:grid-cols-[1fr_400px] min-h-dvh lg:h-full lg:overflow-hidden'>
 
-                    <ScrollArea className='space-y-6 overflow-y-auto p-6 w-full no-scrollbar'>
+                    {/* ── Columna principal ───────────────────────────────── */}
+                    <ScrollArea className='min-w-0 space-y-6 p-4 sm:p-6 w-full no-scrollbar lg:overflow-y-auto'>
                         <div className='max-w-4xl mx-auto space-y-6'>
-                            <h2 className='text-2xl font-medium'>New Submission</h2>
+                            <h2 className='text-xl sm:text-2xl font-medium'>New Submission</h2>
 
-                            <Card className='w-full p-9'>
+                            <Card className='w-full p-5 sm:p-9'>
 
                                 <CardContent className="space-y-6 px-0">
                                     <AbstractContentForm abstractId={selectedAbstract?.id} />
@@ -104,21 +106,21 @@ function TestAbstractFeaturePage() {
                         </div>
                     </ScrollArea>
 
-                    <ScrollArea className='overflow-y-auto w-full no-scrollbar bg-background border-l'>
-                        <header className="sticky top-0 h-9 px-4 bg-primary-light/50 border-b border-border/60 flex items-center justify-between text-xs text-muted-foreground select-none">
+                    {/* ── Panel lateral ───────────────────────────────────── */}
+                    <ScrollArea className='min-w-0 w-full no-scrollbar bg-background border-t lg:border-t-0 lg:border-l lg:overflow-y-auto'>
+                        <header className="lg:sticky lg:top-0 z-10 min-h-9 px-4 py-1.5 lg:py-0 bg-primary-light/50 border-b border-border/60 flex flex-wrap items-center justify-between gap-x-3 gap-y-1 text-xs text-muted-foreground select-none">
                             <div className="flex items-center gap-2">
                                 <span className="font-semibold text-foreground/80 tracking-tight">System Status</span>
                             </div>
 
-                            <div className="flex items-center gap-2.5">
+                            <div className="flex min-w-0 items-center gap-2.5">
                                 <span className="text-[11px] uppercase tracking-wider font-semibold text-foreground/80">
                                     Current user:
                                 </span>
 
                                 {user ? (
-                                    <div className="flex items-center gap-2 bg-background/80 border border-border/80 px-2.5 py-0.5 rounded-full shadow-2xs">
-                                        {/* Indicador activo verde */}
-                                        <span className="relative flex size-2">
+                                    <div className="flex min-w-0 items-center gap-2 bg-background/80 border border-border/80 px-2.5 py-0.5 rounded-full shadow-2xs">
+                                        <span className="relative flex size-2 shrink-0">
                                             <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75"></span>
                                             <span className="relative inline-flex size-2 rounded-full bg-emerald-500"></span>
                                         </span>
@@ -135,9 +137,9 @@ function TestAbstractFeaturePage() {
                             </div>
                         </header>
 
-
-                        <div className='space-y-6 p-6 w-100'>
-                            <CardHeader>
+                        {/* w-full en mobile, ancho fijo 400px (w-100) en desktop */}
+                        <div className='space-y-6 p-4 sm:p-6 w-full lg:w-100'>
+                            <CardHeader className='px-0'>
                                 <CardTitle>Download Submission Preview</CardTitle>
                                 <CardDescription>
                                     Generate and download a PDF preview of your submission.
@@ -146,24 +148,26 @@ function TestAbstractFeaturePage() {
 
                             <TestAbstractFeature abstractId={selectedAbstract ? selectedAbstract.id : null} />
 
-                            <CardHeader>
+                            <CardHeader className='px-0'>
                                 <CardTitle>Your submissions</CardTitle>
                                 <CardDescription>
                                     Generate and download a PDF preview of your submission.
                                 </CardDescription>
                             </CardHeader>
 
-
                             <section className='flex flex-col gap-2 min-h-60'>
+
                                 <CreateAbstractDialog redirect={false} size='xs' />
 
                                 <div className='bg-muted flex-1 space-y-1 p-1 rounded-sm border'>
+
                                     {results?.results?.map((abstract) => (
                                         <Item key={abstract.id} variant="outline" size="sm" asChild>
                                             <a href='#' className='bg-card'>
                                                 <ItemMedia>
                                                     <Button type='button' variant='outline' size='icon-lg' onClick={(e) => onAbstractSelected(e, abstract)}
                                                         className={cn(
+                                                            'shrink-0',
                                                             abstract.id === selectedAbstract?.id && 'border-primary-light bg-primary-light/20 hover:bg-primary-light/10 text-primary-light hover:text-primary-light'
                                                         )}
                                                     >
@@ -176,7 +180,7 @@ function TestAbstractFeaturePage() {
                                                         <p className='truncate text-muted-foreground text-xs'>{abstract.presentation_type.toUpperCase()}</p>
                                                     </div>
                                                 </ItemContent>
-                                                <ItemActions>
+                                                <ItemActions className='shrink-0'>
                                                     <AlertDialog>
                                                         <AlertDialogTrigger asChild>
                                                             <Button type='button' variant='outline' size='icon-sm' className='border-destructive hover:bg-destructive/10'>
@@ -233,8 +237,8 @@ function TestAbstractFeaturePage() {
                 </section>
             </div>
 
-            <div className='absolute bottom-0 left-0'>
-                <p className='text-destructive'>DEV environment</p>
+            <div className='absolute bottom-0 left-0 z-50 px-2 pb-1 pointer-events-none'>
+                <p className='text-destructive text-xs sm:text-sm'>DEV environment</p>
             </div>
         </div>
     )
