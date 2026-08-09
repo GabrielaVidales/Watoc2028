@@ -23,7 +23,7 @@ class PDFGenerationConsumer(AsyncJsonWebsocketConsumer):
         )
 
     async def pdf_status(self, event):
-
+        print('Respondiendo status de job:')
         await self.send_json(
             {
                 "type": f"pdf.status.{self.job_id}",

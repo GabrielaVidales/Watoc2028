@@ -69,12 +69,14 @@ def generate_abstract_pdf(job_id: int):
     group = f"pdf_job_{job_id}"
 
     try:
+        print('Generando PDF')
         job.status = PDFGenerationJob.Status.GENERATING
         job.save(update_fields=["status"])
         
         context = get_abstract_context(abstract)
         pdf_bytes = build_abstract_pdf(context)
 
+        print('Generación completa')
         job.file.save(
             name=f"{context['file_title']}.pdf",
             content=ContentFile(pdf_bytes),
@@ -84,6 +86,7 @@ def generate_abstract_pdf(job_id: int):
         job.completed_at = timezone.now()
         job.save()
 
+        print('Respondiendo por websocket')
         _notify_job_status(job, group, channel_layer)
         return "OK! Abstract PDF successfully generated!"
 
