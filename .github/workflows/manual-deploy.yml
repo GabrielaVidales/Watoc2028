@@ -58,7 +58,7 @@ jobs:
           cd frontend
           
           echo "VITE_API_URL=${VITE_API_URL}" > .env.production
-          echo "VITE_WS_URL='ws://127.0.0.1:8000/ws/'" > .env.production
+          echo "VITE_WS_URL='wss://tu-dominio.com/ws/'" > .env.production
           
           pnpm install --frozen-lockfile
           pnpm build
