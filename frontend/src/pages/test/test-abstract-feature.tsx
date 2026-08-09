@@ -48,13 +48,10 @@ function TestAbstractFeature({ abstractId }: TestAbstractFeatureProps) {
     ) : false
 
     useEffect(() => {
-        if (!jobUri || !job) return
+        if (!jobUri) return
 
-        console.log("Conneted to: " + jobUri);
-        connect(jobUri)
-
-
-        const wsEventName = `pdf.status.${job.id}`
+        const jobId = jobUri.split('/')[1]
+        const wsEventName = `pdf.status.${jobId}`
 
         websocketDispatcher.register(wsEventName, async (job: PDFGenerationJob) => {
             console.log('Listen:', job);
@@ -72,11 +69,14 @@ function TestAbstractFeature({ abstractId }: TestAbstractFeatureProps) {
             }
         })
 
+        console.log("QUE COÑO???: " + jobUri);
+        connect(jobUri)
+
         return () => {
             websocketDispatcher.unregister(wsEventName)
             disconnect(jobUri)
         }
-    }, [jobUri, job])
+    }, [jobUri])
 
 
     const onGeneratingPdf = async () => {

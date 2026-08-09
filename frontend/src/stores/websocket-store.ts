@@ -1,3 +1,4 @@
+import { DEBUG } from "@/lib/constants";
 import websocketDispatcher from "./websocket-dispatcher";
 import { create } from "zustand";
 
@@ -12,6 +13,7 @@ type WebSocketState = {
 let sockets = new Map<string, WebSocket>()
 const reconnectTimers = new Map<string, number>();
 const reconnectAttempts = new Map<string, number>();
+const intentionalDisconnects = new Set<string>();
 
 const WEBSOCKET_URL = import.meta.env.VITE_WS_URL
 const MAX_DELAY = 30_000;
@@ -19,6 +21,8 @@ const MAX_DELAY = 30_000;
 const useWebsocket = create<WebSocketState>((set, get) => ({
     connected: {},
     connect(socketUri = 'api/socket/') {
+        intentionalDisconnects.delete(socketUri);
+
         if (import.meta.env.VITE_USE_WEBSOCKETS !== 'true') {
             if (import.meta.env.VITE_DEBUG) {
                 console.log(`[WebSocket] - Websocket disabled`)
@@ -38,7 +42,7 @@ const useWebsocket = create<WebSocketState>((set, get) => ({
         sockets.set(socketUri, socket);
 
         socket.onopen = (ev: Event) => {
-            if (import.meta.env.VITE_DEBUG) {
+            if (DEBUG) {
                 console.log(`[WebSocket] - Open: ${ev.timeStamp}`)
             }
 
@@ -52,7 +56,7 @@ const useWebsocket = create<WebSocketState>((set, get) => ({
         }
 
         socket.onclose = (ev: CloseEvent) => {
-            if (import.meta.env.VITE_DEBUG) {
+            if (DEBUG) {
                 console.log(`[WebSocket] - Closed: ${ev.reason}`)
             }
             set(state => ({
@@ -64,6 +68,15 @@ const useWebsocket = create<WebSocketState>((set, get) => ({
 
             if (sockets.get(socketUri) === socket) {
                 sockets.delete(socketUri);
+            }
+
+            if (intentionalDisconnects.has(socketUri)) {
+                intentionalDisconnects.delete(socketUri);
+
+                if (DEBUG) {
+                    console.log('[WebSocket] - Cierre intencional, no reconectar');
+                }
+                return;
             }
 
             const attempts = reconnectAttempts.get(socketUri) ?? 0;
@@ -78,7 +91,7 @@ const useWebsocket = create<WebSocketState>((set, get) => ({
             );
 
             const timer = window.setTimeout(() => {
-                if (import.meta.env.VITE_DEBUG) {
+                if (DEBUG) {
                     console.log('[WebSocket] - Reconectar');
                 }
 
@@ -97,12 +110,14 @@ const useWebsocket = create<WebSocketState>((set, get) => ({
         }
 
         socket.onerror = (evt) => {
-            if (import.meta.env.VITE_DEBUG) {
+            if (DEBUG) {
                 console.error(`[WebSocket] - Error`, evt);
             }
         };
     },
     disconnect(socketUri = 'api/socket/') {
+        intentionalDisconnects.add(socketUri);
+
         const timer = reconnectTimers.get(socketUri);
 
         if (timer !== undefined) {

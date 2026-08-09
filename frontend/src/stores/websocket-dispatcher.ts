@@ -7,7 +7,9 @@ class WebSocketDispatcher {
     private handlers = new Map<string, (data: any) => void>
 
     register(key: string, handler: (data: any) => void) {
-        this.handlers.set(key, handler)
+        if (!this.handlers.has(key)) {
+            this.handlers.set(key, handler)
+        }
     }
 
     dispatch(message: WebSocketMessage) {
