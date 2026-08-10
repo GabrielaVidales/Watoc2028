@@ -53,7 +53,7 @@ function AbstractContentForm({ abstractId = null }: AbstractFormProps) {
 
     const updateMut = useMutation<AbstractSchema, AxiosError, UpdateParams>({
         mutationFn: updateSubmission,
-        onSuccess: () => queryClient.invalidateQueries({ queryKey: ['abstract', abstractId] }),
+        onSuccess: () => queryClient.invalidateQueries({ queryKey: ['abstract',] }),
         onError: onError,
     })
 

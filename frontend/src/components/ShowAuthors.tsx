@@ -39,6 +39,7 @@ function ShowAuthorsComponent({ abstractId }: Props) {
         queryKey: ['authors', abstractId],
         refetchOnWindowFocus: false,
         refetchOnReconnect: false,
+        enabled: !!abstractId,
         queryFn: async () => {
             const { data } = await api.get<AuthorSchema[]>(`/abstracts/submissions/${abstractId}/authors`)
             return data
@@ -108,7 +109,7 @@ function ShowAuthorsComponent({ abstractId }: Props) {
         setAuthors(next)
     }
 
-    React.useEffect(() => { setAuthors(data ? data : []) }, [data])
+    React.useEffect(() => { setAuthors(data) }, [data])
 
     if (!data) {
         return <Spinner />

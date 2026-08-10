@@ -50,7 +50,7 @@ export function CreateAbstractDialog({ redirect = true, ...rest }: CreateAbstrac
             setOpen(false)
             redirect && navigate(routes.users.submissions.edit.build({ id: data.id }))
             queryClient.invalidateQueries({
-                queryKey: ['abstracts', user.id],
+                queryKey: ['abstract'],
             })
         }
     })

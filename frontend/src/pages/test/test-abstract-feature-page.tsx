@@ -49,7 +49,7 @@ function TestAbstractFeaturePage() {
     const [page, setPage] = useState(1)
     const [itemsPerPage, setItemsPerPage] = useState(3)
     const { data: results } = useQuery<PaginatedResponse<AbstractSchema>>({
-        queryKey: ['abstracts', page, itemsPerPage],
+        queryKey: ['abstract', page, itemsPerPage],
         queryFn: async () => {
             const { data } = await api.get('/participants/profiles/submissions/', {
                 params: {
@@ -71,6 +71,7 @@ function TestAbstractFeaturePage() {
     const deleteMut = useMutation<void, AxiosError, number | string>({
         mutationFn: deleteSubmission,
         onSuccess: () => {
+            setSelectedAbstract(null)
             queryClient.invalidateQueries({
                 queryKey: ['abstracts', page, itemsPerPage],
             })
@@ -87,7 +88,7 @@ function TestAbstractFeaturePage() {
             <div className='w-full mx-auto min-h-dvh md:h-full'>
                 <section className='grid grid-cols-1 md:grid-cols-[minmax(0,1fr)_400px] min-h-dvh md:h-full md:overflow-hidden'>
 
-                    <ScrollArea className='order-2 md:order-1 min-w-0 shrink space-y-6 w-full no-scrollbar md:overflow-y-auto max-md:border-t'>
+                    <ScrollArea className='order-2 md:order-1 min-w-0 shrink space-y-6 w-full no-scrollbar md:overflow-y-hidden max-md:border-t'>
                         <section className='border-b w-full bg-background p-4 sm:p-6 '>
                             <h3 className='font-medium text-muted-foreground'>Editing submission:</h3>
                             {selectedAbstract ? (
@@ -159,13 +160,17 @@ function TestAbstractFeaturePage() {
                                 <Separator />
 
                                 <CardContent className="space-y-6 px-0">
-                                    <ShowAuthorsComponent abstractId={selectedAbstract?.id} />
+                                    {selectedAbstract && (
+                                        <ShowAuthorsComponent abstractId={selectedAbstract.id} />
+                                    )}
                                 </CardContent>
 
                                 <Separator />
 
                                 <CardContent className="space-y-2 px-0">
-                                    <ShowAffiliations abstractId={selectedAbstract?.id} />
+                                    {selectedAbstract && (
+                                        <ShowAffiliations abstractId={selectedAbstract?.id} />
+                                    )}
                                 </CardContent>
 
                             </Card>
@@ -306,8 +311,8 @@ function TestAbstractFeaturePage() {
                 </section>
             </div>
 
-            <div className='fixed bottom-0 w-full bg-primary/80 dark:bg-white/10 left-0 z-50 p-1 pointer-events-none flex items-center justify-center'>
-                <p className='text-accent text-xs font-medium'>DEV environment</p>
+            <div className='fixed bottom-0 w-full bg-primary/80 dark:bg-white/20 left-0 z-50 p-1 pointer-events-none flex items-center justify-center'>
+                <p className='text-accent text-xs font-medium dark:text-destructive'>DEV environment</p>
             </div>
         </div>
     )
