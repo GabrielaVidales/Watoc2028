@@ -4,17 +4,17 @@ on:
   workflow_dispatch:
     inputs:
       environment:
-        description: 'Entorno que se va a desplegar'
+        description: "Entorno que se va a desplegar"
         required: true
-        default: 'dev'
+        default: "dev"
         type: choice
         options:
           - dev
           - prod
       target:
-        description: '¿Qué deseas desplegar?'
+        description: "¿Qué deseas desplegar?"
         required: true
-        default: 'all'
+        default: "all"
         type: choice
         options:
           - all
@@ -32,49 +32,38 @@ jobs:
       FRONTEND_DEPLOY_PATH: ${{ github.event.inputs.environment == 'prod' && secrets.PROD_FRONTEND_DEPLOY_PATH || secrets.DEV_FRONTEND_DEPLOY_PATH }}
       PROJECT_PATH: ${{ github.event.inputs.environment == 'prod' && secrets.PROD_PROJECT_PATH || secrets.DEV_PROJECT_PATH }}
       DJANGO_SERVICE_NAME: ${{ github.event.inputs.environment == 'prod' && secrets.PROD_DJANGO_SERVICE_NAME || secrets.DEV_DJANGO_SERVICE_NAME }}
- 
+      CELERY_SERVICE_NAME: ${{ github.event.inputs.environment == 'prod' && secrets.PROD_CELERY_SERVICE_NAME || secrets.DEV_CELERY_SERVICE_NAME }}
+
     steps:
       - uses: actions/checkout@v4
-      - name: Install pnpm
-        if: ${{ github.event.inputs.target == 'all' || github.event.inputs.target == 'frontend' }}
-        uses: pnpm/action-setup@v4
-        with:
-          version: 10
 
-      - name: Setup Node.js
+      - name: Deploy frontend
         if: ${{ github.event.inputs.target == 'all' || github.event.inputs.target == 'frontend' }}
-        uses: actions/setup-node@v4
-        with:
-          node-version: '24'
-          cache: 'pnpm'
-          cache-dependency-path: 'frontend/pnpm-lock.yaml'
-
-      - name: Compile React
-        if: ${{ github.event.inputs.target == 'all' || github.event.inputs.target == 'frontend' }}
-        env:
-          VITE_API_URL: ${{ github.event.inputs.environment == 'prod' && secrets.PROD_VITE_API_URL || secrets.DEV_VITE_API_URL }}
-    
-        run: |
-          cd frontend
-          
-          echo "VITE_API_URL=${VITE_API_URL}" > .env.production
-          echo "VITE_WS_URL='wss://tu-dominio.com/ws/'" > .env.production
-          
-          pnpm install --frozen-lockfile
-          pnpm build
-
-      - name: Copy dist to VPS
-        if: ${{ github.event.inputs.target == 'all' || github.event.inputs.target == 'frontend' }}
-        uses: appleboy/scp-action@v0.1.7
+        uses: appleboy/ssh-action@v1
         with:
           host: ${{ env.VPS_HOST }}
           username: ${{ env.VPS_USER }}
           key: ${{ env.VPS_SSH_KEY }}
           port: 22
-          source: "frontend/dist/*"
-          target: ${{ env.FRONTEND_DEPLOY_PATH }}
-          strip_components: 2
           debug: true
+          timeout: 10m
+          command_timeout: 10m
+          script: |
+            set -e
+
+            echo ">>> Actualizando React en [${{ github.event.inputs.environment }}]..."
+
+            cd ${{ env.PROJECT_PATH }}
+            git pull origin ${{ github.ref_name }}
+
+            cd frontend
+
+            pnpm install --frozen-lockfile
+            pnpm build
+
+            sudo rsync -av --delete dist/ ${{ env.FRONTEND_DEPLOY_PATH }}
+
+            echo ">>> Despliegue en ${{ github.event.inputs.environment }} finalizado con éxito."
 
       - name: Deploy backend
         if: ${{ github.event.inputs.target == 'all' || github.event.inputs.target == 'backend' }}
@@ -89,12 +78,12 @@ jobs:
           command_timeout: 10m
           script: |
             set -e
-            
+
             echo ">>> Actualizando Django en [${{ github.event.inputs.environment }}]..."
-            
+
             cd ${{ env.PROJECT_PATH }}
             git pull origin ${{ github.ref_name }}
-            
+
             cd backend
             source venv/bin/activate
             pip install -r requirements.txt
@@ -102,6 +91,7 @@ jobs:
             python manage.py collectstatic --noinput
 
             sudo systemctl restart ${{ env.DJANGO_SERVICE_NAME }}
-            
+
+            sudo systemctl restart ${{ env.CELERY_SERVICE_NAME }}
+
             echo ">>> Despliegue en ${{ github.event.inputs.environment }} finalizado con éxito."
-            
