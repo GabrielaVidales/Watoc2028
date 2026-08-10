@@ -202,7 +202,7 @@ function TestAbstractFeaturePage() {
                             </div>
                         </header>
 
-                        <div className='space-y-6 p-4 sm:p-6 min-w-0 w-full md:w-100 mb-10'>
+                        <div className='space-y-6 p-4 sm:p-6 min-w-0 w-dvw mb-10'>
                             <CardHeader className='px-0'>
                                 <CardTitle>Download Submission Preview</CardTitle>
                                 <CardDescription>
