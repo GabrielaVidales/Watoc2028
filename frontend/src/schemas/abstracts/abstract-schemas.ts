@@ -94,7 +94,8 @@ export const abstractSchema = z.object({
 
     references: z.string()
         .min(1, "Please provide the references")
-        .refine((val) => countWordsFromHTML(val) <= 150, "References must be at most 150 words"),
+        .refine((val) => countWordsFromHTML(val) > 0, "References are required")
+        .refine((val) => countWordsFromHTML(val) <= 350, "References must be at most 150 words"),
 
     status: z.enum(ABSTRACT_STATUS).optional(),
 

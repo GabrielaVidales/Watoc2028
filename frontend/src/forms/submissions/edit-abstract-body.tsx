@@ -148,17 +148,17 @@ function AbstractContentForm({ abstractId = null }: AbstractFormProps) {
                                 className="wrap-anywhere text-xl"
                                 maxLength={3500}
                                 footer={
-                                    <InputGroupText className={'w-full min-h-5 flex flex-col-reverse gap-0 md:flex-row'}>
-                                        {fieldState.invalid ? (
+                                    <InputGroupText className={'w-full min-h-5 flex flex-col gap-0 md:flex-row'}>
+                                        {fieldState.invalid && (
                                             <FieldError errors={[fieldState.error]} />
-                                        ) : (
-                                            <FieldLabel htmlFor={field.name} className={cn(
-                                                'font-normal ml-auto',
-                                                (fieldState.invalid || countWordsFromHTML(field.value || "") > 20) && 'text-destructive'
-                                            )}>
-                                                {countWordsFromHTML(field.value || "")}/20 words
-                                            </FieldLabel>
                                         )}
+
+                                        <FieldLabel htmlFor={field.name} className={cn(
+                                            'font-normal ml-auto',
+                                            (fieldState.invalid || countWordsFromHTML(field.value || "") > 20) && 'text-destructive'
+                                        )}>
+                                            {countWordsFromHTML(field.value || "")}/20 words
+                                        </FieldLabel>
                                     </InputGroupText>
                                 }
                             />
@@ -218,17 +218,16 @@ function AbstractContentForm({ abstractId = null }: AbstractFormProps) {
                                 className="min-h-40 wrap-anywhere max-h-80"
                                 maxLength={3500}
                                 footer={
-                                    <InputGroupText className={'w-full min-h-5 flex flex-col-reverse gap-0 md:flex-row'}>
-                                        {fieldState.invalid ? (
+                                    <InputGroupText className={'w-full min-h-5 flex flex-col gap-0 md:flex-row'}>
+                                        {fieldState.invalid && (
                                             <FieldError errors={[fieldState.error]} />
-                                        ) : (
-                                            <FieldLabel htmlFor={field.name} className={cn(
-                                                'font-normal ml-auto',
-                                                (fieldState.invalid || countWordsFromHTML(field.value || "") > 350) && 'text-destructive'
-                                            )}>
-                                                {countWordsFromHTML(field.value || "")}/350 words
-                                            </FieldLabel>
                                         )}
+                                        <FieldLabel htmlFor={field.name} className={cn(
+                                            'font-normal ml-auto',
+                                            (fieldState.invalid || countWordsFromHTML(field.value || "") > 350) && 'text-destructive'
+                                        )}>
+                                            {countWordsFromHTML(field.value || "")}/350 words
+                                        </FieldLabel>
                                     </InputGroupText>
                                 }
                             />
@@ -242,7 +241,7 @@ function AbstractContentForm({ abstractId = null }: AbstractFormProps) {
                         <Field data-invalid={fieldState.invalid}>
                             <FieldLabel className="text-lg" htmlFor={field.name}>References</FieldLabel>
                             <FieldDescription className='max-sm:text-xs'>
-                                References are required, and must not exceed 150 words.
+                                References are required, and must not exceed 350 words.
                             </FieldDescription>
                             <RichTextEditor
                                 {...field}
@@ -255,17 +254,16 @@ function AbstractContentForm({ abstractId = null }: AbstractFormProps) {
                                 className="min-h-20 wrap-anywhere max-h-80"
                                 maxLength={2000}
                                 footer={
-                                    <InputGroupText className={'w-full min-h-5 flex flex-col-reverse gap-0 md:flex-row'}>
-                                        {fieldState.invalid ? (
+                                    <InputGroupText className={'w-full min-h-5 flex flex-col gap-0 md:flex-row'}>
+                                        {fieldState.invalid && (
                                             <FieldError errors={[fieldState.error]} />
-                                        ) : (
-                                            <FieldLabel htmlFor={field.name} className={cn(
-                                                'font-normal ml-auto',
-                                                (fieldState.invalid || countWordsFromHTML(field.value || "") > 150) && 'text-destructive'
-                                            )}>
-                                                {countWordsFromHTML(field.value || "")}/150 words
-                                            </FieldLabel>
                                         )}
+                                        <FieldLabel htmlFor={field.name} className={cn(
+                                            'font-normal ml-auto',
+                                            (fieldState.invalid || countWordsFromHTML(field.value || "") > 350) && 'text-destructive'
+                                        )}>
+                                            {countWordsFromHTML(field.value || "")}/350 words
+                                        </FieldLabel>
                                     </InputGroupText>
                                 }
                             />
