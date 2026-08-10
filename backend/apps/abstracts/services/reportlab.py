@@ -20,6 +20,8 @@ from reportlab.platypus import HRFlowable, KeepTogether, Paragraph, SimpleDocTem
 # Configuración de Fuentes
 # ----------------------------------------------------------------------
 
+
+
 FONT_DEFAULTS = {
     "regular": "Helvetica",
     "bold": "Helvetica-Bold",
@@ -264,6 +266,7 @@ def get_logo_path() -> str | None:
 
 def get_styles() -> dict[str, ParagraphStyle]:
     fonts = configure_fonts()
+    print(fonts)
     base = getSampleStyleSheet()["Normal"]
 
     return {
