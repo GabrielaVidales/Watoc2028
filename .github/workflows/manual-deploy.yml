@@ -50,6 +50,8 @@ jobs:
           command_timeout: 10m
           script: |
             set -e
+            
+            export PATH="$HOME/.nvm/versions/node/v24.19.0/bin:$PATH"
 
             echo ">>> Actualizando React en [${{ github.event.inputs.environment }}]..."
 
