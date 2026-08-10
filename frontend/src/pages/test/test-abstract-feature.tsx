@@ -36,16 +36,16 @@ function TestAbstractFeature({ abstractId }: TestAbstractFeatureProps) {
     const [cachedFile, setCachedFile] = useState<Blob | null>(null)
     const [jobUri, setJobUri] = useState<string | null>(null)
 
+    const isLoading = job ? (
+        job.status === "pending" ||
+        job.status === "generating"
+    ) : false
+
     useEffect(() => {
         setJob(null)
         setCachedFile(null)
         setJobUri(null)
     }, [abstractId])
-
-    const isLoading = job ? (
-        job.status === "pending" ||
-        job.status === "generating"
-    ) : false
 
     useEffect(() => {
         if (!jobUri) return
@@ -78,19 +78,18 @@ function TestAbstractFeature({ abstractId }: TestAbstractFeatureProps) {
         }
     }, [jobUri])
 
-
     const onGeneratingPdf = async () => {
-        if (cachedFile) {
-            const url = typeof cachedFile === 'string' ?
-                import.meta.env.VITE_API_URL + cachedFile :
-                URL.createObjectURL(cachedFile);
+        // if (cachedFile) {
+        //     const url = typeof cachedFile === 'string' ?
+        //         import.meta.env.VITE_API_URL + cachedFile :
+        //         URL.createObjectURL(cachedFile);
 
-            triggerDownload(url)
-            return
-        }
+        //     triggerDownload(url)
+        //     return
+        // }
 
         try {
-            const { data } = await api.post<PDFGenerationJob>('/abstracts/jobs/?force=1', {
+            const { data } = await api.post<PDFGenerationJob>('/abstracts/jobs/', {
                 abstract_id: abstractId
             })
 
@@ -155,18 +154,18 @@ function TestAbstractFeature({ abstractId }: TestAbstractFeatureProps) {
 
     return (
         <>
-            <div className="rounded-lg border bg-muted/30 p-5 space-y-3">
-                <div>
+            <div className="min-w-0 w-full overflow-hidden rounded-lg border bg-muted/30 p-5 space-y-3">
+                <div className="min-w-0 w-full overflow-hidden">
                     <p className="text-[10px] font-medium uppercase tracking-wide text-muted-foreground">
                         Job ID
                     </p>
 
-                    <p className="break-all font-mono text-sm truncate" title={job?.id || "Not set"}>
+                    <p className="min-w-0 w-full truncate font-mono text-sm" title={job?.id || "Not set"}>
                         {job?.id || "Not set"}
                     </p>
                 </div>
 
-                <div>
+                <div className="min-w-0 w-full overflow-hidden">
                     <div className='flex gap-2'>
                         <p className="text-[10px] font-medium uppercase tracking-wide text-muted-foreground">
                             Abstract Hash
@@ -181,12 +180,12 @@ function TestAbstractFeature({ abstractId }: TestAbstractFeatureProps) {
                         </Tooltip>
                     </div>
 
-                    <p className="font-mono text-sm truncate" title={job?.content_hash || "Not set"}>
+                    <p className="min-w-0 w-full truncate font-mono text-sm" title={job?.content_hash || "Not set"}>
                         {job?.content_hash || "Not set"}
                     </p>
                 </div>
 
-                <div>
+                <div className="min-w-0 w-full overflow-hidden">
                     <p className="text-[10px] font-medium uppercase tracking-wide text-muted-foreground">
                         Status
                     </p>

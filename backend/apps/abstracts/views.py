@@ -19,7 +19,6 @@ from .models import Affiliation, Abstract, Author, AbstactStatus, AbstractDeclar
 from .serializers import AffiliationSerializer, AbstractSerializer, AuthorSerializer, AbstractDeclarationSerializer, PDFGenerationJobSerializer
 import os, logging, html
 
-
 User = get_user_model()
 
 logger = logging.getLogger("abstracts")
@@ -31,28 +30,31 @@ class PDFGenerationViewSet(ModelViewSet):
     serializer_class = PDFGenerationJobSerializer
 
     def create(self, request: Request):
-        force_param = request.query_params.get('force', None)
-        force = force_param in ['true', '1'] 
-        
+        force_param = request.query_params.get("force", None)
+        force = force_param in ["true", "1"]
+
         abstract_id = request.data.get("abstract_id", None)
 
         abstract = Abstract.objects.filter(id=abstract_id).first()
         if abstract is None:
             return Response(status=status.HTTP_404_NOT_FOUND)
 
-        existing_job = self.queryset.filter(abstract=abstract).first()
+        # Obtiene el último PDF generado del abstract existente
+        existing_job = self.queryset.filter(abstract=abstract).order_by("-completed_at").first()
+        
         if existing_job is not None and not force:
             # si existe hay que comprobar que el abstract no ha cambiado
             new_hash = abstract.get_hash()
             last_hash = existing_job.content_hash
-            
+
             same_hash = new_hash == last_hash
             is_completed = existing_job.status == existing_job.Status.COMPLETED
 
             # si el abstract no ha cambiado desde la última generación, devolverla
             if same_hash and is_completed:
+                print("REUSAR")
                 serializer = self.serializer_class(existing_job)
-                return Response(serializer.data)
+                return Response(serializer.data, status=status.HTTP_208_ALREADY_REPORTED)
 
         logger.info("generando PDF")
         if is_redis_available():
@@ -65,7 +67,7 @@ class PDFGenerationViewSet(ModelViewSet):
             if is_redis_available():
                 generate_abstract_pdf.delay(f"{job.id}")
 
-            return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
 
         return Response(status=status.HTTP_400_BAD_REQUEST)
 
@@ -103,7 +105,7 @@ class AffiliationViewSet(ModelViewSet):
         queryset = Affiliation.objects.all()
 
         user = self.request.user
-        if user.is_superuser:
+        if not user.is_superuser:
             return queryset.filter(user__id=user.id)
 
         return queryset
@@ -111,20 +113,11 @@ class AffiliationViewSet(ModelViewSet):
     def destroy(self, request, pk=None):
         instance = self.get_object()
 
-        authors_count = instance.authors.count()
+        authors_count = instance.authors.all().count()
         if authors_count != 0:
             raise ValidationError({"errors": {"root": ["This affiliation cannot be deleted because it is currently assigned to one or more authors."]}})
 
         return Response(status=status.HTTP_204_NO_CONTENT)
-
-    """
-    {
-        user_id: number,
-        institution: string
-        country: string
-        city: string
-    }
-    """
 
 
 class AbstractView(ModelViewSet):

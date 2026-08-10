@@ -35,7 +35,7 @@ type Props = {
 
 function ShowAuthorsComponent({ abstractId }: Props) {
 
-    const { data } = useQuery({
+    const { data = [] } = useQuery({
         queryKey: ['authors', abstractId],
         refetchOnWindowFocus: false,
         refetchOnReconnect: false,
@@ -185,7 +185,6 @@ function ShowAuthorsComponent({ abstractId }: Props) {
                 </CardDescription>
             </CardHeader>
 
-
             <Button size='sm' onClick={() => { setEditAuthor(null); setOpenA(true) }}>
                 <Plus />
                 Add Author
@@ -244,7 +243,7 @@ function ShowAuthorsComponent({ abstractId }: Props) {
                             disabled={saveAuthorsMutation.isPending}
                             className={cn(
                                 'relative p-2 border-2 border-border rounded-md transition-colors! duration-300',
-                                'active:border-primary-light hover:shadow-sm',
+                                'bg-background active:border-primary-light active:shadow-md',
                                 'md:flex-row md:items-center md:justify-between',
                                 'flex flex-col gap-3',
                             )}
@@ -359,7 +358,7 @@ function ShowAuthorsComponent({ abstractId }: Props) {
                 <Button
                     type='button'
                     variant='outline'
-                    onClick={() => setAuthors(data ? data : [])}
+                    onClick={() => queryClient.invalidateQueries({ queryKey: ['authors', abstractId], })}
                     disabled={data === authors || saveAuthorsMutation.isPending}
                 >
                     <RotateCw className='text-muted-foreground' /> Reset

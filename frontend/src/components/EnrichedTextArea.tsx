@@ -31,6 +31,28 @@ const defaultAddons: AddonsOptions = {
     underline: true
 }
 
+const ALLOWED = new Set(['P', 'B', 'STRONG', 'I', 'EM', 'SUP', 'SUB', 'BR'])
+
+function cleanHTML(html) {
+    const doc = new DOMParser().parseFromString(html, 'text/html')
+
+    doc.body.querySelectorAll('script,style,noscript,meta,link').forEach(el => el.remove())
+
+    const walk = (node) => {
+        ;[...node.children].forEach(walk)
+        if (node === doc.body) return
+
+        if (ALLOWED.has(node.tagName)) {
+            ;[...node.attributes].forEach(a => node.removeAttribute(a.name))
+        } else {
+            node.replaceWith(...node.childNodes)
+        }
+    }
+
+    walk(doc.body)
+    return doc.body.innerHTML
+}
+
 type RichTextEditorProps = {
     value?: string
     addonsOptions?: AddonsOptions
@@ -67,6 +89,7 @@ export default function RichTextEditor({
 
     const editor = useEditor({
         editorProps: {
+            transformPastedHTML: cleanHTML,
             handleKeyDown({ }, event) {
                 if (!multiline && event.key === "Enter") {
                     event.preventDefault()

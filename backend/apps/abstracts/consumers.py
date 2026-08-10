@@ -13,15 +13,16 @@ class PDFGenerationConsumer(AsyncJsonWebsocketConsumer):
             self.channel_name,
         )
 
-        print(f"ACCEPT: {f"pdf_job_{self.job_id}"}")
         await self.accept()
 
+        # Esto es importante: se puede dar una race condition
+        # en la que la tarea se complete ANTES de siquiera establecer
+        # la conexión, por lo que se debe mandar un status inicial
         job = await self.get_job()
         if job is not None:
             from apps.abstracts.serializers import PDFGenerationJobSerializer
             
             serializer = PDFGenerationJobSerializer(job)
-            print(f"INITIAL STATUS: {serializer.data}")
             
             await self.send_json({
                 "type": f"pdf.status.{self.job_id}",

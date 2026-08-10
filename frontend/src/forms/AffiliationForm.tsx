@@ -16,13 +16,12 @@ import { notify } from '@/components/custom/notify'
 import { DEBUG } from '@/lib/constants'
 
 type Props = {
+    abstractId?: number | string
     defaults?: Affiliation
     onSubmitSuccess?: () => void
 }
 
-function AffiliationForm({ defaults, onSubmitSuccess, id }: Props & React.HTMLProps<HTMLFormElement>) {
-    const { id: abstractId } = useParams()
-
+function AffiliationForm({ defaults, onSubmitSuccess, id: formId, abstractId }: Props & React.HTMLProps<HTMLFormElement>) {
     const { user: { id: userId } } = useAuth()
 
     const { control, handleSubmit, reset, formState: { isSubmitting } } = useForm({
@@ -48,7 +47,7 @@ function AffiliationForm({ defaults, onSubmitSuccess, id }: Props & React.HTMLPr
 
     React.useEffect(() => {
         if (defaults) {
-            queueMicrotask(()=> {
+            queueMicrotask(() => {
                 reset({
                     id: defaults.id,
                     institution: defaults.institution,
@@ -99,7 +98,7 @@ function AffiliationForm({ defaults, onSubmitSuccess, id }: Props & React.HTMLPr
     })
 
     return (
-        <form id={id} onSubmit={onFormSubmit}>
+        <form id={formId} onSubmit={onFormSubmit}>
             <fieldset disabled={isSubmitting} className='px-1 space-y-1'>
                 <Controller
                     name={'institution'}

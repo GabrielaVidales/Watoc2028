@@ -4,7 +4,7 @@ import React, { useState } from 'react'
 import { Spinner } from './ui/spinner';
 import type { Affiliation } from '@/schemas/abstracts/affiliation-schema';
 import { Button } from './ui/button';
-import { Edit, Plus, School2, Trash2, TriangleAlert } from 'lucide-react';
+import { Edit, Plus, School, School2, Trash2, TriangleAlert } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { RefreshCcwIcon } from "lucide-react"
 import { Empty, EmptyContent, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle, } from "@/components/ui/empty"
@@ -19,24 +19,24 @@ import type { PaginatedResponse } from '@/domain/pagination';
 import { useParams } from 'react-router';
 import { Avatar, AvatarFallback } from './ui/avatar';
 import { DEBUG } from '@/lib/constants';
+import { useAuth } from '@/contexts/AuthContext';
 
 
 type Props = {
     onAffiliationClicked?: (a: Affiliation) => void
+    abstractId?: number | string
 }
 
-function ShowAffiliations({ onAffiliationClicked }: Props) {
-    const { id: abstractId } = useParams()
+function ShowAffiliations({ abstractId, onAffiliationClicked }: Props) {
+    const queryClient = useQueryClient()
 
     const { data, isLoading, isError, isFetching, error, refetch } = useQuery<PaginatedResponse<Affiliation>>({
-        queryKey: ['affiliations'],
+        queryKey: ['affiliations', abstractId],
         queryFn: async () => {
             const { data } = await api.get('/abstracts/affiliations');
             return data
         },
     })
-
-    const queryClient = useQueryClient()
 
     const [edit, setEdit] = React.useState<Affiliation | null>(null)
     const [openEdit, setOpenEdit] = React.useState<boolean>(false)
@@ -66,6 +66,10 @@ function ShowAffiliations({ onAffiliationClicked }: Props) {
         }
     })
 
+    if (!abstractId) {
+        return <Spinner />
+    }
+
     if (isLoading) return (
         <div className='mx-auto w-full text-muted-foreground'>
             <Spinner className='size-10 mx-auto' />
@@ -73,7 +77,9 @@ function ShowAffiliations({ onAffiliationClicked }: Props) {
         </div>
     )
 
-    if (isError) return <p>Failed to load affiliations: {error.message}</p>;
+    if (isError) return (
+        <p>Failed to load affiliations: {error.message}</p>
+    )
 
     const affiliations = data?.results ?? []
 
@@ -98,7 +104,7 @@ function ShowAffiliations({ onAffiliationClicked }: Props) {
     )
 
     return (
-        <div className='space-y-3'>
+        <div className='space-y-4'>
             <AlertDialog open={open} onOpenChange={(v) => { setDeleteAffiliation(null); setOpen(v) }}>
                 <AlertDialogContent size='sm'>
                     <AlertDialogHeader>
@@ -135,6 +141,7 @@ function ShowAffiliations({ onAffiliationClicked }: Props) {
                     <ScrollArea className="-mx-4 max-h-[60vh] overflow-y-auto px-4 overflow-visible">
                         <AffiliationForm
                             id='affiliation-form'
+                            abstractId={abstractId}
                             defaults={edit}
                             onSubmitSuccess={() => { setOpenEdit(false); setEdit(null); }}
                         />
@@ -153,25 +160,29 @@ function ShowAffiliations({ onAffiliationClicked }: Props) {
             </Dialog>
 
             <CardHeader className='px-0'>
+                <CardTitle className="flex gap-3 items-center">
+                    <School className='text-primary-main shrink-0' />
+                    <h2 className='text-xl font-semibold'>Manage Affiliations</h2>
+                </CardTitle>
                 <CardDescription>
                     View, create, edit, or remove affiliation records for your organization.
                 </CardDescription>
-                <CardAction className='mt-auto'>
-                    <Button size='sm' onClick={() => { setEdit(null); setOpenEdit(true) }}>
-                        <Plus />
-                        Add affiliation
-                    </Button>
-                </CardAction>
             </CardHeader>
+
+            <Button size='sm' onClick={() => { setEdit(null); setOpenEdit(true) }}>
+                <Plus />
+                Add affiliation
+            </Button>
 
             <div className='space-y-2'>
                 {affiliations?.length > 0 && affiliations.map((item, i) => (
                     <div
                         key={i}
                         className={cn(
-                            'cursor-pointer p-3 border-2 border-border rounded-md transition-colors duration-300',
-                            'bg-secondary hover:bg-background hover:border-primary-light hover:shadow-md',
-                            'flex flex-col gap-3 items-start sm:flex-row sm:items-center justify-between'
+                            'relative p-2 border-2 border-border rounded-md transition-colors! duration-300',
+                            'bg-background active:border-primary-light active:shadow-md',
+                            'md:flex-row md:items-center md:justify-between',
+                            'flex flex-col gap-3 pl-3',
                         )}
                     >
                         <Avatar className="size-10 shrink-0 border shadow-sm">
@@ -180,7 +191,7 @@ function ShowAffiliations({ onAffiliationClicked }: Props) {
                             </AvatarFallback>
                         </Avatar>
                         <div>
-                            <h4 className="font-medium">{item.institution}</h4>
+                            <h4 className="font-medium text-sm">{item.institution}</h4>
                             <p className="text-muted-foreground text-sm">
                                 {item.city}, {item.country}
                             </p>

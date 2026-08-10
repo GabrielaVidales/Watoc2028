@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import TestAbstractFeature from './test-abstract-feature'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import type { UserSchema } from '@/schemas/user-schemas'
-import { Delete, FileText, Plus, Trash2, TriangleAlertIcon } from 'lucide-react'
+import { Delete, FileText, Plus, School, Trash2, TriangleAlertIcon } from 'lucide-react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import type { AbstractSchema } from '@/schemas/abstracts/abstract-schemas'
 import type { PaginatedResponse } from '@/domain/pagination'
@@ -22,6 +21,9 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { Spinner } from '@/components/ui/spinner'
 import { cn } from '@/lib/utils'
 import { DEBUG } from '@/lib/constants'
+import { formatDate } from '@/utils/formatDate'
+import ShowAffiliations from '@/components/ShowAffiliations'
+import { InfoAlert } from '@/components/InfoAlert'
 
 
 function TestAbstractFeaturePage() {
@@ -59,7 +61,6 @@ function TestAbstractFeaturePage() {
         },
     })
 
-
     const onAbstractSelected = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>, abstract: AbstractSchema) => {
         e.preventDefault()
         setSelectedAbstract(prev => prev?.id === abstract.id ? null : abstract)
@@ -82,17 +83,74 @@ function TestAbstractFeaturePage() {
     })
 
     return (
-        <div className='bg-slate-50 relative min-h-dvh lg:h-screen'>
-            <div className='w-full mx-auto min-h-dvh lg:h-full'>
-                {/* 1 columna en mobile → 2 columnas fijas en desktop */}
-                <section className='grid grid-cols-1 lg:grid-cols-[1fr_400px] min-h-dvh lg:h-full lg:overflow-hidden'>
+        <div className='bg-slate-100 dark:bg-secondary min-h-dvh h-full md:h-screen'>
+            <div className='w-full mx-auto min-h-dvh md:h-full'>
+                <section className='grid grid-cols-1 md:grid-cols-[minmax(0,1fr)_400px] min-h-dvh md:h-full md:overflow-hidden'>
 
-                    {/* ── Columna principal ───────────────────────────────── */}
-                    <ScrollArea className='min-w-0 space-y-6 p-4 sm:p-6 w-full no-scrollbar lg:overflow-y-auto'>
-                        <div className='max-w-4xl mx-auto space-y-6'>
-                            <h2 className='text-xl sm:text-2xl font-medium'>New Submission</h2>
+                    <ScrollArea className='order-2 md:order-1 min-w-0 shrink space-y-6 w-full no-scrollbar md:overflow-y-auto max-md:border-t'>
+                        <section className='border-b w-full bg-background p-4 sm:p-6 '>
+                            <h3 className='font-medium text-muted-foreground'>Editing submission:</h3>
+                            {selectedAbstract ? (
+                                <>
+                                    <h4 className='text-xl leading-tight truncate' dangerouslySetInnerHTML={{ __html: selectedAbstract.title }}></h4>
+                                    <p className='text-xs text-muted-foreground mt-2'>Last modification: {formatDate(selectedAbstract.last_update)}</p>
+                                </>
+                            ) : (
+                                <>
+                                    <h4 className='text-xl leading-tight truncate text-destructive'>No abstract selected</h4>
+                                    <p className='text-xs text-muted-foreground mt-2'>Last modification: <span className='text-destructive'>No abstract selected</span></p>
+                                </>
+                            )}
+                        </section>
 
+                        <div className='max-w-4xl mx-auto space-y-6 p-4 sm:p-6'>
                             <Card className='w-full p-5 sm:p-9'>
+                                <CardHeader className='px-0'>
+                                    <CardTitle className="flex gap-3 items-center">
+                                        <FileText className='text-primary-main' />
+                                        <h2 className='text-xl font-semibold'>Abstract Content</h2>
+                                    </CardTitle>
+                                    <CardDescription>
+                                        Complete the details (full name, email, affiliation and country) of collaboration authors. You can include a maximum of 16 authors. Please indicate which of the authors will present the abstract.
+                                    </CardDescription>
+                                </CardHeader>
+
+                                <InfoAlert
+                                    title='Submission Guidelines'
+                                    variant='warning'
+                                    messages={[
+                                        <p>Please review the following requirements before completing your submission:</p>,
+                                        <ul className="list-disc space-y-2 pl-4 opacity-80">
+                                            <li>
+                                                <strong>Authors:</strong> Provide the full name, email, affiliation, and country
+                                                for each collaboration author. You may include a maximum of <strong>16 authors</strong>.
+                                                Please indicate which author will present the abstract.
+                                            </li>
+
+                                            <li>
+                                                <strong>Title:</strong> Use a concise and descriptive title of no more than <strong>20 words</strong>.
+                                                Do not include author names, affiliations, institutions, or other identifying information.
+                                            </li>
+
+                                            <li>
+                                                <strong>Presentation type:</strong> Select your preferred format for presenting your work.
+                                            </li>
+
+                                            <li>
+                                                <strong>Abstract:</strong> The abstract must be written in <strong>English</strong> and contain no more than
+                                                <strong>300 words</strong>. Do not include information that identifies the presenters
+                                                or their institutions, as abstracts will be reviewed anonymously.
+                                            </li>
+
+                                            <li>
+                                                <strong>References:</strong> References are required and must not exceed <strong>150 words</strong>.
+                                            </li>
+
+                                        </ul>
+                                    ]}
+                                />
+
+                                <Separator />
 
                                 <CardContent className="space-y-6 px-0">
                                     <AbstractContentForm abstractId={selectedAbstract?.id} />
@@ -103,13 +161,19 @@ function TestAbstractFeaturePage() {
                                 <CardContent className="space-y-6 px-0">
                                     <ShowAuthorsComponent abstractId={selectedAbstract?.id} />
                                 </CardContent>
+
+                                <Separator />
+
+                                <CardContent className="space-y-2 px-0">
+                                    <ShowAffiliations abstractId={selectedAbstract?.id} />
+                                </CardContent>
+
                             </Card>
                         </div>
                     </ScrollArea>
 
-                    {/* ── Panel lateral ───────────────────────────────────── */}
-                    <ScrollArea className='min-w-0 w-full no-scrollbar bg-background border-t lg:border-t-0 lg:border-l lg:overflow-y-auto'>
-                        <header className="lg:sticky lg:top-0 z-10 min-h-9 px-4 py-1.5 lg:py-0 bg-primary-light/50 border-b border-border/60 flex flex-wrap items-center justify-between gap-x-3 gap-y-1 text-xs text-muted-foreground select-none">
+                    <ScrollArea className='order-1 md:order-2 min-w-0 w-full no-scrollbar bg-background border-t md:border-t-0 md:border-l md:overflow-y-auto'>
+                        <header className="md:sticky md:top-0 z-10 min-h-9 px-4 py-1.5 md:py-0 bg-indigo-300 border-b border-border/60 flex flex-wrap items-center justify-between gap-x-3 gap-y-1 text-xs text-muted-foreground select-none">
                             <div className="flex items-center gap-2">
                                 <span className="font-semibold text-foreground/80 tracking-tight">System Status</span>
                             </div>
@@ -138,8 +202,7 @@ function TestAbstractFeaturePage() {
                             </div>
                         </header>
 
-                        {/* w-full en mobile, ancho fijo 400px (w-100) en desktop */}
-                        <div className='space-y-6 p-4 sm:p-6 w-full lg:w-100'>
+                        <div className='space-y-6 p-4 sm:p-6 min-w-0 w-full md:w-100 mb-10'>
                             <CardHeader className='px-0'>
                                 <CardTitle>Download Submission Preview</CardTitle>
                                 <CardDescription>
@@ -147,7 +210,11 @@ function TestAbstractFeaturePage() {
                                 </CardDescription>
                             </CardHeader>
 
-                            <TestAbstractFeature abstractId={selectedAbstract ? selectedAbstract.id : null} />
+                            <CardContent className='px-0 space-y-4'>
+                                <TestAbstractFeature abstractId={selectedAbstract ? selectedAbstract.id : null} />
+                            </CardContent>
+
+                            <Separator />
 
                             <CardHeader className='px-0'>
                                 <CardTitle>Your submissions</CardTitle>
@@ -175,9 +242,9 @@ function TestAbstractFeaturePage() {
                                                         <FileText className='size-5' />
                                                     </Button>
                                                 </ItemMedia>
-                                                <ItemContent className='min-w-0'>
-                                                    <div className="min-w-0 text-xs">
-                                                        <p className="truncate">{abstract.title}</p>
+                                                <ItemContent className='min-w-0 w-0 flex-1'>
+                                                    <div className="min-w-0 w-full">
+                                                        <p className="w-full min-w-0 truncate" dangerouslySetInnerHTML={{ __html: abstract.title }}></p>
                                                         <p className='truncate text-muted-foreground text-xs'>{abstract.presentation_type.toUpperCase()}</p>
                                                     </div>
                                                 </ItemContent>
@@ -235,11 +302,12 @@ function TestAbstractFeaturePage() {
                             </section>
                         </div>
                     </ScrollArea>
+
                 </section>
             </div>
 
-            <div className='absolute bottom-0 left-0 z-50 px-2 pb-1 pointer-events-none'>
-                <p className='text-destructive text-xs sm:text-sm'>DEV environment</p>
+            <div className='fixed bottom-0 w-full bg-primary/80 dark:bg-white/10 left-0 z-50 p-1 pointer-events-none flex items-center justify-center'>
+                <p className='text-accent text-xs font-medium'>DEV environment</p>
             </div>
         </div>
     )

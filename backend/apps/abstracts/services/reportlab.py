@@ -273,7 +273,7 @@ def get_styles() -> dict[str, ParagraphStyle]:
         "heading": ParagraphStyle("AbstractHeading", parent=base, fontName=fonts["bold"], fontSize=11, leading=14, spaceBefore=12, spaceAfter=6, textColor=colors.HexColor("#1a1a1a")),
         "body": ParagraphStyle("AbstractBody", parent=base, fontName=fonts["regular"], fontSize=10, leading=14.5, alignment=TA_JUSTIFY),
         "body_bullet": ParagraphStyle("AbstractBodyBullet", parent=base, fontName=fonts["regular"], fontSize=10, leading=14.5, alignment=TA_JUSTIFY, leftIndent=14, bulletIndent=2),
-        "reference": ParagraphStyle("AbstractReference", parent=base, fontName=fonts["regular"], fontSize=10, leading=12, alignment=TA_JUSTIFY),
+        "reference": ParagraphStyle("AbstractReference", parent=base, fontName=fonts["regular"], fontSize=10, leading=14.5, alignment=TA_JUSTIFY),
         "reference_bullet": ParagraphStyle("AbstractReferenceBullet", parent=base, fontName=fonts["regular"], fontSize=8.5, leading=12, alignment=TA_JUSTIFY, leftIndent=14, bulletIndent=2),
     }
 

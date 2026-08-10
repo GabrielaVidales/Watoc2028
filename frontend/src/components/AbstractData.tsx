@@ -8,6 +8,7 @@ import { CircleCheckBig } from 'lucide-react'
 import React, { useMemo } from 'react'
 import { Badge } from './ui/badge'
 
+// OLD
 
 export type AbstractDataProps = {
     abstract: AbstractSchema
