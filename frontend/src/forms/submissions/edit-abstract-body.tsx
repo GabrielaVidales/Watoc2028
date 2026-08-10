@@ -16,6 +16,7 @@ import { Controller, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import { cn } from '@/lib/utils'
 import { DEBUG } from '@/lib/constants'
+import { notify } from '@/components/custom/notify'
 
 type AbstractFormProps = {
     abstractId?: number | null,
@@ -34,19 +35,18 @@ function AbstractContentForm({ abstractId = null }: AbstractFormProps) {
         enabled: abstractId !== null,
     })
 
-    const onError = (error: Error) => {
-        if (isAxiosError(error)) {
-            if (DEBUG) {
-                console.error(error.response.data);
-            }
-        } else if (DEBUG) {
-            console.error(error);
+    const onError = (error: AxiosError) => {
+        if (DEBUG) {
+            console.error(error.response.data);
         }
+        notify.destructive('Something went wrong!', {
+            description: "Submission couldn't be created. Check your information and try again."
+        })
     }
 
     const createMut = useMutation<AbstractSchema, AxiosError, AbstractSchema>({
         mutationFn: createSubmission,
-        onSuccess: () => queryClient.invalidateQueries({ queryKey: ['abstracts',], exact: false, }),
+        onSuccess: () => queryClient.invalidateQueries({ queryKey: ['abstract',], exact: false, }),
         onError: onError,
 
     })
@@ -71,13 +71,21 @@ function AbstractContentForm({ abstractId = null }: AbstractFormProps) {
     const onFormSubmit = handleSubmit(
         async (data) => {
             if (abstractId === null) {
-                await createMut.mutateAsync(data)
-                toast.info('Submission created successfully!', { position: 'top-center', dismissible: true })
+                const abstract = await createMut.mutateAsync(data)
+                notify.success('Submission created successfully!', {
+                    description: (
+                        <p>The submission <strong>{abstract.title}</strong> was saved in the system.</p>
+                    )
+                })
                 reset()
                 return
             }
             await updateMut.mutateAsync({ id: abstractId, data })
-            toast.info('Submission saved successfully!', { position: 'top-center', dismissible: true })
+            notify.success('Submission saved successfully!', {
+                description: (
+                    <p>The submission <strong>{abstract.title}</strong> was updated.</p>
+                )
+            })
         },
         async (data) => {
             if (DEBUG) {

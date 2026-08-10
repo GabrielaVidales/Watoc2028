@@ -154,11 +154,21 @@ function TestAbstractFeature({ abstractId }: TestAbstractFeatureProps) {
 
     return (
         <>
-            <div className="min-w-0 w-full overflow-hidden rounded-lg border bg-muted/30 p-5 space-y-3">
+            <div className="min-w-0 w-full overflow-hidden rounded-lg border bg-muted/30 p-3 space-y-1">
                 <div className="min-w-0 w-full overflow-hidden">
-                    <p className="text-[10px] font-medium uppercase tracking-wide text-muted-foreground">
-                        Job ID
-                    </p>
+                    <div className='flex gap-2'>
+                        <p className="text-[10px] font-medium uppercase tracking-wide text-muted-foreground">
+                            Job ID
+                        </p>
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <InfoIcon className='size-3 text-muted-foreground' />
+                            </TooltipTrigger>
+                            <TooltipContent className='max-w-60'>
+                                <p>Each PDF generation task is identified in the system by it's unique ID.</p>
+                            </TooltipContent>
+                        </Tooltip>
+                    </div>
 
                     <p className="min-w-0 w-full truncate font-mono text-sm" title={job?.id || "Not set"}>
                         {job?.id || "Not set"}

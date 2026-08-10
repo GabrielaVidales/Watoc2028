@@ -24,6 +24,12 @@ import { DEBUG } from '@/lib/constants'
 import { formatDate } from '@/utils/formatDate'
 import ShowAffiliations from '@/components/ShowAffiliations'
 import { InfoAlert } from '@/components/InfoAlert'
+import {
+    Accordion,
+    AccordionContent,
+    AccordionItem,
+    AccordionTrigger,
+} from "@/components/ui/accordion"
 
 
 function TestAbstractFeaturePage() {
@@ -73,7 +79,7 @@ function TestAbstractFeaturePage() {
         onSuccess: () => {
             setSelectedAbstract(null)
             queryClient.invalidateQueries({
-                queryKey: ['abstracts', page, itemsPerPage],
+                queryKey: ['abstract', page, itemsPerPage],
             })
         },
         onError: (error) => {
@@ -118,36 +124,43 @@ function TestAbstractFeaturePage() {
 
                                 <InfoAlert
                                     title='Submission Guidelines'
-                                    variant='warning'
                                     messages={[
-                                        <p>Please review the following requirements before completing your submission:</p>,
-                                        <ul className="list-disc space-y-2 pl-4 opacity-80">
-                                            <li>
-                                                <strong>Authors:</strong> Provide the full name, email, affiliation, and country
-                                                for each collaboration author. You may include a maximum of <strong>16 authors</strong>.
-                                                Please indicate which author will present the abstract.
-                                            </li>
+                                        <Accordion type="single" collapsible className="w-full">
+                                            <AccordionItem value="guidelines" className="w-full">
+                                                <AccordionTrigger className="w-full flex-1 p-1">
+                                                    Please review the following requirements before completing your submission.
+                                                </AccordionTrigger>
 
-                                            <li>
-                                                <strong>Title:</strong> Use a concise and descriptive title of no more than <strong>20 words</strong>.
-                                                Do not include author names, affiliations, institutions, or other identifying information.
-                                            </li>
+                                                <AccordionContent>
+                                                    <ul className="list-disc space-y-2 pl-4 pr-6 opacity-80">
+                                                        <li>
+                                                            <strong>Authors:</strong> Provide the full name, email, affiliation, and country
+                                                            for each collaboration author. You may include a maximum of <strong>16 authors</strong>.
+                                                            Please indicate which author will present the abstract.
+                                                        </li>
 
-                                            <li>
-                                                <strong>Presentation type:</strong> Select your preferred format for presenting your work.
-                                            </li>
+                                                        <li>
+                                                            <strong>Title:</strong> Use a concise and descriptive title of no more than <strong>20 words</strong>.
+                                                            Do not include author names, affiliations, institutions, or other identifying information.
+                                                        </li>
 
-                                            <li>
-                                                <strong>Abstract:</strong> The abstract must be written in <strong>English</strong> and contain no more than
-                                                <strong>300 words</strong>. Do not include information that identifies the presenters
-                                                or their institutions, as abstracts will be reviewed anonymously.
-                                            </li>
+                                                        <li>
+                                                            <strong>Presentation type:</strong> Select your preferred format for presenting your work.
+                                                        </li>
 
-                                            <li>
-                                                <strong>References:</strong> References are required and must not exceed <strong>150 words</strong>.
-                                            </li>
+                                                        <li>
+                                                            <strong>Abstract:</strong> The abstract must be written in <strong>English</strong> and contain no more than
+                                                            <strong>300 words</strong>. Do not include information that identifies the presenters
+                                                            or their institutions, as abstracts will be reviewed anonymously.
+                                                        </li>
 
-                                        </ul>
+                                                        <li>
+                                                            <strong>References:</strong> References are required and must not exceed <strong>150 words</strong>.
+                                                        </li>
+                                                    </ul>
+                                                </AccordionContent>
+                                            </AccordionItem>
+                                        </Accordion>
                                     ]}
                                 />
 
@@ -178,13 +191,13 @@ function TestAbstractFeaturePage() {
                     </ScrollArea>
 
                     <ScrollArea className='order-1 md:order-2 min-w-0 w-full no-scrollbar bg-background border-t md:border-t-0 md:border-l md:overflow-y-auto'>
-                        <header className="md:sticky md:top-0 z-10 min-h-9 px-4 py-1.5 md:py-0 bg-indigo-300 border-b border-border/60 flex flex-wrap items-center justify-between gap-x-3 gap-y-1 text-xs text-muted-foreground select-none">
+                        <header className="md:sticky md:top-0 z-10 min-h-9 px-4 py-1.5 md:py-0 bg-blue-800 border-b border-blue-600 flex flex-wrap items-center justify-between gap-x-3 gap-y-1 text-xs text-muted-foreground select-none">
                             <div className="flex items-center gap-2">
-                                <span className="font-semibold text-foreground/80 tracking-tight">System Status</span>
+                                <span className="font-semibold text-white/80 tracking-tight">System Status</span>
                             </div>
 
                             <div className="flex min-w-0 items-center gap-2.5">
-                                <span className="text-[11px] uppercase tracking-wider font-semibold text-foreground/80">
+                                <span className="text-[11px] uppercase tracking-wider font-semibold text-white/80">
                                     Current user:
                                 </span>
 
@@ -228,12 +241,10 @@ function TestAbstractFeaturePage() {
                                 </CardDescription>
                             </CardHeader>
 
-                            <section className='flex flex-col gap-2 min-h-60'>
-
-                                <CreateAbstractDialog redirect={false} size='xs' />
+                            <CardContent className='px-0 space-y-4'>
+                                <CreateAbstractDialog redirect={false} size='sm' className='w-full' />
 
                                 <div className='bg-muted flex-1 space-y-1 p-1 rounded-sm border'>
-
                                     {results?.results?.map((abstract) => (
                                         <Item key={abstract.id} variant="outline" size="sm" asChild>
                                             <a href='#' className='bg-card'>
@@ -304,7 +315,7 @@ function TestAbstractFeaturePage() {
                                         totalPages={results ? results.meta.total_pages : 0}
                                     />
                                 </div>
-                            </section>
+                            </CardContent>
                         </div>
                     </ScrollArea>
 
