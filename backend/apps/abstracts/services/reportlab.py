@@ -21,7 +21,6 @@ from reportlab.platypus import HRFlowable, KeepTogether, Paragraph, SimpleDocTem
 # ----------------------------------------------------------------------
 
 
-
 FONT_DEFAULTS = {
     "regular": "Helvetica",
     "bold": "Helvetica-Bold",
@@ -266,18 +265,16 @@ def get_logo_path() -> str | None:
 
 def get_styles() -> dict[str, ParagraphStyle]:
     fonts = configure_fonts()
-    print(fonts)
     base = getSampleStyleSheet()["Normal"]
-
     return {
-        "title": ParagraphStyle("AbstractTitle", parent=base, fontName=fonts["bold"], fontSize=14, leading=18, alignment=TA_CENTER, spaceAfter=10),
-        "authors": ParagraphStyle("AbstractAuthors", parent=base, fontName=fonts["regular"], fontSize=10.5, leading=14, alignment=TA_CENTER, spaceAfter=4),
-        "affiliations": ParagraphStyle("AbstractAffiliations", parent=base, fontName=fonts["italic"], fontSize=8.5, leading=11, alignment=TA_CENTER, textColor=colors.HexColor("#444444")),
-        "heading": ParagraphStyle("AbstractHeading", parent=base, fontName=fonts["bold"], fontSize=11, leading=14, spaceBefore=12, spaceAfter=6, textColor=colors.HexColor("#1a1a1a")),
-        "body": ParagraphStyle("AbstractBody", parent=base, fontName=fonts["regular"], fontSize=10, leading=14.5, alignment=TA_JUSTIFY),
-        "body_bullet": ParagraphStyle("AbstractBodyBullet", parent=base, fontName=fonts["regular"], fontSize=10, leading=14.5, alignment=TA_JUSTIFY, leftIndent=14, bulletIndent=2),
-        "reference": ParagraphStyle("AbstractReference", parent=base, fontName=fonts["regular"], fontSize=10, leading=14.5, alignment=TA_JUSTIFY),
-        "reference_bullet": ParagraphStyle("AbstractReferenceBullet", parent=base, fontName=fonts["regular"], fontSize=8.5, leading=12, alignment=TA_JUSTIFY, leftIndent=14, bulletIndent=2),
+        "title": ParagraphStyle("AbstractTitle", parent=base, fontName=fonts["bold"], fontSize=11, leading=15, charSpace=-0.2, alignment=TA_CENTER, spaceAfter=8),
+        "authors": ParagraphStyle("AbstractAuthors", parent=base, fontName=fonts["regular"], fontSize=8, leading=12, alignment=TA_CENTER, spaceAfter=3),
+        "affiliations": ParagraphStyle("AbstractAffiliations", parent=base, fontName=fonts["italic"], fontSize=7.5, leading=10, alignment=TA_CENTER, textColor=colors.HexColor("#444444")),
+        "heading": ParagraphStyle("AbstractHeading", parent=base, fontName=fonts["bold"], fontSize=9, leading=13, spaceBefore=10, spaceAfter=5, textColor=colors.HexColor("#1a1a1a")),
+        "body": ParagraphStyle("AbstractBody", parent=base, fontName=fonts["regular"], fontSize=8, leading=13, alignment=TA_JUSTIFY),
+        "body_bullet": ParagraphStyle("AbstractBodyBullet", parent=base, fontName=fonts["regular"], fontSize=8, leading=13, alignment=TA_JUSTIFY, leftIndent=14, bulletIndent=2),
+        "reference": ParagraphStyle("AbstractReference", parent=base, fontName=fonts["regular"], fontSize=8, leading=13, alignment=TA_JUSTIFY),
+        "reference_bullet": ParagraphStyle("AbstractReferenceBullet", parent=base, fontName=fonts["regular"], fontSize=8, leading=11, alignment=TA_JUSTIFY, leftIndent=14, bulletIndent=2),
     }
 
 
