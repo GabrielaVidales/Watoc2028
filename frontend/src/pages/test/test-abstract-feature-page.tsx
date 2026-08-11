@@ -93,27 +93,12 @@ function TestAbstractFeaturePage() {
     })
 
     return (
-        <div className='bg-slate-100 dark:bg-secondary min-h-dvh h-full md:h-screen'>
+        <div className='bg-indigo-100 dark:bg-secondary min-h-dvh h-full md:h-screen'>
             <div className='w-full mx-auto min-h-dvh md:h-full'>
                 <section className='grid grid-cols-1 md:grid-cols-[minmax(0,1fr)_400px] min-h-dvh md:h-full md:overflow-hidden'>
 
                     <ScrollArea className='order-2 md:order-1 min-w-0 shrink space-y-6 w-full no-scrollbar md:overflow-y-hidden max-md:border-t'>
-                        <section className='border-b w-full bg-background p-4 sm:p-6 '>
-                            <h3 className='font-medium text-muted-foreground'>Editing submission:</h3>
-                            {data ? (
-                                <>
-                                    <h4 className='text-xl leading-tight truncate' dangerouslySetInnerHTML={{ __html: data.title }}></h4>
-                                    <p className='text-xs text-muted-foreground mt-2'>Last modification: {formatDate(data.last_update)}</p>
-                                </>
-                            ) : (
-                                <>
-                                    <h4 className='text-xl leading-tight truncate text-destructive'>No abstract selected</h4>
-                                    <p className='text-xs text-muted-foreground mt-2'>Last modification: <span className='text-destructive'>No abstract selected</span></p>
-                                </>
-                            )}
-                        </section>
-
-                        <div className='max-w-4xl mx-auto space-y-6 p-4 sm:p-6'>
+                        <div className='max-w-4xl mx-auto space-y-6 p-4 sm:p-6 lg:py-10'>
                             <Card className='w-full p-5 sm:p-9'>
                                 <CardHeader className='px-0'>
                                     <CardTitle className="flex gap-3 items-center">
@@ -222,10 +207,29 @@ function TestAbstractFeaturePage() {
                             </div>
                         </header>
 
+                        <div className='p-2 sm:p-4 min-w-0 w-dvw md:w-100'>
+                            <Card>
+                                <CardContent>
+                                    <h3 className='font-medium text-muted-foreground'>Selected abstract:</h3>
+                                    {data ? (
+                                        <>
+                                            <h4 className='leading-tight truncate' dangerouslySetInnerHTML={{ __html: data.title }}></h4>
+                                            <p className='text-xs text-muted-foreground mt-2'>Last modification: {formatDate(data.last_update)}</p>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <h4 className='leading-tight truncate text-destructive'>No abstract selected</h4>
+                                            <p className='text-xs text-muted-foreground mt-2'>Last modification: <span className='text-destructive'>No abstract selected</span></p>
+                                        </>
+                                    )}
+                                </CardContent>
+                            </Card>
+                        </div>
+
                         <Tabs defaultValue="list" className='p-2 sm:p-4 min-w-0 w-dvw md:w-100 mb-10'>
                             <TabsList>
                                 <TabsTrigger value="list">Submission List</TabsTrigger>
-                                <TabsTrigger value="download">Download PDF</TabsTrigger>
+                                <TabsTrigger value="download">Generate PDF</TabsTrigger>
                             </TabsList>
                             <TabsContent value="list" className='space-y-4'>
                                 <Card>
@@ -319,21 +323,6 @@ function TestAbstractFeaturePage() {
                                             Generate and download a PDF preview of your submission.
                                         </CardDescription>
                                     </CardHeader>
-
-                                    <CardContent>
-                                        <h3 className='font-bold text-muted-foreground'>Selected abstract:</h3>
-                                        {data ? (
-                                            <>
-                                                <h4 className='leading-tight truncate' dangerouslySetInnerHTML={{ __html: data.title }}></h4>
-                                                <p className='text-xs text-muted-foreground mt-2'>Last modification: {formatDate(data.last_update)}</p>
-                                            </>
-                                        ) : (
-                                            <>
-                                                <h4 className='leading-tight truncate text-destructive'>No abstract selected</h4>
-                                                <p className='text-xs text-muted-foreground mt-2'>Last modification: <span className='text-destructive'>No abstract selected</span></p>
-                                            </>
-                                        )}
-                                    </CardContent>
 
                                     <CardContent className='space-y-4'>
                                         <TestAbstractFeature abstractId={data ? data.id : null} />
