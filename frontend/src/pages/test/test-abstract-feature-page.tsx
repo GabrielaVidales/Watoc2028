@@ -26,6 +26,7 @@ import ShowAffiliations from '@/components/ShowAffiliations'
 import { InfoAlert } from '@/components/InfoAlert'
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger, } from "@/components/ui/accordion"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import ChangeThemeButton from '@/components/custom/change-theme-button'
 
 function TestAbstractFeaturePage() {
     const { user, handleLogin, } = useAuth()
@@ -177,11 +178,9 @@ function TestAbstractFeaturePage() {
                         </div>
                     </ScrollArea>
 
-                    <ScrollArea className='order-1 md:order-2 min-w-0 w-full no-scrollbar bg-background border-t md:border-t-0 md:border-l md:overflow-y-auto'>
+                    <ScrollArea className='order-1 md:order-2 min-w-0 w-full no-scrollbar bg-background md:border-l md:overflow-y-auto'>
                         <header className="md:sticky md:top-0 z-10 min-h-9 px-4 py-1.5 md:py-0 bg-blue-800 border-b border-blue-600 flex flex-wrap items-center justify-between gap-x-3 gap-y-1 text-xs text-muted-foreground select-none">
-                            <div className="flex items-center gap-2">
-                                <span className="font-semibold text-white/80 tracking-tight">System Status</span>
-                            </div>
+                            <ChangeThemeButton variant='secondary' />
 
                             <div className="flex min-w-0 items-center gap-2.5">
                                 <span className="text-[11px] uppercase tracking-wider font-semibold text-white/80">
