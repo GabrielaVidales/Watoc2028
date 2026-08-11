@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import TestAbstractFeature from './test-abstract-feature'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Delete, FileText, Plus, School, Trash2, TriangleAlertIcon } from 'lucide-react'
+import { FileText, Trash2, TriangleAlertIcon } from 'lucide-react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import type { AbstractSchema } from '@/schemas/abstracts/abstract-schemas'
 import type { PaginatedResponse } from '@/domain/pagination'
@@ -24,13 +24,8 @@ import { DEBUG } from '@/lib/constants'
 import { formatDate } from '@/utils/formatDate'
 import ShowAffiliations from '@/components/ShowAffiliations'
 import { InfoAlert } from '@/components/InfoAlert'
-import {
-    Accordion,
-    AccordionContent,
-    AccordionItem,
-    AccordionTrigger,
-} from "@/components/ui/accordion"
-
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger, } from "@/components/ui/accordion"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 
 function TestAbstractFeaturePage() {
     const { user, handleLogin, } = useAuth()
@@ -50,10 +45,18 @@ function TestAbstractFeaturePage() {
         authenticate()
     }, [user])
 
-    const [selectedAbstract, setSelectedAbstract] = useState<AbstractSchema>(null)
+    const [selectedAbstract, setSelectedAbstract] = useState<number>(null)
+    const { data = null } = useQuery<AbstractSchema>({
+        queryKey: ['abstract', selectedAbstract],
+        queryFn: async () => {
+            const { data } = await api.get<AbstractSchema>(`/abstracts/submissions/${selectedAbstract}/`)
+            return data
+        }
+    })
+
 
     const [page, setPage] = useState(1)
-    const [itemsPerPage, setItemsPerPage] = useState(3)
+    const [itemsPerPage, setItemsPerPage] = useState(5)
     const { data: results } = useQuery<PaginatedResponse<AbstractSchema>>({
         queryKey: ['abstract', page, itemsPerPage],
         queryFn: async () => {
@@ -69,7 +72,7 @@ function TestAbstractFeaturePage() {
 
     const onAbstractSelected = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>, abstract: AbstractSchema) => {
         e.preventDefault()
-        setSelectedAbstract(prev => prev?.id === abstract.id ? null : abstract)
+        setSelectedAbstract(prev => prev === abstract.id ? null : abstract.id)
     }
 
     const queryClient = useQueryClient()
@@ -97,10 +100,10 @@ function TestAbstractFeaturePage() {
                     <ScrollArea className='order-2 md:order-1 min-w-0 shrink space-y-6 w-full no-scrollbar md:overflow-y-hidden max-md:border-t'>
                         <section className='border-b w-full bg-background p-4 sm:p-6 '>
                             <h3 className='font-medium text-muted-foreground'>Editing submission:</h3>
-                            {selectedAbstract ? (
+                            {data ? (
                                 <>
-                                    <h4 className='text-xl leading-tight truncate' dangerouslySetInnerHTML={{ __html: selectedAbstract.title }}></h4>
-                                    <p className='text-xs text-muted-foreground mt-2'>Last modification: {formatDate(selectedAbstract.last_update)}</p>
+                                    <h4 className='text-xl leading-tight truncate' dangerouslySetInnerHTML={{ __html: data.title }}></h4>
+                                    <p className='text-xs text-muted-foreground mt-2'>Last modification: {formatDate(data.last_update)}</p>
                                 </>
                             ) : (
                                 <>
@@ -138,22 +141,18 @@ function TestAbstractFeaturePage() {
                                                             for each collaboration author. You may include a maximum of <strong>16 authors</strong>.
                                                             Please indicate which author will present the abstract.
                                                         </li>
-
                                                         <li>
                                                             <strong>Title:</strong> Use a concise and descriptive title of no more than <strong>20 words</strong>.
                                                             Do not include author names, affiliations, institutions, or other identifying information.
                                                         </li>
-
                                                         <li>
                                                             <strong>Presentation type:</strong> Select your preferred format for presenting your work.
                                                         </li>
-
                                                         <li>
-                                                            <strong>Abstract:</strong> The abstract must be written in <strong>English</strong> and contain no more than
-                                                            <strong>300 words</strong>. Do not include information that identifies the presenters
+                                                            <strong>Abstract:</strong> The abstract must be written in <strong>English</strong> and contain no more than <strong>300 words</strong>.
+                                                            Do not include information that identifies the presenters
                                                             or their institutions, as abstracts will be reviewed anonymously.
                                                         </li>
-
                                                         <li>
                                                             <strong>References:</strong> References are required and must not exceed <strong>150 words</strong>.
                                                         </li>
@@ -167,25 +166,28 @@ function TestAbstractFeaturePage() {
                                 <Separator />
 
                                 <CardContent className="space-y-6 px-0">
-                                    <AbstractContentForm abstractId={selectedAbstract?.id} />
+                                    <AbstractContentForm abstractId={selectedAbstract} />
                                 </CardContent>
 
-                                <Separator />
+                                {selectedAbstract && (
+                                    <>
+                                        <Separator />
 
-                                <CardContent className="space-y-6 px-0">
-                                    {selectedAbstract && (
-                                        <ShowAuthorsComponent abstractId={selectedAbstract.id} />
-                                    )}
-                                </CardContent>
+                                        <CardContent className="space-y-6 px-0">
+                                            <ShowAuthorsComponent abstractId={selectedAbstract} />
+                                        </CardContent>
+                                    </>
+                                )}
 
-                                <Separator />
+                                {selectedAbstract && (
+                                    <>
+                                        <Separator />
 
-                                <CardContent className="space-y-2 px-0">
-                                    {selectedAbstract && (
-                                        <ShowAffiliations abstractId={selectedAbstract?.id} />
-                                    )}
-                                </CardContent>
-
+                                        <CardContent className="space-y-2 px-0">
+                                            <ShowAffiliations abstractId={selectedAbstract} />
+                                        </CardContent>
+                                    </>
+                                )}
                             </Card>
                         </div>
                     </ScrollArea>
@@ -220,103 +222,125 @@ function TestAbstractFeaturePage() {
                             </div>
                         </header>
 
-                        <div className='space-y-6 p-4 sm:p-6 min-w-0 w-dvw md:w-100 mb-10'>
-                            <CardHeader className='px-0'>
-                                <CardTitle>Download Submission Preview</CardTitle>
-                                <CardDescription>
-                                    Generate and download a PDF preview of your submission.
-                                </CardDescription>
-                            </CardHeader>
+                        <Tabs defaultValue="list" className='p-2 sm:p-4 min-w-0 w-dvw md:w-100 mb-10'>
+                            <TabsList>
+                                <TabsTrigger value="list">Submission List</TabsTrigger>
+                                <TabsTrigger value="download">Download PDF</TabsTrigger>
+                            </TabsList>
+                            <TabsContent value="list" className='space-y-4'>
+                                <Card>
+                                    <CardHeader>
+                                        <CardTitle>Your submissions</CardTitle>
+                                        <CardDescription>
+                                            Create a submission or select a submission from the list below to edit your abstract.
+                                        </CardDescription>
+                                    </CardHeader>
 
-                            <CardContent className='px-0 space-y-4'>
-                                <TestAbstractFeature abstractId={selectedAbstract ? selectedAbstract.id : null} />
-                            </CardContent>
+                                    <CardContent className='space-y-4'>
+                                        <CreateAbstractDialog redirect={false} size='sm' className='w-full' />
 
-                            <Separator />
+                                        <div className='bg-muted flex-1 space-y-1 p-1 rounded-sm border'>
+                                            {results?.results?.map((abstract) => (
+                                                <Item key={abstract.id} variant="outline" size="sm" className='bg-card'>
+                                                    <ItemMedia>
+                                                        <Button type='button' variant='outline' size='icon-lg' onClick={(e) => onAbstractSelected(e, abstract)}
+                                                            className={cn(
+                                                                'shrink-0',
+                                                                abstract.id === data?.id && 'border-primary-light bg-primary-light/20 hover:bg-primary-light/10 text-primary-light hover:text-primary-light'
+                                                            )}
+                                                        >
+                                                            <FileText className='size-5' />
+                                                        </Button>
+                                                    </ItemMedia>
+                                                    <ItemContent className='min-w-0 w-0 flex-1'>
+                                                        <div className="min-w-0 w-full">
+                                                            <p className="w-full min-w-0 truncate" dangerouslySetInnerHTML={{ __html: abstract.title }}></p>
+                                                            <p className='truncate text-muted-foreground text-xs'>{abstract.presentation_type.toUpperCase()}</p>
+                                                        </div>
+                                                    </ItemContent>
+                                                    <ItemActions className='shrink-0'>
+                                                        <AlertDialog>
+                                                            <AlertDialogTrigger asChild>
+                                                                <Button type='button' variant='outline' size='icon-sm' className='border-destructive hover:bg-destructive/10'>
+                                                                    <Trash2 className='text-destructive' />
+                                                                </Button>
+                                                            </AlertDialogTrigger>
 
-                            <CardHeader className='px-0'>
-                                <CardTitle>Your submissions</CardTitle>
-                                <CardDescription>
-                                    Generate and download a PDF preview of your submission.
-                                </CardDescription>
-                            </CardHeader>
+                                                            <AlertDialogContent size="sm">
+                                                                <AlertDialogHeader>
+                                                                    <AlertDialogTitle className="mb-2 rounded-full bg-destructive/10 p-3">
+                                                                        <TriangleAlertIcon className="size-8 text-destructive" />
+                                                                    </AlertDialogTitle>
 
-                            <CardContent className='px-0 space-y-4'>
-                                <CreateAbstractDialog redirect={false} size='sm' className='w-full' />
+                                                                    <AlertDialogTitle>
+                                                                        Delete Abstract?
+                                                                    </AlertDialogTitle>
 
-                                <div className='bg-muted flex-1 space-y-1 p-1 rounded-sm border'>
-                                    {results?.results?.map((abstract) => (
-                                        <Item key={abstract.id} variant="outline" size="sm" asChild>
-                                            <a href='#' className='bg-card'>
-                                                <ItemMedia>
-                                                    <Button type='button' variant='outline' size='icon-lg' onClick={(e) => onAbstractSelected(e, abstract)}
-                                                        className={cn(
-                                                            'shrink-0',
-                                                            abstract.id === selectedAbstract?.id && 'border-primary-light bg-primary-light/20 hover:bg-primary-light/10 text-primary-light hover:text-primary-light'
-                                                        )}
-                                                    >
-                                                        <FileText className='size-5' />
-                                                    </Button>
-                                                </ItemMedia>
-                                                <ItemContent className='min-w-0 w-0 flex-1'>
-                                                    <div className="min-w-0 w-full">
-                                                        <p className="w-full min-w-0 truncate" dangerouslySetInnerHTML={{ __html: abstract.title }}></p>
-                                                        <p className='truncate text-muted-foreground text-xs'>{abstract.presentation_type.toUpperCase()}</p>
-                                                    </div>
-                                                </ItemContent>
-                                                <ItemActions className='shrink-0'>
-                                                    <AlertDialog>
-                                                        <AlertDialogTrigger asChild>
-                                                            <Button type='button' variant='outline' size='icon-sm' className='border-destructive hover:bg-destructive/10'>
-                                                                <Trash2 className='text-destructive' />
-                                                            </Button>
-                                                        </AlertDialogTrigger>
+                                                                    <AlertDialogDescription>
+                                                                        This action cannot be undone. The abstract will be permanently deleted.
+                                                                    </AlertDialogDescription>
+                                                                </AlertDialogHeader>
 
-                                                        <AlertDialogContent size="sm">
-                                                            <AlertDialogHeader>
-                                                                <AlertDialogTitle className="mb-2 rounded-full bg-destructive/10 p-3">
-                                                                    <TriangleAlertIcon className="size-8 text-destructive" />
-                                                                </AlertDialogTitle>
+                                                                <AlertDialogFooter>
+                                                                    <AlertDialogCancel>
+                                                                        Cancel
+                                                                    </AlertDialogCancel>
 
-                                                                <AlertDialogTitle>
-                                                                    Delete Abstract?
-                                                                </AlertDialogTitle>
+                                                                    <AlertDialogAction
+                                                                        variant="destructive"
+                                                                        onClick={() => deleteMut.mutateAsync(abstract.id)}
+                                                                    >
+                                                                        {deleteMut.isPending ? <Spinner /> : "Delete"}
+                                                                    </AlertDialogAction>
+                                                                </AlertDialogFooter>
+                                                            </AlertDialogContent>
+                                                        </AlertDialog>
 
-                                                                <AlertDialogDescription>
-                                                                    This action cannot be undone. The abstract will be permanently deleted.
-                                                                </AlertDialogDescription>
-                                                            </AlertDialogHeader>
+                                                    </ItemActions>
+                                                </Item>
+                                            ))}
+                                        </div>
 
-                                                            <AlertDialogFooter>
-                                                                <AlertDialogCancel>
-                                                                    Cancel
-                                                                </AlertDialogCancel>
+                                        <div className='mt-auto'>
+                                            <PaginationController
+                                                onPageChange={setPage}
+                                                page={page}
+                                                totalPages={results ? results.meta.total_pages : 0}
+                                            />
+                                        </div>
+                                    </CardContent>
+                                </Card>
+                            </TabsContent>
+                            <TabsContent value="download">
+                                <Card>
+                                    <CardHeader>
+                                        <CardTitle>Download Submission Preview</CardTitle>
+                                        <CardDescription>
+                                            Generate and download a PDF preview of your submission.
+                                        </CardDescription>
+                                    </CardHeader>
 
-                                                                <AlertDialogAction
-                                                                    variant="destructive"
-                                                                    onClick={() => deleteMut.mutateAsync(abstract.id)}
-                                                                >
-                                                                    {deleteMut.isPending ? <Spinner /> : "Delete"}
-                                                                </AlertDialogAction>
-                                                            </AlertDialogFooter>
-                                                        </AlertDialogContent>
-                                                    </AlertDialog>
+                                    <CardContent>
+                                        <h3 className='font-bold text-muted-foreground'>Selected abstract:</h3>
+                                        {data ? (
+                                            <>
+                                                <h4 className='leading-tight truncate' dangerouslySetInnerHTML={{ __html: data.title }}></h4>
+                                                <p className='text-xs text-muted-foreground mt-2'>Last modification: {formatDate(data.last_update)}</p>
+                                            </>
+                                        ) : (
+                                            <>
+                                                <h4 className='leading-tight truncate text-destructive'>No abstract selected</h4>
+                                                <p className='text-xs text-muted-foreground mt-2'>Last modification: <span className='text-destructive'>No abstract selected</span></p>
+                                            </>
+                                        )}
+                                    </CardContent>
 
-                                                </ItemActions>
-                                            </a>
-                                        </Item>
-                                    ))}
-                                </div>
-
-                                <div className='mt-auto'>
-                                    <PaginationController
-                                        onPageChange={setPage}
-                                        page={page}
-                                        totalPages={results ? results.meta.total_pages : 0}
-                                    />
-                                </div>
-                            </CardContent>
-                        </div>
+                                    <CardContent className='space-y-4'>
+                                        <TestAbstractFeature abstractId={data ? data.id : null} />
+                                    </CardContent>
+                                </Card>
+                            </TabsContent>
+                        </Tabs>
                     </ScrollArea>
 
                 </section>

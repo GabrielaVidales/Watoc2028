@@ -121,7 +121,7 @@ function App() {
 			</Route>
 
 			<Route path={'/test'} element={<TestPage />} />
-			<Route path={'/test/pdf'} element={<TestAbstractFeaturePage />} />
+			<Route path={'/test/abstract-submission'} element={<TestAbstractFeaturePage />} />
 			<Route path={routes.auth.verify} element={<VerifyEmailPage />} />
 
 			{/* Para rutas diferentes */}

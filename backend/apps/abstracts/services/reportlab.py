@@ -242,7 +242,7 @@ def missing_paragraph(style: ParagraphStyle) -> Paragraph:
 
 
 LOGO_FILENAME = "img/WatocPNGLogo.png"
-LOGO_HEIGHT = 1.3 * cm
+LOGO_HEIGHT = 1 * cm
 LOGO_ALIGN = "left"
 LOGO_TOP = 1.1 * cm
 HEADER_RULE = True

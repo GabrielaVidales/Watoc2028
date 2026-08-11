@@ -74,7 +74,7 @@ function AbstractContentForm({ abstractId = null }: AbstractFormProps) {
                 const abstract = await createMut.mutateAsync(data)
                 notify.success('Submission created successfully!', {
                     description: (
-                        <p>The submission <strong>{abstract.title}</strong> was saved in the system.</p>
+                        <p>The submission <strong dangerouslySetInnerHTML={{ __html: abstract.title }} /> was saved in the system.</p>
                     )
                 })
                 reset()
@@ -83,7 +83,7 @@ function AbstractContentForm({ abstractId = null }: AbstractFormProps) {
             await updateMut.mutateAsync({ id: abstractId, data })
             notify.success('Submission saved successfully!', {
                 description: (
-                    <p>The submission <strong>{abstract.title}</strong> was updated.</p>
+                    <p>The submission <strong dangerouslySetInnerHTML={{ __html: abstract.title }} /> was updated.</p>
                 )
             })
         },
