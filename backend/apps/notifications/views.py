@@ -37,7 +37,7 @@ class NotificationViewSet(ModelViewSet):
     @action(detail=False, methods=["get"], url_path="user")
     def get_for_user(self, request: Request):
         user = request.user
-        notifications = self.get_queryset().filter(recipient=user)
+        notifications = self.get_queryset().filter(user=user)
         unread_count = notifications.filter(is_read=False).count()
         notifications = self.filter_queryset(notifications)
         paginated_queryset = self.paginate_queryset(notifications)
@@ -53,7 +53,7 @@ class NotificationViewSet(ModelViewSet):
     @action(detail=True, methods=["patch"], url_path="toggle-is-read")
     def toggle_is_read(self, request: Request, pk: int = None):
         user = request.user
-        notification = self.get_queryset().filter(Q(recipient=user) & Q(pk=pk)).first()
+        notification = self.get_queryset().filter(Q(user=user) & Q(pk=pk)).first()
 
         if not notification:
             return Response(
@@ -75,6 +75,6 @@ class NotificationViewSet(ModelViewSet):
     @action(detail=False, methods=["patch"], url_path="toggle-all-read")
     def toggle_all_read(self, request: Request, pk: int = None):
         user = request.user
-        notification = self.get_queryset().filter(Q(recipient=user))
+        notification = self.get_queryset().filter(Q(user=user))
         notification.update(is_read=True)
         return Response(status=status.HTTP_204_NO_CONTENT)

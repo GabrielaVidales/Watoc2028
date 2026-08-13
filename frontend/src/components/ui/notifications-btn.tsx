@@ -24,6 +24,7 @@ export function NotificationsBell() {
     })
 
     const notifications = data?.notifications.results || []
+
     const unreadCount = data?.unread_count || 0
 
     const toggleMutation = useMutation({
@@ -50,11 +51,8 @@ export function NotificationsBell() {
                     {unreadCount > 0 && (
                         <span
                             className={cn(
-                                "absolute right-0 top-0",
-                                "flex h-4 min-w-4 items-center justify-center",
-                                "rounded-full px-1 text-white!",
-                                "bg-destructive text-destructive-foreground",
-                                "text-[10px] font-semibold leading-none",
+                                "absolute right-0 top-0 flex h-4 min-w-4 items-center justify-center rounded-full px-1",
+                                "text-white! bg-destructive text-destructive-foreground text-[10px] font-semibold leading-none",
                                 unreadCount > 99 && "min-w-7"
                             )}
                         >
@@ -63,7 +61,7 @@ export function NotificationsBell() {
                     )}
                 </Button>
             </PopoverTrigger>
-            <PopoverContent align="end" className="bg-secondary max-w-xs sm:max-w-sm md:max-w-md w-full md:w-100 max-sm:px-1">
+            <PopoverContent align="end" className="bg-card max-w-xs sm:max-w-sm md:max-w-md w-full md:w-100 max-sm:px-1">
                 <section className="flex flex-col sm:flex-row gap-2 items-center justify-between border-b px-0 pb-3">
                     <div>
                         <h4 className="font-semibold">Notifications</h4>
@@ -97,7 +95,7 @@ export function NotificationsBell() {
                     </div>
                 </section>
 
-                <div className="flex h-80 items-center justify-center my-3">
+                <div className="flex items-center justify-center">
                     <ScrollArea className="w-full h-80 -mr-3 pr-3">
                         {(!notifications || notifications.length === 0) && (
                             <Empty>
@@ -117,7 +115,7 @@ export function NotificationsBell() {
                             </Empty>
                         )}
 
-                        <div className="space-y-1">
+                        <div className="my-3">
                             {notifications?.map((notification) => (
                                 <NotificationItem key={notification.id} notification={notification} />
                             ))}

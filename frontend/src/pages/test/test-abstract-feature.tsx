@@ -33,17 +33,10 @@ function TestAbstractFeature({ abstractId }: TestAbstractFeatureProps) {
     const disconnect = useWebsocket(w => w.disconnect)
 
     const [job, setJob] = useState<PDFGenerationJob | null>(null)
-    const [cachedFile, setCachedFile] = useState<Blob | null>(null)
     const [jobUri, setJobUri] = useState<string | null>(null)
-
-    const isLoading = job ? (
-        job.status === "pending" ||
-        job.status === "generating"
-    ) : false
 
     useEffect(() => {
         setJob(null)
-        setCachedFile(null)
         setJobUri(null)
     }, [abstractId])
 
@@ -54,22 +47,16 @@ function TestAbstractFeature({ abstractId }: TestAbstractFeatureProps) {
         const wsEventName = `pdf.status.${jobId}`
 
         websocketDispatcher.register(wsEventName, async (job: PDFGenerationJob) => {
-            console.log('Listen:', job);
-
             if (job.status === 'completed') {
-                try {
-                    const file = await downloadAPIFile(job.id)
-                    setCachedFile(file)
-                    setJob(job)
-                    disconnect(jobUri)
+                setJob(job)
 
-                } catch (error) {
-                    console.log(error.response);
+                const file = await downloadAPIFile(job.id)
+                if (file) {
+                    disconnect(jobUri)
                 }
             }
         })
 
-        console.log("QUE COÑO???: " + jobUri);
         connect(jobUri)
 
         return () => {
@@ -79,29 +66,17 @@ function TestAbstractFeature({ abstractId }: TestAbstractFeatureProps) {
     }, [jobUri])
 
     const onGeneratingPdf = async () => {
-        // if (cachedFile) {
-        //     const url = typeof cachedFile === 'string' ?
-        //         import.meta.env.VITE_API_URL + cachedFile :
-        //         URL.createObjectURL(cachedFile);
-
-        //     triggerDownload(url)
-        //     return
-        // }
-
         try {
             const { data } = await api.post<PDFGenerationJob>('/abstracts/jobs/', {
                 abstract_id: abstractId
             })
 
-            setCachedFile(null)
             setJob(data)
 
             if (data.status === 'completed') {
-                const file = await downloadAPIFile(data.id)
-                setCachedFile(file)
-            }
+                await downloadAPIFile(data.id)
 
-            if (['pending', 'generating'].includes(data.status)) {
+            } else if (['pending', 'generating'].includes(data.status)) {
                 const socketUri = `pdf/${data.id}/`
                 setJobUri(socketUri)
             }
@@ -142,15 +117,26 @@ function TestAbstractFeature({ abstractId }: TestAbstractFeatureProps) {
         URL.revokeObjectURL(url);
     }
 
-    const downloadAPIFile = async (id: string) => {
-        const { data: blobdata } = await api.get(`abstracts/jobs/${id}/download`, {
-            responseType: 'blob'
-        })
+    const downloadAPIFile = async (id: string): Promise<Blob | false> => {
+        try {
+            const { data: blob } = await api.get<Blob>(`abstracts/jobs/${id}/download`, {
+                responseType: 'blob'
+            })
 
-        const url = URL.createObjectURL(blobdata)
-        triggerDownload(url)
-        return blobdata
+            const url = URL.createObjectURL(blob)
+            triggerDownload(url)
+            return blob
+
+        } catch (error) {
+            DEBUG && console.log(error)
+            return false
+        }
     }
+    
+    const isLoading = job ? (
+        job.status === "pending" ||
+        job.status === "generating"
+    ) : false
 
     return (
         <>

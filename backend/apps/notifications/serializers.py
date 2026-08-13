@@ -22,10 +22,10 @@ class UserDetailNotification(serializers.ModelSerializer):
 
 
 class NotificationSerializer(serializers.ModelSerializer):
-    recipient = UserDetailNotification(read_only=True)
+    user = UserDetailNotification(read_only=True)
     actor = UserDetailNotification(read_only=True)
 
-    recipient_id = serializers.PrimaryKeyRelatedField(source="recipient", queryset=User.objects.all(), write_only=True)
+    user_id = serializers.PrimaryKeyRelatedField(source="user", queryset=User.objects.all(), write_only=True)
 
     created_at = serializers.SerializerMethodField()
 
@@ -41,12 +41,12 @@ class NotificationSerializer(serializers.ModelSerializer):
         model = Notification
         fields = [
             "id",
-            "recipient",
+            "user",
             "actor",
-            "recipient_id",
+            "user_id",
             "actor_id",
             "message",
-            "target_url",
+            "urlpath",
             "is_read",
             "created_at",
         ]

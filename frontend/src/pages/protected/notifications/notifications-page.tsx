@@ -48,7 +48,7 @@ function NotificationsPage() {
         onSuccess: refetchNotifications,
     })
 
-    const results = isLoading ? [] : data.notifications.results
+    const results = data ? data.notifications.results : []
 
     return (
         <div className='w-full h-full flex flex-col'>
@@ -113,7 +113,7 @@ function NotificationsPage() {
 
                     <ScrollArea className='h-100 border-y pr-3'>
                         <fieldset disabled={isLoading} className={cn(
-                            "space-y-2 py-4",
+                            "space-y-0 py-4",
                             isLoading ? 'pointer-events-none' : 'pointer-events-auto'
                         )}>
                             {results?.map((notification) =>
@@ -133,7 +133,7 @@ function NotificationsPage() {
                         </fieldset>
                     </ScrollArea>
 
-                    {!isLoading && (
+                    {data && (
                         <PaginationController
                             page={page}
                             onPageChange={setPage}

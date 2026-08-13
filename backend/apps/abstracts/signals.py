@@ -15,19 +15,19 @@ def notify_abstract_created(sender, instance: Abstract, created: bool, **kwargs)
     if created:
         logger.info(f"Abstract creado [{instance.pk}]: {instance}")
 
-        recipient = instance.user
+        user = instance.user
         actor = None
         sanitized_title = bleach.clean(instance.title, [], {}, strip=True)
         message = f"New submission created: {sanitized_title}."
-        target_url = '/'
+        urlpath = '/'
 
         transaction.on_commit(
             partial(
                 Notification.objects.create,
-                recipient=recipient,
+                user=user,
                 actor=actor,
                 message=message,
-                target_url=target_url,
+                urlpath=urlpath,
             )
         )
     else:
@@ -39,18 +39,16 @@ def notify_abstract_created(sender, instance: Abstract, created: bool, **kwargs)
 def notify_abstract_deleted(sender, instance: Abstract, **kwargs):
     logger.info(f"Abstract eliminado [{instance.pk}]: {instance}")    
 
-    recipient = instance.user
-    actor = None
     sanitized_title = bleach.clean(instance.title, [], {}, strip=True)
     message = f"Submission {sanitized_title} deleted."
-    target_url = '/user/notifications'
+    urlpath = '/user/notifications'
     
     transaction.on_commit(
         partial(
             Notification.objects.create,
-            recipient=recipient,
-            actor=actor,
+            user=instance.user,
+            actor=None,
             message=message,
-            target_url=target_url,
+            urlpath=urlpath,
         )
     )

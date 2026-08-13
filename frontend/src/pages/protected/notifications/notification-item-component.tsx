@@ -46,8 +46,8 @@ function NotificationItem({ notification }: Props) {
                 is_read: true,
             })
         }
-        if (notification.target_url) {
-            navigate(notification.target_url || "#")
+        if (notification.urlpath) {
+            navigate(notification.urlpath || "#")
         }
     }
     

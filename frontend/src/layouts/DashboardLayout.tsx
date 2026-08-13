@@ -174,7 +174,7 @@ function DashboardLayoutContent() {
 
                     <DynamicBreadcrumb />
                 </div>
-                <div className='flex flex-row items-center'>
+                <div className='flex flex-row items-center gap-3'>
                     <NotificationsBell />
 
                     <ChangeThemeButton variant='ghost' />
