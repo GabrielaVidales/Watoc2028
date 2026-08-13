@@ -255,7 +255,7 @@ class PasswordResetView(ViewSet):
         if not email:
             logger.warning("[PasswordResetView] — Solicitud de restablecimiento sin proporcionar email")
             return Response(
-                {"errors": {"root": ["Please make sure you've entered a valid email address and try again."]}},
+                {"errors": {"email": ["Please make sure you've entered a valid email address and try again."]}},
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
@@ -264,27 +264,28 @@ class PasswordResetView(ViewSet):
         try:
             user = User.objects.get(email=email)
         except User.DoesNotExist:
-            logger.warning(f"[PasswordResetView] — Intento de restablecimiento para email inexistente - Email: {email}")
+            logger.warning(f"[PasswordResetView] — Intento de restablecimiento para usuario inexistente - Email: {email}")
+            
             return Response(
-                {"errors": {"root": ["Please make sure you've entered a valid email address and try again."]}},
+                {"errors": {"email": ["No account is associated with this email address."]}},
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
         if not user.is_active:
             logger.warning(f"[PasswordResetView] — Intento de restablecimiento para cuenta inactiva - ID: {user.id}, Email: {email}")
+            
             return Response(
-                {"errors": {"root": ["Please make sure you've entered a valid email address and try again."]}},
+                {"errors": {"email": ["This account is currently inactive. Please contact support for assistance."]}},
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
-        signature = get_password_signature(user)
-
-        send_reset_password_email.delay(user.email, signature)
-
+        # signature = get_password_signature(user)
+        # send_reset_password_email.delay(user.email, signature)
+        
         logger.info(f"[PasswordResetView] — Email de restablecimiento encolado - ID: {user.id}, Email: {email}")
 
         return Response(
-            {"detail": "If an account exists with this email address, you will receive a password reset link."},
+            {"detail": "If an account exists with this email address, you will receive a password reset link. Don't forget to check your spam folder"},
             status=status.HTTP_200_OK,
         )
 

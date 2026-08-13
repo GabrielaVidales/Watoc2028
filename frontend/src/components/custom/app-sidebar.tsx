@@ -134,7 +134,7 @@ export function AppSidebar() {
 
                     <SidebarGroup>
                         <SidebarGroupLabel className='text-neutral-100'>
-                            SPECIAL MODULES
+                            MODULES
                         </SidebarGroupLabel>
                         <SidebarGroupContent>
                             {user.roles.includes('admin') && (
@@ -210,7 +210,6 @@ export function AppSidebar() {
                                 </SidebarMenu>
                             )}
                         </SidebarGroupContent>
-
                     </SidebarGroup>
 
                     <SidebarGroup>

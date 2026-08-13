@@ -19,6 +19,7 @@ import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbP
 import { useIsMobile } from '@/hooks/use-mobile'
 import RightSidebar from '@/components/custom/right-sidebar'
 import { RightSidebarProvider, useRightSidebar } from '@/contexts/RightSidebarContext'
+import ChangeThemeButton from '@/components/custom/change-theme-button'
 
 
 export function DropdownMenuAvatar() {
@@ -26,12 +27,11 @@ export function DropdownMenuAvatar() {
     return (
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="rounded-full">
-                    <Avatar className="h-8 w-8 rounded-full border border-primary">
+                <Button variant="ghost" className="rounded-full" size='icon-lg'>
+                    <Avatar className="h-8 w-8 rounded-full">
                         <AvatarImage src={user.photo as string || null} alt={`${user.full_name} Profile Picture`} />
                         <AvatarFallback>LR</AvatarFallback>
                     </Avatar>
-                    <ChevronDown />
                 </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
@@ -176,6 +176,8 @@ function DashboardLayoutContent() {
                 </div>
                 <div className='flex flex-row items-center'>
                     <NotificationsBell />
+
+                    <ChangeThemeButton variant='ghost' />
 
                     <DropdownMenuAvatar />
                 </div>

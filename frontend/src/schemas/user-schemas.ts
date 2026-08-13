@@ -77,8 +77,6 @@ export type ParticipantSchema = z.infer<typeof participantSchema>
 export type ReviewerSchema = z.infer<typeof reviewerSchema>
 
 
-
-
 export const profilePicSchema = z.object({
     photo: z.instanceof(File, { error: 'Please upload an valid image' })
 })

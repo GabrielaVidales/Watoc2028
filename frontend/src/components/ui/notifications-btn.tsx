@@ -8,13 +8,11 @@ import NotificationItem from "@/pages/protected/notifications/notification-item-
 import { routes } from "@/routes/routes"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { ArrowRight, Bell, BellOff, CheckCheck, RotateCw } from "lucide-react"
-import { Link, useNavigate } from "react-router"
+import { Link } from "react-router"
 import { ScrollArea } from "./scroll-area"
 
 
 export function NotificationsBell() {
-    const navigate = useNavigate()
-
     const queryClient = useQueryClient()
 
     const { data, isLoading, refetch } = useQuery<NotificationResponse>({
@@ -26,10 +24,9 @@ export function NotificationsBell() {
     })
 
     const notifications = data?.notifications.results || []
-
     const unreadCount = data?.unread_count || 0
 
-    const mutation = useMutation({
+    const toggleMutation = useMutation({
         mutationFn: async (ctx: { id?: number, is_read?: boolean, mark_all_read?: boolean }) => {
             if (ctx.mark_all_read) {
                 const { data } = await api.patch(`/notifications/toggle-all-read/`);
@@ -44,29 +41,6 @@ export function NotificationsBell() {
             refetch()
         },
     })
-
-    const deleteMut = useMutation({
-        mutationFn: async (id: number) => {
-            const { data } = await api.delete(`/notifications/${id}/`);
-            return data;
-        },
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['notifications'], refetchType: 'all' });
-            refetch()
-        },
-    })
-
-    const onNotificationTapped = async () => {
-        // if (!notification.is_read) {
-        //     await mutation.mutateAsync({
-        //         id: notification.id,
-        //         is_read: true,
-        //     })
-        // }
-        // if (notification.target_url) {
-        //     navigate(notification.target_url || "#")
-        // }
-    }
 
     return (
         <Popover>
@@ -102,7 +76,7 @@ export function NotificationsBell() {
                         <Button
                             size="sm"
                             variant="outline"
-                            onClick={async () => await mutation.mutateAsync({ mark_all_read: true })}
+                            onClick={async () => await toggleMutation.mutateAsync({ mark_all_read: true })}
                             className="text-xs sm:text-sm"
                         >
                             <CheckCheck />

@@ -1,15 +1,8 @@
 import React from 'react'
 import { Button, type ButtonProps } from '@/components/ui/button'
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuGroup,
-    DropdownMenuItem,
-    DropdownMenuSeparator,
-    DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
 import { useTheme } from '../theme-provider'
 import { MoonIcon, SunIcon, SunMoonIcon } from 'lucide-react'
+import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuTrigger, } from "@/components/ui/dropdown-menu"
 
 
 function ChangeThemeButton(props: ButtonProps) {
@@ -20,11 +13,11 @@ function ChangeThemeButton(props: ButtonProps) {
             <DropdownMenuTrigger asChild>
                 <Button size='icon-sm' variant="outline" {...props}>
                     {theme === 'dark' ? (
-                        <MoonIcon />
+                        <MoonIcon className='size-5' />
                     ) : theme === 'light' ? (
-                        <SunIcon />
+                        <SunIcon className='size-5' />
                     ) : (
-                        <SunMoonIcon />
+                        <SunMoonIcon className='size-5' />
                     )}
                 </Button>
             </DropdownMenuTrigger>

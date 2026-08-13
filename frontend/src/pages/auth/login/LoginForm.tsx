@@ -117,7 +117,7 @@ export default function LoginForm() {
 
                 <div className='flex justify-center w-full'>
                     <Button
-                        className='rounded-full px-4!'
+                        className='px-4!'
                         type='submit'
                         variant='main'
                         data-icon="inline-start"

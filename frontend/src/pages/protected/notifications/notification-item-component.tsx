@@ -50,10 +50,8 @@ function NotificationItem({ notification }: Props) {
             navigate(notification.target_url || "#")
         }
     }
-
-    const actorName = notification.actor
-        ? `${notification.actor.first_name} ${notification.actor.last_name}`
-        : "[System]";
+    
+    const actor = notification.actor
 
     return (
         <fieldset
@@ -69,10 +67,10 @@ function NotificationItem({ notification }: Props) {
             <div onClick={onNotificationTapped} className="flex flex-1 items-start gap-3 min-w-0">
                 <div className="relative shrink-0">
                     <Avatar className="size-10 border shadow-sm">
-                        <AvatarImage src={notification.actor?.photo as string ?? null} />
+                        <AvatarImage src={actor?.photo as string ?? null} />
                         <AvatarFallback>
-                            {notification.actor ? (
-                                actorName
+                            {actor ? (
+                                `${actor.first_name} ${actor.last_name}`
                                     .split(" ")
                                     .map((x) => x[0])
                                     .join("")
@@ -89,11 +87,13 @@ function NotificationItem({ notification }: Props) {
                 </div>
 
                 <div className="min-w-0 flex-1">
-                    <p className="text-[13px] leading-relaxed">
-                        <span className="font-semibold">
-                            {actorName}
-                        </span>{" "}
-                        <span className="text-muted-foreground" dangerouslySetInnerHTML={{ __html: notification.message }} />
+                    <p className="text-xs leading-tight">
+                        {actor && (
+                            <span className="font-semibold">
+                                {actor.full_name}
+                            </span>
+                        )}{" "}
+                        <span className="text-muted-accent" dangerouslySetInnerHTML={{ __html: notification.message }} />
                     </p>
 
                     <p className="mt-1 text-xs text-muted-foreground">
