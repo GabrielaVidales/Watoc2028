@@ -71,6 +71,7 @@ INSTALLED_APPS = [
     "apps.notifications.apps.NotificationsConfig",
     "apps.contact_requests.apps.ContactRequestsConfig",
     "apps.payments.apps.PaymentsConfig",
+    "apps.program.apps.ProgramConfig",
     # Bibliotecas de terceros
     "django_extensions",
     "corsheaders",

@@ -67,7 +67,7 @@ function TestAbstractFeature({ abstractId }: TestAbstractFeatureProps) {
 
     const onGeneratingPdf = async () => {
         try {
-            const { data } = await api.post<PDFGenerationJob>('/abstracts/jobs/', {
+            const { data } = await api.post<PDFGenerationJob>('/abstracts/jobs/?force=1', {
                 abstract_id: abstractId
             })
 

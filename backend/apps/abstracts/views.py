@@ -25,7 +25,7 @@ logger = logging.getLogger("abstracts")
 
 
 class PDFGenerationViewSet(ModelViewSet):
-    # permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.AllowAny]
     queryset = PDFGenerationJob.objects.all()
     serializer_class = PDFGenerationJobSerializer
 

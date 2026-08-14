@@ -8,8 +8,6 @@ from apps.abstracts.models import Abstract, PDFGenerationJob
 from apps.abstracts.serializers import PDFGenerationJobSerializer
 from apps.abstracts.services.reportlab import build_abstract_pdf
 
-import time
-
 
 def get_abstract_context(abstract: Abstract) -> dict:
     authors_data = []
@@ -40,6 +38,7 @@ def get_abstract_context(abstract: Abstract) -> dict:
         )
 
     return {
+        "id": abstract.pk,
         "file_title": abstract.get_plain_title(),
         "title_html": abstract.title or "",
         "text_html": abstract.text or "",
@@ -50,13 +49,10 @@ def get_abstract_context(abstract: Abstract) -> dict:
 
 
 def _notify_job_status(job, group, channel_layer):
-    print("🔥 CHANNEL LAYER:", channel_layer, flush=True)
-    print("🔥 CHANNEL LAYER CLASS:", type(channel_layer), flush=True)
+    print("🔥 Channel layer:", channel_layer, flush=True)
 
     if hasattr(channel_layer, "hosts"):
-        print("🔥 CHANNEL LAYER HOSTS:", channel_layer.hosts, flush=True)
-
-    print("🔥 GROUP:", group, flush=True)
+        print("Channel layer hosts:", channel_layer.hosts, flush=True)
 
     serializer = PDFGenerationJobSerializer(job)
 
@@ -65,14 +61,10 @@ def _notify_job_status(job, group, channel_layer):
         "message": serializer.data,
     }
 
-    print("🔥 EVENT:", event, flush=True)
-
     async_to_sync(channel_layer.group_send)(
         group,
         event,
     )
-
-    print("🔥 GROUP SEND TERMINÓ", flush=True)
 
 
 @shared_task
