@@ -56,10 +56,10 @@ function ManageReviewsPage() {
 
                     <div>
                         <h1 className="text-2xl font-semibold">
-                            Manage Users
+                            Gestión de Reviews
                         </h1>
                         <p className="text-sm text-muted-foreground">
-                            Search, filter and manage registered users.
+                            En esta vista puedes visualizar y gestionar la asignación de Abstracts a los revisores del congreso.
                         </p>
                     </div>
                 </div>
@@ -141,9 +141,12 @@ function ManageReviewsPage() {
                                 </PopoverContent>
                             </Popover>
 
-                            <Button size='sm'>
+                            <Button size='sm' onClick={() => {
+                                setSelected(null)
+                                setOpen(true)
+                            }}>
                                 <Plus />
-                                Add User
+                                Add Assignment
                             </Button>
                         </div>
                     </div>

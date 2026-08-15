@@ -269,7 +269,6 @@ class HTMLToReportLab(HTMLParser):
 
 def html_to_blocks(raw_html: str) -> list[dict]:
     if not raw_html:
-        print(raw_html)
         return []
     parser = HTMLToReportLab()
     parser.feed(html.unescape(str(raw_html)))
@@ -293,7 +292,6 @@ def blocks_to_flowables(raw_html: str, style: ParagraphStyle, bullet_style: Para
     flowables = []
 
     for index, block in enumerate(html_to_blocks(raw_html), start=1):
-        print(block)
         bullet = f"{index}." if enumerated else block["bullet"]
         st = bullet_style if (block["bullet"] and bullet_style) else style
 
@@ -341,7 +339,7 @@ def get_styles() -> dict[str, ParagraphStyle]:
     fonts = configure_fonts()
     base = getSampleStyleSheet()["Normal"]
     return {
-        "title": ParagraphStyle("AbstractTitle", parent=base, fontName=fonts["bold"], fontSize=17, leading=24, charSpace=-0.2, alignment=TA_CENTER, spaceAfter=0, spaceBefore=5, leftIndent=TEXT_INDENT, rightIndent=TEXT_INDENT),
+        "title": ParagraphStyle("AbstractTitle", parent=base, fontName=fonts["bold"], fontSize=16, leading=22, charSpace=-0.2, alignment=TA_CENTER, spaceAfter=0, spaceBefore=5, leftIndent=TEXT_INDENT, rightIndent=TEXT_INDENT),
         "authors": ParagraphStyle("AbstractAuthors", parent=base, fontName=fonts["bold"], fontSize=10, leading=12, alignment=TA_CENTER, spaceAfter=9, spaceBefore=3, leftIndent=TEXT_INDENT, rightIndent=TEXT_INDENT),
         "affiliations": ParagraphStyle("AbstractAffiliations", parent=base, fontName=fonts["light_italic"], fontSize=8, leading=11, alignment=TA_CENTER, spaceAfter=3, spaceBefore=3, leftIndent=TEXT_INDENT, rightIndent=TEXT_INDENT, textColor=colors.HexColor("#444444")),
         "heading": ParagraphStyle("AbstractHeading", parent=base, fontName=fonts["bold"], fontSize=16, leading=26, spaceBefore=10, spaceAfter=0, textColor=colors.HexColor(MAIN_COLOR)),
@@ -596,8 +594,19 @@ def build_abstract_pdf(context: dict) -> bytes:
         parts = []
         for author in authors_list:
             name = escape(author["full_name"])
+
+            if author["is_corresponding_author"]:
+                image_path = os.path.join(
+                    settings.BASE_DIR,
+                    "static",
+                    "img",
+                    "mail.png",
+                )
+                name += f' <img src="{image_path}" width="9" height="9" valign="middle"/> '
+                
             if author["aff_index"]:
                 name += f'<super>{author["aff_index"]}</super>'
+
             parts.append(name)
         story.append(safe_paragraph(", ".join(parts), styles["authors"]))
     else:

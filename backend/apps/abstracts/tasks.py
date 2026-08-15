@@ -34,6 +34,7 @@ def get_abstract_context(abstract: Abstract) -> dict:
             {
                 "full_name": f"{initial} {author.last_name}".strip(),
                 "aff_index": affiliations_set.get(aff_id),
+                "is_corresponding_author": author.is_corresponding_author,
             }
         )
 
@@ -83,6 +84,8 @@ def generate_abstract_pdf(job_id: str):
         
         context = get_abstract_context(abstract)
         pdf_bytes = build_abstract_pdf(context)
+
+        print(context)
 
         print('Generación completa')
         job.file.save(

@@ -15,15 +15,16 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { isAxiosError } from 'axios'
 import { Plus, Pointer, RotateCw } from 'lucide-react'
-import { useEffect } from 'react'
+import { useEffect, type FieldsetHTMLAttributes, type HTMLAttributes } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 
 
 type Props = {
     defaultValues?: AssignmentFormInput
+    fieldsetProps?: FieldsetHTMLAttributes<HTMLFieldSetElement>
 }
 
-function ReviewAssignmentForm({ defaultValues }: Props) {
+function ReviewAssignmentForm({ defaultValues, fieldsetProps, ...rest }: Props & HTMLAttributes<HTMLFormElement>) {
     const queryClient = useQueryClient()
 
     const { user } = useAuth()
@@ -116,8 +117,8 @@ function ReviewAssignmentForm({ defaultValues }: Props) {
     }, [defaultValues, user, reset]);
 
     return (
-        <form onSubmit={onFormSubmit} id='review-assignment-form'>
-            <fieldset className='px-1 grid grid-cols-1 gap-3' disabled={isSubmitting}>
+        <form onSubmit={onFormSubmit} id='review-assignment-form' {...rest}>
+            <fieldset className='px-1 grid grid-cols-1 gap-3' disabled={isSubmitting} {...fieldsetProps}>
                 <Controller
                     name="is_active"
                     control={control}

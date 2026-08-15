@@ -6,7 +6,6 @@ import type { ReviewAssignment } from "@/domain/reviews"
 import { Separator } from '@/components/ui/separator'
 import { useQuery } from '@tanstack/react-query'
 import { getAssignment } from '@/services/administration/review-services'
-import { Spinner } from '@/components/ui/spinner'
 
 type Props = {
     assignment?: ReviewAssignment['id']
@@ -15,17 +14,12 @@ type Props = {
     open?: boolean
 }
 
-function DialogReviewAssignmentForm({
-    assignment = -1,
-    open,
-    setOpen,
-    onClose,
-}: Props) {
+function DialogReviewAssignmentForm({ assignment = null, open, setOpen, onClose }: Props) {
 
     const { data = null, isLoading } = useQuery<ReviewAssignment>({
         queryKey: ['assignment', assignment],
         queryFn: async () => {
-            if (assignment === -1) return null
+            if (assignment === null) return null
             return await getAssignment(assignment)
         }
     })
@@ -35,6 +29,11 @@ function DialogReviewAssignmentForm({
         setOpen(v)
     }
 
+    const title = data?.id ? 'Edit Review Assignment' : 'Create Review Assignment'
+    const dialogdescription = data?.id ?
+        'Click save when you&apos;re done.' :
+        'Make changes to your profile here. Click save when you&apos;re done.'
+
     return (
         <Dialog open={open} onOpenChange={onCloseFn}>
             <DialogContent
@@ -42,32 +41,27 @@ function DialogReviewAssignmentForm({
                 className="w-full sm:max-w-md md:max-w-lg lg:max-w-xl xl:max-w-xl"
             >
                 <DialogHeader>
-                    <DialogTitle>Edit Review Assignment</DialogTitle>
-                    <DialogDescription>
-                        Make changes to your profile here. Click save when you&apos;re
-                        done.
-                    </DialogDescription>
+                    <DialogTitle>{title}</DialogTitle>
+                    <DialogDescription>{dialogdescription}</DialogDescription>
                 </DialogHeader>
 
                 <Separator />
 
                 <div className="-mx-4 no-scrollbar min-h-[20vh] max-h-[60vh] px-4">
-                    {(isLoading) && (
-                        <Spinner className='size-8' />
-                    )}
 
-                    {data && (
-                        <ReviewAssignmentForm
-                            defaultValues={data && {
-                                id: data.id,
-                                is_active: data.is_active,
-                                abstract: data.abstract,
-                                assigned_by: data.assigned_by,
-                                due_date: new Date(data.due_date_timestamp),
-                                user: data.user,
-                            }}
-                        />
-                    )}
+                    <ReviewAssignmentForm
+                        fieldsetProps={{
+                            disabled: isLoading
+                        }}
+                        defaultValues={{
+                            id: data?.id,
+                            is_active: data?.is_active,
+                            abstract: data?.abstract,
+                            assigned_by: data?.assigned_by,
+                            due_date: new Date(data?.due_date_timestamp || new Date()),
+                            user: data?.user,
+                        }}
+                    />
                 </div>
 
                 <div className="max-sm:text-xs text-xs text-muted-foreground">
