@@ -5,6 +5,7 @@ from rest_framework.filters import SearchFilter
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.exceptions import ValidationError
+from django.db import transaction
 from django_filters import rest_framework as filters
 from django.contrib.auth import get_user_model
 from django.template.loader import render_to_string
@@ -41,7 +42,7 @@ class PDFGenerationViewSet(ModelViewSet):
 
         # Obtiene el último PDF generado del abstract existente
         existing_job = self.queryset.filter(abstract=abstract).order_by("-completed_at").first()
-        
+
         if existing_job is not None and not force:
             # si existe hay que comprobar que el abstract no ha cambiado
             new_hash = abstract.get_hash()
@@ -117,6 +118,8 @@ class AffiliationViewSet(ModelViewSet):
         if authors_count != 0:
             raise ValidationError({"errors": {"root": ["This affiliation cannot be deleted because it is currently assigned to one or more authors."]}})
 
+        self.perform_destroy(instance)
+
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
@@ -127,6 +130,36 @@ class AbstractView(ModelViewSet):
     filter_backends = [filters.DjangoFilterBackend]
     filterset_class = AbstractSearchFilter
     pagination_class = Pagination
+
+    def perform_create(self, serializer):
+        """
+        Cuando crea un nuevo abstract, le añade automáticamente
+        al user que lo creó como el primer Author, usando sus datos
+        de afiliación.
+        """
+        
+        # TODO: cambiar (otra vez) los atributos en Participants para que queden mejor en las affiliations
+
+        with transaction.atomic():
+            abstract: Abstract = serializer.save()
+            data = {
+                "abstract_id": abstract.pk,
+                "related_user_id": abstract.user.pk,
+                "editable": False,
+                "institution": "NA",
+                "country": "NA",
+                "city": "NA",
+            }
+
+            participant_data = abstract.user.participant
+            if participant_data:
+                data["institution"] = participant_data.affiliation
+                data["institution"] = abstract.user.nationality
+                data["institution"] = abstract.user.city
+
+            author_serializer = AuthorSerializer(data=data)
+            author_serializer.is_valid(raise_exception=True)
+            author_serializer.save()
 
     # region otras vistas
     @action(detail=True, methods=["get"], url_path="affiliations")
@@ -185,7 +218,6 @@ class AbstractView(ModelViewSet):
 
         serializer = AuthorSerializer(
             abstract.authors,
-            # [],
             many=True,
             context={"request": request},
         )
@@ -316,17 +348,27 @@ class AuthorsView(ModelViewSet):
     queryset = Author.objects.all()
     serializer_class = AuthorSerializer
     permission_classes = [permissions.IsAuthenticated]
-    """
-    {
-        abstract_id: number,
-        related_user_id: number | None
-        affiliation_id: number | None (solo None si related_user_id no es None)
-        first_name: string
-        last_name: string
-        email: string
-        is_corresponding_author: boolean
-    }
-    """
+
+    def destroy(self, request, pk=None):
+        """
+        Antes de eliminar un autor se debe validar que no sea el autor
+        que representa al propio usuario que creó el abstract, ese no
+        se puede eliminar, solo editar. Un participante DEBE ser coautor
+        del abstract que envía.
+        """
+
+        instance = self.get_object()
+
+        author_user_pk = instance.related_user.pk
+        abstract_user_pk = instance.abstract.user.pk
+        author_is_creator = author_user_pk == abstract_user_pk
+
+        if author_is_creator:
+            raise ValidationError({"errors": {"root": ["At least one corresponding author is required."]}})
+
+        self.perform_destroy(instance)
+
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class AuthorDeclarationView(ModelViewSet):

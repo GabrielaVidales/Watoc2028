@@ -12,18 +12,18 @@ import { TooltipProvider } from './components/ui/tooltip.jsx'
 const queryClient = new QueryClient()
 
 createRoot(document.getElementById('root')).render(
-  // <StrictMode>
-  <QueryClientProvider client={queryClient}>
-    <AuthProvider>
-      <BrowserRouter>
-        <ThemeProvider>
-          <TooltipProvider>
-            <App />
-          </TooltipProvider>
-        </ThemeProvider>
-        <Toaster />
-      </BrowserRouter>
-    </AuthProvider>
-  </QueryClientProvider>
+  <StrictMode>
+    <QueryClientProvider client={queryClient}>
+      <AuthProvider>
+        <BrowserRouter>
+          <ThemeProvider>
+            <TooltipProvider>
+              <App />
+            </TooltipProvider>
+          </ThemeProvider>
+          <Toaster />
+        </BrowserRouter>
+      </AuthProvider>
+    </QueryClientProvider>
   // </StrictMode>,
 )

@@ -4,7 +4,7 @@ const tomorrow = new Date()
 tomorrow.setHours(24, 0, 0, 0)
 
 const assignmentSchema = z.object({
-    id: z.number().optional(),
+    id: z.number().nullable().optional(),
     user: z.any().nullable(),
     abstract: z.any().nullable(),
     assigned_by: z.any().nullable(),

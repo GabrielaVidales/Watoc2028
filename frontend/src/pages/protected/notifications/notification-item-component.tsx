@@ -5,7 +5,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem,
 import type { Notification } from '@/domain/notifications';
 import { cn } from '@/lib/utils';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { MessageCircleCheck, MessageCircleReply, MoreHorizontal, Settings, Trash2 } from 'lucide-react';
+import { MessageCircleCheck, MessageCircleReply, MoreHorizontal, MoreHorizontalIcon, MoreVerticalIcon, Settings, Trash2 } from 'lucide-react';
 import React from 'react';
 import { useNavigate } from 'react-router';
 
@@ -16,6 +16,8 @@ type Props = {
 
 function NotificationItem({ notification }: Props) {
     const navigate = useNavigate()
+
+    const actor = notification?.actor
 
     const queryClient = useQueryClient()
 
@@ -50,21 +52,19 @@ function NotificationItem({ notification }: Props) {
             navigate(notification.urlpath || "#")
         }
     }
-    
-    const actor = notification.actor
 
     return (
         <fieldset
             disabled={mutation.isPending || deleteMut.isPending}
             key={notification.id}
             className={cn(
-                "group cursor-pointer p-3 border-2 border-border rounded-md transition-colors duration-300",
+                "group cursor-pointer border-2 border-border rounded-md transition-colors duration-300",
                 "hover:border-primary-light hover:shadow-sm",
-                "flex flex-col items-start md:flex-row md:items-center justify-between gap-3",
+                "flex flex-row items-start justify-between gap-3",
                 notification.is_read ? "bg-secondary" : 'bg-card'
             )}
         >
-            <div onClick={onNotificationTapped} className="flex flex-1 items-start gap-3 min-w-0">
+            <div onClick={onNotificationTapped} className="flex flex-1 items-start gap-3 min-w-0 p-3">
                 <div className="relative shrink-0">
                     <Avatar className="size-10 border shadow-sm">
                         <AvatarImage src={actor?.photo as string ?? null} />
@@ -100,19 +100,17 @@ function NotificationItem({ notification }: Props) {
                         {new Date(notification.created_at).toLocaleString()}
                     </p>
                 </div>
+            </div>
 
+            <div className='py-3 pr-3'>
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                         <Button
-                            variant="outline"
+                            variant="ghost"
                             size="icon-xs"
                             className="shrink-0 opacity-0 transition-opacity group-hover:opacity-100"
-                            onClick={e => {
-                                e.preventDefault()
-                                e.stopPropagation()
-                            }}
                         >
-                            <MoreHorizontal className="size-4" />
+                            <MoreHorizontalIcon className='size-5 shrink-0'  />
                         </Button>
                     </DropdownMenuTrigger>
 
@@ -123,9 +121,7 @@ function NotificationItem({ notification }: Props) {
                             </DropdownMenuLabel>
 
                             <DropdownMenuItem
-                                onClick={(e) => {
-                                    e.preventDefault()
-                                    e.stopPropagation()
+                                onClick={() => {
                                     mutation.mutate({
                                         id: notification.id,
                                         is_read: !notification.is_read,
@@ -147,9 +143,7 @@ function NotificationItem({ notification }: Props) {
 
                             <DropdownMenuItem
                                 variant="destructive"
-                                onClick={(e) => {
-                                    e.preventDefault()
-                                    e.stopPropagation()
+                                onClick={() => {
                                     deleteMut.mutate(notification.id)
                                 }}
                             >

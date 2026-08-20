@@ -4,7 +4,7 @@ from . import views
 
 router = DefaultRouter()
 router.register(r"assignments", views.ReviewAssignmentViewSet, "assignments")
-router.register(r"review", views.ReviewViewSet, "review")
+router.register(r"reviews", views.ReviewViewSet, "reviews")
 
 urlpatterns = [
     path('users/', views.ReviewerViewSet.as_view(), name='users-list')

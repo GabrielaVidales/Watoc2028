@@ -7,6 +7,7 @@ import { Field, FieldContent, FieldError, FieldLabel } from '@/components/ui/fie
 import { InputGroup, InputGroupAddon, InputGroupInput } from '@/components/ui/input-group'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Switch } from '@/components/ui/switch'
+import { useAuth } from '@/contexts/AuthContext'
 import { DEBUG } from '@/lib/constants'
 import { cn } from '@/lib/utils'
 import type { Affiliation } from '@/schemas/abstracts/affiliation-schema'
@@ -18,7 +19,7 @@ import { useQueryClient } from '@tanstack/react-query'
 import { isAxiosError } from 'axios'
 import { Mail, Plus, School } from 'lucide-react'
 import React from 'react'
-import { Controller, FormProvider, useForm, useFormContext } from 'react-hook-form'
+import { Controller, FormProvider, useForm, useFormContext, useWatch } from 'react-hook-form'
 
 
 export function AuthorForm({ children }: React.PropsWithChildren) {
@@ -37,6 +38,7 @@ export function AuthorForm({ children }: React.PropsWithChildren) {
             city: '',
             country: '',
             institution: '',
+            editable: true,
         }
     })
 
@@ -58,6 +60,12 @@ export function AuthorFormContent({ abstractId, onSubmit, values }: Props) {
     const queryClient = useQueryClient()
 
     const { control, setValue, handleSubmit, getValues, reset, formState: { isSubmitting } } = useFormContext<AuthorFormSchema>()
+
+    const isEditable = useWatch({
+        control: control,
+        name: 'editable'
+    })
+
     const [user, setUser] = React.useState<Partial<UserSchema>>(null)
     const handleUserSelection = (user: UserSchema | null) => {
         if (user === null) {
@@ -104,8 +112,7 @@ export function AuthorFormContent({ abstractId, onSubmit, values }: Props) {
             if (data.id) {
                 const res = await api.patch(`/abstracts/authors/${data.id}/`, { ...data, abstract_id: abstractId })
 
-                if (DEBUG)
-                    console.log(res);
+                DEBUG && console.log(res.data);
 
                 notify.success('Saved successfully!', {
                     description: 'Your changes have been saved.',
@@ -113,8 +120,7 @@ export function AuthorFormContent({ abstractId, onSubmit, values }: Props) {
             } else {
                 const res = await api.post('/abstracts/authors/', { ...data, id: undefined, abstract_id: abstractId })
 
-                if (DEBUG)
-                    console.log(res);
+                DEBUG && console.log(res.data);
 
                 notify.success('Created successfully!', {
                     description: 'The record has been created.',
@@ -129,18 +135,14 @@ export function AuthorFormContent({ abstractId, onSubmit, values }: Props) {
             onSubmit?.()
         } catch (error) {
             if (isAxiosError(error)) {
-                if (DEBUG) {
-                    console.error(error.response);
-                }
+                DEBUG && console.error(error.response);
                 notify.destructive('Something went wrong!', {
                     description: error.response.data.errors?.email || 'Try again',
                 })
             }
         }
     }, async (data) => {
-        if (DEBUG) {
-            console.error(data, getValues());
-        }
+        DEBUG && console.error(data, getValues());
     })
 
 
@@ -155,6 +157,7 @@ export function AuthorFormContent({ abstractId, onSubmit, values }: Props) {
                     country: values.affiliation?.country || '',
                     city: values.affiliation?.city || '',
                     is_corresponding_author: values.is_corresponding_author,
+                    editable: values.editable,
                 }, {
                     keepDefaultValues: false,
                 })
@@ -188,9 +191,12 @@ export function AuthorFormContent({ abstractId, onSubmit, values }: Props) {
                 <div className='space-y-3'>
                     {/* Related user */}
                     <Field>
-                        <FieldLabel htmlFor={'related-user-id'}>Search registered author</FieldLabel>
+                        <FieldLabel htmlFor={'related-user-id'}>
+                            {isEditable ? 'Search by registered user' : 'Non editable'}
+                        </FieldLabel>
 
                         <SelectCommand<UserSchema>
+                            disabled={!isEditable}
                             onChange={handleUserSelection}
                             value={user}
                             endpoint='/users/'

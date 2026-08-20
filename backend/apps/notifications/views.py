@@ -25,6 +25,7 @@ class NotificationViewSet(ModelViewSet):
 
     def list(self, request):
         """TODO: Esto es solo para testeo, eliminar después"""
+
         notification = Notification.objects.first()
         serializer = self.get_serializer(notification)
         channel_layer = get_channel_layer()

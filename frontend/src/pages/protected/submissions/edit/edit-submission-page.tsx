@@ -311,25 +311,22 @@ function EditAbstractPage() {
                                 <ShowAuthorsComponent abstractId={data ? data.id : null} />
                             </CardContent>
 
-                            <CardContent className='px-10'>
+                            <Separator/>
+
+                            <CardContent className='space-y-5 md:py-5 md:px-10'>
                                 <Accordion
                                     type="single"
                                     collapsible
-                                    className="rounded-lg p-0"
                                 >
                                     <AccordionItem value={'item'} className={cn(
-                                        "group relative cursor-pointer rounded-md transition-colors duration-300",
+                                        "group relative rounded-md transition-colors duration-300",
                                     )}>
-
-                                        <AccordionTrigger className="cursor-pointer text-base focus-visible:outline-none focus-visible:ring-0">
-                                            <CardTitle className="flex gap-3 items-center">
-                                                <School className='text-primary-main shrink-0' />
-                                                <h2 className='text-xl font-semibold'>Manage Affiliations</h2>
-                                            </CardTitle>
+                                        <AccordionTrigger className="cursor-pointer text-base font-normal text-muted-foreground focus-visible:outline-none focus-visible:ring-0">
+                                            More settings...
                                         </AccordionTrigger>
 
                                         <AccordionContent>
-                                            <ShowAffiliations />
+                                            <ShowAffiliations abstractId={data ? data.id : null} />
                                         </AccordionContent>
 
                                     </AccordionItem>

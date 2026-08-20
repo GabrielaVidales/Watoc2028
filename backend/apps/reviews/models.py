@@ -67,7 +67,7 @@ class ReviewAssignment(models.Model):
         db_column="is_active",
     )
 
-    def __str__(self):
+    def __repr__(self):
         title = self.abstract.get_plain_title()
         truncated_title = (title[:32] + "...") if len(title) > 35 else title
         return f"ReviewAssignment(abstract={truncated_title}, user={self.user.get_full_name()})"
@@ -80,6 +80,12 @@ class Review(models.Model):
 
     assignment = models.ForeignKey(
         ReviewAssignment,
+        on_delete=models.CASCADE,
+        related_name="reviews",
+    )
+    submitted_by = models.ForeignKey(
+        User,
+        null=True,
         on_delete=models.CASCADE,
         related_name="reviews",
     )

@@ -98,6 +98,9 @@ class RelatedUserSerializer(serializers.ModelSerializer):
             return None
 
 
+
+MAX_AUTHORS_PER_ABSTRACT = 16
+
 class AuthorSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField(required=False)
     abstract_id = serializers.PrimaryKeyRelatedField(
@@ -147,6 +150,7 @@ class AuthorSerializer(serializers.ModelSerializer):
             "last_name",
             "order",
             "email",
+            "editable",
             "is_corresponding_author",
             "affiliation",
             "related_user",
@@ -162,15 +166,21 @@ class AuthorSerializer(serializers.ModelSerializer):
         }
 
     def validate(self, attrs=None):
+        """
+        Valida los datos de entrada. related_user_id se mapea 
+        a related_user. abstract_id se mapea a abstract
+        """
+
         errors = {}
 
-        if not attrs.get("first_name"):
-            errors["first_name"] = ["First name is required"]
+        related_user = attrs.get("related_user", None)
+        if not related_user:
+            if not attrs.get("first_name"):
+                errors["first_name"] = ["First name is required"]
+            if not attrs.get("last_name"):
+                errors["last_name"] = ["Last name is required"]
 
-        if not attrs.get("last_name"):
-            errors["last_name"] = ["Last name is required"]
-
-        email = attrs.get("email")
+        email = attrs.get("email") or (related_user.email if related_user else None)
         if not email:
             errors["email"] = ["Email is required"]
 
@@ -201,6 +211,23 @@ class AuthorSerializer(serializers.ModelSerializer):
 
     @transaction.atomic
     def create(self, validated_data):
+        """
+        Al crear hay que verificar que no se repita un autor en el,
+        abstract no con el mismo related_user ni con el mismo email.
+        """
+
+        abstract = validated_data.get("abstract")
+
+        authors_count = abstract.authors.count()
+        if authors_count >= MAX_AUTHORS_PER_ABSTRACT:
+            raise serializers.ValidationError({"errors": {"root": f"Maximum of authors is {MAX_AUTHORS_PER_ABSTRACT}"}})
+
+        validated_data["order"] = abstract.authors.count() + 1
+
+        is_corresponding_author = validated_data['is_corresponding_author']
+        if is_corresponding_author:
+            abstract.authors.update(is_corresponding_author=False)
+
         related_user = validated_data.get("related_user", None)
         if related_user:
             validated_data["first_name"] = related_user.first_name
@@ -222,15 +249,6 @@ class AuthorSerializer(serializers.ModelSerializer):
             print("New affiliation instance was created" if created else "Existing affiliation instance was used")
             validated_data["affiliation"] = affiliation
 
-        abstract = validated_data.get("abstract")
-
-        MAX_AUTHORS = 16
-        authors_count = abstract.authors.count()
-        if authors_count >= MAX_AUTHORS:
-            raise serializers.ValidationError({"errors": {"root": f"Maximum of authors is {MAX_AUTHORS}"}})
-
-        validated_data["order"] = abstract.authors.count() + 1
-
         instance = super().create(validated_data)
         normalize_author_order(instance.abstract)
 
@@ -240,6 +258,12 @@ class AuthorSerializer(serializers.ModelSerializer):
     @transaction.atomic
     def update(self, instance, validated_data):
         instance = self.instance
+        
+        abstract = validated_data.get("abstract")
+
+        is_corresponding_author = validated_data['is_corresponding_author']
+        if is_corresponding_author:
+            abstract.authors.update(is_corresponding_author=False)
 
         related_user = validated_data.get("related_user", None)
         if related_user:

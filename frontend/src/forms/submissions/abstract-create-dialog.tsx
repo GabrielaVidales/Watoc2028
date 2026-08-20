@@ -18,6 +18,7 @@ import { Controller, useForm } from 'react-hook-form'
 import { useNavigate } from 'react-router'
 import { createSubmission } from '@/services/submissions/submission-services'
 import { DEBUG } from '@/lib/constants'
+import { notify } from '@/components/custom/notify'
 
 
 type CreateAbstractDialogProps = {
@@ -27,7 +28,6 @@ type CreateAbstractDialogProps = {
 export function CreateAbstractDialog({ redirect = true, ...rest }: CreateAbstractDialogProps) {
     const [open, setOpen] = useState(false)
 
-    const { user: user } = useAuth()
     const queryClient = useQueryClient()
     const navigate = useNavigate()
 
@@ -42,16 +42,23 @@ export function CreateAbstractDialog({ redirect = true, ...rest }: CreateAbstrac
     const { mutateAsync: createAbstractAsync, isPending } = useMutation<AbstractSchema, AxiosError, CreateAbstractFormValues>({
         mutationFn: createSubmission,
         onError: error => {
-            if (DEBUG) {
-                console.log(error.response.data)
-            }
+            DEBUG && console.log(error.response.data)
         },
         onSuccess: (data) => {
-            setOpen(false)
-            redirect && navigate(routes.users.submissions.edit.build({ id: data.id }))
-            queryClient.invalidateQueries({
-                queryKey: ['abstract'],
-            })
+            DEBUG && console.log(data)
+            if (data.id) {
+                redirect && navigate(routes.users.submissions.edit.build({
+                    id: data.id
+                }))
+                notify.success('Abstract created successfully!', {
+                    description: (
+                        <p>You cand edit your submission <span className='font-bold' dangerouslySetInnerHTML={{ __html: data.title }} />.</p>
+                    )
+                })
+                queryClient.invalidateQueries({
+                    queryKey: ['abstract'],
+                })
+            }
         }
     })
 

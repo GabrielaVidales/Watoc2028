@@ -169,13 +169,17 @@ class Author(models.Model):
         null=False,
     )
     email = models.EmailField(blank=True)
+    editable = models.BooleanField(default=True)
     is_corresponding_author = models.BooleanField(default=False)
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return f"{self.first_name} {self.last_name} ({self.email})"
+        string = f"{self.first_name} {self.last_name} ({self.email})"
+        if not self.editable:
+            string += ' [readonly]'
+        return string
 
 
 class AbstractDeclaration(models.Model):

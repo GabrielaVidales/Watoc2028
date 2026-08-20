@@ -1,10 +1,12 @@
+import api from '@/clients/api'
 import { CustomUserFilter } from '@/components/custom/custom-filter'
+import { notify } from '@/components/custom/notify'
 import { PaginationController } from '@/components/custom/pagination-controller'
 import { type Filter } from '@/components/reui/filters'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { Card, CardAction, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardAction, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import { InputGroup, InputGroupAddon, InputGroupInput } from '@/components/ui/input-group'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
@@ -14,11 +16,11 @@ import { Tooltip, TooltipContent, TooltipTrigger, } from "@/components/ui/toolti
 import type { PaginatedRequest, PaginatedResponse } from '@/domain/pagination'
 import type { ReviewAssignment } from '@/domain/reviews'
 import DialogReviewAssignmentForm from '@/forms/reviews/dialog-assignment-form'
-import ReviewAssignmentForm from '@/forms/reviews/review-assignment-form'
-import { getAllAssignments } from '@/services/administration/review-services'
+import { deleteAssignment, getAllAssignments, notifyAssignmentDeleted } from '@/services/administration/review-assignments-services'
 import { formatDate } from '@/utils/formatDate'
-import { useQuery } from '@tanstack/react-query'
-import { CalendarDaysIcon, EyeIcon, FunnelXIcon, InfoIcon, ListFilter, MoreHorizontal, Plus, Search, UserSquare, X } from 'lucide-react'
+import { useMutation, useQuery } from '@tanstack/react-query'
+import type { AxiosError } from 'axios'
+import { CalendarDaysIcon, DeleteIcon, EyeIcon, FunnelXIcon, InfoIcon, ListFilter, MoreHorizontal, Plus, Search, Trash2, UserSquare, X } from 'lucide-react'
 import { motion } from "motion/react"
 import { useMemo, useState } from 'react'
 import { useDebounce } from 'use-debounce'
@@ -65,137 +67,133 @@ function ManageReviewsPage() {
                 </div>
             </div>
 
-            <section className='flex-1 h-full bg-secondary p-2 md:p-6'>
-                <div className='space-y-4 h-full'>
-                    <div className='flex justify-between'>
-                        <div className="flex items-center gap-4">
-                            <div>
-                                <p className="text-sm font-medium">
-                                    {/* {filteredUsers?.length ?? 0} users found */}
-                                </p>
+            <DialogReviewAssignmentForm
+                assignment={selected}
+                setOpen={setOpen}
+                open={open}
+                onClose={() => {
+                    setSelected(null)
+                    setOpen(false)
+                }}
+            />
 
-                                <p className="text-xs text-muted-foreground">
-                                    {filters.length > 0
-                                        ? `${filters.length} active filter${filters.length > 1 ? "s" : ""}`
-                                        : "Showing all users"}
-                                </p>
-                            </div>
+            <main className='flex-1 h-full flex flex-col gap-4 p-2 md:p-6'>
+                <section className='flex justify-between'>
+                    <div className="flex items-center gap-4">
+                        <p className="text-xs text-muted-foreground">
+                            {filters.length > 0
+                                ? `${filters.length} active filter${filters.length > 1 ? "s" : ""}`
+                                : "Showing all users"}
+                        </p>
 
-                            {filters.length > 0 && (
-                                <Badge variant="secondary">
-                                    {filters.length} filter{filters.length > 1 ? "s" : ""}
-                                </Badge>
-                            )}
-                        </div>
+                        {filters.length > 0 && (
+                            <Badge variant="secondary">
+                                {filters.length} filter{filters.length > 1 ? "s" : ""}
+                            </Badge>
+                        )}
+                    </div>
 
-                        <div className='flex gap-2'>
-                            <InputGroup className="max-w-xs">
-                                <InputGroupInput
-                                    value={search}
-                                    onChange={e => setSearch(e.target.value)}
-                                    placeholder="Search..."
-                                />
-                                <InputGroupAddon>
-                                    <Search />
-                                </InputGroupAddon>
-                            </InputGroup>
+                    <div className='flex gap-2'>
+                        <InputGroup className="max-w-xs">
+                            <InputGroupInput
+                                value={search}
+                                onChange={e => setSearch(e.target.value)}
+                                placeholder="Search..."
+                            />
+                            <InputGroupAddon>
+                                <Search />
+                            </InputGroupAddon>
+                        </InputGroup>
 
-                            <Popover>
-                                <PopoverTrigger asChild>
-                                    <Button variant='outline' size='sm' className='group relative pr-6!'>
-                                        <ListFilter />
-                                        Filters
+                        <Popover>
+                            <PopoverTrigger asChild>
+                                <Button variant='outline' size='sm' className='group relative pr-6!'>
+                                    <ListFilter />
+                                    Filters
 
-                                        {filters.length > 0 && (
-                                            <div
-                                                onClick={(e) => {
-                                                    e.stopPropagation()
-                                                    setFilters([])
-                                                }}
-                                                className="absolute right-1 top-1/2 -translate-y-1/2 rounded-sm p-1 opacity-0 transition-opacity group-hover:opacity-100 group-hover:bg-accent hover:text-destructive"
-                                            >
-                                                <X className="size-3 opacity-0 transition-opacity group-hover:opacity-100" />
-                                            </div>
-                                        )}
-                                    </Button>
-                                </PopoverTrigger>
-                                <PopoverContent className="w-120" align='end'>
-                                    <div className="grid gap-2">
-                                        <div className="flex justify-between">
-                                            <div className='space-y-1'>
-                                                <h4 className="leading-none font-medium">Filters</h4>
-                                                <p className='text-muted-foreground text-xs'>Refine search params</p>
-                                            </div>
-                                            <Button variant="outline" size='sm' onClick={() => setFilters([])}>
-                                                <FunnelXIcon />
-                                                Clear
-                                            </Button>
+                                    {filters.length > 0 && (
+                                        <div
+                                            onClick={(e) => {
+                                                e.stopPropagation()
+                                                setFilters([])
+                                            }}
+                                            className="absolute right-1 top-1/2 -translate-y-1/2 rounded-sm p-1 opacity-0 transition-opacity group-hover:opacity-100 group-hover:bg-accent hover:text-destructive"
+                                        >
+                                            <X className="size-3 opacity-0 transition-opacity group-hover:opacity-100" />
                                         </div>
-                                        <div className="grid gap-2">
-                                            <CustomUserFilter
-                                                filters={filters}
-                                                setFilters={setFilters}
-                                            />
+                                    )}
+                                </Button>
+                            </PopoverTrigger>
+                            <PopoverContent className="w-120" align='end'>
+                                <div className="grid gap-2">
+                                    <div className="flex justify-between">
+                                        <div className='space-y-1'>
+                                            <h4 className="leading-none font-medium">Filters</h4>
+                                            <p className='text-muted-foreground text-xs'>Refine search params</p>
                                         </div>
+                                        <Button variant="outline" size='sm' onClick={() => setFilters([])}>
+                                            <FunnelXIcon />
+                                            Clear
+                                        </Button>
                                     </div>
-                                </PopoverContent>
-                            </Popover>
+                                    <div className="grid gap-2">
+                                        <CustomUserFilter
+                                            filters={filters}
+                                            setFilters={setFilters}
+                                        />
+                                    </div>
+                                </div>
+                            </PopoverContent>
+                        </Popover>
 
-                            <Button size='sm' onClick={() => {
-                                setSelected(null)
-                                setOpen(true)
-                            }}>
-                                <Plus />
-                                Add Assignment
-                            </Button>
-                        </div>
-                    </div>
-
-                    <DialogReviewAssignmentForm
-                        onClose={() => {
+                        <Button size='sm' onClick={() => {
                             setSelected(null)
-                            setOpen(false)
-                        }}
-                        assignment={selected}
-                        setOpen={setOpen}
-                        open={open}
-                    />
-
-                    <section className="flex flex-wrap items-stretch gap-3">
-                        {pageResults?.results.map((assignment, i) => (
-                            <motion.div
-                                key={assignment.id}
-                                className="w-full max-w-sm flex"
-                                initial={{ opacity: 0, x: 12, scale: 0.98 }}
-                                animate={{ opacity: 1, x: 0, scale: 1 }}
-                                exit={{ opacity: 0, x: -12, scale: 0.98 }}
-                                transition={{ duration: 0.3, ease: "easeOut", delay: i * 0.1 }}
-                            >
-                                <ReviewAssignmentComponent
-                                    onAssignmentSelected={a => {
-                                        if (selected === a.id) {
-                                            setSelected(null)
-                                            setOpen(false)
-                                            return
-                                        }
-                                        setSelected(a.id)
-                                        setOpen(true)
-                                    }}
-                                    assignment={assignment}
-                                />
-                            </motion.div>
-                        ))}
-                    </section>
-
-                    <div>
-                        <PaginationController
-                            onPageChange={setPage}
-                            page={page}
-                            totalPages={pageResults ? pageResults.meta.total_pages : 0}
-                        />
+                            setOpen(true)
+                        }}>
+                            <Plus />
+                            Add Assignment
+                        </Button>
                     </div>
+                </section>
+
+                <section className="flex flex-wrap justify-between items-stretch gap-2">
+                    {pageResults?.results.map((assignment, i) => (
+                        <motion.div
+                            key={assignment.id}
+                            className="w-full max-w-sm flex"
+                            initial={{ opacity: 0, x: 12, scale: 0.98 }}
+                            animate={{ opacity: 1, x: 0, scale: 1 }}
+                            exit={{ opacity: 0, x: -12, scale: 0.98 }}
+                            transition={{ duration: 0.3, ease: "easeOut", delay: i * 0.1 }}
+                        >
+                            <ReviewAssignmentComponent
+                                onAssignmentSelected={a => {
+                                    if (selected === a.id) {
+                                        setSelected(null)
+                                        setOpen(false)
+                                        return
+                                    }
+                                    setSelected(a.id)
+                                    setOpen(true)
+                                }}
+                                assignment={assignment}
+                            />
+                        </motion.div>
+                    ))}
+                </section>
+
+                <div className='bg-background border py-2'>
+                    <PaginationController
+                        onPageChange={setPage}
+                        page={page}
+                        totalPages={pageResults ? pageResults.meta.total_pages : 0}
+                    />
                 </div>
-            </section>
+
+                <section>
+                    <ReviewsComponent />
+                </section>
+            </main>
         </div>
     )
 }
@@ -225,6 +223,11 @@ export function ReviewAssignmentComponent({ assignment, onAssignmentSelected }: 
             "destructive" : remaining < 1000 * 60 * 60 * 24 ?
                 "warning" : "success"
     ) as "success" | "warning" | "destructive"
+
+    const deleteMut = useMutation<void, AxiosError, number>({
+        mutationFn: deleteAssignment,
+        onSuccess: () => notifyAssignmentDeleted(assignment)
+    })
 
     return (
         <Card key={assignment.id} className="h-full w-full overflow-hidden transition-shadow hover:shadow-md gap-0">
@@ -271,13 +274,24 @@ export function ReviewAssignmentComponent({ assignment, onAssignmentSelected }: 
                                 </DropdownMenuLabel>
 
                                 <DropdownMenuItem
+                                    disabled={deleteMut.isPending}
                                     onClick={() => {
                                         onAssignmentSelected(assignment)
                                     }}
-                                // onClick={() => navigate(routes.users.reviews.view.build({ id: assignment.id }))}
                                 >
                                     <EyeIcon />
                                     <span>View detail</span>
+                                </DropdownMenuItem>
+
+                                <DropdownMenuItem
+                                    disabled={deleteMut.isPending}
+                                    variant='destructive'
+                                    onClick={() => {
+                                        deleteMut.mutate(assignment.id)
+                                    }}
+                                >
+                                    <DeleteIcon />
+                                    <span>Discard</span>
                                 </DropdownMenuItem>
                             </DropdownMenuGroup>
                         </DropdownMenuContent>
@@ -324,5 +338,35 @@ export function ReviewAssignmentComponent({ assignment, onAssignmentSelected }: 
                 </div>
             </CardContent>
         </Card>
+    )
+}
+
+
+
+function ReviewsComponent() {
+    const id = 1
+
+    const { data = [], isLoading } = useQuery({
+        queryKey: ['reviews', id],
+        queryFn: async () => {
+            const { data } = await api.get('/reviews/reviews/')
+            return data
+        }
+    })
+
+    if (isLoading) {
+        return (
+            <Spinner />
+        )
+    }
+
+    return (
+        <div>
+            {data.map(item => (
+                <div key={item.id}>
+                    
+                </div>
+            ))}
+        </div>
     )
 }

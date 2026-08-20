@@ -1,11 +1,10 @@
-import { Badge } from '@/components/ui/badge';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { Separator } from '@/components/ui/separator';
 import type { AbstractSchema } from '@/schemas/abstracts/abstract-schemas'
 import type { AuthorSchema } from '@/schemas/abstracts/author-schema';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { Separator } from '@/components/ui/separator';
+import { cn } from '@/lib/utils';
 import { countries } from '@/utils/countriesInfo';
 import { BookOpen, Quote } from 'lucide-react';
-
 import React from 'react'
 
 type AbstractPreviewDataProps = {
@@ -32,7 +31,10 @@ function AbstractPreviewData({ abstract, }: AbstractPreviewDataProps) {
 
                 <ScrollArea className='h-60 pr-2'>
                     <div
-                        className="text-xs sm:text-sm prose prose-sm dark:prose-invert max-w-none text-foreground/90 leading-relaxed"
+                        className={cn(
+                            "text-xs sm:text-sm prose prose-sm dark:prose-invert max-w-none leading-relaxed",
+                            abstract?.text ? 'text-foreground/90' : 'text-destructive'
+                        )}
                         dangerouslySetInnerHTML={{ __html: abstract?.text || 'Not set' }}
                     />
                 </ScrollArea>
@@ -48,7 +50,10 @@ function AbstractPreviewData({ abstract, }: AbstractPreviewDataProps) {
 
                 <ScrollArea className='h-50'>
                     <div
-                        className="text-xs sm:text-sm prose-p:mb-1 dark:prose-invert max-w-none text-foreground/90 leading-relaxed"
+                        className={cn(
+                            "text-xs sm:text-sm prose prose-sm dark:prose-invert max-w-none leading-relaxed",
+                            abstract?.text ? 'text-foreground/90' : 'text-destructive'
+                        )}
                         dangerouslySetInnerHTML={{ __html: abstract?.references || 'Not set' }}
                     />
                 </ScrollArea>
@@ -106,7 +111,11 @@ function AuthorsPreview({ authors }: AuthorsPreviewProps) {
         return { affiliations, authorsLine };
     }, [authors]);
 
-    if (!authorsLine) return null;
+    if (!authorsLine) return (
+        <div className='text-destructive text-xs sm:text-sm'>
+            No authors set
+        </div>
+    )
 
     const parseCountry = (value: string) => {
         const target = countries.find(c => c.value === value)
@@ -114,8 +123,8 @@ function AuthorsPreview({ authors }: AuthorsPreviewProps) {
     }
 
     const renderAffiliations = affiliations.map((aff, idx) => (
-        <p key={aff.id} className="italic leading-tight">
-            <sup className="text-[8px] sm:text-xs font-bold mr-1 not-italic">{idx + 1}</sup>
+        <p key={aff.id} className="italic leading-tight text-muted-foreground">
+            <sup className="text-[8px] sm:text-xs mr-1 not-italic">{idx + 1}</sup>
             {[aff.institution, aff.city, parseCountry(aff.country)]
                 .filter(Boolean)
                 .join(", ")}
@@ -124,7 +133,7 @@ function AuthorsPreview({ authors }: AuthorsPreviewProps) {
 
     return (
         <div className='text-xs sm:text-sm'>
-            <div className="leading-relaxed">
+            <div className="leading-relaxed mb-3">
                 {authorsLine}
             </div>
             {renderAffiliations}

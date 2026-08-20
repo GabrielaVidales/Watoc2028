@@ -1,7 +1,19 @@
 type Status = "pending" | "accepted" | "declined" | "completed" | "cancelled"
 
+
+type Review = {
+    id: number | null | undefined
+    assignment: ReviewAssignment
+    submitted_by: UserDetail
+    status: Status
+    comments: string
+    suggestions: string
+    submitted_at_timestamp: number
+}
+
+
 type ReviewAssignment = {
-    id: number
+    id: number | null | undefined
     last_update_timestamp: number
     created_at_timestamp: number
     due_date_timestamp: number

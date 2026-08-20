@@ -1,7 +1,7 @@
 from django.db import transaction
 from django.contrib.auth import get_user_model
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import permissions
+from rest_framework import permissions, status
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.generics import ListAPIView
 from rest_framework.decorators import action
@@ -21,11 +21,10 @@ class ReviewAssignmentViewSet(ModelViewSet):
     permission_classes = [permissions.AllowAny]
     pagination_class = Pagination
     
-    @transaction.atomic
-    def create(self, request, *args, **kwargs):
-        response = super().create(request, *args, **kwargs)
-        transaction.set_rollback(True)
-        return response
+    def destroy(self, request, pk=None):
+        print('CHINGADA PUTA', request, pk)        
+        return Response(status=status.HTTP_204_NO_CONTENT)
+        
 
     @action(detail=False, methods=["get"], url_path="for-user")
     def get_by_user(self, request, pk=None):

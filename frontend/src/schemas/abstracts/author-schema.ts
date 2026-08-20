@@ -5,7 +5,7 @@ import { userSchema } from "../user-schemas";
 
 export const authorSchema = object({
     id: z.number()
-    .nullable(),
+        .nullable(),
     first_name: z.string()
         .min(1, "Required")
         .max(60, 'Input too long'),
@@ -19,6 +19,7 @@ export const authorSchema = object({
     is_corresponding_author: z.boolean(),
     affiliation_id: z.number().nullable(),
     related_user_id: z.number().nullable(),
+    editable: z.boolean(),
 })
 
 

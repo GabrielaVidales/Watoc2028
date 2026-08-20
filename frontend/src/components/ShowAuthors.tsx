@@ -4,13 +4,12 @@ import React, { useState } from 'react'
 import { Spinner } from './ui/spinner'
 import { cn } from '@/lib/utils'
 import { Button } from './ui/button'
-import { Edit, GripVertical, Plus, RotateCw, Trash2, TriangleAlert, Upload, User2, UserPlus, Users2 } from 'lucide-react'
+import { Edit, GripVertical, MailIcon, Plus, RotateCw, Trash2, TriangleAlert, Upload, User2, UserPlus, Users2 } from 'lucide-react'
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar'
 import { Sortable, SortableItem, SortableItemHandle, } from "@/components/reui/sortable"
 import { Field, FieldLabel } from './ui/field'
 import { Switch } from './ui/switch'
 import { AxiosError, isAxiosError } from 'axios'
-import { InfoAlert } from './InfoAlert'
 import { AlertDialog, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from './ui/alert-dialog'
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from './ui/dialog'
 import { ScrollArea } from './ui/scroll-area'
@@ -20,6 +19,7 @@ import type { AuthorSchema } from '@/schemas/abstracts/author-schema'
 import { saveAbstractAuthors, type SaveAbstractAuthorsParams } from '@/services/submissions/author-services'
 import { notify } from './custom/notify'
 import { DEBUG } from '@/lib/constants'
+import { useAuth } from '@/contexts/AuthContext'
 
 
 type APIError = {
@@ -34,6 +34,7 @@ type Props = {
 }
 
 function ShowAuthorsComponent({ abstractId }: Props) {
+    const { user } = useAuth()
 
     const { data = [] } = useQuery({
         queryKey: ['authors', abstractId],
@@ -244,16 +245,16 @@ function ShowAuthorsComponent({ abstractId }: Props) {
                             disabled={saveAuthorsMutation.isPending}
                             className={cn(
                                 'relative p-2 border-2 border-border rounded-md transition-colors! duration-300',
-                                'bg-background active:border-primary-light active:shadow-md',
-                                'md:flex-row md:items-center md:justify-between',
                                 'flex flex-col gap-3',
+                                'md:flex-row md:items-center md:justify-between',
+                                'bg-background active:border-primary-light active:shadow-md'
                             )}
                         >
                             <SortableItemHandle
                                 className={cn(
                                     'text-muted-foreground',
                                     'absolute right-3 top-4',
-                                    'md:static'
+                                    'md:static',
                                 )}
                             >
                                 <GripVertical />
@@ -273,9 +274,18 @@ function ShowAuthorsComponent({ abstractId }: Props) {
                             </Avatar>
 
                             <div className="min-w-0 flex-1 space-y-0">
-                                <h4 className="truncate font-medium text-sm">
-                                    {author.first_name} {author.last_name}{" "}
-                                </h4>
+                                {author.is_corresponding_author ? (
+                                    <h4 className="flex min-w-0 items-center gap-1 truncate font-medium text-sm">
+                                        <span className="truncate">
+                                            {author.first_name} {author.last_name}
+                                        </span>
+                                        <MailIcon className="size-3.5 shrink-0 text-primary-main" />
+                                    </h4>
+                                ) : (
+                                    <h4 className="truncate font-medium text-sm">
+                                        {author.first_name} {author.last_name}{" "}
+                                    </h4>
+                                )}
                                 <p className="truncate text-xs text-muted-foreground">
                                     {author.email}
                                 </p>
@@ -338,16 +348,18 @@ function ShowAuthorsComponent({ abstractId }: Props) {
                                         <Edit className="size-5 text-primary-main" />
                                     </Button>
 
-                                    <Button
-                                        variant="ghost"
-                                        size="icon-sm"
-                                        onClick={() => {
-                                            setDeleteAuthor(author)
-                                            setOpen(true)
-                                        }}
-                                    >
-                                        <Trash2 className="size-5 text-destructive" />
-                                    </Button>
+                                    {author?.related_user?.id !== user.id && (
+                                        <Button
+                                            variant="ghost"
+                                            size="icon-sm"
+                                            onClick={() => {
+                                                setDeleteAuthor(author)
+                                                setOpen(true)
+                                            }}
+                                        >
+                                            <Trash2 className="size-5 text-destructive" />
+                                        </Button>
+                                    )}
                                 </div>
                             </fieldset>
                         </SortableItem>
