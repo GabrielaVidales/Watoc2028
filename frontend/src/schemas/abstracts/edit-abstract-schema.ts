@@ -35,6 +35,7 @@ const editAbstractSchema = z.object({
     references: z.string()
         .min(1, "Please provide the references")
         .refine((val) => countWordsFromHTML(val) <= 150, "References must be at most 150 words"),
+    is_for_young_watoc: z.boolean(),
 })
 
 type EditAbstractFormValues = z.infer<typeof editAbstractSchema>

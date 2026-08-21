@@ -68,6 +68,11 @@ class Abstract(models.Model):
         null=True,
         blank=True,
     )
+    is_for_young_watoc = models.BooleanField(
+        null=False,
+        blank=False,
+        default=False,
+    )
 
     def get_plain_title(self):
         unescaped_title = html.unescape(self.title)
@@ -76,11 +81,13 @@ class Abstract(models.Model):
 
     def get_hash(self):
         data = {
+            "id": self.pk,
             "title": self.title,
             "content": self.text,
             "references": self.references,
             "authors": list(self.authors.values_list("id", flat=True)),
             "presentation_type": self.get_presentation_type_display(),
+            "last_update": self.last_update.isoformat()
         }
         serialized = json.dumps(
             data,

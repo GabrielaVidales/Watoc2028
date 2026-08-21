@@ -276,7 +276,7 @@ function EditAbstractPage() {
 
 
                     <div className='sticky top-0 z-10 bg-background border-b-2 border-b-border space-y-4 px-8 py-4 tracking-wide'>
-                        <div className="flex items-center gap-3">
+                        {/* <div className="flex items-center gap-3">
                             <Button size='icon-xs' variant='outline'>
                                 <ChevronLeft />
                             </Button>
@@ -284,7 +284,7 @@ function EditAbstractPage() {
                             <Link to={routes.users.submissions.summary} className="text-sm text-muted-foreground">
                                 Return to Submissions
                             </Link>
-                        </div>
+                        </div> */}
 
                         <div>
                             <h3 className='font-medium text-muted-foreground'>Editing submission:</h3>

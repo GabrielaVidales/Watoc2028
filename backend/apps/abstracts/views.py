@@ -137,7 +137,7 @@ class AbstractView(ModelViewSet):
         al user que lo creó como el primer Author, usando sus datos
         de afiliación.
         """
-        
+
         # TODO: cambiar (otra vez) los atributos en Participants para que queden mejor en las affiliations
 
         with transaction.atomic():
@@ -145,6 +145,7 @@ class AbstractView(ModelViewSet):
             data = {
                 "abstract_id": abstract.pk,
                 "related_user_id": abstract.user.pk,
+                "is_corresponding_author": True,
                 "editable": False,
                 "institution": "NA",
                 "country": "NA",

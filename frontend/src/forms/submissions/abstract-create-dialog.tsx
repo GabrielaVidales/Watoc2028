@@ -122,14 +122,14 @@ export function CreateAbstractDialog({ redirect = true, ...rest }: CreateAbstrac
                                 spellCheck="false"
                                 disabled={isPending}
                                 className="wrap-anywhere text-lg"
-                                maxLength={3500}
+                                maxLength={500}
                                 footer={
                                     <InputGroupText className={'ml-auto'}>
                                         <FieldLabel htmlFor={field.name} className={cn(
                                             'text-xs',
-                                            (fieldState.invalid || countWordsFromHTML(field.value || "") > 10) && 'text-destructive'
+                                            (fieldState.invalid || countWordsFromHTML(field.value || "") > 20) && 'text-destructive'
                                         )}>
-                                            {countWordsFromHTML(field.value || "")}/10 words
+                                            {countWordsFromHTML(field.value || "")}/20 words
                                         </FieldLabel>
                                     </InputGroupText>
                                 }

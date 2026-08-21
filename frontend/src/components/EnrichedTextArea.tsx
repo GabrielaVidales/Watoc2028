@@ -10,17 +10,18 @@ import Subscript from "@tiptap/extension-subscript"
 import Superscript from "@tiptap/extension-superscript"
 import Document from '@tiptap/extension-document'
 
-import { Bold, Italic, UnderlineIcon } from "lucide-react"
-import { Button } from "@/components/ui/button"
+import { Bold, Italic, RemoveFormattingIcon, UnderlineIcon } from "lucide-react"
+import { Button, type ButtonProps } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 import { useEffect, type ReactNode } from "react"
 
 type AddonsOptions = {
     bold?: boolean
-    underline?: boolean
     italic?: boolean
     sup?: boolean
     sub?: boolean
+    underline?: boolean
+    clearFormatting?: boolean
 }
 
 const defaultAddons: AddonsOptions = {
@@ -28,7 +29,8 @@ const defaultAddons: AddonsOptions = {
     italic: true,
     sub: true,
     sup: true,
-    underline: true
+    underline: true,
+    clearFormatting: true,
 }
 
 const ALLOWED = new Set(['P', 'B', 'STRONG', 'I', 'EM', 'SUP', 'SUB', 'BR'])
@@ -176,19 +178,19 @@ export default function RichTextEditor({
             <div className={cn("flex items-center gap-2 border-b bg-muted/40 p-1")}>
                 {addonsConfig.bold && (
                     <ToolbarButton onClick={() => editor.chain().focus().toggleBold().run()}>
-                        <Bold className="h-4 w-4" />
+                        <Bold className="size-4" />
                     </ToolbarButton>
                 )}
 
                 {addonsConfig.italic && (
                     <ToolbarButton onClick={() => editor.chain().focus().toggleItalic().run()}>
-                        <Italic className="h-4 w-4" />
+                        <Italic className="size-4" />
                     </ToolbarButton>
                 )}
 
                 {addonsConfig.underline && (
                     <ToolbarButton onClick={() => editor.chain().focus().toggleUnderline().run()}>
-                        <UnderlineIcon className="h-4 w-4" />
+                        <UnderlineIcon className="size-4" />
                     </ToolbarButton>
                 )}
 
@@ -201,6 +203,12 @@ export default function RichTextEditor({
                 {addonsConfig.sup && (
                     <ToolbarButton onClick={() => editor.chain().focus().toggleSuperscript().run()}>
                         X²
+                    </ToolbarButton>
+                )}
+
+                {addonsConfig.clearFormatting && (
+                    <ToolbarButton onClick={() => editor.chain().focus().clearNodes().unsetAllMarks().run() }>
+                        <RemoveFormattingIcon className="size-4" />
                     </ToolbarButton>
                 )}
             </div>
@@ -216,12 +224,8 @@ export default function RichTextEditor({
     )
 }
 
-type ToolbarButtonProps = {
-    onClick: () => void
-    children: React.ReactNode
-}
 
-function ToolbarButton({ onClick, children, }: ToolbarButtonProps) {
+function ToolbarButton({ onClick, children, }: ButtonProps) {
     return (
         <Button
             type="button"

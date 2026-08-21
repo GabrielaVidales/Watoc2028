@@ -5,8 +5,8 @@ const createAbstractSchema = z.object({
     title: z.string()
         .min(1, 'Required')
         .refine(
-            value => countWordsFromHTML(value) <= 10,
-            "The abstract title must not exceed 10 words."
+            value => countWordsFromHTML(value) <= 20,
+            "The abstract title must not exceed 20 words."
         )
 })
 

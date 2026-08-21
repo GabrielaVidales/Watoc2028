@@ -3,20 +3,21 @@ import RichTextEditor, { countWordsFromHTML } from '@/components/EnrichedTextAre
 import { Button } from '@/components/ui/button'
 import { Spinner } from '@/components/ui/spinner'
 import { InputGroupText } from '@/components/ui/input-group'
-import { Field, FieldDescription, FieldError, FieldLabel } from '@/components/ui/field'
+import { Field, FieldContent, FieldDescription, FieldError, FieldGroup, FieldLabel, FieldLegend, FieldSet } from '@/components/ui/field'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { createSubmission, updateSubmission, type UpdateParams } from '@/services/submissions/submission-services'
 import { abstractSchema, presentationTypes, type AbstractSchema } from '@/schemas/abstracts/abstract-schemas'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { AxiosError, isAxiosError } from 'axios'
+import { AxiosError } from 'axios'
 import { RotateCcw, Upload } from 'lucide-react'
 import { Fragment, useEffect, } from 'react'
-import { Controller, useForm } from 'react-hook-form'
-import { toast } from 'sonner'
+import { Controller, useForm, useWatch } from 'react-hook-form'
 import { cn } from '@/lib/utils'
 import { DEBUG } from '@/lib/constants'
 import { notify } from '@/components/custom/notify'
+import { Checkbox } from '@/components/ui/checkbox'
+import { AnimatePresence, motion } from 'motion/react'
 
 type AbstractFormProps = {
     abstractId?: number | null,
@@ -61,11 +62,17 @@ function AbstractContentForm({ abstractId = null }: AbstractFormProps) {
         resolver: zodResolver(abstractSchema),
         mode: 'onChange',
         defaultValues: {
+            is_for_young_watoc: false,
             presentation_type: null,
             references: '',
             title: '',
             text: '',
         },
+    })
+
+    const isForYoungWatoc = useWatch({
+        name: 'is_for_young_watoc',
+        control,
     })
 
     const onFormSubmit = handleSubmit(
@@ -97,19 +104,16 @@ function AbstractContentForm({ abstractId = null }: AbstractFormProps) {
     useEffect(() => {
         if (abstractId === null) {
             reset({
+                is_for_young_watoc: false,
                 presentation_type: null,
                 references: '',
                 title: '',
                 text: '',
-            }, {
-                keepValues: false
             })
-
-            return
         }
-
-        if (abstract) {
+        else if (abstract) {
             reset({
+                is_for_young_watoc: abstract.is_for_young_watoc,
                 presentation_type: abstract.presentation_type,
                 title: abstract.title,
                 references: abstract.references,
@@ -119,9 +123,11 @@ function AbstractContentForm({ abstractId = null }: AbstractFormProps) {
 
     }, [abstract])
 
+    const formDisabled = isSubmitting || createMut.isPending || updateMut.isPending
+
     return (
         <form onSubmit={onFormSubmit} id='abstract-submission-form' className='space-y-5'>
-            <fieldset disabled={isSubmitting} className='space-y-8'>
+            <fieldset disabled={formDisabled} className='space-y-8'>
                 <Controller
                     name="title"
                     control={control}
@@ -145,7 +151,7 @@ function AbstractContentForm({ abstractId = null }: AbstractFormProps) {
                                 autoComplete="off"
                                 autoCorrect="off"
                                 spellCheck="false"
-                                className="wrap-anywhere text-xl"
+                                className="wrap-anywhere text-xl tracking-wide! font-medium"
                                 maxLength={3500}
                                 footer={
                                     <InputGroupText className={'w-full min-h-5 flex flex-col gap-0 md:flex-row'}>
@@ -165,39 +171,91 @@ function AbstractContentForm({ abstractId = null }: AbstractFormProps) {
                         </Field>
                     )}
                 />
-                <Controller
-                    name="presentation_type"
-                    defaultValue='oral'
-                    control={control}
-                    render={({ field, fieldState }) => (
-                        <Field orientation="responsive" data-invalid={fieldState.invalid}>
-                            <FieldLabel className="text-lg" htmlFor="presentationType">Presentation Format</FieldLabel>
-                            <Select
-                                name={field.name}
-                                value={field.value}
-                                onValueChange={field.onChange}
-                            >
-                                <SelectTrigger
-                                    id="presentationType"
-                                    aria-invalid={fieldState.invalid}
-                                    className="min-w-30"
-                                >
-                                    <SelectValue placeholder="Choose an option..." />
-                                </SelectTrigger>
-                                <SelectContent position="item-aligned">
-                                    {presentationTypes.map(item => (
-                                        <SelectItem key={item.value} value={item.value}>
-                                            {item.label}
-                                        </SelectItem>
-                                    ))}
+                <FieldSet>
+                    <FieldLegend className="text-lg">Presentation Format</FieldLegend>
+                    <FieldGroup>
+                        <Controller
+                            name="is_for_young_watoc"
+                            control={control}
+                            render={({ field, fieldState }) => (
+                                <Field orientation="horizontal" data-invalid={fieldState.invalid}>
+                                    <Checkbox
+                                        id={field.name}
+                                        name={field.name}
+                                        aria-invalid={fieldState.invalid}
+                                        checked={field.value}
+                                        onCheckedChange={field.onChange}
+                                        className="size-5"
+                                    />
+                                    <FieldContent>
+                                        <FieldLabel className="font-normal cursor-pointer" htmlFor={field.name}>
+                                            Submit for Young WATOC
+                                        </FieldLabel>
+                                    </FieldContent>
+                                </Field>
+                            )}
+                        />
 
-                                </SelectContent>
-                            </Select>
-                            <FieldDescription className='max-sm:text-xs'>Select the preferred format for presenting your work.</FieldDescription>
-                            {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-                        </Field>
-                    )}
-                />
+                        <AnimatePresence mode="wait" initial={false}>
+                            {isForYoungWatoc ? (
+                                <motion.div
+                                    key="young-watoc-desc"
+                                    initial={{ opacity: 0, height: 0 }}
+                                    animate={{ opacity: 1, height: 'auto' }}
+                                    exit={{ opacity: 0, height: 0 }}
+                                    transition={{ duration: 0.2, ease: "easeInOut" }}
+                                    className="overflow-hidden"
+                                >
+                                    <FieldDescription>
+                                        This submission is for the Young WATOC 2028
+                                    </FieldDescription>
+                                </motion.div>
+                            ) : (
+                                <motion.div
+                                    key="presentation-type-select"
+                                    initial={{ opacity: 0, height: 0 }}
+                                    animate={{ opacity: 1, height: 'auto' }}
+                                    exit={{ opacity: 0, height: 0 }}
+                                    transition={{ duration: 0.2, ease: "easeInOut" }}
+                                    className="overflow-hidden"
+                                >
+                                    <Controller
+                                        name="presentation_type"
+                                        defaultValue="oral"
+                                        control={control}
+                                        render={({ field, fieldState }) => (
+                                            <Field orientation="responsive" data-invalid={fieldState.invalid} className="pt-2">
+                                                <Select
+                                                    name={field.name}
+                                                    value={field.value}
+                                                    onValueChange={field.onChange}
+                                                >
+                                                    <SelectTrigger
+                                                        id="presentationType"
+                                                        aria-invalid={fieldState.invalid}
+                                                        className="min-w-30"
+                                                    >
+                                                        <SelectValue placeholder="Choose an option..." />
+                                                    </SelectTrigger>
+                                                    <SelectContent position="item-aligned">
+                                                        {presentationTypes.map((item) => (
+                                                            <SelectItem key={item.value} value={item.value}>
+                                                                {item.label}
+                                                            </SelectItem>
+                                                        ))}
+                                                    </SelectContent>
+                                                </Select>
+                                                <FieldDescription className="max-sm:text-xs">
+                                                    Select the preferred format for presenting your work.
+                                                </FieldDescription>
+                                            </Field>
+                                        )}
+                                    />
+                                </motion.div>
+                            )}
+                        </AnimatePresence>
+                    </FieldGroup>
+                </FieldSet>
                 <Controller
                     name="text"
                     control={control}
@@ -276,7 +334,7 @@ function AbstractContentForm({ abstractId = null }: AbstractFormProps) {
                         type='button'
                         variant='outline'
                         onClick={() => reset()}
-                        disabled={!isDirty || isSubmitting}
+                        disabled={!isDirty || formDisabled}
                     >
                         <RotateCcw className='text-muted-foreground' /> Reset
                     </Button>
@@ -284,9 +342,9 @@ function AbstractContentForm({ abstractId = null }: AbstractFormProps) {
                     <Button
                         type="submit"
                         form="abstract-submission-form"
-                        disabled={!isValid || !isDirty}
+                        disabled={!isValid || !isDirty || formDisabled}
                     >
-                        {isSubmitting ? (
+                        {formDisabled ? (
                             <Fragment>
                                 <Spinner />
                                 <span>Saving...</span>
