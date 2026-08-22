@@ -1,6 +1,7 @@
 import { countWordsFromHTML } from "@/components/EnrichedTextArea";
 import { countries } from "@/utils/countriesInfo";
 import z from "zod";
+import { userSchema } from "../user-schemas";
 
 
 const countriesArray = countries.map(country => country.value)
@@ -75,7 +76,7 @@ export const abstractSchema = z.object({
 
     is_for_young_watoc: z.boolean(),
 
-    presentation_type: z.enum(presentationTypes.map(v => v.value), 'Opción no válida'),
+    presentation_type: z.enum(['oral', 'poster'], 'Opción no válida'),
 
     text: z.string()
         .refine((val) => countWordsFromHTML(val) <= 350, "Abstract must be at most 350 words")
@@ -107,26 +108,10 @@ export const abstractSchema = z.object({
 
     last_review_at: z.coerce.date().optional(),
 
-    user: z.number().optional()
+    user: z.number().or(z.lazy(() => userSchema.partial())).optional(),
 })
 
 
-export const submitAbstractSchema = abstractSchema.extend({
-    authorsConsent: z.boolean()
-        .default(false)
-        .refine((v) => v === true, {
-            message: "You must accept the ethical statement.",
-        }),
-})
-    .refine((data) => {
-        if (data.authors.length > 0 && !data.authorsConsent) {
-            return false;
-        }
-        return true;
-    }, {
-        message: "Debes confirmar que los co-autores otorgan su consentimiento",
-        path: ["authorsConsent"],
-    })
 
 // Default values
 export const authorDefaults: z.input<typeof authorSchema> = authorSchema.partial().parse({
@@ -134,15 +119,8 @@ export const authorDefaults: z.input<typeof authorSchema> = authorSchema.partial
 })
 
 
-export const submitAbstractDefaults = abstractSchema.extend({
-    authorsConsent: z.boolean().default(false)
-})
 
-export const validateAbstractsSchema = abstractSchema.omit({ authors: true })
 export const validateAuthorsSchema = abstractSchema.pick({ authors: true })
-
-
-
 
 const abstractDTO = abstractSchema.omit({ user: true }).extend({
     user: z.object({
@@ -165,6 +143,5 @@ export type AbstractSchema = z.infer<typeof abstractSchema>
 export type AuthorSchema = z.infer<typeof authorSchema>
 
 
-export type AbstractFormValues = z.infer<typeof submitAbstractSchema>
 
 export type AuthorAffiliationSchema = z.infer<typeof authorAffiliationSchema>

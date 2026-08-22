@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import TestAbstractFeature from './test-abstract-feature'
+import DownloadAbstractPDFButton from './test-abstract-feature'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { FileText, Trash2, TriangleAlertIcon } from 'lucide-react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
@@ -7,7 +7,7 @@ import type { AbstractSchema } from '@/schemas/abstracts/abstract-schemas'
 import type { PaginatedResponse } from '@/domain/pagination'
 import api from '@/clients/api'
 import { Item, ItemActions, ItemContent, ItemMedia, } from "@/components/ui/item"
-import AbstractContentForm from '@/forms/submissions/edit-abstract-body'
+import AbstractContentForm from '@/forms/submissions/abstract-content-form'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { PaginationController } from '@/components/custom/pagination-controller'
 import ShowAuthorsComponent from '@/components/ShowAuthors'
@@ -324,7 +324,7 @@ function TestAbstractFeaturePage() {
                                     </CardHeader>
 
                                     <CardContent className='space-y-4'>
-                                        <TestAbstractFeature abstractId={data ? data.id : null} />
+                                        <DownloadAbstractPDFButton abstractId={data ? data.id : null} />
                                     </CardContent>
                                 </Card>
                             </TabsContent>

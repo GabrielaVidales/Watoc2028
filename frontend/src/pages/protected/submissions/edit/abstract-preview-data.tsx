@@ -65,10 +65,10 @@ function AbstractPreviewData({ abstract, }: AbstractPreviewDataProps) {
 export default AbstractPreviewData
 
 
-
 type AuthorsPreviewProps = {
     authors: AuthorSchema[];
-};
+}
+
 
 function AuthorsPreview({ authors }: AuthorsPreviewProps) {
     const { affiliations, authorsLine } = React.useMemo(() => {

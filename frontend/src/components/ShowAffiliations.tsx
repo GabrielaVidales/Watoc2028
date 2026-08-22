@@ -1,70 +1,42 @@
-import api from '@/clients/api';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import React, { useState } from 'react'
+import React from 'react'
+import AffiliationForm from '@/forms/AffiliationForm';
+import { useIsMutating, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { Spinner } from './ui/spinner';
-import type { Affiliation } from '@/schemas/abstracts/affiliation-schema';
 import { Button } from './ui/button';
-import { Edit, Plus, School, School2, Trash2, TriangleAlert } from 'lucide-react';
+import { Edit, Plus, School, School2, Trash2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { RefreshCcwIcon } from "lucide-react"
 import { Empty, EmptyContent, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle, } from "@/components/ui/empty"
-import { AlertDialog, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from './ui/alert-dialog'
-import { CardAction, CardDescription, CardHeader, CardTitle } from './ui/card';
+import { CardDescription, CardHeader, CardTitle } from './ui/card';
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, } from "@/components/ui/dialog"
 import { ScrollArea } from './ui/scroll-area';
-import AffiliationForm from '@/forms/AffiliationForm';
 import { toast } from 'sonner';
-import { isAxiosError } from 'axios';
-import type { PaginatedResponse } from '@/domain/pagination';
-import { useParams } from 'react-router';
+import { AxiosError } from 'axios';
 import { Avatar, AvatarFallback } from './ui/avatar';
 import { DEBUG } from '@/lib/constants';
-import { useAuth } from '@/contexts/AuthContext';
+import type { Affiliation } from '@/schemas/abstracts/affiliation-schema';
+import type { PaginatedResponse } from '@/domain/pagination';
+import { deleteAffiliationById, getUserAffiliations } from '@/services/submissions/affiliation-services';
+import { ConfirmProvider, useConfirm } from '@/contexts/ConfirmationDialogContext';
 
 
 type Props = {
-    onAffiliationClicked?: (a: Affiliation) => void
     abstractId?: number | string
+    onAffiliationClicked?: (a: Affiliation) => void
 }
 
 function ShowAffiliations({ abstractId, onAffiliationClicked }: Props) {
-    const queryClient = useQueryClient()
-
-    const { data, isLoading, isError, isFetching, error, refetch } = useQuery<PaginatedResponse<Affiliation>>({
+    const { data, isLoading, isError, error, refetch } = useQuery<PaginatedResponse<Affiliation>>({
         queryKey: ['affiliations', abstractId],
-        queryFn: async () => {
-            const { data } = await api.get('/abstracts/affiliations');
-            return data
-        },
+        queryFn: getUserAffiliations,
+    })
+
+    const deletingMutationCount = useIsMutating({
+        mutationKey: ['delete-affiliation'],
     })
 
     const [edit, setEdit] = React.useState<Affiliation | null>(null)
     const [openEdit, setOpenEdit] = React.useState<boolean>(false)
-
-    const [open, setOpen] = useState(false)
-    const [deleteAffiliation, setDeleteAffiliation] = useState<Affiliation>(null)
-    const deleteMutation = useMutation({
-        mutationFn: async (id: number | string) => {
-            const { data } = await api.delete(`/abstracts/affiliations/${id}/`);
-            return data;
-        },
-        onSuccess: async () => {
-            await Promise.all([
-                queryClient.invalidateQueries({ queryKey: ['affiliations'] }),
-                queryClient.invalidateQueries({ queryKey: ['authors', abstractId], }),
-            ])
-            setDeleteAffiliation(null)
-            setOpen(false)
-        },
-        onError: (error) => {
-            if (isAxiosError(error)) {
-                toast.error(error.response.data.errors.root)
-                if (DEBUG) {
-                    console.error(error.response.data.errors.root);
-                }
-            }
-        }
-    })
 
     if (!abstractId) {
         return <Spinner />
@@ -105,29 +77,6 @@ function ShowAffiliations({ abstractId, onAffiliationClicked }: Props) {
 
     return (
         <div className='space-y-4'>
-            <AlertDialog open={open} onOpenChange={(v) => { setDeleteAffiliation(null); setOpen(v) }}>
-                <AlertDialogContent size='sm'>
-                    <AlertDialogHeader>
-                        <AlertDialogTitle className="p-3 bg-destructive/10 rounded-full mb-2">
-                            <TriangleAlert className='size-8 text-destructive' />
-                        </AlertDialogTitle>
-                        <AlertDialogTitle>Delete Affiliation?</AlertDialogTitle>
-                        <AlertDialogDescription>
-                            This action <strong>cannot be undone</strong>. This will permanently remove this affiliation.
-                        </AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <AlertDialogFooter>
-                        <AlertDialogCancel>Cancel</AlertDialogCancel>
-                        <Button variant='destructive' onClick={() => deleteMutation.mutate(deleteAffiliation.id)} disabled={deleteMutation.isPending}>
-                            {deleteMutation.isPending ? (<>
-                                <Spinner className="mr-2" />
-                                Deleting...
-                            </>) : 'Delete Author'}
-                        </Button>
-                    </AlertDialogFooter>
-                </AlertDialogContent>
-            </AlertDialog>
-
             <Dialog open={openEdit} onOpenChange={() => { setOpenEdit(false); setEdit(null); }}>
                 <DialogContent className='max-w-md w-full'>
                     <DialogHeader>
@@ -169,47 +118,104 @@ function ShowAffiliations({ abstractId, onAffiliationClicked }: Props) {
                 </CardDescription>
             </CardHeader>
 
-            <Button size='sm' onClick={() => { setEdit(null); setOpenEdit(true) }}>
+            <Button size='sm' disabled={deletingMutationCount > 0} onClick={() => { setEdit(null); setOpenEdit(true) }}>
                 <Plus />
                 Add affiliation
             </Button>
 
             <div className='space-y-2'>
-                {affiliations?.length > 0 && affiliations.map((item, i) => (
-                    <div
-                        key={i}
-                        className={cn(
-                            'relative p-2 border-2 border-border rounded-md transition-colors! duration-300',
-                            'bg-background active:border-primary-light active:shadow-md',
-                            'md:flex-row md:items-center md:justify-between',
-                            'flex flex-col gap-3 pl-3',
-                        )}
-                    >
-                        <Avatar className="size-10 shrink-0 border shadow-sm">
-                            <AvatarFallback>
-                                <School2 />
-                            </AvatarFallback>
-                        </Avatar>
-                        <div>
-                            <h4 className="font-medium text-sm">{item.institution}</h4>
-                            <p className="text-muted-foreground text-sm">
-                                {item.city}, {item.country}
-                            </p>
-                        </div>
-                        <fieldset className='ml-auto' disabled={isFetching || deleteMutation.isPending}>
-                            <Button variant='ghost' size='icon-sm' onClick={() => { setEdit(item); setOpenEdit(true); onAffiliationClicked?.(item) }}>
-                                <Edit className='text-primary-main size-5' />
-                            </Button>
-
-                            <Button variant='ghost' size='icon-sm' onClick={() => { setDeleteAffiliation(item); setOpen(true) }}>
-                                <Trash2 className='text-destructive size-5' />
-                            </Button>
-                        </fieldset>
-                    </div>
-                ))}
+                <ConfirmProvider>
+                    {affiliations?.length > 0 && affiliations.map((item) => (
+                        <AffiliationItemComponent
+                            key={item.id}
+                            disabled={deletingMutationCount > 0}
+                            affiliation={item}
+                            onEditAffiliation={(a) => {
+                                setEdit(a);
+                                setOpenEdit(true);
+                                onAffiliationClicked?.(a)
+                            }}
+                        />
+                    ))}
+                </ConfirmProvider>
             </div>
         </div>
     )
 }
 
 export default ShowAffiliations
+
+
+type AffiliationItemComponentProps = {
+    disabled: boolean
+    affiliation: Affiliation
+    onEditAffiliation: (a: Affiliation) => void
+}
+
+function AffiliationItemComponent({
+    disabled,
+    affiliation,
+    onEditAffiliation
+}: AffiliationItemComponentProps) {
+    const queryClient = useQueryClient()
+
+    const confirm = useConfirm()
+
+    const deleteMutation = useMutation<void, AxiosError<any>, number | string>({
+        mutationKey: ['delete-affiliation'],
+        mutationFn: deleteAffiliationById,
+        onSuccess: async () => {
+            await Promise.all([
+                queryClient.invalidateQueries({ queryKey: ['affiliations'], exact: false }),
+                queryClient.invalidateQueries({ queryKey: ['authors'], exact: false }),
+            ])
+        },
+        onError: (error) => {
+            toast.error(error.response.data.errors.root)
+            DEBUG && console.error(error.response.data.errors.root);
+        }
+    })
+
+    const handleDelete = async () => {
+        const ok = await confirm({
+            title: "Delete Affiliation",
+            description: (
+                <span>This action <strong>cannot be undone</strong>.
+                    This will permanently remove this affiliation.</span>
+            )
+        })
+        ok && deleteMutation.mutate(affiliation.id)
+    }
+
+    return (
+        <div
+            className={cn(
+                'relative p-2 border-2 border-border rounded-md transition-colors! duration-300',
+                'bg-background flex flex-col gap-3 pl-3 md:flex-row md:items-center md:justify-between',
+            )}
+        >
+            <Avatar className="size-10 shrink-0 border shadow-sm">
+                <AvatarFallback>
+                    <School2 />
+                </AvatarFallback>
+            </Avatar>
+            <div className="min-w-0 flex-1 space-y-0">
+                <h4 className="font-medium text-sm truncate" title={affiliation.institution}>
+                    {affiliation.institution}
+                </h4>
+                <p className="truncate text-xs text-muted-foreground">
+                    {affiliation.city}, {affiliation.country}
+                </p>
+            </div>
+            <fieldset className='ml-auto' disabled={disabled || deleteMutation.isPending}>
+                <Button variant='ghost' size='icon-sm' onClick={() => { onEditAffiliation?.(affiliation) }}>
+                    <Edit className='text-primary-main size-5' />
+                </Button>
+
+                <Button variant='ghost' size='icon-sm' onClick={handleDelete}>
+                    <Trash2 className='text-destructive size-5' />
+                </Button>
+            </fieldset>
+        </div>
+    )
+}

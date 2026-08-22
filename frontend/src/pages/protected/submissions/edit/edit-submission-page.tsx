@@ -7,7 +7,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger, } from "@
 import { Button } from '@/components/ui/button'
 import { Card, CardAction, CardContent, CardDescription, CardFooter, CardHeader, CardTitle, } from "@/components/ui/card"
 import AbstractDeclarations from '@/forms/submissions/abstract-declarations-form'
-import AbstractContentForm from '@/forms/submissions/edit-abstract-body'
+import AbstractContentForm from '@/forms/submissions/abstract-content-form'
 import { useIsMobile } from '@/hooks/use-mobile'
 import { useScrollSpy } from '@/hooks/useScrollSpy'
 import { cn, } from '@/lib/utils'

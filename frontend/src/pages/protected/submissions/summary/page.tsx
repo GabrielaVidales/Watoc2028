@@ -27,13 +27,13 @@ import AbstractPreviewData from '../edit/abstract-preview-data'
 import { createSubmission, deleteSubmission } from '@/services/submissions/submission-services'
 import { CreateAbstractDialog } from '@/forms/submissions/abstract-create-dialog'
 import { DEBUG } from '@/lib/constants'
+import { ConfirmProvider, useConfirm } from '@/contexts/ConfirmationDialogContext'
+import DownloadAbstractPDFButton from '@/pages/test/test-abstract-feature'
+import { Separator } from '@/components/ui/separator'
 
 
 function AbstractSubmissionPage() {
     const { user: user } = useAuth()
-    const navigate = useNavigate()
-
-    const queryClient = useQueryClient()
 
     const [activeAbstract, setActiveAbstract] = useState<AbstractSchema | null>()
 
@@ -44,6 +44,7 @@ function AbstractSubmissionPage() {
     const { data, isLoading } = useQuery<PaginatedResponse<AbstractSchema>>({
         queryKey: ['abstracts', user.id, page, itemsPerPage, query],
         placeholderData: keepPreviousData,
+        refetchOnWindowFocus: false,
         queryFn: async () => {
             const { data } = await api.get<PaginatedResponse<AbstractSchema>>('/participants/profiles/submissions', {
                 params: {
@@ -56,57 +57,12 @@ function AbstractSubmissionPage() {
         }
     })
 
-    const { mutateAsync, isPending } = useMutation<void, AxiosError, number | string>({
-        mutationFn: deleteSubmission,
-        onSuccess: () => {
-            queryClient.invalidateQueries({
-                queryKey: ['abstracts', user.id],
-            })
-        },
-        onError: (error) => {
-            if (isAxiosError(error)) {
-                if (DEBUG) {
-                    console.log(error.response.data);
-                }
-            } else {
-                if (DEBUG) {
-                    console.log(error);
-                }
-            }
-        }
-    })
-
-    const handlePreview = async (id: number | string, name: string = 'abstract') => {
-        try {
-            const response = await api.get<Blob>(`/abstracts/submissions/${id}/preview`, {
-                responseType: 'blob',
-            })
-            const href = URL.createObjectURL(response.data);
-            const link = document.createElement('a');
-
-            const doc = new DOMParser().parseFromString(name, 'text/html');
-            const title = doc.documentElement.textContent
-            const textoPlano = title.replace(/<\/?[^>]+(>|$)/g, "");
-
-            link.href = href;
-            link.setAttribute('download', `${textoPlano}_preview.pdf`);
-            link.click();
-        } catch (error) {
-            if (DEBUG) {
-                if (isAxiosError(error)) {
-                    console.log(error.response.data);
-                }
-            }
-        }
-    }
-
     const stats = [
         { label: "Total", value: data?.meta.total_items ?? 0 },
         { label: "Draft", value: data?.results.filter(x => x.status === "draft").length ?? 0 },
         { label: "Submitted", value: data?.results.filter(x => x.status === "submitted").length ?? 0 },
         { label: "Reviewed", value: 0 },
     ] as const
-
 
     return (
         <article className='w-full h-full flex flex-col'>
@@ -142,7 +98,7 @@ function AbstractSubmissionPage() {
                 </div>
             </header>
 
-            <fieldset disabled={isLoading || isPending}>
+            <fieldset disabled={isLoading}>
                 <div className='grid grid-cols-1 md:grid-cols-[1fr_400px] items-stretch'>
                     <div className='bg-card'>
                         <div className="sticky top-0 bg-card flex flex-col gap-4 border-b p-4 md:flex-row md:items-center md:justify-between">
@@ -177,133 +133,15 @@ function AbstractSubmissionPage() {
                                 </div>
                             )}
 
-                            {data?.results.map((abstract) => (
-                                <Card key={abstract.id} className="group outline-2 outline-transparent hover:shadow-md hover:outline-primary-light transition-all duration-300 gap-3">
-                                    <CardHeader className="flex flex-row items-start justify-between gap-4">
-                                        <div className='space-y-2'>
-                                            <CardTitle className="text-base sm:text-lg font-semibold leading-tight">
-                                                {abstract.title ? (
-                                                    <div onClick={() => setActiveAbstract(abstract)} className="cursor-pointer hover:underline" dangerouslySetInnerHTML={{ __html: abstract.title }} />
-                                                ) : (
-                                                    <span className="flex items-center gap-2 text-destructive">
-                                                        <CircleAlert className="shrink-0 size-5" />
-                                                        Undefined title
-                                                    </span>
-                                                )}
-                                            </CardTitle>
-
-                                            <CardDescription className="text-sm">
-                                                <Badge variant="outline">
-                                                    {presentationTypes?.find((p) => p.value === abstract.presentation_type)?.label || (
-                                                        <span className="flex items-center gap-1 text-destructive">
-                                                            <CircleAlert className="size-3.5 shrink-0" />
-                                                            Presentation type not set
-                                                        </span>
-                                                    )}
-                                                </Badge>
-                                            </CardDescription>
-                                        </div>
-                                        <CardAction className='max-sm:hidde'>
-                                            <div className="flex items-center ml-auto gap-2">
-                                                <DropdownMenu>
-                                                    <DropdownMenuTrigger asChild>
-                                                        <Button size="icon" variant="ghost">
-                                                            <MoreVertical className="size-5" />
-                                                        </Button>
-                                                    </DropdownMenuTrigger>
-
-                                                    <DropdownMenuContent align="end">
-                                                        <DropdownMenuItem onClick={() => setActiveAbstract(abstract)}>
-                                                            <Eye className="mr-2 size-4" />
-                                                            Preview
-                                                        </DropdownMenuItem>
-
-                                                        {abstract.status !== "submitted" && (
-                                                            <>
-                                                                <DropdownMenuItem
-                                                                    onClick={() =>
-                                                                        navigate(
-                                                                            routes.users.submissions.edit.build({
-                                                                                id: abstract.id,
-                                                                            })
-                                                                        )
-                                                                    }
-                                                                >
-                                                                    <Pencil className="mr-2 size-4" />
-                                                                    Edit
-                                                                </DropdownMenuItem>
-
-                                                                <DropdownMenuItem
-                                                                    onClick={() =>
-                                                                        navigate(
-                                                                            routes.users.submissions.edit.build({
-                                                                                id: abstract.id,
-                                                                            }) + "?action=submit"
-                                                                        )
-                                                                    }
-                                                                >
-                                                                    <Send className="mr-2 size-4" />
-                                                                    Submit
-                                                                </DropdownMenuItem>
-                                                            </>
-                                                        )}
-
-                                                        <DropdownMenuSeparator />
-
-                                                        <AlertDialog>
-                                                            <AlertDialogTrigger asChild>
-                                                                <DropdownMenuItem
-                                                                    className="text-destructive"
-                                                                    onSelect={(e) => e.preventDefault()}
-                                                                >
-                                                                    <Trash2 className="mr-2 size-4" />
-                                                                    Delete
-                                                                </DropdownMenuItem>
-                                                            </AlertDialogTrigger>
-
-                                                            <AlertDialogContent size="sm">
-                                                                <AlertDialogHeader>
-                                                                    <AlertDialogTitle className="mb-2 rounded-full bg-destructive/10 p-3">
-                                                                        <TriangleAlert className="size-8 text-destructive" />
-                                                                    </AlertDialogTitle>
-
-                                                                    <AlertDialogTitle>
-                                                                        Delete Abstract?
-                                                                    </AlertDialogTitle>
-
-                                                                    <AlertDialogDescription>
-                                                                        This action cannot be undone. The abstract will be permanently deleted.
-                                                                    </AlertDialogDescription>
-                                                                </AlertDialogHeader>
-
-                                                                <AlertDialogFooter>
-                                                                    <AlertDialogCancel>
-                                                                        Cancel
-                                                                    </AlertDialogCancel>
-
-                                                                    <AlertDialogAction
-                                                                        variant="destructive"
-                                                                        onClick={() => mutateAsync(abstract.id)}
-                                                                    >
-                                                                        {isPending ? <Spinner /> : "Delete"}
-                                                                    </AlertDialogAction>
-                                                                </AlertDialogFooter>
-                                                            </AlertDialogContent>
-                                                        </AlertDialog>
-
-                                                    </DropdownMenuContent>
-                                                </DropdownMenu>
-                                            </div>
-                                        </CardAction>
-                                    </CardHeader>
-
-                                    <CardFooter className="flex flex-wrap items-center justify-between gap-2 pt-0">
-                                        <div className="text-xs text-muted-foreground space-y-1">
-                                            <p>Created: {formatDate(abstract.created_at)} | Last update: {formatDate(abstract.last_update)}</p>
-                                        </div>
-                                    </CardFooter>
-                                </Card>
-                            ))}
+                            <ConfirmProvider>
+                                {data?.results.map((abstract) => (
+                                    <AbstractItem
+                                        key={abstract.id}
+                                        abstract={abstract}
+                                        onAbstractSelected={setActiveAbstract}
+                                    />
+                                ))}
+                            </ConfirmProvider>
                         </section>
 
                         <div className='p-3 md:p-5 xl:p-8 space-y-3'>
@@ -340,64 +178,10 @@ function AbstractSubmissionPage() {
                     </div>
                 </div>
 
-                <Dialog
-                    open={!!activeAbstract}
-                    onOpenChange={(open) => !open && setActiveAbstract(null)}
-                >
-                    {activeAbstract && (
-                        <DialogContent className="sm:max-w-3xl">
-                            <DialogHeader>
-                                <div className="flex items-center justify-between">
-
-                                    <CardTitle className="flex gap-3 items-center">
-                                        <FileText className='text-primary-main' />
-                                        <div>
-                                            <DialogTitle className='text-xl font-semibold tracking-tight'>
-                                                Abstract Preview
-                                            </DialogTitle>
-                                            <DialogDescription className="text-xs mt-0.5 font-normal">
-                                                Review your paper formatting and declarations before submission.
-                                            </DialogDescription>
-                                        </div>
-                                    </CardTitle>
-                                </div>
-                            </DialogHeader>
-
-                            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between p-2 border rounded-xl bg-muted/50 shadow-sm">
-                                <div className="flex items-center gap-3">
-                                    <div className="p-2 bg-primary/10 rounded-lg text-primary shrink-0">
-                                        <FileText size={18} className="stroke-2" />
-                                    </div>
-                                    <div>
-                                        <p className="text-xs font-semibold text-foreground">PDF Compilation Available</p>
-                                        <p className="text-[11px] text-muted-foreground">Download to verify layout rules.</p>
-                                    </div>
-                                </div>
-                                <Button
-                                    variant="secondary"
-                                    size="sm"
-                                    className="gap-1.5 h-8 font-medium text-xs shadow-sm shrink-0 justify-center"
-                                    onClick={() => handlePreview(activeAbstract.id, activeAbstract.title)}
-                                    disabled={!activeAbstract?.id}
-                                >
-                                    <Download size={13} /> Download PDF
-                                </Button>
-                            </div>
-
-                            <div className="no-scrollbar max-h-[50vh] overflow-y-auto bg-muted border rounded-lg">
-                                <div className='p-2 md:p-4'>
-                                    <AbstractPreviewData abstract={activeAbstract} />
-                                </div>
-                            </div>
-
-                            <DialogFooter>
-                                <DialogClose asChild>
-                                    <Button variant="outline">Close</Button>
-                                </DialogClose>
-                            </DialogFooter>
-                        </DialogContent>
-                    )}
-                </Dialog>
+                <AbstractPreviewDialog
+                    abstract={activeAbstract}
+                    setAbstract={setActiveAbstract}
+                />
             </fieldset>
         </article>
     )
@@ -414,6 +198,190 @@ export function PreviewAbstractDialog({ id }: { id: string | number }) {
         <div className='w-full'>
             <AbstractData abstract={abstract} authors={authors} declarations={declarations} />
         </div>
+    )
+}
+
+
+type AbstractItemProps = {
+    disabled?: boolean
+    abstract: AbstractSchema
+    onAbstractSelected: (a: AbstractSchema) => void
+}
+
+export function AbstractItem({
+    abstract,
+    onAbstractSelected,
+}: AbstractItemProps) {
+    const { user: user } = useAuth()
+
+    const navigate = useNavigate()
+
+    const queryClient = useQueryClient()
+
+    const confirm = useConfirm()
+
+
+    const { mutateAsync, isPending } = useMutation<void, AxiosError, number | string>({
+        mutationKey: ['delete-submission'],
+        mutationFn: deleteSubmission,
+        onSuccess: () => {
+            queryClient.invalidateQueries({
+                queryKey: ['abstracts', user.id],
+                exact: false,
+            })
+        },
+        onError: (error) => {
+            DEBUG && console.log(error.response.data);
+        }
+    })
+
+    const handleDelete = async () => {
+        await confirm({
+            title: 'Delete Abstract?',
+            description: 'This action cannot be undone. The abstract will be permanently deleted.',
+            onConfirm: async () => await mutateAsync(abstract.id)
+        })
+    }
+
+
+    return (
+        <Card key={abstract.id} className="group outline-2 outline-transparent hover:shadow-md hover:outline-primary-light transition-all duration-300 gap-3">
+            <CardHeader className="flex flex-row items-start justify-between gap-4">
+                <div className='space-y-2'>
+                    <CardTitle className="text-base sm:text-lg font-semibold leading-tight">
+                        {abstract.title ? (
+                            <div onClick={() => onAbstractSelected(abstract)} className="cursor-pointer hover:underline" dangerouslySetInnerHTML={{ __html: abstract.title }} />
+                        ) : (
+                            <span className="flex items-center gap-2 text-destructive">
+                                <CircleAlert className="shrink-0 size-5" />
+                                Undefined title
+                            </span>
+                        )}
+                    </CardTitle>
+
+                    <CardDescription className="text-sm">
+                        <Badge variant="outline">
+                            {presentationTypes?.find((p) => p.value === abstract.presentation_type)?.label || (
+                                <span className="flex items-center gap-1 text-destructive">
+                                    <CircleAlert className="size-3.5 shrink-0" />
+                                    Presentation type not set
+                                </span>
+                            )}
+                        </Badge>
+                    </CardDescription>
+                </div>
+                <CardAction className='max-sm:hidde'>
+                    <div className="flex items-center ml-auto gap-2">
+                        <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                                <Button size="icon" variant="ghost">
+                                    <MoreVertical className="size-5" />
+                                </Button>
+                            </DropdownMenuTrigger>
+
+                            <DropdownMenuContent align="end">
+                                <DropdownMenuItem onClick={() => onAbstractSelected(abstract)}>
+                                    <Eye className="mr-2 size-4" />
+                                    Preview
+                                </DropdownMenuItem>
+
+                                {abstract.status !== "submitted" && (
+                                    <>
+                                        <DropdownMenuItem
+                                            onClick={() => {
+                                                navigate(routes.users.submissions.edit.build({
+                                                    id: abstract.id,
+                                                }))
+                                            }}
+                                        >
+                                            <Pencil className="mr-2 size-4" />
+                                            Edit
+                                        </DropdownMenuItem>
+
+                                        <DropdownMenuItem
+                                            onClick={() => {
+                                                navigate(routes.users.submissions.edit.build({
+                                                    id: abstract.id,
+                                                }) + "?action=submit")
+                                            }}
+                                        >
+                                            <Send className="mr-2 size-4" />
+                                            Submit
+                                        </DropdownMenuItem>
+                                    </>
+                                )}
+
+                                <DropdownMenuSeparator />
+
+                                <DropdownMenuItem variant='destructive' onClick={handleDelete}>
+                                    <Trash2 className="mr-2 size-4" />
+                                    Delete
+                                </DropdownMenuItem>
+                            </DropdownMenuContent>
+                        </DropdownMenu>
+                    </div>
+                </CardAction>
+            </CardHeader>
+
+            <CardFooter className="flex flex-wrap items-center justify-between gap-2 pt-0">
+                <div className="text-xs text-muted-foreground space-y-1">
+                    <p>Created: {formatDate(abstract.created_at)} | Last update: {formatDate(abstract.last_update)}</p>
+                </div>
+            </CardFooter>
+        </Card>
+    )
+}
+
+
+
+type AbstractPreviewDialogProps = {
+    abstract: AbstractSchema
+    setAbstract: (a: AbstractSchema) => void
+}
+
+export function AbstractPreviewDialog({ abstract, setAbstract: setActiveAbstract }: AbstractPreviewDialogProps) {
+
+    return (
+        <Dialog
+            open={!!abstract}
+            onOpenChange={(open) => !open && setActiveAbstract(null)}
+        >
+            {abstract && (
+                <DialogContent className="sm:max-w-2xl">
+                    <DialogHeader>
+                        <CardTitle className="flex gap-3 items-center">
+                            <div className="flex size-12 shrink-0 items-center justify-center rounded-lg bg-primary-light/10 border-2 border-primary-main/20 text-primary">
+                                <FileText className="text-primary-main stroke-2 size-8" />
+                            </div>
+                            <div>
+                                <DialogTitle className='text-xl font-semibold tracking-tight'>
+                                    Abstract Preview
+                                </DialogTitle>
+                                <DialogDescription className="text-xs mt-0.5 font-normal">
+                                    Review your paper formatting and declarations before submission.
+                                </DialogDescription>
+                            </div>
+                        </CardTitle>
+                    </DialogHeader>
+
+                    <Separator />
+
+                    <DownloadAbstractPDFButton abstractId={abstract.id} />
+
+                    <div className="no-scrollbar max-h-[50vh] overflow-y-auto bg-muted border rounded-lg">
+                        <div className='p-2 md:p-4'>
+                            <AbstractPreviewData abstract={abstract} />
+                        </div>
+                    </div>
+
+                    <DialogFooter>
+                        <DialogClose asChild>
+                            <Button variant="outline">Close</Button>
+                        </DialogClose>
+                    </DialogFooter>
+                </DialogContent>
+            )}
+        </Dialog>
     )
 }
 

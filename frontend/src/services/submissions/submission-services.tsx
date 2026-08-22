@@ -8,6 +8,11 @@ async function createSubmission(data: CreateAbstractFormValues) {
     return responseData
 }
 
+async function getSubmissionById(id: number | string) {
+    const { data } = await api.get<AbstractSchema>(`/abstracts/submissions/${id}/`)
+    return data
+}
+
 
 export type UpdateParams = {
     id: number | string
@@ -26,6 +31,7 @@ async function deleteSubmission(id: number | string) {
 
 export {
     updateSubmission,
+    getSubmissionById,
     createSubmission,
     deleteSubmission,
 }

@@ -1,5 +1,6 @@
 import { countWordsFromHTML } from "@/components/EnrichedTextArea";
 import z from "zod";
+import type { AbstractSchema } from "./abstract-schemas";
 
 
 export const presentationTypes = [
@@ -13,6 +14,7 @@ export const presentationTypes = [
     },
 ] as const
 
+
 export const ABSTRACT_STATUS = [
     "draft",
     "submitted",
@@ -25,21 +27,36 @@ export const ABSTRACT_STATUS = [
 
 const editAbstractSchema = z.object({
     id: z.number(),
+
     title: z.string()
         .min(1, "Please enter the abstract title")
-        .refine((val) => countWordsFromHTML(val) <= 10, "The abstract title must not exceed 10 words."),
+        .refine((val) => countWordsFromHTML(val) <= 20, "The abstract title must not exceed 20 words."),
+
     presentation_type: z.enum(presentationTypes.map(v => v.value), 'Opción no válida'),
+
     text: z.string()
         .refine((val) => countWordsFromHTML(val) <= 350, "Abstract must be at most 350 words")
         .refine((val) => countWordsFromHTML(val) > 99, "Abstract must be at least 100 words"),
+
     references: z.string()
         .min(1, "Please provide the references")
         .refine((val) => countWordsFromHTML(val) <= 150, "References must be at most 150 words"),
+
     is_for_young_watoc: z.boolean(),
 })
+    .transform(data => {
+        const abstract: AbstractSchema = {
+            title: data.title,
+            is_for_young_watoc: data.is_for_young_watoc,
+            presentation_type: data.presentation_type,
+            references: data.references,
+            text: data.text,
+            id: data.id
+        }
+        return abstract
+    })
 
-type EditAbstractFormValues = z.infer<typeof editAbstractSchema>
-
+type EditAbstractFormValues = z.input<typeof editAbstractSchema>
 
 export {
     editAbstractSchema,

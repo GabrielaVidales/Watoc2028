@@ -6,62 +6,54 @@ import { Spinner } from '../ui/spinner'
 
 type ConfirmationDialogProps = {
     open: boolean
-    setOpen: (b: boolean) => void
+    loading?: boolean
+    title: React.ReactNode
+    description: React.ReactNode
     btnLabel: string
     cancelBtnLabel: string
-    title: string
-    description: string
-    onConfirmCallback: () => Promise<void> | Promise<any>
-    onCancelCallback: () => void
+    onConfirm: () => Promise<void> | Promise<any>
+    onCancel: () => void
 }
 
 function ConfirmationDialog({
     open,
-    setOpen,
-    title,
-    description,
-    btnLabel,
-    cancelBtnLabel,
-    onConfirmCallback = null,
-    onCancelCallback = null,
-
+    loading = false,
+    title = 'Confirm action',
+    description = (<span>This action <strong>cannot be undone</strong>.</span>),
+    btnLabel = 'Confirm',
+    cancelBtnLabel = 'Cancel',
+    onConfirm = null,
+    onCancel = null,
 }: ConfirmationDialogProps) {
-    const [loading, setLoading] = React.useState(false)
-
-    const onConfirm = async () => {
-        setLoading(true)
-        await onConfirmCallback?.()
-        setLoading(false)
-    }
-
     return (
-        <AlertDialog open={open} onOpenChange={setOpen}>
+        <AlertDialog
+            open={open}
+            onOpenChange={(next) => { if (!next && !loading) onCancel() }}
+        >
             <AlertDialogContent size='sm'>
                 <AlertDialogHeader>
                     <AlertDialogTitle className="p-3 bg-destructive/10 rounded-full mb-2">
                         <TriangleAlert className='size-8 text-destructive' />
                     </AlertDialogTitle>
                     <AlertDialogTitle>
-                        {title || 'Confirm action'}
+                        {title}
                     </AlertDialogTitle>
                     <AlertDialogDescription>
-                        {description || (
-                            <span>This action <strong>cannot be undone</strong>. This will permanently remove this affiliation.</span>
-                        )}
+                        {description}
                     </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
-                    <AlertDialogCancel onClick={onCancelCallback}>
-                        {cancelBtnLabel || 'Cancel'}
+                    <AlertDialogCancel onClick={null}>
+                        {cancelBtnLabel}
                     </AlertDialogCancel>
-                    <Button variant='destructive' onClick={onConfirm} disabled={loading}>
+                    <Button variant="destructive" onClick={onConfirm} disabled={loading}>
                         {loading ? (
                             <>
                                 <Spinner className="mr-2" />
                                 Deleting...
                             </>
                         ) : (
-                            btnLabel || 'Confirm'
+                            btnLabel
                         )}
                     </Button>
                 </AlertDialogFooter>
@@ -70,4 +62,7 @@ function ConfirmationDialog({
     )
 }
 
-export default ConfirmationDialog
+export {
+    type ConfirmationDialogProps,
+    ConfirmationDialog
+}

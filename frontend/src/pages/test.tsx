@@ -7,13 +7,18 @@ import { Separator } from '@/components/ui/separator'
 import ReviewAssignmentForm from '@/forms/reviews/review-assignment-form'
 import { routes } from '@/routes/routes'
 import { useNavigate } from 'react-router'
-import TestAbstractFeature from './test/test-abstract-feature'
+import DownloadAbstractPDFButton from './test/test-abstract-feature'
+import { ConfirmProvider, useConfirm } from '@/contexts/ConfirmationDialogContext'
+import { GenericConfirmProvider, useGenericConfirm } from '@/contexts/GenericConfirmationContext'
+import type { AbstractSchema } from '@/schemas/abstracts/abstract-schemas'
+import { getSubmissionById } from '@/services/submissions/submission-services'
 
 function TestPage() {
     const navigate = useNavigate()
 
+
     return (
-        <div className='bg-neutral-900 h-full'>
+        <div className='bg-muted h-full'>
             <div className='max-w-sm mx-auto w-full space-y-4 py-4'>
                 <Card className='w-full mx-auto'>
                     <CardHeader>
@@ -119,10 +124,86 @@ function TestPage() {
                     </DialogContent>
                 </Dialog>
 
-                <TestAbstractFeature abstractId={16} />
+                <DownloadAbstractPDFButton abstractId={38} />
+
+                <div className='flex justify-between items-center gap-3 mt-6'>
+                    <ConfirmProvider>
+                        <TestButtonComponent />
+                    </ConfirmProvider>
+
+                    <GenericConfirmProvider>
+                        <TestComponent />
+                    </GenericConfirmProvider>
+                </div>
             </div>
         </div>
     )
 }
 
 export default TestPage
+
+
+function TestComponent() {
+    const {
+        confirm,
+        resolvedData,
+    } = useGenericConfirm<AbstractSchema>()
+
+    return (
+        <Button
+            onClick={async () => {
+                const selection = await confirm({
+                    resolveFn: async () => await getSubmissionById(38),
+                    keepPreviousData: false,
+                    options: {
+                        btnLabel: 'Delete',
+                        cancelBtnLabel: 'Cancel',
+                        description: 'This action cannot be undone. The abstract will be permanently deleted.',
+                        title: 'Delete Abstract?',
+                        onCancel: () => console.log('Cancel'),
+                        onConfirm: async () => {
+                            await new Promise(r => setTimeout(r, 500))
+                            console.log('Confirm')
+                        }
+                    },
+                })
+
+                console.log(selection);
+
+
+            }}
+        >
+            {resolvedData ? 'Awebo' : 'Haz click aquí'}
+        </Button>
+    )
+}
+
+
+function TestButtonComponent() {
+    const confirm = useConfirm()
+
+    return (
+        <Button
+            onClick={async () => {
+
+                const selection = await confirm({
+                    btnLabel: 'Delete',
+                    cancelBtnLabel: 'Cancel',
+                    description: 'This action cannot be undone. The abstract will be permanently deleted.',
+                    title: 'Delete Abstract?',
+                    onCancel: () => console.log('Cancel'),
+                    onConfirm: async () => {
+                        await new Promise(r => setTimeout(r, 500))
+                        console.log('Confirm')
+                    }
+                })
+
+                if (selection) {
+                    console.log('AWEBO PINCHE PUTA!');
+                }
+            }}
+        >
+            Confirm?
+        </Button>
+    )
+}

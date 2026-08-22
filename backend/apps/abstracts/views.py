@@ -87,6 +87,35 @@ class PDFGenerationViewSet(ModelViewSet):
 
         return Response(status=status.HTTP_404_NOT_FOUND)
 
+    @action(detail=False, methods=["get"], url_path="abstract")
+    def get_last_version(self, request: Request, pk=None):
+        abstract_id = request.query_params.get("id", None)
+        if not abstract_id:
+            return Response(
+                {"detail": "No abstract ID provided"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        try:
+            abstract = Abstract.objects.get(pk=abstract_id)
+        except Abstract.DoesNotExist:
+            return Response(
+                {"detail": "Abstract not found"},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        queryset = self.queryset.filter(abstract=abstract).order_by("-created_at")
+        job = queryset.first()
+        if not job:
+            return Response(
+                {"detail": "Job not found"},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        response = HttpResponse(job.file, content_type="application/pdf")
+        response["Content-Disposition"] = f'attachment; filename="{job.abstract.get_plain_title()}.pdf"'
+        return response
+
     @action(detail=True, methods=["get"], url_path="download")
     def download(self, request: Request, pk=None):
         job = self.get_object()
@@ -249,26 +278,6 @@ class AbstractView(ModelViewSet):
             return Response(serializer.data)
 
         return Response(status=status.HTTP_400_BAD_REQUEST)
-
-    @action(detail=True, methods=["get"], url_path="preview")
-    def generate_pdf(self, request: Request, pk=None):
-        abstract = Abstract.objects.prefetch_related("authors__affiliation").get(id=pk)
-        context = self.get_abstract_context(abstract)
-
-        from weasyprint import HTML, CSS
-
-        html_string = render_to_string("abstract_template.html", context)
-        path_to_css = os.path.join(settings.BASE_DIR, "static", "css", "abstract_styles.css")
-        path_to_static = os.path.join(settings.BASE_DIR, "static")
-        html_file = HTML(string=html_string, base_url=path_to_static)
-
-        pdf_file = html_file.write_pdf(
-            stylesheets=[CSS(filename=path_to_css)],
-        )
-
-        response = HttpResponse(pdf_file, content_type="application/pdf")
-        response["Content-Disposition"] = f'attachment; filename="{abstract.get_plain_title()}.pdf"'
-        return response
 
     @action(detail=True, methods=["get"], url_path="authors-preview")
     def get_abstract_author_context(self, request, pk=None):
