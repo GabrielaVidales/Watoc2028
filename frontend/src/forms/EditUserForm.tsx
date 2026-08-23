@@ -95,6 +95,7 @@ function EditUserForm({ defaultValues }: P) {
                     render={({ field, fieldState }) => (
                         <Field data-invalid={fieldState.invalid}>
                             <AvatarUpload
+                                defaultAvatar={defaultValues?.photo as string}
                                 accept=".png,.jpg,.jpeg,.webp"
                                 onFileChange={(files) => {
                                     queueMicrotask(() => {

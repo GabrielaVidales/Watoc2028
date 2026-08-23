@@ -14,7 +14,7 @@ function PlayStoreButton({ href = '#', className = '' }: StoreButtonProps) {
             target="_blank"
             rel="noopener noreferrer"
             role="button"
-            className={cn("bg-card flex border p-3 gap-0 bg-no-repeat", className)}
+            className={cn("bg-card flex border p-3 gap-1 bg-no-repeat hover:bg-slate-100", className)}
         >
             <span className='google-btn size-7 bg-contain'></span>
             <div className='flex flex-col justify-stretch'>
@@ -38,10 +38,18 @@ function AppStoreButton({ href = '#', className = '' }: StoreButtonProps) {
             target="_blank"
             rel="noopener noreferrer"
             role="button"
-            className={cn("market-btn apple-btn", className)}
+            className={cn("bg-card flex border p-3 gap-1 bg-no-repeat hover:bg-slate-100", className)}
         >
-            <span className="market-button-subtitle">Download on the</span>
-            <span className="market-button-title">App Store</span>
+            <span className='apple-btn size-8 bg-contain'></span>
+            <div className='flex flex-col justify-stretch'>
+                <span className="text-xs text-muted-foreground leading-1 mt-1">
+                    Download on the
+                </span>
+
+                <span className="text-base">
+                    App Store
+                </span>
+            </div>
         </a>
     )
 }

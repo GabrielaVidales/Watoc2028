@@ -1,4 +1,5 @@
 import api from '@/clients/api'
+import AdaptableTooltip from '@/components/custom/adaptable-tooltip'
 import { notify } from '@/components/custom/notify'
 import { SelectCommand } from '@/components/custom/select-command-generic'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
@@ -70,9 +71,6 @@ export function AuthorFormContent({ abstractId, onSubmit, values }: Props) {
     const handleUserSelection = (user: UserSchema | null) => {
         if (user === null) {
             setValue('related_user_id', null)
-            setValue('first_name', '')
-            setValue('last_name', '')
-            setValue('email', '')
             setUser(null)
             return
         }
@@ -87,9 +85,6 @@ export function AuthorFormContent({ abstractId, onSubmit, values }: Props) {
     const handleAffiliationSelected = (affiliation: Affiliation | null) => {
         if (affiliation === null) {
             setValue('affiliation_id', null)
-            setValue('institution', '')
-            setValue('country', '')
-            setValue('city', '')
             setAffiliation(null)
             return
         }
@@ -358,10 +353,22 @@ export function AuthorFormContent({ abstractId, onSubmit, values }: Props) {
                     />
                 </div>
 
-                <div className="space-y-3 border-t pt-6 md:pt-0 md:border-t-0 md:border-l-2 md:pl-6">
+                <div className="space-y-3 border-t pt-6 md:pt-0 md:border-t-0 md:border-l md:pl-6">
                     {/* Afiliación */}
                     <Field>
-                        <FieldLabel htmlFor={'related-user-id'}>Search existing affiliation</FieldLabel>
+                        <FieldLabel htmlFor={'related-user-id'} className='flex items-center justify-between gap-2'>
+                            Search existing affiliation
+
+                            <AdaptableTooltip
+                                buttonClassNames='size-4 text-primary'
+                                tooltipContent={(
+                                    <p>
+                                        Select a previously used affiliation to autofill its details, 
+                                        or fill out the fields to create a new one.
+                                    </p>
+                                )}
+                            />
+                        </FieldLabel>
                         <SelectCommand<Affiliation>
                             onChange={handleAffiliationSelected}
                             value={affiliation}

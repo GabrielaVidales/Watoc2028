@@ -18,6 +18,8 @@ class AbstractSerializer(serializers.ModelSerializer):
     authors = serializers.SerializerMethodField()
     declarations = serializers.SerializerMethodField()
     user = serializers.SerializerMethodField()
+    plain_title = serializers.SerializerMethodField()
+    
 
     class Meta:
         model = models.Abstract
@@ -26,6 +28,9 @@ class AbstractSerializer(serializers.ModelSerializer):
 
     def get_user(self, instance):
         return RelatedUserSerializer(instance.user, context=self.context).data
+    
+    def get_plain_title(self, instance):
+        return instance.get_plain_title()
 
     def get_authors(self, instance):
         return AuthorSerializer(instance.authors.all(), many=True, context=self.context).data

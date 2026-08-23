@@ -29,10 +29,10 @@ function AbstractPreviewData({ abstract, }: AbstractPreviewDataProps) {
                     <span>Content</span>
                 </div>
 
-                <ScrollArea className='h-60 pr-2'>
+                <ScrollArea className='max-h-60 pr-2'>
                     <div
                         className={cn(
-                            "text-xs sm:text-sm prose prose-sm dark:prose-invert max-w-none leading-relaxed",
+                            "min-h-20 text-xs sm:text-sm prose prose-sm dark:prose-invert max-w-none leading-relaxed",
                             abstract?.text ? 'text-foreground/90' : 'text-destructive'
                         )}
                         dangerouslySetInnerHTML={{ __html: abstract?.text || 'Not set' }}
@@ -48,15 +48,13 @@ function AbstractPreviewData({ abstract, }: AbstractPreviewDataProps) {
                     <span>References</span>
                 </div>
 
-                <ScrollArea className='h-50'>
                     <div
                         className={cn(
-                            "text-xs sm:text-sm prose prose-sm dark:prose-invert max-w-none leading-relaxed",
+                            "min-h-20 text-xs sm:text-sm prose prose-sm dark:prose-invert max-w-none leading-relaxed",
                             abstract?.text ? 'text-foreground/90' : 'text-destructive'
                         )}
                         dangerouslySetInnerHTML={{ __html: abstract?.references || 'Not set' }}
                     />
-                </ScrollArea>
             </div>
         </div>
     )

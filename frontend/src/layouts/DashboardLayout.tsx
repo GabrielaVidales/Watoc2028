@@ -167,7 +167,7 @@ function DashboardLayoutContent() {
     }, [])
 
     const header = (
-        <header className="sticky top-0 z-50 border-b shrink-0 h-14 flex items-center bg-background">
+        <header className="sticky top-0 z-50 border-b shrink-0 h-14 flex items-center bg-card">
             <div className='w-full px-3 mx-auto flex flex-row justify-between items-center gap-6'>
                 <div className='flex flex-row items-center gap-8 shrink-0'>
                     <SidebarTrigger />
@@ -188,7 +188,7 @@ function DashboardLayoutContent() {
 
     if (content) {
         return (
-            <SidebarProvider id='sidebar-provider'>
+            <SidebarProvider id='sidebar-provider' defaultOpen={false}>
                 <AppSidebar />
 
                 <SidebarInset className="min-h-screen overflow-hidden">
@@ -220,7 +220,7 @@ function DashboardLayoutContent() {
 
             <SidebarInset className="min-h-screen overflow-hidden">
                 {header}
-                <div className='no-scrollbar overflow-auto h-full bg-secondary'>
+                <div className='no-scrollbar overflow-auto h-full bg-background'>
                     <Outlet />
                 </div>
             </SidebarInset>

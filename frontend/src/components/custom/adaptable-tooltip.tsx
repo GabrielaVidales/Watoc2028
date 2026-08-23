@@ -35,7 +35,7 @@ function AdaptableTooltip({
                     )} />
                 </PopoverTrigger>
                 <PopoverContent className={cn(
-                    'max-w-60 text-xs font-normal py-1.5 px-3 bg-black dark:bg-white text-white dark:text-black',
+                    'max-w-60 text-[10px] font-normal py-1.5 px-3 bg-black dark:bg-white text-white dark:text-black border-0',
                     className,
                 )}>
                     {tooltipContent || 'Hello world!'}

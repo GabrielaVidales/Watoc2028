@@ -1,6 +1,7 @@
-import miniLogo from '@/assets/WatocPNGLogoBlank.png';
+import miniLogo from '/logo_mini.png';
+import logo from '@/assets/WatocPNGLogoBlank.png';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger, } from "@/components/ui/dropdown-menu";
-import { Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarMenuSub, SidebarMenuSubButton, SidebarMenuSubItem, useSidebar } from "@/components/ui/sidebar";
+import { Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarMenuSub, SidebarMenuSubButton, SidebarMenuSubItem, SidebarSeparator, useSidebar } from "@/components/ui/sidebar";
 import { useAuth } from "@/contexts/AuthContext";
 import { routes } from "@/routes/routes";
 import { ArrowLeftFromLine, BadgeCheckIcon, Bell, Bot, ChevronDown, ChevronRight, ChevronUp, FileBadge, FileCheck, FileType2, LayoutDashboard, LayoutList, LogOut, MessageSquareDot, PackageCheck, Settings2, TableProperties, Users, type LucideIcon } from "lucide-react";
@@ -25,6 +26,24 @@ type NavCollapsible = {
 }
 
 
+const mainModules: NavItem[] = [
+    {
+        name: "Dashboard",
+        url: routes.users.profile,
+        icon: LayoutDashboard,
+    },
+    {
+        name: "Notifications",
+        url: routes.users.notifications,
+        icon: MessageSquareDot,
+    },
+    {
+        name: "Settings",
+        url: routes.users.settings,
+        icon: Settings2,
+    },
+]
+
 const participantModules: NavItem[] = [
     {
         name: "Abstract Submissions",
@@ -38,7 +57,7 @@ const participantModules: NavItem[] = [
     },
     {
         name: "Certificate of Attendance",
-        url: routes.users.profile,
+        url: routes.users.settings,
         icon: FileBadge,
     },
 ]
@@ -81,59 +100,58 @@ const reviewerModules: NavCollapsible[] = [
 export function AppSidebar() {
     const { user: user } = useAuth()
 
-    const style = 'border-r-2 bg-indigo-900 text-neutral-100 dark:border-indigo-900 dark:bg-indigo-950 dark:text-indigo-50'
+    const { setOpen, state } = useSidebar()
+
+    const style = 'bg-gradient-to-b from-indigo-950 via-primary-dark to-indigo-950 text-neutral-100 dark:bg-indigo-950 dark:text-indigo-50'
 
     return (
-        <Sidebar collapsible='icon'>
-            <SidebarHeader className={style}>
-                <TeamSwitcher />
+        <Sidebar collapsible='icon' className={style}>
+            <SidebarHeader>
+                <div className={cn("flex items-center justify-center rounded-lg text-sidebar-primary-foreground",)}>
+                    <img
+                        src={logo}
+                        className="p-2 group-data-[collapsible=icon]:hidden group-data-[state=collapsed]:hidden"
+                        alt="Logo"
+                    />
+
+                    <img
+                        src={miniLogo}
+                        className="hidden mb-4 mt-2 group-data-[collapsible=icon]:block size-0 group-data-[state=collapsed]:block group-data-[state=collapsed]:h-5 group-data-[state=collapsed]:w-15"
+                        alt="Mini Logo"
+                    />
+                </div>
             </SidebarHeader>
 
-            <SidebarContent className={style}>
+            <SidebarContent>
                 <ScrollArea className="h-full">
                     <SidebarGroup>
-                        <SidebarGroupLabel className='text-neutral-100'>
+                        <SidebarGroupLabel className={cn(state === 'collapsed' ? 'hidden' : 'text-neutral-100')}>
                             MAIN
                         </SidebarGroupLabel>
                         <SidebarGroupContent>
-                            <SidebarMenuItem>
-                                <NavLink to={routes.users.profile} end>
-                                    {({ isActive }) => (
-                                        <SidebarMenuButton className={cn(
-                                            " active:bg-white/30",
-                                            "dark:hover:bg-white/50 dark:active:bg-white/30",
-                                            "text-neutral-50 hover:translate-x-1 transition-transform duration-300",
-                                            isActive && 'bg-white/30'
-                                        )}>
-                                            <LayoutDashboard />
-                                            <span>Dashboard</span>
-                                        </SidebarMenuButton>
-                                    )}
-                                </NavLink>
-                            </SidebarMenuItem>
+                            {mainModules.map((item, i) => (
+                                <SidebarMenuItem key={i}>
+                                    <NavLink to={item.url}>
+                                        {({ isActive }) => (
+                                            <SidebarMenuButton className={cn(
+                                                "hover:bg-white/20 hover:text-neutral-50 active:bg-white/20 active:text-neutral-50",
+                                                "dark:hover:bg-white/20 dark:active:bg-white/30",
 
-                            <SidebarMenuItem>
-                                <SidebarMenuButton asChild>
-                                    <NavLink to={routes.users.notifications} className="hover:translate-x-1 transition-transform duration-300">
-                                        <MessageSquareDot />
-                                        <span>Notifications</span>
+                                                "text-neutral-50 hover:translate-x-1 transition-transform duration-300",
+                                                isActive && 'bg-white/30'
+                                            )}>
+                                                <item.icon />
+                                                <span>{item.name}</span>
+                                            </SidebarMenuButton>
+                                        )}
                                     </NavLink>
-                                </SidebarMenuButton>
-                            </SidebarMenuItem>
-
-                            <SidebarMenuItem>
-                                <SidebarMenuButton asChild>
-                                    <NavLink to={routes.users.settings} className="hover:translate-x-1 transition-transform duration-300">
-                                        <Settings2 />
-                                        <span>Settings</span>
-                                    </NavLink>
-                                </SidebarMenuButton>
-                            </SidebarMenuItem>
+                                </SidebarMenuItem>
+                            ))}
                         </SidebarGroupContent>
                     </SidebarGroup>
 
                     <SidebarGroup>
-                        <SidebarGroupLabel className='text-neutral-100'>
+                        <SidebarGroupLabel className={cn(state === 'collapsed' ? 'hidden' : 'text-neutral-100')}>
                             MODULES
                         </SidebarGroupLabel>
                         <SidebarGroupContent>
@@ -148,23 +166,38 @@ export function AppSidebar() {
                                         >
                                             <SidebarMenuItem>
                                                 <CollapsibleTrigger asChild>
-                                                    <SidebarMenuButton tooltip={item.title} className="hover:translate-x-1 transition-transform duration-300">
+                                                    <SidebarMenuButton
+                                                        onClick={() => setOpen(true)}
+                                                        className={cn(
+                                                            "hover:bg-white/20 hover:text-neutral-50 active:bg-white/20 active:text-neutral-50",
+                                                            "dark:hover:bg-white/20 dark:active:bg-white/30",
+                                                            "text-neutral-50 hover:translate-x-1 transition-transform duration-300",
+                                                        )}
+                                                    >
                                                         {item.icon && <item.icon />}
                                                         <span>{item.title}</span>
-                                                        <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
+                                                        <ChevronRight className="pointer-events-none ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
                                                     </SidebarMenuButton>
                                                 </CollapsibleTrigger>
                                                 <CollapsibleContent>
                                                     <SidebarMenuSub>
-                                                        {item.items?.map((subItem) => (
-                                                            <SidebarMenuSubItem key={subItem.name}>
-                                                                <SidebarMenuSubButton asChild>
-                                                                    <NavLink to={subItem.url} className="text-neutral-100! hover:translate-x-1 transition-transform duration-300">
-                                                                         {subItem.icon && <subItem.icon className='text-neutral-100!' />}
-                                                                        <span>{subItem.name}</span>
-                                                                    </NavLink>
-                                                                </SidebarMenuSubButton>
-                                                            </SidebarMenuSubItem>
+                                                        {item.items?.map((subItem, i) => (
+                                                            <SidebarMenuItem key={i}>
+                                                                <NavLink to={subItem.url}>
+                                                                    {({ isActive }) => (
+                                                                        <SidebarMenuButton className={cn(
+                                                                            "hover:bg-white/20 hover:text-neutral-50 active:bg-white/20 active:text-neutral-50",
+                                                                            "dark:hover:bg-white/20 dark:active:bg-white/30",
+
+                                                                            "text-neutral-50 hover:translate-x-1 transition-transform duration-300",
+                                                                            isActive && 'bg-white/30'
+                                                                        )}>
+                                                                            <item.icon />
+                                                                            <span>{subItem.name}</span>
+                                                                        </SidebarMenuButton>
+                                                                    )}
+                                                                </NavLink>
+                                                            </SidebarMenuItem>
                                                         ))}
                                                     </SidebarMenuSub>
                                                 </CollapsibleContent>
@@ -184,23 +217,38 @@ export function AppSidebar() {
                                         >
                                             <SidebarMenuItem>
                                                 <CollapsibleTrigger asChild>
-                                                    <SidebarMenuButton tooltip={item.title} className="hover:translate-x-1 transition-transform duration-300">
+                                                    <SidebarMenuButton
+                                                        onClick={() => setOpen(true)}
+                                                        className={cn(
+                                                            "hover:bg-white/20 hover:text-neutral-50 active:bg-white/20 active:text-neutral-50",
+                                                            "dark:hover:bg-white/20 dark:active:bg-white/30",
+                                                            "text-neutral-50 hover:translate-x-1 transition-transform duration-300",
+                                                        )}
+                                                    >
                                                         {item.icon && <item.icon />}
                                                         <span>{item.title}</span>
-                                                        <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
+                                                        <ChevronRight className="pointer-events-none ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
                                                     </SidebarMenuButton>
                                                 </CollapsibleTrigger>
                                                 <CollapsibleContent>
                                                     <SidebarMenuSub>
-                                                        {item.items?.map((subItem) => (
-                                                            <SidebarMenuSubItem key={subItem.name}>
-                                                                <SidebarMenuSubButton asChild>
-                                                                    <NavLink to={subItem.url} className="text-neutral-100! hover:translate-x-1 transition-transform duration-300">
-                                                                        {subItem.icon && <subItem.icon className='text-neutral-100!' />}
-                                                                        <span>{subItem.name}</span>
-                                                                    </NavLink>
-                                                                </SidebarMenuSubButton>
-                                                            </SidebarMenuSubItem>
+                                                        {item.items?.map((subItem, i) => (
+                                                            <SidebarMenuItem key={i}>
+                                                                <NavLink to={subItem.url}>
+                                                                    {({ isActive }) => (
+                                                                        <SidebarMenuButton className={cn(
+                                                                            "hover:bg-white/20 hover:text-neutral-50 active:bg-white/20 active:text-neutral-50",
+                                                                            "dark:hover:bg-white/20 dark:active:bg-white/30",
+
+                                                                            "text-neutral-50 hover:translate-x-1 transition-transform duration-300",
+                                                                            isActive && 'bg-white/30'
+                                                                        )}>
+                                                                            <item.icon />
+                                                                            <span>{subItem.name}</span>
+                                                                        </SidebarMenuButton>
+                                                                    )}
+                                                                </NavLink>
+                                                            </SidebarMenuItem>
                                                         ))}
                                                     </SidebarMenuSub>
                                                 </CollapsibleContent>
@@ -213,18 +261,26 @@ export function AppSidebar() {
                     </SidebarGroup>
 
                     <SidebarGroup>
-                        <SidebarGroupLabel className='text-neutral-100'>
+                        <SidebarGroupLabel className={cn(state === 'collapsed' ? 'hidden' : 'text-neutral-100')}>
                             CONGRESS
                         </SidebarGroupLabel>
                         <SidebarGroupContent>
                             {participantModules.map((item, i) => (
                                 <SidebarMenuItem key={i}>
-                                    <SidebarMenuButton asChild>
-                                        <NavLink to={item.url} title={item.name} className="hover:translate-x-1 transition-transform duration-300">
-                                            <item.icon />
-                                            <span>{item.name}</span>
-                                        </NavLink>
-                                    </SidebarMenuButton>
+                                    <NavLink to={item.url}>
+                                        {({ isActive }) => (
+                                            <SidebarMenuButton className={cn(
+                                                "hover:bg-white/20 hover:text-neutral-50 active:bg-white/20 active:text-neutral-50",
+                                                "dark:hover:bg-white/20 dark:active:bg-white/30",
+
+                                                "text-neutral-50 hover:translate-x-1 transition-transform duration-300",
+                                                isActive && 'bg-white/30'
+                                            )}>
+                                                <item.icon />
+                                                <span>{item.name}</span>
+                                            </SidebarMenuButton>
+                                        )}
+                                    </NavLink>
                                 </SidebarMenuItem>
                             ))}
                         </SidebarGroupContent>
@@ -232,7 +288,7 @@ export function AppSidebar() {
                 </ScrollArea>
             </SidebarContent>
 
-            <SidebarFooter className={style}>
+            <SidebarFooter>
                 <SidebarFooterContent user={{
                     avatar: user.photo as string || null,
                     email: user.email,
@@ -332,6 +388,8 @@ export function TeamSwitcher() {
     const navigate = useNavigate()
     const { isMobile } = useSidebar()
 
+    const { open } = useSidebar()
+
     return (
         <SidebarMenu>
             <SidebarMenuItem>
@@ -341,13 +399,16 @@ export function TeamSwitcher() {
                             size="lg"
                             className="cursor-pointer data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
                         >
-                            <div className="flex aspect-square size-48 items-center justify-center rounded-lg text-sidebar-primary-foreground">
+                            <div className={cn(
+                                "flex aspect-square items-center invert justify-center rounded-lg text-sidebar-primary-foreground",
+                                open ? 'size-16' : 'size-8'
+                            )}>
                                 <img src={miniLogo} className="" />
                             </div>
-                            {/* <div className="grid flex-1 text-left text-base leading-tight">
+                            <div className="grid flex-1 text-left text-base leading-tight">
                                 <span className="truncate font-medium">WATOC 2028</span>
                                 <span className="truncate text-sm">Mérida, MX</span>
-                            </div> */}
+                            </div>
                             <ChevronDown className="ml-auto" />
                         </SidebarMenuButton>
                     </DropdownMenuTrigger>

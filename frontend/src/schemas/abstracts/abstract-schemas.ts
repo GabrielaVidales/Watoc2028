@@ -109,15 +109,10 @@ export const abstractSchema = z.object({
     last_review_at: z.coerce.date().optional(),
 
     user: z.number().or(z.lazy(() => userSchema.partial())).optional(),
+
+    plain_title: z.string().optional(),
+
 })
-
-
-
-// Default values
-export const authorDefaults: z.input<typeof authorSchema> = authorSchema.partial().parse({
-    affiliation: {}
-})
-
 
 
 export const validateAuthorsSchema = abstractSchema.pick({ authors: true })
@@ -141,7 +136,3 @@ export type AbstractDTO = z.infer<typeof abstractDTO>
 export type AbstractSchema = z.infer<typeof abstractSchema>
 
 export type AuthorSchema = z.infer<typeof authorSchema>
-
-
-
-export type AuthorAffiliationSchema = z.infer<typeof authorAffiliationSchema>

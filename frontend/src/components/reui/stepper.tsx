@@ -124,11 +124,17 @@ function Stepper({
     () => ({
       activeStep: currentStep,
       setActiveStep: handleSetActiveStep,
-      stepsCount: Children.toArray(children).filter(
-        (child): child is ReactElement =>
-          isValidElement(child) &&
-          (child.type as { displayName?: string }).displayName === "StepperItem"
-      ).length,
+      stepsCount: Children.toArray(children)
+        .filter(isValidElement)
+        .flatMap((child) =>
+          (child.props as { children?: React.ReactNode }).children
+            ? Children.toArray(
+              (child.props as { children?: React.ReactNode }).children
+            )
+            : []
+        )
+        .filter(isValidElement)
+        .length,
       orientation,
       registerTrigger,
       focusNext,
@@ -307,7 +313,7 @@ function StepperTrigger({
       data-loading={isLoading}
       className={cn(
         "focus-visible:border-ring focus-visible:ring-ring/50 inline-flex cursor-pointer items-center outline-none focus-visible:z-10 focus-visible:ring-3 disabled:pointer-events-none disabled:opacity-60",
-        "gap-2.5 rounded-full",
+        "gap-2.5 rounded-md",
         className
       )}
       onClick={() => setActiveStep(step)}
@@ -332,7 +338,7 @@ function StepperIndicator({
       data-slot="stepper-indicator"
       data-state={state}
       className={cn(
-        "border-background bg-primary/10 text-accent-foreground data-[state=completed]:bg-primary data-[state=completed]:text-primary-foreground data-[state=active]:bg-primary data-[state=active]:text-primary-foreground relative flex size-6 shrink-0 items-center justify-center overflow-hidden",
+        "border-background bg-primary-main/20 text-accent-foreground data-[state=completed]:bg-primary-main data-[state=completed]:text-primary-foreground data-[state=active]:bg-primary-main data-[state=active]:text-primary-foreground relative flex size-6 shrink-0 items-center justify-center overflow-hidden",
         "rounded-full text-xs",
         className
       )}
@@ -361,7 +367,7 @@ function StepperSeparator({ className }: React.ComponentProps<"div">) {
       data-slot="stepper-separator"
       data-state={state}
       className={cn(
-        "bg-primary/10 rounded-sm group-data-[orientation=horizontal]/stepper-nav:h-0.5 group-data-[orientation=vertical]/stepper-nav:h-12 group-data-[orientation=vertical]/stepper-nav:w-0.5 m-0.5 group-data-[orientation=horizontal]/stepper-nav:flex-1",
+        "bg-primary-main/20 rounded-sm group-data-[orientation=horizontal]/stepper-nav:h-0.5 group-data-[orientation=vertical]/stepper-nav:h-12 group-data-[orientation=vertical]/stepper-nav:w-0.5 m-0.5 group-data-[orientation=horizontal]/stepper-nav:flex-1",
         className
       )}
     />

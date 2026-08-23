@@ -250,21 +250,20 @@ function EditAbstractPage() {
                 isMobile ? "grid-cols-1" : "sticky top-0 ",
             )}>
                 <main id='main-container' className='h-full w-full overflow-y-auto no-scrollbar bg-background' ref={parentRef}>
-                    <div className='bg-background space-y-4 p-8'>
+                    <div className='bg-background space-y-4 p-8 border-b-2 border-b-border sticky top-0 z-10'>
 
                         <div className='flex flex-row md:justify-between gap-5'>
-                            <div className="flex items-start gap-3">
+                            <div className="flex items-start gap-3 min-w-0">
                                 <div className="flex size-12 shrink-0 items-center justify-center rounded-lg bg-primary-light/10 border-2 border-primary-main/20 text-primary">
                                     <LucideFileEdit className="text-primary-main stroke-2 size-8" />
                                 </div>
 
-                                <div>
-                                    <h1 className="text-2xl font-semibold">
-                                        Manage Users
-                                    </h1>
+                                <div className="min-w-0 flex-1 space-y-0">
                                     <p className="text-sm text-muted-foreground">
-                                        Search, filter and manage registered users.
+                                        Editting submission
                                     </p>
+                                    <h4 className='text-2xl font-semibold leading-tight truncate' title={data.plain_title} dangerouslySetInnerHTML={{ __html: data.title }}></h4>
+                                    <p className='text-xs text-muted-foreground mt-2'>Last modification: {formatDate(data.last_update)}</p>
                                 </div>
                             </div>
 
@@ -275,25 +274,7 @@ function EditAbstractPage() {
                     </div>
 
 
-                    <div className='sticky top-0 z-10 bg-background border-b-2 border-b-border space-y-4 px-8 py-4 tracking-wide'>
-                        {/* <div className="flex items-center gap-3">
-                            <Button size='icon-xs' variant='outline'>
-                                <ChevronLeft />
-                            </Button>
-
-                            <Link to={routes.users.submissions.summary} className="text-sm text-muted-foreground">
-                                Return to Submissions
-                            </Link>
-                        </div> */}
-
-                        <div>
-                            <h3 className='font-medium text-muted-foreground'>Editing submission:</h3>
-                            <h4 className='text-xl leading-tight truncate' dangerouslySetInnerHTML={{ __html: data.title }}></h4>
-                            <p className='text-xs text-muted-foreground mt-2'>Last modification: {formatDate(data.last_update)}</p>
-                        </div>
-                    </div>
-
-                    <div className={cn("p-2 md:p-4 lg:p-6 bg-secondary space-y-4 md:space-y-8 lg:space-y-12 mb-8",)}>
+                    <div className={cn("p-2 md:p-4 lg:p-6 bg-secondary dark:bg-slate-950 space-y-4 md:space-y-8 lg:space-y-12 mb-8",)}>
                         <Card className='max-w-4xl mx-auto w-full gap-0' id='abstract-content'>
                             <CardContent className='space-y-5 md:py-5 md:px-10'>
                                 <CardTitle className="flex gap-3 items-center">
@@ -311,7 +292,7 @@ function EditAbstractPage() {
                                 <ShowAuthorsComponent abstractId={data ? data.id : null} />
                             </CardContent>
 
-                            <Separator/>
+                            <Separator />
 
                             <CardContent className='space-y-5 md:py-5 md:px-10'>
                                 <Accordion
@@ -345,7 +326,7 @@ function EditAbstractPage() {
                             </CardContent>
                         </Card>
 
-                        <Card className='max-w-4xl mx-auto w-full gap-0' id='abstract-submit'>
+                        {/* <Card className='max-w-4xl mx-auto w-full gap-0' id='abstract-submit'>
                             <CardContent className='space-y-5 md:py-5 md:px-10'>
                                 <CardTitle className="flex gap-3 items-center">
                                     <MessageSquareCode className='text-primary-main' />
@@ -356,7 +337,7 @@ function EditAbstractPage() {
                             </CardContent>
                         </Card>
 
-                        <Separator />
+                        <Separator /> */}
                     </div>
                 </main>
 

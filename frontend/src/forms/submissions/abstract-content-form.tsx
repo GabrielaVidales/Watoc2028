@@ -141,7 +141,7 @@ function AbstractContentForm({ abstractId = null }: AbstractFormProps) {
                     control={control}
                     render={({ field, fieldState }) => (
                         <Field data-invalid={fieldState.invalid} className='w-full'>
-                            <FieldLabel className="text-lg" htmlFor={field.name}>Abstract title</FieldLabel>
+                            <FieldLabel htmlFor={field.name}>Abstract title</FieldLabel>
                             <FieldDescription className='max-sm:text-xs'>
                                 Provide a concise, descriptive title (maximum 20 words). Please do not include author names, affiliations, or other identifying information.
                             </FieldDescription>
@@ -180,7 +180,7 @@ function AbstractContentForm({ abstractId = null }: AbstractFormProps) {
                     )}
                 />
                 <FieldSet>
-                    <FieldLegend className="text-lg">Presentation Format</FieldLegend>
+                    <FieldLegend className="text-sm!">Presentation Format</FieldLegend>
                     <FieldGroup>
                         <Controller
                             name="is_for_young_watoc"
@@ -256,7 +256,7 @@ function AbstractContentForm({ abstractId = null }: AbstractFormProps) {
                     control={control}
                     render={({ field, fieldState }) => (
                         <Field data-invalid={fieldState.invalid}>
-                            <FieldLabel className="text-lg" htmlFor={field.name}>Abstract text</FieldLabel>
+                            <FieldLabel htmlFor={field.name}>Abstract text</FieldLabel>
                             <FieldDescription className='max-sm:text-xs'>
                                 Abstract text must not exceed 300 words. Abstracts must be writter in English and not contain any information about the presenters or the institutions involves, this is to facilitate the review process.
                             </FieldDescription>
@@ -292,7 +292,7 @@ function AbstractContentForm({ abstractId = null }: AbstractFormProps) {
                     control={control}
                     render={({ field, fieldState }) => (
                         <Field data-invalid={fieldState.invalid}>
-                            <FieldLabel className="text-lg" htmlFor={field.name}>References</FieldLabel>
+                            <FieldLabel htmlFor={field.name}>References</FieldLabel>
                             <FieldDescription className='max-sm:text-xs'>
                                 References are required, and must not exceed 350 words.
                             </FieldDescription>
