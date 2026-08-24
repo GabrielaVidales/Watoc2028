@@ -1,35 +1,33 @@
-import api from '@/clients/api'
-import { AbstractData } from '@/components/AbstractData'
 import { PaginationController, SelectItemsPerPage } from '@/components/custom/pagination-controller'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { Card, CardAction, CardDescription, CardFooter, CardHeader, CardTitle, } from "@/components/ui/card"
+import { Card, CardAction, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, } from "@/components/ui/dialog"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
-import { InputGroup, InputGroupAddon, InputGroupInput, InputGroupText } from '@/components/ui/input-group'
+import { InputGroup, InputGroupAddon, InputGroupInput } from '@/components/ui/input-group'
+import { ScrollArea } from '@/components/ui/scroll-area'
+import { Separator } from '@/components/ui/separator'
+import { Sheet, SheetContent, SheetDescription, SheetFooter, SheetHeader, SheetTitle } from "@/components/ui/sheet"
 import { Spinner } from '@/components/ui/spinner'
 import { useAuth } from '@/contexts/AuthContext'
+import { ConfirmProvider, useConfirm } from '@/contexts/ConfirmationDialogContext'
 import type { PaginatedResponse } from '@/domain/pagination'
-import { useFetch } from '@/hooks/use-fetch'
+import { CreateAbstractDialog } from '@/forms/submissions/abstract-create-dialog'
+import { DEBUG } from '@/lib/constants'
+import { cn } from '@/lib/utils'
+import DownloadAbstractPDFButton from '@/pages/test/test-abstract-feature'
 import { routes } from '@/routes/routes'
-import type { AbstractDeclarationValues } from '@/schemas/abstract-declaration-schema'
-import { presentationTypes, type AbstractSchema, type AuthorSchema } from '@/schemas/abstracts/abstract-schemas'
+import { presentationTypes, type AbstractSchema } from '@/schemas/abstracts/abstract-schemas'
+import { deleteSubmission, getParticipantSubmissions } from '@/services/submissions/submission-services'
 import { formatDate } from '@/utils/formatDate'
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { AxiosError } from 'axios'
-import { CircleAlert, Eye, FilePenIcon, FileText, MoreVertical, Pencil, Search, Send, Trash2 } from 'lucide-react'
+import { CircleAlert, Eye, FileCodeIcon, FilePenIcon, FileText, InfoIcon, MoreVertical, Pencil, Search, Send, Trash2 } from 'lucide-react'
 import { useState } from 'react'
 import { useNavigate } from 'react-router'
 import { useDebounce } from 'use-debounce'
 import AbstractPreviewData from '../edit/abstract-preview-data'
-import { deleteSubmission } from '@/services/submissions/submission-services'
-import { CreateAbstractDialog } from '@/forms/submissions/abstract-create-dialog'
-import { DEBUG } from '@/lib/constants'
-import { ConfirmProvider, useConfirm } from '@/contexts/ConfirmationDialogContext'
-import DownloadAbstractPDFButton from '@/pages/test/test-abstract-feature'
-import { Separator } from '@/components/ui/separator'
 import DeadlinesCard from './deadlines-card'
-import { cn } from '@/lib/utils'
 
 
 function AbstractSubmissionPage() {
@@ -45,16 +43,7 @@ function AbstractSubmissionPage() {
         queryKey: ['abstracts', user.id, page, itemsPerPage, query],
         placeholderData: keepPreviousData,
         refetchOnWindowFocus: false,
-        queryFn: async () => {
-            const { data } = await api.get<PaginatedResponse<AbstractSchema>>('/participants/profiles/submissions', {
-                params: {
-                    page: page,
-                    limit: itemsPerPage,
-                    title: query,
-                }
-            })
-            return data
-        }
+        queryFn: () => getParticipantSubmissions({ page, itemsPerPage, search: query })
     })
 
     return (
@@ -107,7 +96,7 @@ function AbstractSubmissionPage() {
                         </div>
                     </div>
 
-                    <section className='py-2 space-y-2'>
+                    <section className='py-4 space-y-4'>
                         {isLoading && (
                             <div>
                                 <Spinner />
@@ -141,7 +130,7 @@ function AbstractSubmissionPage() {
                 </div>
             </fieldset>
 
-            <AbstractPreviewDialog
+            <AbstractPreviewSheet
                 abstract={activeAbstract}
                 setAbstract={setActiveAbstract}
             />
@@ -149,19 +138,8 @@ function AbstractSubmissionPage() {
     )
 }
 
+export default AbstractSubmissionPage
 
-export function PreviewAbstractDialog({ id }: { id: string | number }) {
-
-    const { data: abstract } = useFetch<AbstractSchema>(`/abstracts/submissions/${id}/`)
-    const { data: authors } = useFetch<AuthorSchema[]>(`/abstracts/submissions/${id}/authors/`)
-    const { data: declarations } = useFetch<AbstractDeclarationValues>(`/abstracts/submissions/${id}/declarations/`)
-
-    return (
-        <div className='w-full'>
-            <AbstractData abstract={abstract} authors={authors} declarations={declarations} />
-        </div>
-    )
-}
 
 
 type AbstractItemProps = {
@@ -319,13 +297,12 @@ export function AbstractItem({
 }
 
 
-
-type AbstractPreviewDialogProps = {
+type AbstractPreviewProps = {
     abstract: AbstractSchema
     setAbstract: (a: AbstractSchema) => void
 }
 
-export function AbstractPreviewDialog({ abstract, setAbstract: setActiveAbstract }: AbstractPreviewDialogProps) {
+export function AbstractPreviewDialog({ abstract, setAbstract: setActiveAbstract }: AbstractPreviewProps) {
 
     return (
         <Dialog
@@ -352,10 +329,11 @@ export function AbstractPreviewDialog({ abstract, setAbstract: setActiveAbstract
 
                     <Separator />
 
-                    <DownloadAbstractPDFButton abstractId={abstract.id} />
-
-                    <div className="no-scrollbar max-h-[50vh] overflow-y-auto ">
-                        <AbstractPreviewData abstract={abstract} />
+                    {/* <DownloadAbstractPDFButton abstractId={abstract.id} /> */}
+                    <div className="no-scrollbar h-[50vh]">
+                        <ScrollArea className="h-full pr-2">
+                            <AbstractPreviewData abstract={abstract} />
+                        </ScrollArea>
                     </div>
 
                     <DialogFooter>
@@ -369,6 +347,122 @@ export function AbstractPreviewDialog({ abstract, setAbstract: setActiveAbstract
     )
 }
 
+export function AbstractPreviewSheet({
+    abstract,
+    setAbstract: setActiveAbstract,
+}: AbstractPreviewProps) {
+    return (
+        <Sheet
+            open={!!abstract}
+            onOpenChange={(open) => {
+                if (!open) {
+                    setActiveAbstract(null);
+                }
+            }}
+        >
+            <SheetContent className="w-full sm:max-w-2xl">
+                <SheetHeader>
+                    <div className="flex items-center gap-3">
+                        <div className="flex size-12 shrink-0 items-center justify-center rounded-lg border-2 border-primary-main/20 bg-primary-light/10 text-primary">
+                            <InfoIcon className="size-8 stroke-2 text-primary-main" />
+                        </div>
 
+                        <div>
+                            <SheetTitle className="text-xl font-semibold tracking-tight">
+                                Submission Information
+                            </SheetTitle>
 
-export default AbstractSubmissionPage
+                            <SheetDescription className="mt-0.5 text-xs font-normal">
+                                Review your paper formatting and declarations before submission.
+                            </SheetDescription>
+                        </div>
+                    </div>
+                </SheetHeader>
+
+                <Separator />
+
+                {abstract && (
+                    <div className="min-h-0 flex-1 px-4 pr-2 md:px-8 md:pr-4">
+                        <ScrollArea className="h-full pr-4">
+                            <div className="space-y-4 mb-4">
+                                <div className="flex items-center gap-2 text-sm font-semibold uppercase tracking-wider text-primary-main">
+                                    <FileCodeIcon className="size-4" />
+                                    <span>Submission Metadata</span>
+                                </div>
+
+                                <div className="rounded-lg border bg-muted/30 space-y-3 p-4">
+                                    <div>
+                                        <p className="text-xs font-medium text-muted-foreground">Title</p>
+                                        <p className="mt-1 text-sm font-semibold leading-snug" dangerouslySetInnerHTML={{ __html: abstract.title || "Not set" }} />
+                                    </div>
+
+                                    <div className="grid grid-cols-2 gap-3">
+                                        <div>
+                                            <p className="text-xs font-medium text-muted-foreground">
+                                                Presentation
+                                            </p>
+                                            {abstract.is_for_young_watoc ? (
+                                                <Badge variant="secondary">
+                                                    Young WATOC
+                                                </Badge>
+                                            ) : (
+                                                <p className="mt-1 text-sm">
+                                                    {abstract.presentation_type || "Not set"}
+                                                </p>
+                                            )}
+                                        </div>
+
+                                        <div>
+                                            <p className="text-xs font-medium text-muted-foreground">
+                                                Status
+                                            </p>
+                                            <p className="mt-1 text-sm">
+                                                {abstract.status || "Not set"}
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    <div className="grid grid-cols-2 gap-3">
+                                        <div>
+                                            <p className="text-xs font-medium text-muted-foreground">
+                                                Created
+                                            </p>
+                                            <p className="mt-1 text-sm">
+                                                {abstract.created_at
+                                                    ? formatDate(new Date(abstract.created_at))
+                                                    : "Not set"}
+                                            </p>
+                                        </div>
+
+                                        <div>
+                                            <p className="text-xs font-medium text-muted-foreground">
+                                                Last update
+                                            </p>
+                                            <p className="mt-1 text-sm">
+                                                {abstract.last_update
+                                                    ? formatDate(new Date(abstract.last_update))
+                                                    : "Not set"}
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <DownloadAbstractPDFButton abstractId={abstract.id} />
+                            </div>
+                            <AbstractPreviewData abstract={abstract} />
+                        </ScrollArea>
+                    </div>
+                )}
+
+                <SheetFooter>
+                    <Button
+                        variant="outline"
+                        onClick={() => setActiveAbstract(null)}
+                    >
+                        Close
+                    </Button>
+                </SheetFooter>
+            </SheetContent>
+        </Sheet>
+    );
+}

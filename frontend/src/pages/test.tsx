@@ -1,21 +1,53 @@
 import api from '@/clients/api'
+import AdaptableTooltip from '@/components/custom/adaptable-tooltip'
 import { notify } from '@/components/custom/notify'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import { Field, FieldContent, FieldDescription, FieldLabel, FieldLegend, FieldSet, FieldTitle, } from "@/components/ui/field"
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Separator } from '@/components/ui/separator'
-import ReviewAssignmentForm from '@/forms/reviews/review-assignment-form'
-import { routes } from '@/routes/routes'
-import { useNavigate } from 'react-router'
-import DownloadAbstractPDFButton from './test/test-abstract-feature'
 import { ConfirmProvider, useConfirm } from '@/contexts/ConfirmationDialogContext'
 import { GenericConfirmProvider, useGenericConfirm } from '@/contexts/GenericConfirmationContext'
+import ReviewAssignmentForm from '@/forms/reviews/review-assignment-form'
+import { cn } from '@/lib/utils'
+import { routes } from '@/routes/routes'
 import type { AbstractSchema } from '@/schemas/abstracts/abstract-schemas'
 import { getSubmissionById } from '@/services/submissions/submission-services'
+import { ChartColumnIncreasingIcon, LightbulbIcon, SparklesIcon } from 'lucide-react'
+import { useNavigate } from 'react-router'
+import DownloadAbstractPDFButton from './test/test-abstract-feature'
+
+
+const presentationOptions = [
+    {
+        value: "plus",
+        id: "plus-plan",
+        title: "Oral Presentation",
+        description: "Present your research orally during the congress.",
+        icon: LightbulbIcon,
+    },
+    {
+        value: "pro",
+        id: "pro-plan",
+        title: "Poster",
+        description: "Present your research as a scientific poster.",
+        icon: ChartColumnIncreasingIcon,
+    },
+    {
+        value: "enterprise",
+        id: "enterprise-plan",
+        title: "Young WATOC",
+        description: "Submit your work to the Young WATOC program.",
+        icon: SparklesIcon,
+    },
+];
+
 
 function TestPage() {
     const navigate = useNavigate()
 
+    const errors = false
 
     return (
         <div className='bg-muted h-full'>
@@ -136,6 +168,73 @@ function TestPage() {
                     </GenericConfirmProvider>
                 </div>
             </div>
+
+            <div className='max-w-2xl w-full mx-auto'>
+                <Card>
+                    <CardContent>
+                        <FieldSet>
+                            <FieldLegend variant='label' className='flex items-center gap-2 mb-1'>
+                                Presentation Type
+                                <AdaptableTooltip
+                                    content='Pinche puta'
+                                    triggerClassName='text-primary'
+                                />
+                            </FieldLegend>
+                            <FieldDescription>
+                                Choose your preferred presentation type
+                            </FieldDescription>
+                            <RadioGroup aria-invalid defaultValue="plus" className="w-full grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3">
+
+                                {presentationOptions.map(item => (
+                                    <FieldLabel
+                                        key={item.id}
+                                        htmlFor={item.id}
+                                        className={cn(
+                                            "cursor-pointer border-2!",
+                                            "hover:border-primary-light",
+                                            "has-data-[state=checked]:border-primary-main",
+                                            "has-data-[state=checked]:bg-primary-main/5!",
+                                            "transition-all duration-150 hover:-translate-y-1 hover:shadow-md",
+                                            errors && "border-destructive! hover:border-destructive! bg-destructive/5 has-data-[state=checked]:bg-destructive/10!",
+                                        )}
+                                    >
+                                        <Field data-invalid={errors} orientation="vertical">
+                                            <div className="relative flex items-start justify-between gap-3">
+                                                <FieldContent>
+                                                    <FieldTitle className="font-semibold mb-2 text-primary-main">
+                                                        {item.title}
+                                                    </FieldTitle>
+
+                                                    <div className="flex items-start justify-between gap-2">
+                                                        <div className={cn(
+                                                            "flex size-10 shrink-0 items-center justify-center rounded-xl border-2",
+                                                            errors
+                                                                ? "border-destructive bg-destructive/10"
+                                                                : "border-primary-main/20 bg-primary-light/20",
+                                                        )}>
+                                                            <item.icon className={cn(
+                                                                errors
+                                                                    ? 'text-destructive'
+                                                                    : 'text-primary-main',
+                                                            )} />
+                                                        </div>
+                                                        <FieldContent>
+                                                            <FieldDescription className="text-xs">
+                                                                {item.description}
+                                                            </FieldDescription>
+                                                        </FieldContent>
+                                                    </div>
+                                                </FieldContent>
+                                                <RadioGroupItem className='absolute top-0 right-0' value={item.value} id={item.id} />
+                                            </div>
+                                        </Field>
+                                    </FieldLabel>
+                                ))}
+                            </RadioGroup>
+                        </FieldSet>
+                    </CardContent>
+                </Card>
+            </div>
         </div>
     )
 }
@@ -169,8 +268,6 @@ function TestComponent() {
                 })
 
                 console.log(selection);
-
-
             }}
         >
             {resolvedData ? 'Awebo' : 'Haz click aquí'}

@@ -11,6 +11,9 @@ const Toaster = ({ ...props }: ToasterProps) => {
       visibleToasts={5}
       theme={theme as ToasterProps["theme"]}
       className="toaster group pointer-events-auto!"
+      toastOptions={{
+        descriptionClassName: 'text-muted-foreground!',
+      }}
       style={
         {
           "--normal-bg": "var(--popover)",

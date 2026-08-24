@@ -1,11 +1,10 @@
-import type { AbstractSchema } from '@/schemas/abstracts/abstract-schemas'
-import type { AuthorSchema } from '@/schemas/abstracts/author-schema';
-import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
 import { cn } from '@/lib/utils';
+import type { AbstractSchema } from '@/schemas/abstracts/abstract-schemas';
+import type { AuthorSchema } from '@/schemas/abstracts/author-schema';
 import { countries } from '@/utils/countriesInfo';
-import { BookOpen, Quote } from 'lucide-react';
-import React from 'react'
+import { BookOpen, FileTextIcon, Quote } from 'lucide-react';
+import React from 'react';
 
 type AbstractPreviewDataProps = {
     abstract?: AbstractSchema
@@ -14,10 +13,18 @@ type AbstractPreviewDataProps = {
 function AbstractPreviewData({ abstract, }: AbstractPreviewDataProps) {
     return (
         <div className="space-y-4 max-w-4xl">
-            <h4
-                className="text-lg md:text-2xl font-semibold leading-snug tracking-tight text-foreground"
-                dangerouslySetInnerHTML={{ __html: abstract?.title || 'Not set' }}
-            />
+
+            <div className="space-y-3">
+                <div className="flex items-center gap-2 text-sm font-semibold uppercase tracking-wider text-primary-main">
+                    <FileTextIcon className="size-4" />
+                    <span>Submission Preview</span>
+                </div>
+
+                <h4
+                    className="text-lg md:text-2xl font-semibold leading-snug tracking-tight text-foreground"
+                    dangerouslySetInnerHTML={{ __html: abstract?.title || 'Not set' }}
+                />
+            </div>
 
             <AuthorsPreview authors={(abstract?.authors as any || []) as AuthorSchema[]} />
 
@@ -29,15 +36,13 @@ function AbstractPreviewData({ abstract, }: AbstractPreviewDataProps) {
                     <span>Content</span>
                 </div>
 
-                <ScrollArea className='max-h-60 pr-2'>
-                    <div
-                        className={cn(
-                            "min-h-20 text-xs sm:text-sm prose prose-sm dark:prose-invert max-w-none leading-relaxed",
-                            abstract?.text ? 'text-foreground/90' : 'text-destructive'
-                        )}
-                        dangerouslySetInnerHTML={{ __html: abstract?.text || 'Not set' }}
-                    />
-                </ScrollArea>
+                <div
+                    className={cn(
+                        "min-h-20 text-xs sm:text-sm prose prose-sm dark:prose-invert max-w-none leading-relaxed",
+                        abstract?.text ? 'text-foreground/90' : 'text-destructive'
+                    )}
+                    dangerouslySetInnerHTML={{ __html: abstract?.text || 'Not set' }}
+                />
             </div>
 
             <Separator className='mb-4' />
@@ -48,13 +53,30 @@ function AbstractPreviewData({ abstract, }: AbstractPreviewDataProps) {
                     <span>References</span>
                 </div>
 
-                    <div
-                        className={cn(
-                            "min-h-20 text-xs sm:text-sm prose prose-sm dark:prose-invert max-w-none leading-relaxed",
-                            abstract?.text ? 'text-foreground/90' : 'text-destructive'
-                        )}
-                        dangerouslySetInnerHTML={{ __html: abstract?.references || 'Not set' }}
-                    />
+                <ol
+                    className={cn(
+                        "min-h-20 list-decimal pl-6 text-xs sm:text-sm prose prose-sm dark:prose-invert max-w-none leading-relaxed",
+                        abstract?.references
+                            ? "text-foreground/90"
+                            : "text-destructive"
+                    )}
+                >
+                    {abstract?.references ? (
+                        abstract.references
+                            .match(/<p>[\s\S]*?<\/p>/gi)
+                            ?.map((reference, index) => (
+                                <li key={index}>
+                                    <div
+                                        dangerouslySetInnerHTML={{
+                                            __html: reference.replace(/^<p>|<\/p>$/gi, ""),
+                                        }}
+                                    />
+                                </li>
+                            ))
+                    ) : (
+                        <li>Not set</li>
+                    )}
+                </ol>
             </div>
         </div>
     )

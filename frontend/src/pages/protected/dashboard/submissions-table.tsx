@@ -2,7 +2,7 @@ import { DataTable } from '@/components/ui/data-table'
 import { useAuth } from '@/contexts/AuthContext'
 import type { PaginatedResponse } from '@/domain/pagination'
 import type { AbstractSchema } from '@/schemas/abstracts/abstract-schemas'
-import { getSubmissionById, getUserSubmissions } from '@/services/submissions/submission-services'
+import { getSubmissionById, getAllSubmissions, getParticipantSubmissions } from '@/services/submissions/submission-services'
 import { useQuery } from '@tanstack/react-query'
 import React from 'react'
 import { columns } from './columns'
@@ -16,7 +16,7 @@ function SubmissionsSummaryTable() {
     const [itemsPerPage, setItemsPerPage] = React.useState(5)
     const { data, isLoading } = useQuery<PaginatedResponse<AbstractSchema>>({
         queryKey: ['abstracts', user.id, page, itemsPerPage],
-        queryFn: () => getUserSubmissions({ page, itemsPerPage }),
+        queryFn: () => getParticipantSubmissions({ page, itemsPerPage }),
         refetchOnWindowFocus: false,
     })
 

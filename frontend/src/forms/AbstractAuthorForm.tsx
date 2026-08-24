@@ -8,7 +8,6 @@ import { Field, FieldContent, FieldError, FieldLabel } from '@/components/ui/fie
 import { InputGroup, InputGroupAddon, InputGroupInput } from '@/components/ui/input-group'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Switch } from '@/components/ui/switch'
-import { useAuth } from '@/contexts/AuthContext'
 import { DEBUG } from '@/lib/constants'
 import { cn } from '@/lib/utils'
 import type { Affiliation } from '@/schemas/abstracts/affiliation-schema'
@@ -360,8 +359,8 @@ export function AuthorFormContent({ abstractId, onSubmit, values }: Props) {
                             Search existing affiliation
 
                             <AdaptableTooltip
-                                buttonClassNames='size-4 text-primary'
-                                tooltipContent={(
+                                triggerClassName='size-4 text-primary'
+                                content={(
                                     <p>
                                         Select a previously used affiliation to autofill its details, 
                                         or fill out the fields to create a new one.

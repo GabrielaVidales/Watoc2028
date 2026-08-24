@@ -1,65 +1,72 @@
-import { useIsMobile } from '@/hooks/use-mobile'
-import { Tooltip, TooltipContent, TooltipTrigger, } from "@/components/ui/tooltip"
-import React, { type HTMLAttributes } from 'react'
-import { InfoIcon } from 'lucide-react'
-import { cn } from '@/lib/utils'
 import {
     Popover,
     PopoverContent,
-    PopoverDescription,
-    PopoverHeader,
-    PopoverTitle,
-    PopoverTrigger,
+    PopoverTrigger
 } from "@/components/ui/popover"
+import { Tooltip, TooltipContent, TooltipTrigger, } from "@/components/ui/tooltip"
+import { useIsMobile } from '@/hooks/use-mobile'
+import { cn } from '@/lib/utils'
+import { InfoIcon } from 'lucide-react'
+import React, { type ComponentProps } from 'react'
 
 
 type AdaptableTooltipProps = {
-    tooltipContent?: React.ReactNode
-    buttonClassNames?: string
-}
+    content?: React.ReactNode;
+    triggerClassName?: string;
+    children?: React.ReactNode;
+} & Omit<ComponentProps<typeof TooltipContent>, "content">;
 
 function AdaptableTooltip({
-    tooltipContent,
-    buttonClassNames,
+    content,
+    children,
+    triggerClassName,
     className,
-}: AdaptableTooltipProps & HTMLAttributes<HTMLDivElement>) {
+    ...props
+}: AdaptableTooltipProps) {
     const isMobile = useIsMobile()
+
+    const trigger = children ?? (
+        <InfoIcon
+            className={cn(
+                "size-4 shrink-0 text-muted-foreground",
+                triggerClassName,
+            )}
+        />
+    )
 
     if (isMobile) {
         return (
             <Popover>
                 <PopoverTrigger asChild>
-                    <InfoIcon className={cn(
-                        'size-3 shrink-0 text-muted-foreground',
-                        buttonClassNames,
-                    )} />
+                    {trigger}
                 </PopoverTrigger>
-                <PopoverContent className={cn(
-                    'max-w-60 text-[10px] font-normal py-1.5 px-3 bg-black dark:bg-white text-white dark:text-black border-0',
-                    className,
-                )}>
-                    {tooltipContent || 'Hello world!'}
+
+                <PopoverContent
+                    className={cn(
+                        "max-w-60 border-0 bg-black px-3 py-1.5 text-[10px] font-normal text-white dark:bg-white dark:text-black",
+                        className,
+                    )}
+                >
+                    {content}
                 </PopoverContent>
             </Popover>
-        )
+        );
     }
 
     return (
         <Tooltip>
             <TooltipTrigger asChild>
-                <InfoIcon className={cn(
-                    'size-3 shrink-0 text-muted-foreground',
-                    buttonClassNames,
-                )} />
+                {trigger}
             </TooltipTrigger>
-            <TooltipContent className={cn(
-                'max-w-60',
-                className,
-            )}>
-                {tooltipContent || 'Hello world!'}
+
+            <TooltipContent
+                className={cn("max-w-60", className)}
+                {...props}
+            >
+                {content}
             </TooltipContent>
         </Tooltip>
-    )
+    );
 }
 
 export default AdaptableTooltip

@@ -4,14 +4,27 @@ import type { AbstractSchema } from "@/schemas/abstracts/abstract-schemas"
 import type { CreateAbstractFormValues } from "@/schemas/abstracts/create-abstract-schema"
 
 
-async function getUserSubmissions(request: PaginatedRequest) {
+async function getAllSubmissions(request: PaginatedRequest) {
     const { data: responseData } = await api.get<PaginatedResponse<AbstractSchema>>('abstracts/submissions/', {
         params: {
             limit: request.itemsPerPage,
             page: request.page,
+            title: request.search,
         }
     })
     return responseData
+}
+
+
+async function getParticipantSubmissions(request: PaginatedRequest) {
+    const { data } = await api.get<PaginatedResponse<AbstractSchema>>('/participants/profiles/submissions', {
+        params: {
+            page: request.page,
+            limit: request.itemsPerPage,
+            title: request.search,
+        }
+    })
+    return data
 }
 
 
@@ -23,6 +36,12 @@ async function createSubmission(data: CreateAbstractFormValues) {
 
 async function getSubmissionById(id: number | string) {
     const { data } = await api.get<AbstractSchema>(`/abstracts/submissions/${id}/`)
+    return data
+}
+
+
+async function submitAbstract(id: number | string) {
+    const { data } = await api.patch<AbstractSchema>(`/abstracts/submissions/${id}/submit/`)
     return data
 }
 
@@ -44,9 +63,8 @@ async function deleteSubmission(id: number | string) {
 
 
 export {
-    getUserSubmissions,
-    getSubmissionById,
-    createSubmission,
-    updateSubmission,
-    deleteSubmission,
+    createSubmission, deleteSubmission, getAllSubmissions,
+    getParticipantSubmissions,
+    getSubmissionById, submitAbstract, updateSubmission
 }
+

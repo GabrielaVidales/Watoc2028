@@ -1,5 +1,9 @@
 from channels.generic.websocket import AsyncJsonWebsocketConsumer
 from channels.db import database_sync_to_async
+from redis.exceptions import RedisError
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 class PDFGenerationConsumer(AsyncJsonWebsocketConsumer):
@@ -8,12 +12,18 @@ class PDFGenerationConsumer(AsyncJsonWebsocketConsumer):
         self.job_id = self.scope["url_route"]["kwargs"]["job_id"]
         self.group_name = f"pdf_job_{self.job_id}"
 
-        await self.channel_layer.group_add(
-            self.group_name,
-            self.channel_name,
-        )
+        try:
+            await self.channel_layer.group_add(
+                self.group_name,
+                self.channel_name,
+            )
 
-        await self.accept()
+            await self.accept()
+        except RedisError as e:
+            logger.error(f"[Redis Error] -> {e}")
+
+            await self.close()
+            return
 
         # Esto es importante: se puede dar una race condition
         # en la que la tarea se complete ANTES de siquiera establecer
@@ -21,19 +31,24 @@ class PDFGenerationConsumer(AsyncJsonWebsocketConsumer):
         job = await self.get_job()
         if job is not None:
             from apps.abstracts.serializers import PDFGenerationJobSerializer
-            
+
             serializer = PDFGenerationJobSerializer(job)
-            
-            await self.send_json({
-                "type": f"pdf.status.{self.job_id}",
-                "message": serializer.data,
-            })
+
+            await self.send_json(
+                {
+                    "type": f"pdf.status.{self.job_id}",
+                    "message": serializer.data,
+                }
+            )
 
     async def disconnect(self, code):
-        await self.channel_layer.group_discard(
-            self.group_name,
-            self.channel_name,
-        )
+        try:
+            await self.channel_layer.group_discard(
+                self.group_name,
+                self.channel_name,
+            )
+        except RedisError as e:
+            logger.error(f"[Redis Error] -> {e}")
 
     async def pdf_status(self, event):
         print("Respondiendo status de job:")
@@ -47,7 +62,8 @@ class PDFGenerationConsumer(AsyncJsonWebsocketConsumer):
     @database_sync_to_async
     def get_job(self):
         from apps.abstracts.models import PDFGenerationJob
+
         try:
-            return PDFGenerationJob.objects.get(id=self.job_id)
+            return PDFGenerationJob.objects.select_related("abstract", "abstract__user").get(id=self.job_id)
         except PDFGenerationJob.DoesNotExist:
             return None

@@ -14,26 +14,31 @@ from config.pagination import Pagination
 from django_filters.rest_framework import DjangoFilterBackend
 from apps.notifications.filters import NotificationFilter
 
+from asgiref.sync import async_to_sync
+from channels.layers import get_channel_layer
+
 
 class NotificationViewSet(ModelViewSet):
     queryset = Notification.objects.all()
     serializer_class = NotificationSerializer
-    permission_classes = [permissions.IsAuthenticated, HasCSRFToken]
+    permission_classes = [permissions.IsAuthenticated]
     pagination_class = Pagination
     filter_backends = [DjangoFilterBackend]
     filterset_class = NotificationFilter
 
-    def list(self, request):
-        """TODO: Esto es solo para testeo, eliminar después"""
-
+    @action(detail=False, methods=["post"], url_path="send-pulse")
+    def send_pulse(self, request: Request):
         notification = Notification.objects.first()
         serializer = self.get_serializer(notification)
         channel_layer = get_channel_layer()
         async_to_sync(channel_layer.group_send)(
             "notificaciones",
-            {"type": "enviar_notificacion", "message": serializer.data},
+            {
+                "type": "send_notification",
+                "message": serializer.data,
+            },
         )
-        return Response(serializer.data)
+        return Response("Pulso enviado...")
 
     @action(detail=False, methods=["get"], url_path="user")
     def get_for_user(self, request: Request):

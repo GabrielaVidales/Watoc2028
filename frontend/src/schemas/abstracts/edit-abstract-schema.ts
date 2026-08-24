@@ -32,7 +32,11 @@ const editAbstractSchema = z.object({
         .min(1, "Please enter the abstract title")
         .refine((val) => countWordsFromHTML(val) <= 20, "The abstract title must not exceed 20 words."),
 
-    presentation_type: z.enum(presentationTypes.map(v => v.value), 'Opción no válida'),
+    presentation_type: z
+        .enum(presentationTypes.map(v => v.value), 'Opción no válida')
+        .or(z.literal(''))
+        .optional()
+        .transform(value => value === '' ? undefined : value),
 
     text: z.string()
         .refine((val) => countWordsFromHTML(val) <= 350, "Abstract must be at most 350 words")
@@ -44,6 +48,15 @@ const editAbstractSchema = z.object({
 
     is_for_young_watoc: z.boolean(),
 })
+    .superRefine((data, ctx) => {
+        if (!data.is_for_young_watoc && !data.presentation_type) {
+            ctx.addIssue({
+                code: 'custom',
+                message: 'Choose a valid presentation format',
+                path: ['presentation_type'],
+            })
+        }
+    })
     .transform(data => {
         const abstract: AbstractSchema = {
             title: data.title,
@@ -60,5 +73,6 @@ type EditAbstractFormValues = z.input<typeof editAbstractSchema>
 
 export {
     editAbstractSchema,
-    type EditAbstractFormValues,
-}
+    type EditAbstractFormValues
+};
+

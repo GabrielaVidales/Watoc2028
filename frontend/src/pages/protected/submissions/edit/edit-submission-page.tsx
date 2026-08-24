@@ -1,49 +1,31 @@
 import api from '@/clients/api'
-import type { AbstractSchema } from '@/schemas/abstracts/abstract-schemas'
-import { Stepper, StepperDescription, StepperIndicator, StepperItem, StepperNav, StepperSeparator, StepperTitle, StepperTrigger, } from "@/components/reui/stepper"
 import ShowAffiliations from '@/components/ShowAffiliations'
 import ShowAuthorsComponent from '@/components/ShowAuthors'
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger, } from "@/components/ui/accordion"
+import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { Card, CardAction, CardContent, CardDescription, CardFooter, CardHeader, CardTitle, } from "@/components/ui/card"
-import AbstractDeclarations from '@/forms/submissions/abstract-declarations-form'
+import { Card, CardAction, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { Separator } from '@/components/ui/separator'
+import { ConfirmProvider, useConfirm } from '@/contexts/ConfirmationDialogContext'
 import AbstractContentForm from '@/forms/submissions/abstract-content-form'
-import { useIsMobile } from '@/hooks/use-mobile'
-import { useScrollSpy } from '@/hooks/useScrollSpy'
+import { DEBUG } from '@/lib/constants'
 import { cn, } from '@/lib/utils'
 import { routes } from '@/routes/routes'
-import { useQuery } from '@tanstack/react-query'
-import { CheckIcon, ChevronLeft, Info, LoaderCircleIcon, LucideFileEdit, MailOpen, MessageSquareCode, PanelRight, PanelRightIcon, Plus, RotateCw, ScanText, School, UserPlus } from 'lucide-react'
-import { useEffect, useRef, useState } from 'react'
-import { Link, useNavigate, useParams } from 'react-router'
+import type { AbstractSchema } from '@/schemas/abstracts/abstract-schemas'
+import { submitAbstract } from '@/services/submissions/submission-services'
 import { formatDate } from '@/utils/formatDate'
-import AbstractPreviewData from './abstract-preview-data'
-import { Separator } from '@/components/ui/separator'
-import { useRightSidebar } from '@/contexts/RightSidebarContext'
-import { RightSidebarTrigger, SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarRail } from '@/components/ui/sidebar'
+import { useMutation, useQuery } from '@tanstack/react-query'
+import type { AxiosError } from 'axios'
+import { LucideFileEdit, RotateCw, ScanText, SendIcon } from 'lucide-react'
+import { useEffect, useRef } from 'react'
+import { useNavigate, useParams } from 'react-router'
+import DeadlinesCard from '../summary/deadlines-card'
 
 
 function EditAbstractPage() {
-    const isMobile = useIsMobile()
     const navigate = useNavigate()
     const parentRef = useRef<HTMLDivElement | null>(null)
 
-    const onStepperChange = (v: number) => {
-        const id = steps[v - 1].id
-        const element = document.getElementById(id)
-        if (element && parentRef.current) {
-            const parent = parentRef.current;
-
-            // Calculamos la posición del elemento relativa al contenedor main
-            const targetOffsetTop = element.offsetTop;
-
-            // Restamos unos 16-20px si quieres dejar un pequeño margen de cortesía arriba
-            parent.scrollTo({
-                top: targetOffsetTop - (isMobile ? 60 : 120), //  - 140 + 80,
-                behavior: 'smooth'
-            });
-        }
-    }
 
     const { id } = useParams()
     const { data } = useQuery<AbstractSchema>({
@@ -59,174 +41,6 @@ function EditAbstractPage() {
             navigate(routes.users.submissions.summary)
         }
     }, [data])
-
-    const [currStep, setCurrState] = useState(1)
-    const nextStep = () => {
-        console.log('Puta madre');
-
-        if (currStep < 4) {
-            setCurrState(prev => prev + 1)
-        }
-    }
-
-    const previousStep = () => {
-        console.log('Puta madre');
-
-        if (currStep > 1) {
-            setCurrState(prev => prev - 1)
-        }
-    }
-
-    const steps = [
-        {
-            id: 'abstract-content',
-            title: 'Content',
-            label: 'Enter your abstract title, body, and references.',
-        },
-        {
-            id: 'abstract-authors',
-            title: 'Authors',
-            label: 'Add authors and their affiliations.',
-        },
-        {
-            id: 'abstract-declarations',
-            title: 'Declarations',
-            label: 'Review and accept the required declarations.',
-        },
-        {
-            id: 'abstract-review',
-            title: 'Review',
-            label: 'Review your submission and submit your abstract.',
-        },
-    ]
-
-    const activeId = useScrollSpy(steps.map(s => s.id), {
-        root: parentRef.current,
-        rootMargin: '-80px'
-    });
-
-    useEffect(() => {
-        const getActiveId = steps.findIndex(i => i.id === activeId) + 1
-        setCurrState(getActiveId)
-    }, [activeId])
-
-
-    const {
-        setRightSidebarContent,
-        clearRightSidebarContent,
-        setDefaultOpen,
-        setCollapsible,
-        setShowTriggerButton,
-    } = useRightSidebar()
-
-    useEffect(() => {
-        if (!data) {
-            return
-        }
-
-        setShowTriggerButton(false)
-        setCollapsible('icon')
-        setDefaultOpen(true)
-        setRightSidebarContent(
-            <>
-                <SidebarContent>
-                    <SidebarGroup>
-                        <SidebarGroupLabel>
-                            MAIN
-                        </SidebarGroupLabel>
-
-                        <SidebarGroupContent>
-                            <CardHeader>
-                                <div>
-                                    <CardTitle>
-                                        Status
-                                    </CardTitle>
-                                    <CardDescription>
-                                        Your submission status
-                                    </CardDescription>
-                                </div>
-                                <CardAction>
-                                    <div className='cursor-pointer flex flex-col justify-center items-center gap-1 h-14 bg-primary-main hover:bg-primary-light text-primary-contrast py-[1.5] px-3 rounded-lg'>
-                                        <MailOpen />
-                                        <span className='text-xs'>
-                                            {data.status.toUpperCase()}
-                                        </span>
-                                    </div>
-                                </CardAction>
-                            </CardHeader>
-                            <CardContent>
-                                <Stepper
-                                    onValueChange={onStepperChange}
-                                    value={currStep}
-                                    defaultValue={2}
-                                    className="h-full w-full py-6"
-                                    orientation="vertical"
-                                    indicators={{
-                                        completed: (
-                                            <CheckIcon className="size-3.5" />
-                                        ),
-                                        loading: (
-                                            <LoaderCircleIcon className="size-3.5 animate-spin" />
-                                        ),
-                                    }}
-                                >
-                                    <StepperNav>
-                                        {steps.map((step, index) => (
-                                            <StepperItem
-                                                key={index}
-                                                step={index + 1}
-                                                className="relative items-start not-last:flex-1"
-                                            >
-                                                <StepperTrigger className="items-start gap-2.5 pb-8 last:pb-0">
-                                                    <StepperIndicator>
-                                                        {index + 1}
-                                                    </StepperIndicator>
-                                                    <div className="mt-0.5 text-left">
-                                                        <StepperTitle className='text-sm'>{step.title}</StepperTitle>
-                                                        <StepperDescription className='text-xs'>{step.label}</StepperDescription>
-                                                    </div>
-                                                </StepperTrigger>
-                                                {index < steps.length - 1 && (
-                                                    <StepperSeparator className="group-data-[state=completed]/step:bg-primary absolute inset-y-0 top-7 left-3 -order-1 m-0 -translate-x-1/2 group-data-[orientation=vertical]/stepper-nav:h-[calc(100%-2rem)]" />
-                                                )}
-                                            </StepperItem>
-                                        ))}
-                                    </StepperNav>
-                                </Stepper>
-                            </CardContent>
-                            <CardContent className="text-sm text-muted-foreground">
-                                Your abstract is currently in draft. Once you click "Submit", it will move to the <strong>Review Process</strong>.
-                            </CardContent>
-                            <CardFooter className="justify-end gap-2">
-                                <Button variant="outline" onClick={previousStep}>Decline</Button>
-                                <Button
-                                    onClick={nextStep}
-                                    disabled={activeId !== 'abstract-review'}
-                                >
-                                    Accept
-                                </Button>
-                            </CardFooter>
-                        </SidebarGroupContent>
-                        <SidebarRail />
-                    </SidebarGroup>
-                </SidebarContent>
-                <SidebarFooter>
-                    <SidebarMenu>
-                        <SidebarMenuItem>
-                            <SidebarMenuButton asChild>
-                                <RightSidebarTrigger>
-                                    <PanelRightIcon />
-                                    <span className="sr-only">Toggle Sidebar</span>
-                                </RightSidebarTrigger>
-                            </SidebarMenuButton>
-                        </SidebarMenuItem>
-                    </SidebarMenu>
-                </SidebarFooter>
-            </>
-        )
-
-        return () => clearRightSidebarContent()
-    }, [data, currStep, activeId])
 
     if (!data) {
         return (
@@ -244,184 +58,149 @@ function EditAbstractPage() {
     }
 
     return (
-        <>
-            <div className={cn(
-                "h-full grid",
-                isMobile ? "grid-cols-1" : "sticky top-0 ",
-            )}>
-                <main id='main-container' className='h-full w-full overflow-y-auto no-scrollbar bg-background' ref={parentRef}>
-                    <div className='bg-background space-y-4 p-8 border-b-2 border-b-border sticky top-0 z-10'>
+        <div className="max-w-6xl mx-auto w-full grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,1fr)_350px]">
+            <main id='main-container' className="w-full py-8" ref={parentRef}>
+                <div className='bg-background space-y-4 mb-4'>
 
-                        <div className='flex flex-row md:justify-between gap-5'>
-                            <div className="flex items-start gap-3 min-w-0">
-                                <div className="flex size-12 shrink-0 items-center justify-center rounded-lg bg-primary-light/10 border-2 border-primary-main/20 text-primary">
-                                    <LucideFileEdit className="text-primary-main stroke-2 size-8" />
-                                </div>
-
-                                <div className="min-w-0 flex-1 space-y-0">
-                                    <p className="text-sm text-muted-foreground">
-                                        Editting submission
-                                    </p>
-                                    <h4 className='text-2xl font-semibold leading-tight truncate' title={data.plain_title} dangerouslySetInnerHTML={{ __html: data.title }}></h4>
-                                    <p className='text-xs text-muted-foreground mt-2'>Last modification: {formatDate(data.last_update)}</p>
-                                </div>
+                    <div className='flex flex-row md:justify-between gap-5'>
+                        <div className="flex items-start gap-3 min-w-0">
+                            <div className="flex size-12 shrink-0 items-center justify-center rounded-lg bg-primary-light/10 border-2 border-primary-main/20 text-primary">
+                                <LucideFileEdit className="text-primary-main stroke-2 size-8" />
                             </div>
 
-                            {isMobile && (
-                                <RightSidebarTrigger />
-                            )}
+                            <div className="min-w-0 flex-1 space-y-0">
+                                <p className="text-sm text-muted-foreground">
+                                    Editting submission
+                                </p>
+                                <h4 className='text-2xl font-semibold leading-tight truncate' title={data.plain_title} dangerouslySetInnerHTML={{ __html: data.title }}></h4>
+                                <p className='text-xs text-muted-foreground mt-2'>Last modification: {formatDate(data.last_update)}</p>
+                            </div>
                         </div>
                     </div>
+                </div>
+
+                <div className={cn("w-full space-y-4 md:space-y-8 lg:space-y-12 mb-8",)}>
+                    <Card className='w-full gap-0' id='abstract-content'>
+                        <CardContent className='space-y-5'>
+                            <CardTitle className="flex gap-3 items-center">
+                                <ScanText className='text-primary-main' />
+                                <h2 className='text-xl font-semibold'>Abstract Content</h2>
+                            </CardTitle>
+
+                            <AbstractContentForm abstractId={data ? data.id : null} />
+                        </CardContent>
+                    </Card>
+
+                    <Card className='w-full gap-0' id='abstract-authors'>
+
+                        <CardContent className='space-y-5'>
+                            <ShowAuthorsComponent abstractId={data ? data.id : null} />
+                        </CardContent>
+
+                        <Separator />
+
+                        <CardContent className='space-y-5 md:py-5 md:px-10'>
+                            <Accordion
+                                type="single"
+                                collapsible
+                            >
+                                <AccordionItem value={'item'} className={"group relative rounded-md transition-colors duration-300"}>
+                                    <AccordionTrigger className="cursor-pointer text-base font-normal text-muted-foreground focus-visible:outline-none focus-visible:ring-0">
+                                        More settings...
+                                    </AccordionTrigger>
+
+                                    <AccordionContent>
+                                        <ShowAffiliations abstractId={data ? data.id : null} />
+                                    </AccordionContent>
+
+                                </AccordionItem>
+                            </Accordion>
+                        </CardContent>
+                    </Card>
+                </div>
+            </main>
+
+            <aside className='w-full py-8 space-y-4'>
+                <ConfirmProvider>
+                    <SubmitAbstract abstract={data} />
+                </ConfirmProvider>
 
 
-                    <div className={cn("p-2 md:p-4 lg:p-6 bg-secondary dark:bg-slate-950 space-y-4 md:space-y-8 lg:space-y-12 mb-8",)}>
-                        <Card className='max-w-4xl mx-auto w-full gap-0' id='abstract-content'>
-                            <CardContent className='space-y-5 md:py-5 md:px-10'>
-                                <CardTitle className="flex gap-3 items-center">
-                                    <ScanText className='text-primary-main' />
-                                    <h2 className='text-xl font-semibold'>Abstract Content</h2>
-                                </CardTitle>
-
-                                <AbstractContentForm abstractId={data ? data.id : null} />
-                            </CardContent>
-                        </Card>
-
-                        <Card className='max-w-4xl mx-auto w-full gap-0' id='abstract-authors'>
-
-                            <CardContent className='space-y-5 md:py-5 md:px-10'>
-                                <ShowAuthorsComponent abstractId={data ? data.id : null} />
-                            </CardContent>
-
-                            <Separator />
-
-                            <CardContent className='space-y-5 md:py-5 md:px-10'>
-                                <Accordion
-                                    type="single"
-                                    collapsible
-                                >
-                                    <AccordionItem value={'item'} className={cn(
-                                        "group relative rounded-md transition-colors duration-300",
-                                    )}>
-                                        <AccordionTrigger className="cursor-pointer text-base font-normal text-muted-foreground focus-visible:outline-none focus-visible:ring-0">
-                                            More settings...
-                                        </AccordionTrigger>
-
-                                        <AccordionContent>
-                                            <ShowAffiliations abstractId={data ? data.id : null} />
-                                        </AccordionContent>
-
-                                    </AccordionItem>
-                                </Accordion>
-                            </CardContent>
-                        </Card>
-
-                        <Card className='max-w-4xl mx-auto w-full gap-0' id='abstract-declarations'>
-                            <CardContent className='space-y-5 md:py-5 md:px-10'>
-                                <CardTitle className="flex gap-3 items-center">
-                                    <Info className='text-primary-main' />
-                                    <h2 className='text-xl font-semibold'>Additional Information</h2>
-                                </CardTitle>
-
-                                <AbstractDeclarations />
-                            </CardContent>
-                        </Card>
-
-                        {/* <Card className='max-w-4xl mx-auto w-full gap-0' id='abstract-submit'>
-                            <CardContent className='space-y-5 md:py-5 md:px-10'>
-                                <CardTitle className="flex gap-3 items-center">
-                                    <MessageSquareCode className='text-primary-main' />
-                                    <h2 className='text-xl font-semibold'>Submission Review</h2>
-                                </CardTitle>
-
-                                <AbstractPreviewData abstract={data} />
-                            </CardContent>
-                        </Card>
-
-                        <Separator /> */}
-                    </div>
-                </main>
-
-
-                {!isMobile && false && (
-                    <aside className=" w-full border-t lg:border-t-0 lg:border-l bg-background">
-                        <div className="py-6 lg:sticky lg:top-0 lg:h-screen lg:overflow-y-auto lg:py-8">
-                            <CardHeader>
-                                <div>
-                                    <CardTitle>
-                                        Status
-                                    </CardTitle>
-                                    <CardDescription>
-                                        Your submission status
-                                    </CardDescription>
-                                </div>
-                                <CardAction>
-                                    <div className='cursor-pointer flex flex-col justify-center items-center gap-1 h-14 bg-primary-main hover:bg-primary-light text-primary-contrast py-[1.5] px-3 rounded-lg'>
-                                        <MailOpen />
-                                        <span className='text-xs'>
-                                            {data.status.toUpperCase()}
-                                        </span>
-                                    </div>
-                                </CardAction>
-                            </CardHeader>
-                            <CardContent>
-                                <Stepper
-                                    onValueChange={onStepperChange}
-                                    value={currStep}
-                                    defaultValue={2}
-                                    className="h-full w-full py-6"
-                                    orientation="vertical"
-                                    indicators={{
-                                        completed: (
-                                            <CheckIcon className="size-3.5" />
-                                        ),
-                                        loading: (
-                                            <LoaderCircleIcon className="size-3.5 animate-spin" />
-                                        ),
-                                    }}
-                                >
-                                    <StepperNav>
-                                        {steps.map((step, index) => (
-                                            <StepperItem
-                                                key={index}
-                                                step={index + 1}
-                                                className="relative items-start not-last:flex-1"
-                                            >
-                                                <StepperTrigger className="items-start gap-2.5 pb-8 last:pb-0">
-                                                    <StepperIndicator>
-                                                        {index + 1}
-                                                    </StepperIndicator>
-                                                    <div className="mt-0.5 text-left">
-                                                        <StepperTitle className='text-sm'>{step.title}</StepperTitle>
-                                                        <StepperDescription className='text-xs'>{step.label}</StepperDescription>
-                                                    </div>
-                                                </StepperTrigger>
-                                                {index < steps.length - 1 && (
-                                                    <StepperSeparator className="group-data-[state=completed]/step:bg-primary absolute inset-y-0 top-7 left-3 -order-1 m-0 -translate-x-1/2 group-data-[orientation=vertical]/stepper-nav:h-[calc(100%-2rem)]" />
-                                                )}
-                                            </StepperItem>
-                                        ))}
-                                    </StepperNav>
-                                </Stepper>
-                            </CardContent>
-                            <CardContent className="text-sm text-muted-foreground">
-                                Your abstract is currently in draft. Once you click "Submit", it will move to the <strong>Review Process</strong>.
-                            </CardContent>
-                            <CardFooter className="justify-end gap-2">
-                                <Button variant="outline" onClick={previousStep}>Decline</Button>
-                                <Button
-                                    onClick={nextStep}
-                                    disabled={activeId !== 'abstract-review'}
-                                >
-                                    Accept
-                                </Button>
-                            </CardFooter>
-                        </div>
-                    </aside>
-                )}
-
-            </div>
-        </>
+                <DeadlinesCard />
+            </aside>
+        </div>
     )
 }
 
 export default EditAbstractPage
+
+
+type Props = {
+    abstract: AbstractSchema
+}
+
+function SubmitAbstract({ abstract }: Props) {
+    const confirm = useConfirm()
+
+    const submitMutation = useMutation<AbstractSchema, AxiosError, number | string>({
+        mutationFn: submitAbstract,
+        onError: (error) => DEBUG && console.log(error),
+        onSuccess: () => {
+            console.log('PUTA');
+        }
+    })
+
+    const handleSubmit = () => {
+        if (!abstract?.id) return
+
+        confirm({
+            title: 'Submit abstract?',
+            description: 'You are going to submit your abstract',
+            onConfirm: async () => {
+                submitMutation.mutate(abstract.id)
+            }
+        })
+
+    }
+
+    return (
+        <Card>
+            <CardHeader className="flex flex-row-reverse items-center justify-start">
+                <CardAction className="order-2">
+                    <SendIcon className="text-primary-main" />
+                </CardAction>
+
+                <CardTitle className="order-1 mr-auto text-lg">
+                    Submission Status
+                </CardTitle>
+            </CardHeader>
+
+            <CardContent>
+                {getStatusBadge(abstract.status)}
+            </CardContent>
+
+            <CardFooter>
+                <Button onClick={handleSubmit}>
+                    Submit Abstract
+                </Button>
+            </CardFooter>
+        </Card>
+    )
+}
+
+function getStatusBadge(status: string) {
+    switch (status) {
+        case "deleted":
+            return <Badge variant="destructive">Deleted</Badge>;
+        case "draft":
+            return <Badge variant="warning">Not Submitted</Badge>;
+        case "submitted":
+            return <Badge variant="outline">Submitted / Under Review</Badge>;
+        case "accepted":
+            return <Badge variant="default">Accepted</Badge>;
+        case "rejected":
+            return <Badge variant="destructive">Rejected</Badge>;
+        default:
+            return <Badge variant="outline">Unknown</Badge>;
+    }
+}

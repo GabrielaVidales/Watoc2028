@@ -85,8 +85,6 @@ def generate_abstract_pdf(job_id: str):
         context = get_abstract_context(abstract)
         pdf_bytes = build_abstract_pdf(context)
 
-        print(context)
-
         print('Generación completa')
         job.file.save(
             name=f"{context['file_title']}.pdf",

@@ -1,17 +1,10 @@
 import { Field } from '@/components/ui/field';
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { cn } from '@/lib/utils';
-import { ChevronsLeftIcon, ChevronsRightIcon, HashIcon, } from 'lucide-react';
+import { ChevronsLeftIcon, ChevronsRightIcon } from 'lucide-react';
 import { type HTMLAttributes } from 'react';
-import {
-    Popover,
-    PopoverContent,
-    PopoverDescription,
-    PopoverHeader,
-    PopoverTitle,
-    PopoverTrigger,
-} from "@/components/ui/popover"
 import { Button } from '../ui/button';
 
 
@@ -84,7 +77,7 @@ export function PaginationController({
                             <div className="flex flex-col">
                                 {pages.map((item) => (
                                     <Button
-                                    key={item}
+                                        key={item}
                                         size='xs'
                                         variant='ghost'
                                         className='w-full text-sm font-normal'
@@ -94,34 +87,8 @@ export function PaginationController({
                                     </Button>
                                 ))}
                             </div>
-                            {/* <PopoverHeader>
-                                <PopoverTitle>Title</PopoverTitle>
-                                <PopoverDescription>Description text here.</PopoverDescription>
-                            </PopoverHeader> */}
                         </PopoverContent>
                     </Popover>
-                    {/* <Select
-                        value={String(page)}
-                        onValueChange={(value) =>
-                            onPageChange(Number(value))
-                        }
-                    >
-                        <SelectTrigger size='sm'>
-                            <HashIcon className='text-transparent' />
-                            <SelectValue /> / {totalPages}
-                        </SelectTrigger>
-
-                        <SelectContent>
-                            {pages.map((item) => (
-                                <SelectItem
-                                    key={item}
-                                    value={String(item)}
-                                >
-                                    {item}
-                                </SelectItem>
-                            ))}
-                        </SelectContent>
-                    </Select> */}
                 </PaginationItem>
 
                 <PaginationItem>
@@ -165,12 +132,11 @@ export function PaginationController({
 }
 
 
-
 type SelectItemsPerPageProps = {
     itemsPerPage: number
     setItemsPerPage: (n: number) => void
     options?: number[]
-    size?: "sm" | "default"
+    size?: "sm" | "default" | "xs"
 } & HTMLAttributes<HTMLSelectElement>
 
 export function SelectItemsPerPage({
@@ -187,8 +153,7 @@ export function SelectItemsPerPage({
                     setItemsPerPage(limit)
                 }
             }}>
-                <SelectTrigger size={size} id="select-rows-per-page">
-                    Show
+                <SelectTrigger size={size} id="select-rows-per-page" className={cn(size === 'xs' ? 'gap-1 h-6!' : size === 'sm' ? 'gap-2' : 'gap-3')}>
                     <SelectValue />
                     items
                 </SelectTrigger>
@@ -203,4 +168,3 @@ export function SelectItemsPerPage({
         </Field>
     )
 }
-

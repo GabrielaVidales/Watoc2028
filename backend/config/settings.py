@@ -127,6 +127,9 @@ DATABASES = {
         "PASSWORD": os.getenv("DB_PASSWORD"),
         "HOST": os.getenv("DB_HOST"),
         "PORT": os.getenv("DB_PORT"),
+        "TEST": {
+            "MIRROR": "default",  # Instructs Django tests to use the existing 'default' DB
+        },
         # 'OPTIONS': {
         #     'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
         #     'charset': 'utf8mb4',

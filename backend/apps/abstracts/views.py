@@ -143,9 +143,11 @@ class AffiliationViewSet(ModelViewSet):
     def destroy(self, request, pk=None):
         instance = self.get_object()
 
-        authors_count = instance.authors.all().count()
+        queryset = instance.authors.all()
+
+        authors_count = queryset.count()
         if authors_count != 0:
-            raise ValidationError({"errors": {"root": ["This affiliation cannot be deleted because it is currently assigned to one or more authors."]}})
+            raise ValidationError({"errors": {"root": ["This affiliation cannot be deleted because it is currently assigned to one or more authors in 1 or more submissions."]}})
 
         self.perform_destroy(instance)
 
@@ -228,7 +230,7 @@ class AbstractView(ModelViewSet):
             corresponding_authors = [author for author in authors if author.is_corresponding_author]
             corresponding_authors_count = len(corresponding_authors)
             if corresponding_authors_count == 0:
-                raise ValidationError({"errors": {"root": ["At least one corresponding author is required."]}})
+                raise ValidationError({"errors": {"root": ["One corresponding author is required."]}})
             if corresponding_authors_count > 1:
                 raise ValidationError(
                     {
@@ -292,18 +294,28 @@ class AbstractView(ModelViewSet):
 
     @action(detail=True, methods=["patch"], url_path="submit")
     def submit(self, request, pk=None):
-        abstract = self.get_object()
+        with transaction.atomic():
+            abstract = self.get_object()
+            
+            context = self.get_serializer_context()
 
-        serializer = self.get_serializer(
-            abstract,
-            data={},
-            partial=True,
-        )
-        serializer.is_valid(raise_exception=True)
+            serializer = self.get_serializer(
+                abstract,
+                data={},
+                context = {
+                    **context,
+                    "validation": "deep",
+                }
+            )
+            serializer.is_valid(raise_exception=True)
 
-        abstract.status = AbstactStatus.SUBMITTED
-        abstract.save()
-        return Response()
+            abstract.status = AbstactStatus.SUBMITTED
+            abstract.save()
+            
+            print('Peter thiel es el anticristo')
+            
+            transaction.set_rollback(True)
+            return Response()
 
     def get_abstract_context(self, abstract: Abstract):
         authors_data = []

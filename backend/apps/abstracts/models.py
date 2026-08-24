@@ -40,6 +40,7 @@ class Abstract(models.Model):
         verbose_name="Tipo de presentación",
         choices=AbstractPresentation.choices,
         default=AbstractPresentation.NOT_SET,
+        blank=True,
     )
     status = models.CharField(
         max_length=16,
@@ -80,15 +81,7 @@ class Abstract(models.Model):
         return clean_title
 
     def get_hash(self):
-        data = {
-            "id": self.pk,
-            "title": self.title,
-            "content": self.text,
-            "references": self.references,
-            "authors": list(self.authors.values_list("id", flat=True)),
-            "presentation_type": self.get_presentation_type_display(),
-            "last_update": self.last_update.isoformat()
-        }
+        data = {"id": self.pk, "title": self.title, "content": self.text, "references": self.references, "authors": list(self.authors.values_list("id", flat=True)), "presentation_type": self.get_presentation_type_display(), "last_update": self.last_update.isoformat()}
         serialized = json.dumps(
             data,
             sort_keys=True,
@@ -109,6 +102,17 @@ class Affiliation(models.Model):
     class Meta:
         db_table = "affiliations"
         ordering = ["-updated_at"]
+        constraints = [
+            models.UniqueConstraint(
+                fields=[
+                    "institution",
+                    "country",
+                    "city",
+                    "user",
+                ],
+                name="unique_affiliation_per_user",
+            )
+        ]
 
     institution = models.CharField(
         max_length=100,
@@ -185,7 +189,7 @@ class Author(models.Model):
     def __str__(self):
         string = f"{self.first_name} {self.last_name} ({self.email})"
         if not self.editable:
-            string += ' [readonly]'
+            string += " [readonly]"
         return string
 
 

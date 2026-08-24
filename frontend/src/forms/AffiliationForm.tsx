@@ -1,19 +1,17 @@
-import { Field, FieldContent, FieldDescription, FieldError, FieldLabel } from '@/components/ui/field'
+import { notify } from '@/components/custom/notify'
+import { Field, FieldContent, FieldError, FieldLabel } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { useAuth } from '@/contexts/AuthContext'
+import { cn } from '@/lib/utils'
 import { affiliationSchema, type Affiliation } from '@/schemas/abstracts/affiliation-schema'
+import { createAffiliation, handleApiError, updateAffiliation } from '@/services/submissions/affiliation-services'
 import { countries, getCountryImage } from '@/utils/countriesInfo'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Controller, useForm } from 'react-hook-form'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { cn } from '@/lib/utils'
+import { AxiosError } from 'axios'
 import React from 'react'
-import api from '@/clients/api'
-import { isAxiosError } from 'axios'
-import { useAuth } from '@/contexts/AuthContext'
-import { useParams } from 'react-router'
-import { notify } from '@/components/custom/notify'
-import { DEBUG } from '@/lib/constants'
+import { Controller, useForm } from 'react-hook-form'
 
 type Props = {
     abstractId?: number | string
@@ -24,11 +22,16 @@ type Props = {
 function AffiliationForm({ defaults, onSubmitSuccess, id: formId, abstractId }: Props & React.HTMLProps<HTMLFormElement>) {
     const { user: { id: userId } } = useAuth()
 
-    const { control, handleSubmit, reset, formState: { isSubmitting } } = useForm({
+    const {
+        formState: { isSubmitting },
+        handleSubmit,
+        control,
+        reset,
+    } = useForm<Affiliation, any, Affiliation>({
         resolver: zodResolver(affiliationSchema),
         mode: 'onChange',
         defaultValues: {
-            id: null,
+            id: undefined,
             institution: '',
             country: '',
             city: '',
@@ -38,11 +41,38 @@ function AffiliationForm({ defaults, onSubmitSuccess, id: formId, abstractId }: 
     const onFormSubmit = handleSubmit(async (data: Affiliation) => {
         const edit = (defaults !== null && defaults.id)
         if (edit) {
-            await editMutation.mutateAsync(data)
+            editMutation.mutate(data)
             return
         }
-        await createMutation.mutateAsync(data)
-        onSubmitSuccess?.()
+        createMutation.mutate(data)
+    })
+
+    const queryClient = useQueryClient()
+
+    const createMutation = useMutation<Affiliation, AxiosError<any>, Affiliation>({
+        mutationFn: (data) => createAffiliation({ ...data, user_id: userId }),
+        onSuccess: async () => {
+            await Promise.all([
+                queryClient.invalidateQueries({ queryKey: ['affiliations'] }),
+                queryClient.invalidateQueries({ queryKey: ['authors', abstractId], }),
+            ])
+            notify.success('Affiliation created successfully!', { description: 'Your data have been saved.', })
+            onSubmitSuccess?.()
+        },
+        onError: handleApiError
+    })
+
+    const editMutation = useMutation<Affiliation, AxiosError<any>, Affiliation>({
+        mutationFn: updateAffiliation,
+        onSuccess: async () => {
+            await Promise.all([
+                queryClient.invalidateQueries({ queryKey: ['affiliations'] }),
+                queryClient.invalidateQueries({ queryKey: ['authors', abstractId], }),
+            ])
+            notify.success('Affiliation edited successfully!', { description: 'Your changes have been saved.', })
+            onSubmitSuccess?.()
+        },
+        onError: handleApiError
     })
 
     React.useEffect(() => {
@@ -57,45 +87,6 @@ function AffiliationForm({ defaults, onSubmitSuccess, id: formId, abstractId }: 
             })
         }
     }, [defaults])
-
-    const queryClient = useQueryClient()
-
-    const createMutation = useMutation({
-        mutationFn: async (data: Affiliation) => await api.post('/abstracts/affiliations/', { ...data, user_id: userId }),
-        onSuccess: async () => {
-            await Promise.all([
-                queryClient.invalidateQueries({ queryKey: ['affiliations'] }),
-                queryClient.invalidateQueries({ queryKey: ['authors', abstractId], }),
-            ])
-            notify.success('Affiliation created successfully!', { description: 'Your data have been saved.', })
-        },
-        onError: (error) => {
-            if (isAxiosError(error)) {
-                if (DEBUG)
-                    console.error(error.response.data);
-            }
-        }
-    })
-
-    const editMutation = useMutation({
-        mutationFn: async (data: Affiliation) => {
-            const { id, ...values } = data
-            await api.patch(`/abstracts/affiliations/${id}/`, values)
-        },
-        onSuccess: async () => {
-            await Promise.all([
-                queryClient.invalidateQueries({ queryKey: ['affiliations'] }),
-                queryClient.invalidateQueries({ queryKey: ['authors', abstractId], }),
-            ])
-            notify.success('Affiliation edited successfully!', { description: 'Your changes have been saved.', })
-        },
-        onError: (error) => {
-            if (isAxiosError(error)) {
-                if (DEBUG)
-                    console.error(error.response.data);
-            }
-        }
-    })
 
     return (
         <form id={formId} onSubmit={onFormSubmit}>
@@ -124,7 +115,6 @@ function AffiliationForm({ defaults, onSubmitSuccess, id: formId, abstractId }: 
                         </Field>
                     )}
                 />
-
                 <Controller
                     name={'city'}
                     control={control}
@@ -191,11 +181,9 @@ function AffiliationForm({ defaults, onSubmitSuccess, id: formId, abstractId }: 
                         </Field>
                     )}
                 />
-
             </fieldset>
         </form>
     )
 }
 
 export default AffiliationForm
-

@@ -1,4 +1,4 @@
-from django.db import transaction
+from django.db import transaction, IntegrityError
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
 from . import models, text_choices
@@ -10,8 +10,8 @@ User = get_user_model()
 logger = logging.getLogger(__name__)
 
 
-MAX_AUTHORS_PER_ABSTRACT = 16
-ALLOWED_TAGS = ["p", "b", "a", "strong", "i", "s", "sup", "sub"]
+MAX_AUTHORS_PER_ABSTRACT = 10
+ALLOWED_HTML_TAGS = ["p", "b", "a", "strong", "i", "s", "sup", "sub"]
 
 
 class AbstractSerializer(serializers.ModelSerializer):
@@ -19,16 +19,16 @@ class AbstractSerializer(serializers.ModelSerializer):
     declarations = serializers.SerializerMethodField()
     user = serializers.SerializerMethodField()
     plain_title = serializers.SerializerMethodField()
-    
 
     class Meta:
         model = models.Abstract
         fields = "__all__"
         read_only_fields = ["created_at", "last_update", "needs_review"]
 
+    # region GETTERS
     def get_user(self, instance):
         return RelatedUserSerializer(instance.user, context=self.context).data
-    
+
     def get_plain_title(self, instance):
         return instance.get_plain_title()
 
@@ -41,17 +41,22 @@ class AbstractSerializer(serializers.ModelSerializer):
             return {}
         return AbstractDeclarationSerializer(instance.declarations).data
 
+    # endregion
+
+    # region VALIDATE_FIELD
     def validate_title(self, value):
-        sanitized_value = bleach.clean(value, ALLOWED_TAGS, {}, strip=True)
+        sanitized_value = bleach.clean(value, ALLOWED_HTML_TAGS, {}, strip=True)
         return sanitized_value
 
     def validate_text(self, value):
-        sanitized_value = bleach.clean(value, ALLOWED_TAGS, {}, strip=True)
+        sanitized_value = bleach.clean(value, ALLOWED_HTML_TAGS, {}, strip=True)
         return sanitized_value
 
     def validate_references(self, value):
-        sanitized_value = bleach.clean(value, ALLOWED_TAGS, {}, strip=True)
+        sanitized_value = bleach.clean(value, ALLOWED_HTML_TAGS, {}, strip=True)
         return sanitized_value
+
+    # endregion
 
     def validate(self, attrs):
         """
@@ -62,37 +67,67 @@ class AbstractSerializer(serializers.ModelSerializer):
         """
 
         instance: models.Abstract = self.instance
-        action = self.context["view"].action
 
-        if instance and action == "submit":
+        validation = self.context.get("validation")
+
+        if instance and validation == "deep":
             errors = {}
             if not instance.title.strip():
                 errors["title"] = ["Title required"]
             if not instance.text.strip():
                 errors["text"] = ["Text required"]
-            if instance.authors.count() == 0:
-                errors["authors"] = ["At least one author is required"]
-
-            orders = sorted(instance.authors.values_list("order", flat=True))
-            supposed = list(range(1, len(orders) + 1))
-            if orders != supposed:
-                errors["authors"] = ["Author's order must be continuous"]
-
-            for author in instance.authors.all():
-                if isinstance(author, models.Author):
-                    if not author.first_name:
-                        errors["authors"] = ["Author's first name is required"]
-                    if not author.last_name:
-                        errors["authors"] = ["Author's last name is required"]
-                    if not author.email:
-                        errors["authors"] = ["Author's email is required"]
-                    if not author.affiliation:
-                        errors["authors"] = ["Author's affiliation is required"]
-
             if not instance.references.strip():
                 errors["references"] = ["Abstract references are required"]
             if instance.status == models.AbstactStatus.SUBMITTED:
                 errors["status"] = ["This abstract was already submitted"]
+
+            # Validar tipo de presentación (si no es para Young WATOC)
+            if not instance.is_for_young_watoc:
+                if instance.presentation_type == "":
+                    errors["presentation_type"] = ["Choose a valid presentation format"]
+
+            author_errors = []
+
+            authors = instance.authors.all()
+
+            # Validar cantidad de autores
+            author_count = authors.count()
+            if author_count == 0:
+                author_errors.append("At least one author is required")
+            elif author_count > MAX_AUTHORS_PER_ABSTRACT:
+                author_errors.append(f"An abstract can have at most {MAX_AUTHORS_PER_ABSTRACT} authors")
+
+            # Validar que el orden de los autores tenga sentido
+            orders = sorted(authors.values_list("order", flat=True))
+            supposed_order = list(range(1, len(orders) + 1))
+            if orders != supposed_order:
+                author_errors.append("Author's order must be continuous")
+
+            # Validar solo 1 autor corresponsal
+            corresponding_authors = authors.filter(is_corresponding_author=True).count()
+            if corresponding_authors == 0:
+                author_errors.append("One corresponding author is required")
+            elif corresponding_authors > 1:
+                author_errors.append("There must be exactly one corresponding author")
+
+            # Validaciones intrínsecas a los autores
+            for author in authors.all():
+                if isinstance(author, models.Author):
+                    author_serializer = AuthorSerializer(
+                        author,
+                        data=AuthorSerializer(author).data,
+                        context=self.context,
+                    )
+                    if not author_serializer.is_valid():
+                        author_errors.extend(author_serializer.errors.get("non_field_errors", []))
+
+                    if author_errors:
+                        errors.setdefault("authors", []).append(
+                            {
+                                "author_id": author.id,
+                                "errors": author_errors,
+                            }
+                        )
 
             if errors:
                 raise serializers.ValidationError(errors)
@@ -122,12 +157,35 @@ class AbstractSerializer(serializers.ModelSerializer):
         return instance
 
 
+class AbstractDetailSerializer(serializers.ModelSerializer):
+    user = serializers.SerializerMethodField()
+    plain_title = serializers.SerializerMethodField()
+
+    class Meta:
+        model = models.Abstract
+        fields = [
+            "user",
+            "plain_title",
+            "title",
+            "id",
+        ]
+
+    def get_user(self, instance):
+        return RelatedUserSerializer(instance.user, context=self.context).data
+
+    def get_plain_title(self, instance):
+        return instance.get_plain_title()
+
+
 class PDFGenerationJobSerializer(serializers.ModelSerializer):
+    abstract_detail = serializers.SerializerMethodField()
+
     class Meta:
         model = models.PDFGenerationJob
         fields = [
             "id",
             "abstract",
+            "abstract_detail",
             "content_hash",
             "status",
             "file",
@@ -139,15 +197,22 @@ class PDFGenerationJobSerializer(serializers.ModelSerializer):
             "id",
             "status",
             "content_hash",
+            "abstract_detail",
             "file",
             "error",
             "created_at",
             "completed_at",
         ]
 
+    def get_abstract_detail(self, instance):
+        return AbstractDetailSerializer(instance.abstract).data
+
 
 class AffiliationSerializer(serializers.ModelSerializer):
-    id = serializers.IntegerField(required=False)
+    id = serializers.IntegerField(
+        required=False,
+        allow_null=True,
+    )
     user_id = serializers.PrimaryKeyRelatedField(
         queryset=User.objects.all(),
         source="user",
@@ -157,6 +222,7 @@ class AffiliationSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Affiliation
         fields = "__all__"
+        validators = []
 
     def validate(self, attrs=None):
         errors = {}
@@ -175,7 +241,17 @@ class AffiliationSerializer(serializers.ModelSerializer):
 
         if errors:
             raise serializers.ValidationError(errors)
+
         return attrs
+
+    def create(self, validated_data):
+        try:
+            instance = super().create(validated_data)
+        except IntegrityError:
+            raise serializers.ValidationError(
+                {"non_field_errors": ["An affiliation with these values already exists."]},
+            )
+        return instance
 
 
 class RelatedUserSerializer(serializers.ModelSerializer):
@@ -324,10 +400,11 @@ class AuthorSerializer(serializers.ModelSerializer):
 
         if errors:
             raise serializers.ValidationError({"errors": errors})
+
         return attrs
 
     @transaction.atomic
-    def create(self, validated_data):        
+    def create(self, validated_data):
         """
         Al crear hay que verificar que no se repita un autor en el,
         abstract no con el mismo related_user ni con el mismo email.
@@ -335,28 +412,33 @@ class AuthorSerializer(serializers.ModelSerializer):
 
         abstract = validated_data.get("abstract")
 
+        # Validar si ya se superó el límite de autores
         authors_count = abstract.authors.count()
         if authors_count >= MAX_AUTHORS_PER_ABSTRACT:
             raise serializers.ValidationError({"errors": {"root": f"Maximum of authors is {MAX_AUTHORS_PER_ABSTRACT}"}})
 
         validated_data["order"] = abstract.authors.count() + 1
 
+        # Si este es corresponing author, los demás se deseleccionan
         is_corresponding_author = validated_data["is_corresponding_author"]
         if is_corresponding_author:
             abstract.authors.update(is_corresponding_author=False)
 
+        # Si se le pasa un related user, usar sus datos de ese momento
         related_user = validated_data.get("related_user", None)
         if related_user:
             validated_data["first_name"] = related_user.first_name
             validated_data["last_name"] = related_user.last_name
             validated_data["email"] = related_user.email
 
+        # Si se le pasa afiliación, usar la instancia, sino, crearla
         affiliation = validated_data.get("affiliation", None)
         if not affiliation:
             institution = validated_data.pop("institution")
             city = validated_data.pop("city")
             country = validated_data.pop("country")
 
+            # TODO: usar un serializer para validar
             affiliation, created = models.Affiliation.objects.get_or_create(
                 institution=institution,
                 country=country,
@@ -370,10 +452,14 @@ class AuthorSerializer(serializers.ModelSerializer):
             else:
                 logger.info(f"Existing affiliation instance: {affiliation}")
 
-        instance = super().create(validated_data)
-        normalize_author_order(instance.abstract)
+        try:
+            instance = super().create(validated_data)
+        except IntegrityError as e:
+            raise serializers.ValidationError(
+                {"non_field_errors": ["An affiliation with these values already exists."]},
+            )
 
-        logger.info(f"New abstract created: {instance}")
+        normalize_author_order(instance.abstract)
 
         # transaction.set_rollback(True)
         return instance

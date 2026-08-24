@@ -1,26 +1,22 @@
 import api from '@/clients/api'
-import websocketDispatcher from '@/stores/websocket-dispatcher'
-import useWebsocket from '@/stores/websocket-store'
+import AdaptableTooltip from '@/components/custom/adaptable-tooltip'
 import { notify } from '@/components/custom/notify'
 import { Button, type ButtonProps } from '@/components/ui/button'
+import { ButtonGroup, ButtonGroupSeparator, } from "@/components/ui/button-group"
 import { Spinner } from '@/components/ui/spinner'
-import { cn } from '@/lib/utils'
-import { FileDown, InfoIcon } from 'lucide-react'
-import React, { useEffect, useState } from 'react'
-import { isAxiosError } from 'axios'
-import { DEBUG } from '@/lib/constants'
 import type { PDFGenerationJob } from '@/domain/pdf-generation-job'
-import AdaptableTooltip from '@/components/custom/adaptable-tooltip'
+import { DEBUG } from '@/lib/constants'
+import { cn } from '@/lib/utils'
+import websocketDispatcher from '@/stores/websocket-dispatcher'
+import useWebsocket from '@/stores/websocket-store'
+import { isAxiosError } from 'axios'
+import { FileDown, InfoIcon } from 'lucide-react'
 import { AnimatePresence, motion } from 'motion/react'
-import {
-    ButtonGroup,
-    ButtonGroupSeparator,
-    ButtonGroupText,
-} from "@/components/ui/button-group"
+import React, { useEffect, useState } from 'react'
 
 type DownloadAbstractPDFButtonProps = {
     abstractId: number | null
-}
+} & ButtonProps
 
 function DownloadAbstractPDFButton({ abstractId }: DownloadAbstractPDFButtonProps) {
     const connect = useWebsocket(w => w.connect)
@@ -38,7 +34,7 @@ function DownloadAbstractPDFButton({ abstractId }: DownloadAbstractPDFButtonProp
     useEffect(() => {
         if (!jobUri) return
 
-        const jobId = jobUri.split('/')[1]
+        const jobId = jobUri.split("/").filter(Boolean).at(-1)
         const wsEventName = `pdf.status.${jobId}`
 
         websocketDispatcher.register(wsEventName, async (job: PDFGenerationJob) => {
@@ -46,7 +42,7 @@ function DownloadAbstractPDFButton({ abstractId }: DownloadAbstractPDFButtonProp
                 notify.success('PDF generated successfully', { description: 'Your file is ready for download.' });
                 setJob(job)
 
-                const file = await downloadAPIFile(job.id)
+                const file = await downloadAPIFile(job)
                 if (file) {
                     disconnect(jobUri)
                 }
@@ -71,10 +67,10 @@ function DownloadAbstractPDFButton({ abstractId }: DownloadAbstractPDFButtonProp
 
             if (data.status === 'completed') {
                 notify.success('PDF is ready', { description: 'Download starting automatically...' });
-                await downloadAPIFile(data.id)
+                await downloadAPIFile(data)
 
             } else if (['pending', 'generating'].includes(data.status)) {
-                const socketUri = `pdf/${data.id}/`
+                const socketUri = `api/abstracts/jobs/pdf/${data.id}/`
                 setJobUri(socketUri)
             }
 
@@ -102,32 +98,32 @@ function DownloadAbstractPDFButton({ abstractId }: DownloadAbstractPDFButtonProp
         }
     }
 
-    const triggerDownload = (url: string) => {
-        const link = document.createElement("a");
-        link.href = url;
-        link.download = `Abstract preview.pdf`;
-
-        document.body.appendChild(link);
-        link.click();
-        link.remove();
-
-        URL.revokeObjectURL(url);
-    }
-
-    const downloadAPIFile = async (id: string): Promise<Blob | false> => {
+    const downloadAPIFile = async (job: PDFGenerationJob): Promise<Blob | false> => {
         try {
-            const { data: blob } = await api.get<Blob>(`abstracts/jobs/${id}/download`, {
+            const { data: blob } = await api.get<Blob>(`abstracts/jobs/${job.id}/download`, {
                 responseType: 'blob'
             })
 
             const url = URL.createObjectURL(blob)
-            triggerDownload(url)
+            triggerDownload(url, job.abstract_detail?.plain_title)
             return blob
 
         } catch (error) {
             DEBUG && console.log(error)
             return false
         }
+    }
+
+    const triggerDownload = (url: string, filename: string = 'Abstract preview') => {
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = `${filename}.pdf`;
+
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+
+        URL.revokeObjectURL(url);
     }
 
     const isLoading = job ? (
@@ -140,7 +136,7 @@ function DownloadAbstractPDFButton({ abstractId }: DownloadAbstractPDFButtonProp
             <div className="flex flex-col gap-2 sm:flex-row sm:justify-end">
                 <ButtonGroup>
                     <Button
-                        size='xs'
+                        size='sm'
                         variant='main'
                         onClick={onGeneratingPdf}
                         disabled={isLoading || abstractId === null}
@@ -161,7 +157,7 @@ function DownloadAbstractPDFButton({ abstractId }: DownloadAbstractPDFButtonProp
                     <ButtonGroupSeparator />
 
                     <Button
-                        size='icon-xs'
+                        size='icon-sm'
                         variant='main'
                         disabled={!job}
                         onClick={() => setShowJob(prev => !prev)}
@@ -209,7 +205,7 @@ function JobInfo({ job }: JobInfoProps) {
                     </p>
 
                     <AdaptableTooltip
-                        tooltipContent={<p>Each PDF generation task is identified in the system by it's unique ID.</p>}
+                        content={<p>Each PDF generation task is identified in the system by it's unique ID.</p>}
                     />
                 </div>
 
@@ -224,7 +220,7 @@ function JobInfo({ job }: JobInfoProps) {
                         Abstract Hash
                     </p>
                     <AdaptableTooltip
-                        tooltipContent={<p>Each PDF generation task is identified in the system by it's unique ID.</p>}
+                        content={<p>Each PDF generation task is identified in the system by it's unique ID.</p>}
                     />
                 </div>
 

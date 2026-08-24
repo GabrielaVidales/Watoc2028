@@ -1,23 +1,23 @@
+import { notify } from '@/components/custom/notify'
 import RichTextEditor, { countWordsFromHTML } from '@/components/EnrichedTextArea'
 import { Button } from '@/components/ui/button'
-import { Spinner } from '@/components/ui/spinner'
-import { InputGroupText } from '@/components/ui/input-group'
+import { Checkbox } from '@/components/ui/checkbox'
 import { Field, FieldContent, FieldDescription, FieldError, FieldGroup, FieldLabel, FieldLegend, FieldSet } from '@/components/ui/field'
+import { InputGroupText } from '@/components/ui/input-group'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { createSubmission, getSubmissionById, updateSubmission, type UpdateParams } from '@/services/submissions/submission-services'
+import { Spinner } from '@/components/ui/spinner'
+import { DEBUG } from '@/lib/constants'
+import { cn } from '@/lib/utils'
 import { presentationTypes, type AbstractSchema } from '@/schemas/abstracts/abstract-schemas'
+import { editAbstractSchema, type EditAbstractFormValues } from '@/schemas/abstracts/edit-abstract-schema'
+import { createSubmission, getSubmissionById, updateSubmission, type UpdateParams } from '@/services/submissions/submission-services'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { AxiosError } from 'axios'
 import { RotateCcw, Upload } from 'lucide-react'
+import { AnimatePresence, motion } from 'motion/react'
 import { Fragment, useEffect, } from 'react'
 import { Controller, useForm, useWatch } from 'react-hook-form'
-import { cn } from '@/lib/utils'
-import { DEBUG } from '@/lib/constants'
-import { notify } from '@/components/custom/notify'
-import { Checkbox } from '@/components/ui/checkbox'
-import { AnimatePresence, motion } from 'motion/react'
-import { editAbstractSchema, type EditAbstractFormValues } from '@/schemas/abstracts/edit-abstract-schema'
 
 
 type AbstractFormProps = {
@@ -337,7 +337,7 @@ function AbstractContentForm({ abstractId = null }: AbstractFormProps) {
                     <Button
                         type="submit"
                         form="abstract-submission-form"
-                        disabled={!isValid || !isDirty || formDisabled}
+                        // disabled={!isValid || !isDirty || formDisabled}
                     >
                         {formDisabled ? (
                             <Fragment>

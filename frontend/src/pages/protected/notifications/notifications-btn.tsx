@@ -9,7 +9,7 @@ import { routes } from "@/routes/routes"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { ArrowRight, Bell, BellOff, CheckCheck, RotateCw } from "lucide-react"
 import { Link } from "react-router"
-import { ScrollArea } from "./scroll-area"
+import { ScrollArea } from "../../../components/ui/scroll-area"
 
 
 export function NotificationsBell() {
@@ -61,7 +61,7 @@ export function NotificationsBell() {
                     )}
                 </Button>
             </PopoverTrigger>
-            <PopoverContent align="end" className="bg-card max-w-xs sm:max-w-sm md:max-w-md w-full md:w-100 max-sm:px-1">
+            <PopoverContent align="end" className="bg-background max-w-xs sm:max-w-sm md:max-w-md w-full md:w-100 max-sm:px-1">
                 <section className="flex flex-col sm:flex-row gap-2 items-center justify-between border-b px-0 pb-3">
                     <div>
                         <h4 className="font-semibold">Notifications</h4>
@@ -115,7 +115,7 @@ export function NotificationsBell() {
                             </Empty>
                         )}
 
-                        <div className="my-3">
+                        <div className="my-2 space-y-2">
                             {notifications?.map((notification) => (
                                 <NotificationItem key={notification.id} notification={notification} />
                             ))}
