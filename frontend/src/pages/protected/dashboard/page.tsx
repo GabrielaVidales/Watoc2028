@@ -1,20 +1,19 @@
-import React, { useEffect, useState } from 'react'
-import { Card, CardAction, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { PlusCircle, User, Calendar, Mail, MapPin, Shield, Edit2, Building, CheckCircle2, MessageSquareWarning, MessageCircleWarning, Eye, Edit, Download, Smartphone, MegaphoneIcon, FileUpIcon, SquareArrowRightIcon } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
+import { Card, CardAction, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { AppStoreButton, PlayStoreButton } from '@/components/ui/play-store-button'
 import { useAuth } from '@/contexts/AuthContext'
 import { useProfiles } from '@/hooks/use-profiles'
-import { AppStoreButton, PlayStoreButton } from '@/components/ui/play-store-button'
 import useTimeBefore from '@/hooks/use-remaining-time'
+import { routes } from '@/routes/routes'
+import { CheckCircle2, FileUpIcon, MegaphoneIcon, SquareArrowRightIcon } from "lucide-react"
+import { useNavigate } from 'react-router'
 import SubmissionsSummaryTable from './submissions-table'
 
 function UserDashboardPage() {
-    const { user: user } = useAuth()
-
+    const { user } = useAuth()
     const { profile } = useProfiles()
-
+    const navigate = useNavigate()
     const abstracts = profile?.participant?.abstracts || []
 
     return (
@@ -105,7 +104,7 @@ function UserDashboardPage() {
                         </CardContent>
                         <CardFooter>
                             <div className='space-y-3 w-full'>
-                                <Button variant='main' className='flex-1 w-full'>
+                                <Button variant='main' className='flex-1 w-full' onClick={() => navigate(routes.users.submissions.summary)}>
                                     <FileUpIcon />
                                     Submit Abstract
                                 </Button>

@@ -1,22 +1,9 @@
-import React, { useEffect } from 'react'
-import { Field, FieldContent, FieldDescription, FieldError, FieldLabel, FieldLegend, FieldSet, FieldTitle } from '@/components/ui/field'
-import { Controller, useForm } from 'react-hook-form'
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
-import { zodResolver } from '@hookform/resolvers/zod'
-import { selectTourSchema, type SelectTourValues } from "@/schemas/select-tour-schema"
-import { Separator } from '@/components/ui/separator'
-import { useFetch } from '@/hooks/use-fetch'
-import type { Tour } from '@/data/tours-data'
-import { Card, CardAction, CardDescription, CardFooter, CardHeader, CardTitle, } from "@/components/ui/card"
-import { Badge } from '@/components/ui/badge'
-import { Combobox, ComboboxChip, ComboboxChips, ComboboxChipsInput, ComboboxContent, ComboboxEmpty, ComboboxItem, ComboboxList, ComboboxValue, } from "@/components/ui/combobox"
-import { Link } from 'react-router'
-import { routes } from '@/routes/routes'
-import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
-import { ChevronLeft, ChevronRight } from 'lucide-react'
+import { cn } from '@/lib/utils'
 import DinnerForm from '@/pages/protected/confirmation-assistance/dinner/dinner-form'
-import { useRegistrationStore } from '@/data/store'
+import { routes } from '@/routes/routes'
+import { ChevronLeft, ChevronRight } from 'lucide-react'
+import { Link } from 'react-router'
 
 
 export function DinnerPage() {

@@ -1,7 +1,8 @@
 from django.db import transaction, IntegrityError
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
-from . import models, text_choices
+from . import models
+from config.common.nationality import Nationality
 from datetime import datetime
 import logging, bleach
 
@@ -233,7 +234,7 @@ class AffiliationSerializer(serializers.ModelSerializer):
         country = attrs.get("country")
         if not country:
             errors["country"] = ["Country is required."]
-        elif country not in text_choices.Nationality.values:
+        elif country not in Nationality.values:
             errors["country"] = ["Invalid country."]
 
         if not attrs.get("city"):

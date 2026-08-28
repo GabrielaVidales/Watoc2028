@@ -77,12 +77,14 @@ class UserView(ModelViewSet):
         user = self.request.user
 
         if request.method == "POST":
-            file = request.data.get("photo", None)
+            file = request.FILES.get("photo", None)
             if file is not None and user.is_authenticated:
                 if user.photo:
                     user.photo.delete()
+                    
                 user.photo = file
                 user.save()
+                
                 return Response({"detail": "Profile picture was succesfully updated"})
 
         elif request.method == "DELETE":

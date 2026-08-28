@@ -1,13 +1,11 @@
-import { Link, Outlet } from 'react-router'
-import { Button } from '@/components/ui/button';
-import { ChevronsLeft, ClipboardList, FileText, IdCard, LogIn } from 'lucide-react';
-import { routes } from '@/routes/routes';
-import { HeaderProvider, useHeader } from '@/contexts/HeaderContext';
-import React, { useEffect } from 'react'
-import Footer from '@/components/Footer'
 import logo from '@/assets/WatocPNGLogoBlank.png';
-import mayaBackground from '@/assets/field.png'
+import mayaBackground from '@/assets/field.png';
+import Footer from '@/components/Footer';
+import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
+import { routes } from '@/routes/routes';
+import { ChevronsLeft, ClipboardList, FileText, IdCard, LogIn } from 'lucide-react';
+import { Link, Outlet } from 'react-router';
 
 const guessRoutes = [
     {
@@ -35,7 +33,7 @@ const authRoutes = [
     },
 ]
 
-function AuthLayout() {
+export default function AuthLayout() {
     const { user: user } = useAuth()
 
     return (
@@ -100,9 +98,3 @@ function AuthLayout() {
         </>
     )
 }
-
-export default () => (
-    <HeaderProvider>
-        <AuthLayout />
-    </HeaderProvider>
-);

@@ -17,8 +17,8 @@ import { DEBUG } from '@/lib/constants'
 import { cn } from '@/lib/utils'
 import DownloadAbstractPDFButton from '@/pages/test/test-abstract-feature'
 import { routes } from '@/routes/routes'
-import { presentationTypes, type AbstractSchema } from '@/schemas/abstracts/abstract-schemas'
-import { deleteSubmission, getParticipantSubmissions } from '@/services/submissions/submission-services'
+import { type AbstractSchema } from '@/schemas/abstracts/abstract-schemas'
+import { deleteSubmission, getSubmissionsByParticipant, } from '@/services/submissions/submission-services'
 import { formatDate } from '@/utils/formatDate'
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { AxiosError } from 'axios'
@@ -28,6 +28,22 @@ import { useNavigate } from 'react-router'
 import { useDebounce } from 'use-debounce'
 import AbstractPreviewData from '../edit/abstract-preview-data'
 import DeadlinesCard from './deadlines-card'
+
+
+export const presentationTypes = [
+    {
+        value: 'oral',
+        label: 'Oral Presentation'
+    },
+    {
+        value: 'poster',
+        label: 'Poster Presentation'
+    },
+    {
+        value: '',
+        label: 'Not Set'
+    },
+]
 
 
 function AbstractSubmissionPage() {
@@ -43,7 +59,7 @@ function AbstractSubmissionPage() {
         queryKey: ['abstracts', user.id, page, itemsPerPage, query],
         placeholderData: keepPreviousData,
         refetchOnWindowFocus: false,
-        queryFn: () => getParticipantSubmissions({ page, itemsPerPage, search: query })
+        queryFn: () => getSubmissionsByParticipant({ page, itemsPerPage, search: query })
     })
 
     return (

@@ -1,8 +1,8 @@
 import { cn, getFileSize } from "@/lib/utils";
-import { forwardRef, useCallback, useEffect, useImperativeHandle, useState } from "react";
+import { Image, X, type LucideIcon } from "lucide-react";
+import React, { forwardRef, useCallback, useEffect, useImperativeHandle, useState } from "react";
+import * as DropZone from 'react-dropzone';
 import { Button } from "./ui/button";
-import { Image, X } from "lucide-react";
-import * as DropZone from 'react-dropzone'
 
 
 export interface ImageUploadRef {
@@ -15,20 +15,22 @@ interface Props extends DivProps {
     onRejected?: (errors: DropZone.FileRejection[]) => void,
     onChange?: (file: File | null) => void;
     onDelete?: () => void
-    maxSize: number
+    maxSize?: number
     file?: File | null
     overridePreview?: string
+    icon?: LucideIcon
 }
 
 
-export const ImageUpload = forwardRef<ImageUploadRef, Props>(function ImageUpload({
+const ImageUpload = forwardRef<ImageUploadRef, Props>(function ImageUpload({
     onChange,
     onDelete,
     onRejected,
     "aria-invalid": ariaInvalid,
     overridePreview,
     className,
-    maxSize,
+    maxSize = 10485760,
+    icon: Icon = Image,
     file,
 }: Props, ref) {
 
@@ -90,7 +92,7 @@ export const ImageUpload = forwardRef<ImageUploadRef, Props>(function ImageUploa
             onChange?.(file);
         },
     });
-    
+
 
     useImperativeHandle(ref, () => ({
         open,
@@ -124,7 +126,7 @@ export const ImageUpload = forwardRef<ImageUploadRef, Props>(function ImageUploa
                                 ? 'ring-blue-400 bg-blue-200 dark:bg-blue-900/50'
                                 : 'ring-gray-200 border-gray-200 bg-gray-200 hover:border-gray-300 dark:bg-neutral-800 dark:ring-neutral-700'
                     )}>
-                        <Image className={cn(
+                        <Icon className={cn(
                             'size-10 stroke-[1.5]',
                             hasError ? 'text-red-100' : isDragActive ? 'text-blue-400' : 'text-neutral-500',
                             hasError ? 'dark:text-red-300' : isDragActive ? 'text-blue-400' : 'dark:text-neutral-300',

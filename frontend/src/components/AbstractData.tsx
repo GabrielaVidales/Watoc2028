@@ -2,13 +2,30 @@ import { InfoAlert } from '@/components/InfoAlert'
 import { FieldContent, FieldDescription, FieldError, FieldTitle } from '@/components/ui/field'
 import { cn } from '@/lib/utils'
 import { declarationsLabels } from '@/schemas/abstract-declaration-schema'
-import { presentationTypes, type AbstractSchema } from '@/schemas/abstracts/abstract-schemas'
+import { type AbstractSchema } from '@/schemas/abstracts/abstract-schemas'
 import { renderHTMLString } from '@/utils/tsx_utils'
 import { CircleCheckBig } from 'lucide-react'
 import React, { useMemo } from 'react'
 import { Badge } from './ui/badge'
 
 // OLD
+
+
+export const presentationTypes = [
+    {
+        value: 'oral',
+        label: 'Oral Presentation'
+    },
+    {
+        value: 'poster',
+        label: 'Poster Presentation'
+    },
+    {
+        value: '',
+        label: 'Not Set'
+    },
+]
+
 
 export type AbstractDataProps = {
     abstract: AbstractSchema

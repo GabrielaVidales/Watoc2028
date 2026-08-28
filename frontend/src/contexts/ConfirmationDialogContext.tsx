@@ -1,5 +1,5 @@
-import React, { createContext, useCallback, useContext, useRef, useState, type PropsWithChildren } from "react";
 import { ConfirmationDialog } from "@/components/custom/confirmation-dialog";
+import React, { createContext, useCallback, useContext, useRef, useState, type PropsWithChildren } from "react";
 
 
 export type ConfirmOptions = {
@@ -7,7 +7,7 @@ export type ConfirmOptions = {
     description?: React.ReactNode
     btnLabel?: string
     cancelBtnLabel?: string
-    onConfirm?: () => Promise<unknown>
+    onConfirm?: () => Promise<unknown> | void | any
     onCancel?: () => void
 }
 
@@ -42,9 +42,7 @@ export const ConfirmProvider = ({ children }: PropsWithChildren) => {
     const handleConfirm = async () => {
         if (options?.onConfirm) {
             setLoading(true)
-            try {
-                console.log('QUEEEEEEE!P"!??');
-                
+            try {                
                 await options?.onConfirm()
                 close(true)
             } catch {

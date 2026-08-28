@@ -13,6 +13,9 @@ User = get_user_model()
 
 
 class UserSerializer(serializers.ModelSerializer):
+    photo = serializers.SerializerMethodField()
+    photo_filename = serializers.SerializerMethodField()
+
     class Meta:
         model = models.User
         fields = [
@@ -26,6 +29,9 @@ class UserSerializer(serializers.ModelSerializer):
             "last_name",
             "prefix",
             "pronouns",
+            "job_title",
+            "field_of_study",
+            "institution",
             "nationality",
             "city",
             "photo",
@@ -34,8 +40,6 @@ class UserSerializer(serializers.ModelSerializer):
             "roles",
             "last_login",
             "date_joined",
-            "participant",
-            "data",
         ]
         extra_kwargs = {
             "first_name": {
@@ -49,23 +53,6 @@ class UserSerializer(serializers.ModelSerializer):
             "password": {"write_only": True},
             "photo": {"required": False},
         }
-
-    participant = ParticipantSerializer(write_only=True, required=False)
-    photo = serializers.SerializerMethodField()
-    photo_filename = serializers.SerializerMethodField()
-    data = serializers.SerializerMethodField()
-
-    def get_data(self, user):
-        data = {}
-        user_is_participant = user.groups.filter(name="participant").exists()
-        if user_is_participant and hasattr(user, "participant"):
-            data["participant"] = ParticipantSerializer(user.participant).data
-
-        user_is_reviewer = user.groups.filter(name="reviewer").exists()
-        if user_is_reviewer:
-            data["reviewer"] = "user.review_assignments"
-
-        return data
 
     def get_photo(self, user):
         if not user.photo:
@@ -110,32 +97,23 @@ class UserSerializer(serializers.ModelSerializer):
 
     @transaction.atomic
     def create(self, validated_data):
-        participant_data = validated_data.pop("participant", None)
         email = validated_data.pop("email", None)
         password = validated_data.pop("password", None)
 
         # Esto dispara un signal para crear el profile de manera síncrona
-        user = User.objects.create_user(email=email, password=password, **validated_data)
+        user = User.objects.create_user(
+            email=email,
+            password=password,
+            **validated_data,
+        )
 
-        # Después actualiza el profile si hay participant data
-        if participant_data is not None:
-            Participant.objects.filter(user=user).update(**participant_data)
-
+        # transaction.set_rollback(True)
         return user
 
     @transaction.atomic
     def update(self, instance, validated_data):
-        participant_data = validated_data.pop("participant", None)
 
         user = super().update(instance, validated_data)
 
-        if participant_data is not None:
-            participant_serializer = ParticipantSerializer(
-                user.participant,
-                data=participant_data,
-                partial=True,
-            )
-            participant_serializer.is_valid(raise_exception=True)
-            participant_serializer.save(user=user)
 
         return user

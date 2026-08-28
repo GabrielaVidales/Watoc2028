@@ -1,46 +1,31 @@
-import api from '@/clients/api'
 import ShowAffiliations from '@/components/ShowAffiliations'
 import ShowAuthorsComponent from '@/components/ShowAuthors'
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger, } from "@/components/ui/accordion"
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardAction, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Separator } from '@/components/ui/separator'
 import { ConfirmProvider, useConfirm } from '@/contexts/ConfirmationDialogContext'
 import AbstractContentForm from '@/forms/submissions/abstract-content-form'
 import { DEBUG } from '@/lib/constants'
 import { cn, } from '@/lib/utils'
 import { routes } from '@/routes/routes'
 import type { AbstractSchema } from '@/schemas/abstracts/abstract-schemas'
-import { submitAbstract } from '@/services/submissions/submission-services'
+import { getSubmissionById, submitAbstract } from '@/services/submissions/submission-services'
 import { formatDate } from '@/utils/formatDate'
 import { useMutation, useQuery } from '@tanstack/react-query'
 import type { AxiosError } from 'axios'
 import { LucideFileEdit, RotateCw, ScanText, SendIcon } from 'lucide-react'
-import { useEffect, useRef } from 'react'
-import { useNavigate, useParams } from 'react-router'
+import { Navigate, useParams } from 'react-router'
 import DeadlinesCard from '../summary/deadlines-card'
 
 
 function EditAbstractPage() {
-    const navigate = useNavigate()
-    const parentRef = useRef<HTMLDivElement | null>(null)
-
-
     const { id } = useParams()
     const { data } = useQuery<AbstractSchema>({
         queryKey: ['abstract', 'edit'],
-        queryFn: async () => {
-            const { data } = await api.get(`/abstracts/submissions/${id}/`)
-            return data
-        }
+        queryFn: () => getSubmissionById(id),
+        enabled: !!id
     })
-
-    useEffect(() => {
-        if (data?.status === 'submitted') {
-            navigate(routes.users.submissions.summary)
-        }
-    }, [data])
 
     if (!data) {
         return (
@@ -57,11 +42,14 @@ function EditAbstractPage() {
         )
     }
 
+    if (data.status === 'submitted') {
+        return <Navigate to={routes.users.submissions.summary} />
+    }
+
     return (
         <div className="max-w-6xl mx-auto w-full grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,1fr)_350px]">
-            <main id='main-container' className="w-full py-8" ref={parentRef}>
+            <main id='main-container' className="w-full py-8">
                 <div className='bg-background space-y-4 mb-4'>
-
                     <div className='flex flex-row md:justify-between gap-5'>
                         <div className="flex items-start gap-3 min-w-0">
                             <div className="flex size-12 shrink-0 items-center justify-center rounded-lg bg-primary-light/10 border-2 border-primary-main/20 text-primary">
@@ -95,24 +83,18 @@ function EditAbstractPage() {
 
                         <CardContent className='space-y-5'>
                             <ShowAuthorsComponent abstractId={data ? data.id : null} />
-                        </CardContent>
 
-                        <Separator />
-
-                        <CardContent className='space-y-5 md:py-5 md:px-10'>
-                            <Accordion
-                                type="single"
-                                collapsible
-                            >
-                                <AccordionItem value={'item'} className={"group relative rounded-md transition-colors duration-300"}>
-                                    <AccordionTrigger className="cursor-pointer text-base font-normal text-muted-foreground focus-visible:outline-none focus-visible:ring-0">
-                                        More settings...
+                            <Accordion type="single" collapsible className="w-full">
+                                <AccordionItem value="settings" className="border-b-0">
+                                    <AccordionTrigger className="flex items-center justify-between rounded-md bg-muted/40 p-3 text-xs font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground hover:no-underline focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring">
+                                        <span>More settings...</span>
                                     </AccordionTrigger>
 
-                                    <AccordionContent>
-                                        <ShowAffiliations abstractId={data ? data.id : null} />
+                                    <AccordionContent className="pt-4 pb-0">
+                                        <div className="rounded-md border-2 border-input/30 bg-background/30 p-4">
+                                            <ShowAffiliations abstractId={data?.id ?? null} />
+                                        </div>
                                     </AccordionContent>
-
                                 </AccordionItem>
                             </Accordion>
                         </CardContent>
@@ -121,12 +103,11 @@ function EditAbstractPage() {
             </main>
 
             <aside className='w-full py-8 space-y-4'>
+                <DeadlinesCard />
+
                 <ConfirmProvider>
                     <SubmitAbstract abstract={data} />
                 </ConfirmProvider>
-
-
-                <DeadlinesCard />
             </aside>
         </div>
     )

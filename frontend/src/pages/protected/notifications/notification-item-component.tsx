@@ -9,7 +9,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import type { AxiosError } from 'axios';
 import { ExternalLinkIcon, MessageCircleCheck, MessageCircleReply, MoreHorizontalIcon, Settings, Trash2 } from 'lucide-react';
 import React from 'react';
-import { useNavigate } from 'react-router';
+import { Link, useNavigate } from 'react-router';
 
 
 type Props = {
@@ -184,7 +184,12 @@ function NotificationDisplay({ notification }: Props) {
                             {actor.full_name}
                         </span>
                     )}{" "}
-                    <span className="text-muted-accent" dangerouslySetInnerHTML={{ __html: notification.message }} />
+
+                    {notification.urlpath ? (
+                        <Link to={notification.urlpath} className="hover:underline" dangerouslySetInnerHTML={{ __html: notification.message }} />
+                    ) : (
+                        <span className="text-muted-accent" dangerouslySetInnerHTML={{ __html: notification.message }} />
+                    )}
                 </p>
 
                 <p className="mt-1 text-xs text-muted-foreground">

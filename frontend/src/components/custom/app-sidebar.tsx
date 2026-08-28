@@ -1,15 +1,15 @@
-import miniLogo from '/logo_mini.png';
 import logo from '@/assets/WatocPNGLogoBlank.png';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger, } from "@/components/ui/dropdown-menu";
-import { Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarMenuSub, SidebarMenuSubButton, SidebarMenuSubItem, SidebarSeparator, useSidebar } from "@/components/ui/sidebar";
+import { Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarMenuSub, useSidebar } from "@/components/ui/sidebar";
 import { useAuth } from "@/contexts/AuthContext";
+import { cn } from '@/lib/utils';
 import { routes } from "@/routes/routes";
 import { ArrowLeftFromLine, BadgeCheckIcon, Bell, Bot, ChevronDown, ChevronRight, ChevronUp, FileBadge, FileCheck, FileType2, LayoutDashboard, LayoutList, LogOut, MessageSquareDot, PackageCheck, Settings2, TableProperties, Users, type LucideIcon } from "lucide-react";
 import { Link, NavLink, useNavigate, } from "react-router";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "../ui/collapsible";
 import { ScrollArea } from "../ui/scroll-area";
-import { cn } from '@/lib/utils';
+import miniLogo from '/logo_mini.png';
 
 
 type NavItem = {
@@ -74,7 +74,7 @@ const adminModules: NavCollapsible[] = [
                 icon: Users,
             },
             {
-                name: "Abstract Reviews",
+                name: "Review Assignments",
                 url: routes.users.administration.manageReviewers,
                 icon: LayoutList,
             },
@@ -108,27 +108,28 @@ export function AppSidebar() {
         <Sidebar collapsible='icon' className={style}>
             <SidebarHeader>
                 <div className={cn("flex items-center justify-center rounded-lg text-sidebar-primary-foreground",)}>
-                    <img
-                        src={logo}
-                        className="p-2 group-data-[collapsible=icon]:hidden group-data-[state=collapsed]:hidden"
-                        alt="Logo"
-                    />
-
-                    <img
-                        src={miniLogo}
-                        className="hidden mb-4 mt-2 group-data-[collapsible=icon]:block size-0 group-data-[state=collapsed]:block group-data-[state=collapsed]:h-5 group-data-[state=collapsed]:w-15"
-                        alt="Mini Logo"
-                    />
+                    <Link to={routes.home.index} className="flex items-center h-full">
+                        <img
+                            src={logo}
+                            className="p-2 group-data-[collapsible=icon]:hidden group-data-[state=collapsed]:hidden transition-transform hover:scale-105"
+                            alt="Logo"
+                        />
+                        <img
+                            src={miniLogo}
+                            className="hidden mb-4 mt-2 group-data-[collapsible=icon]:block size-0 group-data-[state=collapsed]:block group-data-[state=collapsed]:h-5 group-data-[state=collapsed]:w-15 transition-transform hover:scale-105"
+                            alt="Mini Logo"
+                        />
+                    </Link>
                 </div>
             </SidebarHeader>
 
             <SidebarContent>
                 <ScrollArea className="h-full">
-                    <SidebarGroup>
+                    <SidebarGroup className='space-y-0'>
                         <SidebarGroupLabel className={cn(state === 'collapsed' ? 'hidden' : 'text-neutral-100')}>
                             MAIN
                         </SidebarGroupLabel>
-                        <SidebarGroupContent>
+                        <SidebarGroupContent className='space-y-1'>
                             {mainModules.map((item, i) => (
                                 <SidebarMenuItem key={i}>
                                     <NavLink to={item.url}>
@@ -150,11 +151,11 @@ export function AppSidebar() {
                         </SidebarGroupContent>
                     </SidebarGroup>
 
-                    <SidebarGroup>
+                    <SidebarGroup className='space-y-0'>
                         <SidebarGroupLabel className={cn(state === 'collapsed' ? 'hidden' : 'text-neutral-100')}>
                             MODULES
                         </SidebarGroupLabel>
-                        <SidebarGroupContent>
+                        <SidebarGroupContent className='space-y-1'>
                             {user.roles.includes('admin') && (
                                 <SidebarMenu>
                                     {adminModules.map((item) => (
@@ -260,11 +261,11 @@ export function AppSidebar() {
                         </SidebarGroupContent>
                     </SidebarGroup>
 
-                    <SidebarGroup>
+                    <SidebarGroup className='space-y-0'>
                         <SidebarGroupLabel className={cn(state === 'collapsed' ? 'hidden' : 'text-neutral-100')}>
                             CONGRESS
                         </SidebarGroupLabel>
-                        <SidebarGroupContent>
+                        <SidebarGroupContent className='space-y-1'>
                             {participantModules.map((item, i) => (
                                 <SidebarMenuItem key={i}>
                                     <NavLink to={item.url}>

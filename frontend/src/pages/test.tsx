@@ -1,56 +1,95 @@
 import api from '@/clients/api'
-import AdaptableTooltip from '@/components/custom/adaptable-tooltip'
 import { notify } from '@/components/custom/notify'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardAction, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
-import { Field, FieldContent, FieldDescription, FieldLabel, FieldLegend, FieldSet, FieldTitle, } from "@/components/ui/field"
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Separator } from '@/components/ui/separator'
 import { ConfirmProvider, useConfirm } from '@/contexts/ConfirmationDialogContext'
 import { GenericConfirmProvider, useGenericConfirm } from '@/contexts/GenericConfirmationContext'
+import EditParticipantForm from '@/forms/participants/edit-participant-form'
 import ReviewAssignmentForm from '@/forms/reviews/review-assignment-form'
-import { cn } from '@/lib/utils'
 import { routes } from '@/routes/routes'
 import type { AbstractSchema } from '@/schemas/abstracts/abstract-schemas'
 import { getSubmissionById } from '@/services/submissions/submission-services'
-import { ChartColumnIncreasingIcon, LightbulbIcon, SparklesIcon } from 'lucide-react'
+import { IdCardLanyardIcon, PowerIcon, PowerOffIcon } from 'lucide-react'
+import { useState } from 'react'
 import { useNavigate } from 'react-router'
 import DownloadAbstractPDFButton from './test/test-abstract-feature'
 
 
-const presentationOptions = [
+const feePlans = [
     {
-        value: "plus",
-        id: "plus-plan",
-        title: "Oral Presentation",
-        description: "Present your research orally during the congress.",
-        icon: LightbulbIcon,
+        value: "participant-early",
+        id: "participant-early",
+        title: "Participant",
+        description: "Early Bird",
+        label: '1 Oct 2024 — 28 Feb 2025',
+        price: 15_000,
+        currency: 'MXN',
+        student_fee: false,
     },
     {
-        value: "pro",
-        id: "pro-plan",
-        title: "Poster",
-        description: "Present your research as a scientific poster.",
-        icon: ChartColumnIncreasingIcon,
+        value: "participant-regular",
+        id: "participant-regular",
+        title: "Participant",
+        description: "Regular attendee",
+        label: '1 Oct 2024 — 28 Feb 2025',
+        price: 17_000,
+        currency: 'MXN',
+        student_fee: false,
     },
     {
-        value: "enterprise",
-        id: "enterprise-plan",
-        title: "Young WATOC",
-        description: "Submit your work to the Young WATOC program.",
-        icon: SparklesIcon,
+        value: "participant-late",
+        id: "participant-late",
+        title: "Participant",
+        description: "Late",
+        label: '1 Oct 2024 — 28 Feb 2025',
+        price: 18_000,
+        currency: 'MXN',
+        student_fee: false,
+    },
+    {
+        value: "student-early",
+        id: "student-early",
+        title: "Student",
+        description: "Early Bird",
+        label: '1 Oct 2024 — 28 Feb 2025',
+        price: 7_500,
+        currency: 'MXN',
+        student_fee: true,
+    },
+    {
+        value: "student-regular",
+        id: "student-regular",
+        title: "Student",
+        description: "Regular student",
+        label: '1 Oct 2024 — 28 Feb 2025',
+        price: 7_500,
+        currency: 'MXN',
+        student_fee: true,
+    },
+    {
+        value: "student-late",
+        id: "student-late",
+        title: "Student",
+        description: "Late",
+        label: '1 Oct 2024 — 28 Feb 2025',
+        price: 7_500,
+        currency: 'MXN',
+        student_fee: true,
     },
 ];
 
 
-function TestPage() {
+export default function TestPage() {
+    const [id, setId] = useState<number | null>(null)
+
     const navigate = useNavigate()
 
     const errors = false
 
     return (
-        <div className='bg-muted h-full'>
+        <div className='bg-muted'>
             <div className='max-w-sm mx-auto w-full space-y-4 py-4'>
                 <Card className='w-full mx-auto'>
                     <CardHeader>
@@ -169,77 +208,40 @@ function TestPage() {
                 </div>
             </div>
 
-            <div className='max-w-2xl w-full mx-auto'>
-                <Card>
+            <div className='max-w-3xl w-full mx-auto'>
+                <section className='bg-background shadow-lg p-8'>
+                    <CardHeader className='px-0 mb-8'> 
+                        <div className="flex gap-2 items-start">
+                            <div className='bg-primary-light/20 rounded-full p-1 border-3 border-primary-light'>
+                                <IdCardLanyardIcon className='text-primary-main' />
+                            </div>
+                            <div>
+                                <CardTitle className='text-xl font-semibold'>Additional Information</CardTitle>
+                                <CardDescription>Click the button to load/unload data</CardDescription>
+                            </div>
+                        </div>
+                        <CardAction>
+                            <Button size='icon' onClick={() => {
+                                setId(prev => prev === null ? 1 : null)
+                            }}>
+                                {id === null ? (
+                                    <PowerIcon />
+                                ) : (
+                                    <PowerOffIcon />
+                                )}
+                            </Button>
+                        </CardAction>
+                    </CardHeader>
+                    
                     <CardContent>
-                        <FieldSet>
-                            <FieldLegend variant='label' className='flex items-center gap-2 mb-1'>
-                                Presentation Type
-                                <AdaptableTooltip
-                                    content='Pinche puta'
-                                    triggerClassName='text-primary'
-                                />
-                            </FieldLegend>
-                            <FieldDescription>
-                                Choose your preferred presentation type
-                            </FieldDescription>
-                            <RadioGroup aria-invalid defaultValue="plus" className="w-full grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3">
-
-                                {presentationOptions.map(item => (
-                                    <FieldLabel
-                                        key={item.id}
-                                        htmlFor={item.id}
-                                        className={cn(
-                                            "cursor-pointer border-2!",
-                                            "hover:border-primary-light",
-                                            "has-data-[state=checked]:border-primary-main",
-                                            "has-data-[state=checked]:bg-primary-main/5!",
-                                            "transition-all duration-150 hover:-translate-y-1 hover:shadow-md",
-                                            errors && "border-destructive! hover:border-destructive! bg-destructive/5 has-data-[state=checked]:bg-destructive/10!",
-                                        )}
-                                    >
-                                        <Field data-invalid={errors} orientation="vertical">
-                                            <div className="relative flex items-start justify-between gap-3">
-                                                <FieldContent>
-                                                    <FieldTitle className="font-semibold mb-2 text-primary-main">
-                                                        {item.title}
-                                                    </FieldTitle>
-
-                                                    <div className="flex items-start justify-between gap-2">
-                                                        <div className={cn(
-                                                            "flex size-10 shrink-0 items-center justify-center rounded-xl border-2",
-                                                            errors
-                                                                ? "border-destructive bg-destructive/10"
-                                                                : "border-primary-main/20 bg-primary-light/20",
-                                                        )}>
-                                                            <item.icon className={cn(
-                                                                errors
-                                                                    ? 'text-destructive'
-                                                                    : 'text-primary-main',
-                                                            )} />
-                                                        </div>
-                                                        <FieldContent>
-                                                            <FieldDescription className="text-xs">
-                                                                {item.description}
-                                                            </FieldDescription>
-                                                        </FieldContent>
-                                                    </div>
-                                                </FieldContent>
-                                                <RadioGroupItem className='absolute top-0 right-0' value={item.value} id={item.id} />
-                                            </div>
-                                        </Field>
-                                    </FieldLabel>
-                                ))}
-                            </RadioGroup>
-                        </FieldSet>
+                        <EditParticipantForm participantId={id} />
                     </CardContent>
-                </Card>
+                </section>
             </div>
         </div>
     )
 }
 
-export default TestPage
 
 
 function TestComponent() {

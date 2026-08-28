@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth import get_user_model
-from .text_choices import Nationality, AbstractPresentation, AbstactStatus
+from config.common.nationality import Nationality
+from .text_choices import AbstractPresentation, AbstactStatus
 import html, bleach, uuid, hashlib, json
 
 User = get_user_model()

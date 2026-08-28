@@ -3,26 +3,11 @@ import z from "zod";
 import type { AbstractSchema } from "./abstract-schemas";
 
 
-export const presentationTypes = [
-    {
-        value: 'oral',
-        label: 'Oral Presentation'
-    },
-    {
-        value: 'poster',
-        label: 'Poster Presentation'
-    },
+const presentationValues = [
+    'oral',
+    'poster',
+    'youngWatoc'
 ] as const
-
-
-export const ABSTRACT_STATUS = [
-    "draft",
-    "submitted",
-    "accepted",
-    "rejected",
-    "corrections",
-    "deleted"
-] as const;
 
 
 const editAbstractSchema = z.object({
@@ -33,7 +18,7 @@ const editAbstractSchema = z.object({
         .refine((val) => countWordsFromHTML(val) <= 20, "The abstract title must not exceed 20 words."),
 
     presentation_type: z
-        .enum(presentationTypes.map(v => v.value), 'Opción no válida')
+        .enum(presentationValues, 'Opción no válida')
         .or(z.literal(''))
         .optional()
         .transform(value => value === '' ? undefined : value),
@@ -46,10 +31,9 @@ const editAbstractSchema = z.object({
         .min(1, "Please provide the references")
         .refine((val) => countWordsFromHTML(val) <= 150, "References must be at most 150 words"),
 
-    is_for_young_watoc: z.boolean(),
 })
     .superRefine((data, ctx) => {
-        if (!data.is_for_young_watoc && !data.presentation_type) {
+        if (!data.presentation_type) {
             ctx.addIssue({
                 code: 'custom',
                 message: 'Choose a valid presentation format',
@@ -58,18 +42,24 @@ const editAbstractSchema = z.object({
         }
     })
     .transform(data => {
+        const youngWatoc = data.presentation_type === 'youngWatoc'
+        const presentationType = youngWatoc ? '' : data.presentation_type as 'oral' | 'poster'
+
         const abstract: AbstractSchema = {
             title: data.title,
-            is_for_young_watoc: data.is_for_young_watoc,
-            presentation_type: data.presentation_type,
+            is_for_young_watoc: youngWatoc,
+            presentation_type: presentationType,
             references: data.references,
             text: data.text,
             id: data.id
         }
+
         return abstract
     })
 
+
 type EditAbstractFormValues = z.input<typeof editAbstractSchema>
+
 
 export {
     editAbstractSchema,

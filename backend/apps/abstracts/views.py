@@ -185,7 +185,7 @@ class AbstractView(ModelViewSet):
 
             participant_data = abstract.user.participant
             if participant_data:
-                data["institution"] = participant_data.affiliation
+                data["institution"] = participant_data.institution
                 data["institution"] = abstract.user.nationality
                 data["institution"] = abstract.user.city
 

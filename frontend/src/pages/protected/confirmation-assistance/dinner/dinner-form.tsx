@@ -1,42 +1,29 @@
 import { Button } from '@/components/ui/button'
-import { Checkbox } from '@/components/ui/checkbox'
-import { Field, FieldContent, FieldDescription, FieldError, FieldGroup, FieldLabel, FieldLegend, FieldSet, FieldTitle } from '@/components/ui/field'
-import { Input } from '@/components/ui/input'
+import { CheckboxCard, CheckboxCardGroup } from '@/components/ui/checkbox-card-group'
+import { Field, FieldDescription, FieldError, FieldLabel, FieldLegend, FieldSet, FieldTitle } from '@/components/ui/field'
+import { InputGroup, InputGroupAddon, InputGroupTextarea } from '@/components/ui/input-group'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { Spinner } from '@/components/ui/spinner'
+import { useRegistrationStore } from '@/data/store'
+import { DEBUG } from '@/lib/constants'
+import { cn } from '@/lib/utils'
 import { dietaryNeedsList, dinnerAssistanceSchema, foodAllergyList } from '@/schemas/dinner- schema'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Save } from 'lucide-react'
+import { RotateCcwIcon, UploadIcon } from 'lucide-react'
+import { AnimatePresence, motion } from 'motion/react'
+import { Fragment, useEffect } from 'react'
 import { Controller, useForm } from 'react-hook-form'
-import React, { useEffect } from 'react'
-import { useRegistrationStore } from '@/data/store'
-import { useNavigate } from 'react-router'
-import { routes } from '@/routes/routes'
+
 
 function DinnerForm() {
-    const { handleSubmit, watch, getValues, reset, formState, control } = useForm({
+    const { handleSubmit, watch, getValues, reset, control, formState: { isValid, isSubmitting },  } = useForm({
         resolver: zodResolver(dinnerAssistanceSchema),
-        mode: 'onSubmit',
+        mode: 'onChange',
         defaultValues: {
             dietaryNeeds: [],
             foodAllergies: [],
             otherAllergies: '',
             otherDietaryNeeds: '',
-        }
-    })
-
-    const { isValid, isSubmitting } = formState
-
-    const onFormSubmit = handleSubmit(async (data) => {
-        await new Promise(r => setTimeout(r, 1000))
-        if (import.meta.env.DEV) {
-            console.log(data);
-        }
-        setData({ dinner: data })
-    }, async (invalid) => {
-        if (import.meta.env.DEV) {
-            console.log(invalid);
-            console.log(getValues());
         }
     })
 
@@ -46,31 +33,34 @@ function DinnerForm() {
     const hasFoodAllergy = watch('hasFoodAllergy')
     const allergies = watch('foodAllergies')
 
+    const onFormSubmit = handleSubmit(async (data) => {
+        DEBUG && console.log(data);
+        setData({ dinner: data })
+    }, async (invalid) => {
+        DEBUG && console.log(invalid, getValues());
+    })
 
-    const navigate = useNavigate()
-    const { dinner, fee, setData } = useRegistrationStore()
+    const { dinner, setData } = useRegistrationStore()
+
     useEffect(() => {
         if (!useRegistrationStore.persist.hasHydrated) return
-        if (!fee) {
-            navigate(routes.users.confirmAssistance.fee)
-            return
-        }
-        else if (dinner) {
+
+        if (dinner) {
             reset(dinner)
         }
-    }, [useRegistrationStore.persist.hasHydrated, dinner])
 
+    }, [useRegistrationStore.persist.hasHydrated, dinner])
 
     return (
         <form onSubmit={onFormSubmit} id='dinner-form'>
-            <fieldset disabled={isSubmitting} className='space-y-10'>
+            <fieldset disabled={isSubmitting}>
                 <Controller
                     name={'willAssistDinner'}
                     control={control}
                     render={({ field, fieldState }) => (
-                        <FieldSet className='gap-2'>
-                            <FieldLegend variant='label' className='mb-1'>Congress Dinner Attendance</FieldLegend>
-                            <FieldDescription className='space-y-1'>
+                        <FieldSet>
+                            <FieldLegend variant='label'>Congress Dinner Attendance</FieldLegend>
+                            <FieldDescription>
                                 Please indicate if you wish to attend the Congress Dinner on Day, ## January 2028.
                             </FieldDescription>
                             <RadioGroup
@@ -87,18 +77,13 @@ function DinnerForm() {
                                     title: 'No, I will not attend',
                                     value: false
                                 }].map((plan) => (
-                                    <Field
-                                        key={plan.id}
-                                        orientation="horizontal"
-                                        data-invalid={fieldState.invalid}
-                                        className='gap-x-3 pl-3 rounded-md border border-transparent hover:bg-black/5 hover:border-input/50'
-                                    >
+                                    <Field key={plan.id} orientation="horizontal" data-invalid={fieldState.invalid}>
                                         <RadioGroupItem
                                             value={`${plan.value}`}
                                             id={`${field.name}-${plan.id}`}
                                             aria-invalid={fieldState.invalid}
                                         />
-                                        <FieldLabel htmlFor={`${field.name}-${plan.id}`} className='p-2 cursor-pointer'>
+                                        <FieldLabel htmlFor={`${field.name}-${plan.id}`} className='cursor-pointer'>
                                             <FieldTitle>{plan.title}</FieldTitle>
                                         </FieldLabel>
                                     </Field>
@@ -109,242 +94,325 @@ function DinnerForm() {
                     )}
                 />
 
-                {willAttend && (<>
-                    <Controller
-                        name={'hasDietaryRestriction'}
-                        control={control}
-                        shouldUnregister
-                        render={({ field, fieldState }) => (
-                            <FieldSet className='gap-2'>
-                                <FieldLegend variant='label' className='mb-1'>Dietary Restrictions</FieldLegend>
-                                <FieldDescription className='space-y-1'>
-                                    If you are attending the Congress Dinner, please inform us of any dietary restrictions.
-                                </FieldDescription>
-                                <RadioGroup
-                                    name={field.name}
-                                    value={String(field.value)}
-                                    onValueChange={(value) => field.onChange(value === 'true')}
-                                >
-                                    {[{
-                                        id: 1,
-                                        title: 'Yes, I have dietary restrictions',
-                                        value: true
-                                    }, {
-                                        id: 2,
-                                        title: 'No, I do not have dietary restrictions',
-                                        value: false
-                                    }].map((plan) => (
-                                        <FieldLabel key={plan.id} htmlFor={`${field.name}-${plan.id}`} className='cursor-pointer'>
-                                            <Field orientation="horizontal" data-invalid={fieldState.invalid}>
-                                                <RadioGroupItem
-                                                    value={`${plan.value}`}
-                                                    id={`${field.name}-${plan.id}`}
-                                                    aria-invalid={fieldState.invalid}
-                                                />
-                                                <FieldContent>
-                                                    <FieldTitle>{plan.title}</FieldTitle>
-                                                </FieldContent>
-                                            </Field>
-                                        </FieldLabel>
-                                    ))}
-                                </RadioGroup>
-                                {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-                            </FieldSet>
-                        )}
-                    />
+                <AnimatePresence>
+                    {willAttend && (
+                        <motion.div
+                            key={'will-assist'}
+                            initial={{ opacity: 0, height: 0, scale: 0.5 }}
+                            animate={{ opacity: 1, height: 'auto', scale: 1 }}
+                            exit={{ opacity: 0, height: 0, scale: 0.5 }}
+                            transition={{ duration: 0.3, ease: 'easeInOut' }}
+                            className='overflow-hidden'
+                        >
+                            <div className='h-5' />
 
-                    {hasDietaryRestriction && (<>
-                        <Controller
-                            name="dietaryNeeds"
-                            control={control}
-                            shouldUnregister
-                            render={({ field, fieldState }) => (
-                                <FieldSet>
-                                    <FieldLegend variant="label">Specific Dietary Restrictions</FieldLegend>
-                                    <FieldDescription>
-                                        Please select all that apply. This information will be used to ensure your meal requirements are met during the event.
-                                    </FieldDescription>
-                                    <FieldGroup data-slot="checkbox-group">
-                                        {dietaryNeedsList.map((task) => (
-                                            <Field
-                                                key={task.value}
-                                                orientation="horizontal"
-                                                data-invalid={fieldState.invalid}
+                            <section className='bg-secondary/50 p-6 rounded-lg border'>
+                                <Controller
+                                    name={'hasDietaryRestriction'}
+                                    control={control}
+                                    shouldUnregister
+                                    render={({ field, fieldState }) => (
+                                        <FieldSet>
+                                            <FieldLegend variant='label'>Dietary Restrictions</FieldLegend>
+                                            <FieldDescription>
+                                                If you are attending the Congress Dinner, please inform us of any dietary restrictions.
+                                            </FieldDescription>
+                                            <RadioGroup
+                                                name={field.name}
+                                                value={String(field.value)}
+                                                onValueChange={(value) => field.onChange(value === 'true')}
                                             >
-                                                <Checkbox
-                                                    id={`${field.name}-${task.value}`}
-                                                    name={field.name}
-                                                    aria-invalid={fieldState.invalid}
-                                                    checked={field.value?.includes(task.value)}
-                                                    onCheckedChange={(checked) => {
-                                                        const newValue = checked
-                                                            ? [...field.value, task.value]
-                                                            : field.value.filter((value) => value !== task.value)
-                                                        field.onChange(newValue)
-                                                    }}
-                                                />
-                                                <FieldLabel
-                                                    htmlFor={`${field.name}-${task.value}`}
-                                                    className="font-normal cursor-pointer"
-                                                >
-                                                    {task.label}
-                                                </FieldLabel>
-                                            </Field>
-                                        ))}
-                                    </FieldGroup>
-                                    {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-                                </FieldSet>
-                            )}
-                        />
+                                                {[{
+                                                    id: 1,
+                                                    title: 'Yes, I have dietary restrictions',
+                                                    value: true
+                                                }, {
+                                                    id: 2,
+                                                    title: 'No, I do not have dietary restrictions',
+                                                    value: false
+                                                }].map((plan) => (
+                                                    <Field key={plan.id} orientation="horizontal" data-invalid={fieldState.invalid}>
+                                                        <RadioGroupItem
+                                                            value={`${plan.value}`}
+                                                            id={`${field.name}-${plan.id}`}
+                                                            aria-invalid={fieldState.invalid}
+                                                        />
+                                                        <FieldLabel htmlFor={`${field.name}-${plan.id}`} className='cursor-pointer'>
+                                                            <FieldTitle>{plan.title}</FieldTitle>
+                                                        </FieldLabel>
+                                                    </Field>
+                                                ))}
+                                            </RadioGroup>
+                                            {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                                        </FieldSet>
+                                    )}
+                                />
 
-                        {restrictions?.includes('other') && (
-                            <Controller
-                                name="otherDietaryNeeds"
-                                control={control}
-                                shouldUnregister
-                                render={({ field, fieldState }) => (
-                                    <Field data-invalid={fieldState.invalid}>
-                                        <FieldLabel htmlFor={field.name}>Please specify your restrictions</FieldLabel>
-                                        <Input
-                                            {...field}
-                                            id={field.name}
-                                            aria-invalid={fieldState.invalid}
-                                            placeholder="Your awesome title..."
-                                            maxLength={75}
-                                            autoComplete="off"
-                                        />
-                                        <FieldDescription>
-                                            Provide brief details about any other dietary needs not listed above.
-                                        </FieldDescription>
-                                        {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-                                    </Field>
-                                )}
-                            />
-                        )}
-                    </>)}
+                                <AnimatePresence>
+                                    {hasDietaryRestriction && (
+                                        <motion.div
+                                            key={'dietary-restriction'}
+                                            initial={{ opacity: 0, height: 0, scale: 0.5 }}
+                                            animate={{ opacity: 1, height: 'auto', scale: 1 }}
+                                            exit={{ opacity: 0, height: 0, scale: 0.5 }}
+                                            transition={{ duration: 0.3, ease: 'easeInOut' }}
+                                            className='overflow-hidden p-1'
+                                        >
+                                            <div className='h-8' />
+                                            <Controller
+                                                name="dietaryNeeds"
+                                                control={control}
+                                                shouldUnregister
+                                                render={({ field, fieldState }) => (
+                                                    <FieldSet>
+                                                        <FieldLegend variant="label">Specific Dietary Restrictions</FieldLegend>
+                                                        <FieldDescription>
+                                                            Please select all that apply. This information will be used to ensure your meal requirements are met during the event.
+                                                        </FieldDescription>
+                                                        <CheckboxCardGroup
+                                                            name={field.name}
+                                                            value={field.value}
+                                                            onValueChange={field.onChange}
+                                                            invalid={fieldState.invalid}
+                                                        >
+                                                            {dietaryNeedsList.map((item) => (
+                                                                <CheckboxCard
+                                                                    key={item.id}
+                                                                    value={item.value}
+                                                                    title={item.label}
+                                                                    icon={<item.icon />}
+                                                                    invalid={fieldState.invalid}
+                                                                    disabled={field.disabled}
+                                                                />
+                                                            ))}
+                                                        </CheckboxCardGroup>
+                                                        <FieldError errors={[fieldState.error]} />
+                                                    </FieldSet>
+                                                )}
+                                            />
 
-                    <Controller
-                        name={'hasFoodAllergy'}
-                        control={control}
-                        shouldUnregister
-                        render={({ field, fieldState }) => (
-                            <FieldSet className='gap-2'>
-                                <FieldLegend variant='label' className='mb-1'>Food Allergies</FieldLegend>
-                                <FieldDescription className='space-y-1'>
-                                    Please indicate if you have any food allergies we should be aware of for meal catering.
-                                </FieldDescription>
-                                <RadioGroup
-                                    name={field.name}
-                                    value={String(field.value)}
-                                    onValueChange={(value) => field.onChange(value === 'true')}
-                                >
-                                    {[{
-                                        id: 1,
-                                        title: 'Yes, I have food allergies',
-                                        value: true
-                                    }, {
-                                        id: 2,
-                                        title: 'No, I do not have food allergies',
-                                        value: false
-                                    }].map((plan) => (
-                                        <FieldLabel key={plan.id} htmlFor={`${field.name}-${plan.id}`} className='cursor-pointer'>
-                                            <Field orientation="horizontal" data-invalid={fieldState.invalid}>
-                                                <RadioGroupItem
-                                                    value={`${plan.value}`}
-                                                    id={`${field.name}-${plan.id}`}
-                                                    aria-invalid={fieldState.invalid}
-                                                />
-                                                <FieldContent>
-                                                    <FieldTitle>{plan.title}</FieldTitle>
-                                                </FieldContent>
-                                            </Field>
-                                        </FieldLabel>
-                                    ))}
-                                </RadioGroup>
-                                {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-                            </FieldSet>
-                        )}
-                    />
+                                            <AnimatePresence>
+                                                {restrictions?.includes('other') && (
+                                                    <motion.div
+                                                        key={'other-restriction'}
+                                                        initial={{ opacity: 0, height: 0, }}
+                                                        animate={{ opacity: 1, height: 'auto', }}
+                                                        exit={{ opacity: 0, height: 0, }}
+                                                        transition={{ duration: 0.3, ease: 'easeInOut' }}
+                                                        className='overflow-hidden p-1'
+                                                    >
+                                                        <div className='h-8' />
 
-                    {hasFoodAllergy && (<>
-                        <Controller
-                            name="foodAllergies"
-                            control={control}
-                            shouldUnregister
-                            render={({ field, fieldState }) => (
-                                <FieldSet>
-                                    <FieldLegend variant="label">Specify Food Allergies</FieldLegend>
-                                    <FieldDescription>
-                                        Please select all the food allergies that apply to you.
-                                    </FieldDescription>
-                                    <FieldGroup data-slot="checkbox-group">
-                                        {foodAllergyList.map((task) => (
-                                            <Field
-                                                key={task.value}
-                                                orientation="horizontal"
-                                                data-invalid={fieldState.invalid}
+                                                        <Controller
+                                                            name="otherDietaryNeeds"
+                                                            control={control}
+                                                            shouldUnregister
+                                                            render={({ field, fieldState }) => (
+                                                                <Field data-invalid={fieldState.invalid}>
+                                                                    <FieldLabel htmlFor={field.name}>Please specify your restrictions</FieldLabel>
+                                                                    <FieldDescription>
+                                                                        Provide brief details about any other dietary needs not listed above. {`${fieldState.invalid}`}
+                                                                    </FieldDescription>
+                                                                    <InputGroup>
+                                                                        <InputGroupTextarea
+                                                                            {...field}
+                                                                            id={field.name}
+                                                                            aria-invalid={fieldState.invalid}
+                                                                            maxLength={501}
+                                                                            autoComplete="off"
+                                                                            className="min-h-20 max-h-50 break-all"
+                                                                        />
+                                                                        <InputGroupAddon align="block-end" className="cursor-default py-2">
+                                                                            <FieldLabel htmlFor={field.name} className={cn(
+                                                                                "ml-auto",
+                                                                                (fieldState.invalid || (field?.value?.length || 0) > 500) && 'text-destructive'
+                                                                            )}>
+                                                                                {(field?.value?.length || 0)}/500
+                                                                            </FieldLabel>
+                                                                        </InputGroupAddon>
+                                                                    </InputGroup>
+                                                                    <FieldError allocateLayout errors={[fieldState.error]} />
+                                                                </Field>
+                                                            )}
+                                                        />
+                                                    </motion.div>
+                                                )}
+                                            </AnimatePresence>
+
+                                        </motion.div>
+                                    )}
+                                </AnimatePresence>
+                            </section>
+
+                            <div className='h-5' />
+
+                            <section className='bg-secondary/50 p-6 rounded-lg border'>
+                                <Controller
+                                    name={'hasFoodAllergy'}
+                                    control={control}
+                                    shouldUnregister
+                                    render={({ field, fieldState }) => (
+                                        <FieldSet>
+                                            <FieldLegend variant='label'>Food Allergies</FieldLegend>
+                                            <FieldDescription>
+                                                Please indicate if you have any food allergies we should be aware of for meal catering.
+                                            </FieldDescription>
+                                            <RadioGroup
+                                                name={field.name}
+                                                value={String(field.value)}
+                                                onValueChange={(value) => field.onChange(value === 'true')}
                                             >
-                                                <Checkbox
-                                                    id={`${field.name}-${task.value}`}
-                                                    name={field.name}
-                                                    aria-invalid={fieldState.invalid}
-                                                    checked={field.value?.includes(task.value)}
-                                                    onCheckedChange={(checked) => {
-                                                        const newValue = checked
-                                                            ? [...field.value, task.value]
-                                                            : field.value.filter((value) => value !== task.value)
-                                                        field.onChange(newValue)
-                                                    }}
-                                                />
-                                                <FieldLabel
-                                                    htmlFor={`${field.name}-${task.value}`}
-                                                    className="font-normal"
-                                                >
-                                                    {task.label}
-                                                </FieldLabel>
-                                            </Field>
-                                        ))}
-                                    </FieldGroup>
-                                    {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-                                </FieldSet>
-                            )}
-                        />
+                                                {[{
+                                                    id: 1,
+                                                    title: 'Yes, I have food allergies',
+                                                    value: true
+                                                }, {
+                                                    id: 2,
+                                                    title: 'No, I do not have food allergies',
+                                                    value: false
+                                                }].map((plan) => (
+                                                    <Field key={plan.id} orientation="horizontal" data-invalid={fieldState.invalid}>
+                                                        <RadioGroupItem
+                                                            value={`${plan.value}`}
+                                                            id={`${field.name}-${plan.id}`}
+                                                            aria-invalid={fieldState.invalid}
+                                                        />
+                                                        <FieldLabel htmlFor={`${field.name}-${plan.id}`} className='cursor-pointer'>
+                                                            <FieldTitle>{plan.title}</FieldTitle>
+                                                        </FieldLabel>
+                                                    </Field>
+                                                ))}
+                                            </RadioGroup>
+                                            {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                                        </FieldSet>
+                                    )}
+                                />
 
-                        {allergies?.includes('other') && (
-                            <Controller
-                                name="otherAllergies"
-                                control={control}
-                                shouldUnregister
-                                render={({ field, fieldState }) => (
-                                    <Field data-invalid={fieldState.invalid}>
-                                        <FieldLabel htmlFor={field.name}>Other Food Allergies</FieldLabel>
-                                        <Input
-                                            {...field}
-                                            id={field.name}
-                                            aria-invalid={fieldState.invalid}
-                                            placeholder="Your awesome title..."
-                                            maxLength={100}
-                                            autoComplete="off"
-                                        />
-                                        <FieldDescription>
-                                            Provide details for any allergies not covered in the list above.
-                                        </FieldDescription>
-                                        {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-                                    </Field>
-                                )}
-                            />
-                        )}
-                    </>)}
-                </>)}
+                                <AnimatePresence>
+                                    {hasFoodAllergy && (<>
+                                        <motion.div
+                                            key={'food-allergy'}
+                                            initial={{ opacity: 0, height: 0, scale: 0.5 }}
+                                            animate={{ opacity: 1, height: 'auto', scale: 1 }}
+                                            exit={{ opacity: 0, height: 0, scale: 0.5 }}
+                                            transition={{ duration: 0.3, ease: 'easeInOut' }}
+                                            className='overflow-hidden p-1'
+                                        >
+                                            <div className='h-8' />
+                                            <Controller
+                                                name="foodAllergies"
+                                                control={control}
+                                                shouldUnregister
+                                                render={({ field, fieldState }) => (
+                                                    <FieldSet>
+                                                        <FieldLegend variant="label">Specify Food Allergies</FieldLegend>
+                                                        <FieldDescription>
+                                                            Please select all the food allergies that apply to you.
+                                                        </FieldDescription>
 
-                <div className='flex flex-col items-end gap-3 w-full'>
-                    <Button type='submit' className='p-5 w-60 uppercase' disabled={!isValid}>
+                                                        <CheckboxCardGroup
+                                                            name={field.name}
+                                                            value={field.value}
+                                                            onValueChange={field.onChange}
+                                                            invalid={fieldState.invalid}
+                                                        >
+                                                            {foodAllergyList.map((item) => (
+                                                                <CheckboxCard
+                                                                    key={item.id}
+                                                                    value={item.value}
+                                                                    title={item.label}
+                                                                    icon={<item.icon />}
+                                                                />
+                                                            ))}
+                                                        </CheckboxCardGroup>
+
+                                                        {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                                                    </FieldSet>
+                                                )}
+                                            />
+
+                                            <AnimatePresence>
+                                                {allergies?.includes('other') && (
+                                                    <motion.div
+                                                        key={'other-restriction'}
+                                                        initial={{ opacity: 0, height: 0, }}
+                                                        animate={{ opacity: 1, height: 'auto', }}
+                                                        exit={{ opacity: 0, height: 0, }}
+                                                        transition={{ duration: 0.3, ease: 'easeInOut' }}
+                                                        className='overflow-hidden p-1'
+                                                    >
+                                                        <div className='h-8' />
+                                                        <Controller
+                                                            name="otherAllergies"
+                                                            control={control}
+                                                            shouldUnregister
+                                                            render={({ field, fieldState }) => (
+                                                                <Field data-invalid={fieldState.invalid}>
+                                                                    <FieldLabel htmlFor={field.name}>Other Food Allergies</FieldLabel>
+                                                                    <FieldDescription>
+                                                                        Provide details for any allergies not covered in the list above.
+                                                                    </FieldDescription>
+                                                                    <InputGroup>
+                                                                        <InputGroupTextarea
+                                                                            {...field}
+                                                                            id={field.name}
+                                                                            aria-invalid={fieldState.invalid}
+                                                                            maxLength={501}
+                                                                            autoComplete="off"
+                                                                            className="min-h-20 max-h-50 break-all"
+                                                                        />
+                                                                        <InputGroupAddon align="block-end" className="cursor-default py-2">
+                                                                            <FieldLabel htmlFor={field.name} className={cn(
+                                                                                "ml-auto",
+                                                                                (fieldState.invalid || (field?.value?.length || 0) > 500) && 'text-destructive'
+                                                                            )}>
+                                                                                {(field?.value?.length || 0)}/500
+                                                                            </FieldLabel>
+                                                                        </InputGroupAddon>
+                                                                    </InputGroup>
+                                                                    <FieldError allocateLayout errors={[fieldState.error]} />
+                                                                </Field>
+                                                            )}
+                                                        />
+                                                    </motion.div>
+                                                )}
+                                            </AnimatePresence>
+
+                                        </motion.div>
+                                    </>)}
+                                </AnimatePresence>
+                            </section>
+
+                            <div className='h-5' />
+                        </motion.div>
+                    )}
+                </AnimatePresence>
+
+                <div className={"flex w-fit items-center gap-3 ml-auto"}>
+                    <Button
+                        type='button'
+                        variant='outline'
+                        onClick={() => reset()}
+                        disabled={isSubmitting}
+                    >
+                        <RotateCcwIcon className='text-muted-foreground' /> Reset
+                    </Button>
+
+                    <Button
+                        type="submit"
+                        disabled={isSubmitting || !isValid}
+                    >
                         {isSubmitting ? (
-                            <Spinner data-icon="inline-start" />
+                            <Fragment>
+                                <Spinner />
+                                <span>Saving...</span>
+                            </Fragment>
                         ) : (
-                            <Save data-icon="inline-start" />
+                            <Fragment>
+                                <UploadIcon />
+                                <span>Save Submission</span>
+                            </Fragment>
                         )}
-                        Save preferences
                     </Button>
                 </div>
             </fieldset>

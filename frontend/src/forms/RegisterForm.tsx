@@ -13,7 +13,6 @@ import { DEBUG } from '@/lib/constants';
 import { routes } from '@/routes/routes';
 import type { UserSchema } from '@/schemas/user-schemas';
 import { registrationSchema, type RegisterFormInputValues, type RegisterFormOutputValues } from '@/schemas/users/registration-schema';
-import { handleApiFormError } from '@/services/common';
 import { countries } from '@/utils/countriesInfo';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation } from '@tanstack/react-query';
@@ -35,7 +34,7 @@ const defaultValues = DEBUG ? {
         confirm: 'asdasd@sadsa.sd',
         value: 'asdasd@sadsa.sd',
     },
-    affiliation: 'asdasd@sadsa.sd',
+    institution: 'asdasd@sadsa.sd',
     field_of_study: 'asdasd@sadsa.sd',
     job_title: 'asdasd@sadsa.sd',
     first_name: 'sadsads',
@@ -66,10 +65,15 @@ export default function RegisterForm() {
     const navigate = useNavigate()
 
     const {
-        handleSubmit, setError, clearErrors, trigger,
+        handleSubmit,
+        setError,
+        clearErrors,
+        trigger,
         control, formState: {
-            isValid, isSubmitting,
-            errors, isDirty,
+            isValid,
+            isSubmitting,
+            errors,
+            isDirty,
         }
     } = useForm<RegisterFormInputValues, any, RegisterFormOutputValues>({
         resolver: zodResolver(registrationSchema),
@@ -130,7 +134,6 @@ export default function RegisterForm() {
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const toggleVisibility = (f: typeof setShowPassword) => f((show) => !show);
-
 
     const countryItems = useMemo(() => countries.map(c => (
         <SelectItem value={c.value as string} key={c.value}>
@@ -305,13 +308,13 @@ export default function RegisterForm() {
 
                 <div className='flex flex-col gap-5'>
                     <Controller
-                        name="affiliation"
+                        name="institution"
                         control={control}
                         defaultValue=''
                         render={({ field, fieldState }) => (
                             <Field data-invalid={fieldState.invalid} className='col-span-full'>
                                 <FieldLabel htmlFor={field.name}>
-                                    Affiliation <div className="text-destructive">*</div>
+                                    Institution <div className="text-destructive">*</div>
                                 </FieldLabel>
                                 <Input
                                     {...field}
@@ -323,41 +326,46 @@ export default function RegisterForm() {
                             </Field>
                         )}
                     />
+
                     <Controller
                         name="job_title"
                         control={control}
-                        defaultValue=''
                         render={({ field, fieldState }) => (
-                            <Field data-invalid={fieldState.invalid}>
-                                <FieldLabel htmlFor={field.name}>
-                                    Job title <div className="text-destructive">*</div>
-                                </FieldLabel>
-                                <Input
-                                    {...field}
-                                    id={field.name}
-                                    aria-invalid={fieldState.invalid}
-                                    autoComplete="off"
-                                />
-                                {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                            <Field data-invalid={fieldState.invalid} className='w-full'>
+                                <FieldLabel htmlFor={field.name}>Job Title</FieldLabel>
+                                <InputGroup>
+                                    <InputGroupInput
+                                        {...field}
+                                        id={field.name}
+                                        aria-invalid={fieldState.invalid}
+                                        autoComplete="off"
+                                        maxLength={100}
+                                    />
+                                    <InputGroupAddon align="inline-end">
+                                        <FieldError errors={[fieldState.error]} />
+                                    </InputGroupAddon>
+                                </InputGroup>
                             </Field>
                         )}
                     />
                     <Controller
                         name="field_of_study"
                         control={control}
-                        defaultValue=''
                         render={({ field, fieldState }) => (
-                            <Field data-invalid={fieldState.invalid}>
-                                <FieldLabel htmlFor={field.name}>
-                                    Field of study <div className="text-destructive">*</div>
-                                </FieldLabel>
-                                <Input
-                                    {...field}
-                                    id={field.name}
-                                    aria-invalid={fieldState.invalid}
-                                    autoComplete="off"
-                                />
-                                {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                            <Field data-invalid={fieldState.invalid} className='w-full'>
+                                <FieldLabel htmlFor={field.name}>Field of study</FieldLabel>
+                                <InputGroup>
+                                    <InputGroupInput
+                                        {...field}
+                                        id={field.name}
+                                        aria-invalid={fieldState.invalid}
+                                        autoComplete="off"
+                                        maxLength={100}
+                                    />
+                                    <InputGroupAddon align="inline-end">
+                                        <FieldError errors={[fieldState.error]} />
+                                    </InputGroupAddon>
+                                </InputGroup>
                             </Field>
                         )}
                     />

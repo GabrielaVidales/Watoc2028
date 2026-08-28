@@ -6,12 +6,13 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAuth } from '@/contexts/AuthContext';
 import ChangePasswordForm from '@/forms/ChangePasswordForm';
 import EditUserForm from '@/forms/EditUserForm';
+import EditParticipantForm from '@/forms/participants/edit-participant-form';
 import { useProfiles } from '@/hooks/use-profiles';
-import { Image, LockKeyhole, Settings, Settings2Icon, ShieldAlert, UserRoundKey, UserRoundPen } from "lucide-react";
+import { IdCardLanyardIcon, Image, LockKeyhole, Settings, Settings2Icon, ShieldAlert, SquareUserRoundIcon, UserRoundKey, UserRoundPen } from "lucide-react";
 import { NotificationSettings } from './components/notifications-settings-component';
 
 function SettingsPage() {
-    const { user: user } = useAuth()
+    const { user } = useAuth()
     const { profile } = useProfiles()
 
     return (
@@ -57,29 +58,38 @@ function SettingsPage() {
                             <LockKeyhole className="size-5" />
                             <span className="hidden md:inline">Change Password</span>
                         </TabsTrigger>
+
+                        <TabsTrigger value="additionalData" className="flex-1 gap-2">
+                            <IdCardLanyardIcon className="size-5" />
+                            <span className="hidden md:inline">Additional Information</span>
+                        </TabsTrigger>
                     </TabsList>
                     <TabsContent value="account" className='w-full space-y-5'>
                         <Card>
                             <CardContent>
                                 {profile ? (
-                                    <EditUserForm defaultValues={{
-                                        ...user,
-                                        email: {
-                                            value: '',
-                                            confirm: ''
-                                        },
-                                        participant: {
-                                            affiliation: profile.participant.affiliation,
-                                            job_title: profile.participant.job_title,
-                                            field_of_study: profile.participant.field_of_study
-                                        }
-                                    }} />
+                                    <EditUserForm />
                                 ) : (
                                     <div className='w-full mx-auto text-center text-muted-foreground/50 p-5'>
                                         <Spinner className='mx-auto size-10' />
                                         <span>Loading...</span>
                                     </div>
                                 )}
+                            </CardContent>
+                        </Card>
+                    </TabsContent>
+
+                    <TabsContent value="additionalData" className='w-full space-y-5'>
+                        <Card>
+                            <CardHeader>
+                                <CardTitle className="flex gap-3 items-center">
+                                    <SquareUserRoundIcon className='text-primary-main' />
+                                    <h2 className='text-xl font-semibold'>Additional Information</h2>
+                                </CardTitle>
+                            </CardHeader>
+
+                            <CardContent>
+                                <EditParticipantForm participantId={user.id} />
                             </CardContent>
                         </Card>
                     </TabsContent>

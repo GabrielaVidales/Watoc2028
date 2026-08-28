@@ -1,7 +1,8 @@
+import type { LoginResponse } from "@/domain/auth";
+import { DEBUG } from "@/lib/constants";
+import type { ParticipantSchema, ReviewerSchema, UserSchema } from "@/schemas/user-schemas";
 import { createContext, type PropsWithChildren, useContext, useEffect, useState } from "react";
 import api, { guestApi } from "../clients/api";
-import type { ParticipantSchema, ReviewerSchema, UserSchema } from "@/schemas/user-schemas";
-import { DEBUG } from "@/lib/constants";
 
 
 export type UserProfile = {
@@ -37,15 +38,11 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
     async function fetchUser() {
         setIsLoading(true);
         try {
-            const res = await api.get('/users/session/');
-            if (DEBUG) {
-                console.log(res.data);
-            }
+            const res = await api.get<LoginResponse>('/users/session/');
+            DEBUG && console.log(res.data);
             setUser(res.data.anonymous ? null : res.data.user);
         } catch (error) {
-            if (DEBUG) {
-                console.log(error.response);
-            }
+            DEBUG && console.log(error.response);
             setUser(null);
         } finally {
             setIsLoading(false);
@@ -67,9 +64,7 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
             const res = await api.get<UserProfile>('/users/profile/');
             return res.data
         } catch (error) {
-            if (DEBUG) {
-                console.log(error.response);
-            }
+            DEBUG && console.log(error.response);
             return {}
         }
     }

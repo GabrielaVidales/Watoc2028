@@ -2,30 +2,6 @@ from django.db.models import TextChoices
 from django.utils.translation import gettext_lazy as _
 
 
-class AbstractPresentation(TextChoices):
-    NOT_SET = '', _('Not set')
-    ORAL = "oral", "Oral Presentation Preferred"
-    POSTER = "poster", "Poster Presentation Preferred"
-
-
-class AbstactStatus(TextChoices):
-    DELETED = "deleted", "Eliminado"
-    DRAFT = "draft", "Borrador"
-    SUBMITTED = "submitted", "Enviado / En revisión"
-    ACCEPTED = "accepted", "Aceptado"
-    REJECTED = "rejected", "Rechazado"
-
-
-class PrefixType(TextChoices):
-    MISS = "Miss", "Miss"
-    MS = "Ms.", "Ms."
-    MRS = "Mrs.", "Mrs."
-    MR = "Mr.", "Mr."
-    DR = "Dr.", "Dr."
-    PROF = "Prof.", "Prof."
-    MX = "Mx.", "Mx."
-
-
 class Nationality(TextChoices):
     AFGHANISTAN = "AF", _("Afghanistan")
     ALAND_ISLANDS = "AX", _("Aland Islands")
@@ -269,31 +245,3 @@ class Nationality(TextChoices):
     YEMEN = "YE", _("Yemen")
     ZAMBIA = "ZM", _("Zambia")
     ZIMBABWE = "ZW", _("Zimbabwe")
-
-
-class DietaryRestrictionsList(TextChoices):
-    DEFAULT = '', _('Not set')
-    VEGETARIAN = "veget", _("Vegetarian")
-    VEGAN = "vegan", _("Vegan")
-    GLUTEN_FREE = "glut", _("Gluten-free")
-    HALAL = "halal", _("Halal")
-    KOSHER = "kosher", _("Kosher")
-    PALEO = "paleo", _("Paleo")
-    PESCATARIAN = "fish", _("Pescatarian")
-    OTHER = "other", _("Other restrictions")
-
-
-class FoodAllergiesList(TextChoices):
-    DEFAULT = '', _('Not set')
-    MILK = "milk", _("Milk")
-    EGGS = "eggs", _("Eggs")
-    FISH = "fish", _("Fish")
-    CRUSTACEAN = "crustacean", _("Crustacean")
-    MOLLUSK = "mollusk", _("Mollusk")
-    ALMOND = "almond", _("Almond")
-    HAZELNUT = "hazelnut", _("Hazelnut")
-    WALNUT = "walnut", _("Walnut")
-    PEANUTS = "peanuts", _("Peanuts")
-    WHEAT = "wheat", _("Wheat (Gluten)")
-    SOYBEANS = "soybeans", _("Soybeans")
-    OTHER = "other", _("Other")

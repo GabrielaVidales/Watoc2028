@@ -1,20 +1,20 @@
-import React, { useEffect } from 'react'
-import { Field, FieldContent, FieldDescription, FieldError, FieldLabel, FieldLegend, FieldSet, FieldTitle } from '@/components/ui/field'
-import { Controller, useForm } from 'react-hook-form'
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
-import { zodResolver } from '@hookform/resolvers/zod'
-import { selectTourSchema, type SelectTourValues } from "@/schemas/select-tour-schema"
-import { Separator } from '@/components/ui/separator'
-import { useFetch } from '@/hooks/use-fetch'
-import type { Tour } from '@/data/tours-data'
-import { Card, CardAction, CardDescription, CardFooter, CardHeader, CardTitle, } from "@/components/ui/card"
 import { Badge } from '@/components/ui/badge'
-import { Combobox, ComboboxChip, ComboboxChips, ComboboxChipsInput, ComboboxContent, ComboboxEmpty, ComboboxItem, ComboboxList, ComboboxValue, } from "@/components/ui/combobox"
-import { useNavigate } from 'react-router'
-import { routes } from '@/routes/routes'
 import { Button } from '@/components/ui/button'
-import { useRegistrationStore } from '@/data/store'
+import { Card, CardAction, CardDescription, CardFooter, CardHeader, CardTitle, } from "@/components/ui/card"
+import { Combobox, ComboboxChip, ComboboxChips, ComboboxChipsInput, ComboboxContent, ComboboxEmpty, ComboboxItem, ComboboxList, ComboboxValue, } from "@/components/ui/combobox"
+import { Field, FieldContent, FieldDescription, FieldError, FieldLabel, FieldLegend, FieldSet, FieldTitle } from '@/components/ui/field'
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
+import { Separator } from '@/components/ui/separator'
 import { Spinner } from '@/components/ui/spinner'
+import { useRegistrationStore } from '@/data/store'
+import type { Tour } from '@/data/tours-data'
+import { useFetch } from '@/hooks/use-fetch'
+import { routes } from '@/routes/routes'
+import { selectTourSchema, type SelectTourValues } from "@/schemas/select-tour-schema"
+import { zodResolver } from '@hookform/resolvers/zod'
+import React, { useEffect } from 'react'
+import { Controller, useForm } from 'react-hook-form'
+import { useNavigate } from 'react-router'
 
 
 export function SelectTourForm() {

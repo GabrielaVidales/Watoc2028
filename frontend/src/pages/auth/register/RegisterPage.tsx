@@ -1,9 +1,7 @@
 import handwriting from '@/assets/handwritting.png';
 import { Card, CardContent } from '@/components/ui/card';
-import { useHeader } from '@/contexts/HeaderContext';
 import RegisterForm from '@/forms/RegisterForm';
 import { CheckCircle2, ClipboardSignature, SquareUserRound } from 'lucide-react';
-import { useEffect } from 'react';
 
 export default function RegisterPage() {
 

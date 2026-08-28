@@ -21,7 +21,7 @@ def notify_abstract_created(sender, instance: Abstract, created: bool, raw: bool
         actor = None
         sanitized_title = bleach.clean(instance.title, [], {}, strip=True)
         message = f"New submission created: {sanitized_title}."
-        urlpath = "/"
+        urlpath = "/user/submissions/summary/"
 
         transaction.on_commit(
             partial(
@@ -42,7 +42,7 @@ def notify_abstract_deleted(sender, instance: Abstract, **kwargs):
 
     sanitized_title = bleach.clean(instance.title, [], {}, strip=True)
     message = f"Submission {sanitized_title} deleted."
-    urlpath = "/user/notifications"
+    urlpath = "/user/submissions/summary/"
 
     transaction.on_commit(
         partial(

@@ -21,6 +21,11 @@ function InputGroup({ className, ...props }: React.ComponentProps<"div">) {
         "has-[>[data-align=block-start]]:h-auto has-[>[data-align=block-start]]:flex-col has-[>[data-align=block-start]]:[&>input]:pb-3",
         "has-[>[data-align=block-end]]:h-auto has-[>[data-align=block-end]]:flex-col has-[>[data-align=block-end]]:[&>input]:pt-3",
 
+        // Disabled state
+        "has-[>[data-slot=input-group-control]:disabled]:opacity-50",
+        "has-[>[data-slot=input-group-control]:disabled]:cursor-not-allowed",
+        "has-[>[data-slot=input-group-control]:disabled]:pointer-events-none",
+
         // Focus state.
         "has-[[data-slot=input-group-control]:focus-visible]:border-primary-light has-[[data-slot=input-group-control]:focus-visible]:ring-primary-light/50 has-[[data-slot=input-group-control]:focus-visible]:ring-[3px]",
 
@@ -35,7 +40,7 @@ function InputGroup({ className, ...props }: React.ComponentProps<"div">) {
 }
 
 const inputGroupAddonVariants = cva(
-  "text-muted-foreground bg-background dark:bg-input/30 flex h-auto cursor-text items-center justify-center gap-2 py-3 text-sm font-medium select-none [&>svg:not([class*='size-'])]:size-4 [&>kbd]:rounded-[calc(var(--radius)-5px)] group-data-[disabled=true]/input-group:opacity-50",
+  "text-muted-foreground bg-background dark:bg-input/30 flex h-full cursor-text items-center justify-center gap-2 py-3 text-sm font-medium select-none [&>svg:not([class*='size-'])]:size-4 [&>kbd]:rounded-[calc(var(--radius)-5px)] group-data-[disabled=true]/input-group:opacity-50",
   {
     variants: {
       align: {
@@ -150,7 +155,8 @@ function InputGroupTextarea({
     <Textarea
       data-slot="input-group-control"
       className={cn(
-        "flex-1 resize-none rounded-none border-0 bg-transparent py-3 shadow-none focus-visible:ring-0",
+        "flex-1 resize-none rounded-none border-0 bg-background py-3 shadow-none focus-visible:ring-0 no-scrollbar",
+        "aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive",
         className
       )}
       {...props}

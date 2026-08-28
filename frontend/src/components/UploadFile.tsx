@@ -1,9 +1,9 @@
-import * as React from 'react';
-import * as DropZone from 'react-dropzone'
-import '@/components/UploadFile.css'
-import { ArrowDown, Ban, ImagePlus } from 'lucide-react';
-import { getFileSize } from "@/utils/getFileSize";
+import '@/components/UploadFile.css';
 import { cn } from '@/lib/utils';
+import { getFileSize } from "@/utils/getFileSize";
+import { ArrowDown, Ban, ImagePlus } from 'lucide-react';
+import * as React from 'react';
+import * as DropZone from 'react-dropzone';
 
 
 type DivProps = Omit<React.HTMLAttributes<HTMLDivElement>, "onChange">
@@ -68,7 +68,7 @@ export function UploadFile({
         <>
             <div {...getRootProps()} className={
                 cn(
-                    'dropzone flex flex-col items-center gap-2 justify-center text-center',
+                    'p-4 bg-background flex flex-col items-center gap-2 justify-center text-center',
                     isDragActive ? ' drag ' : ' ',
                     isDragReject ? ' error ' : ' ',
                     className,

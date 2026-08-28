@@ -16,7 +16,14 @@ async function getAllSubmissions(request: PaginatedRequest) {
 }
 
 
-async function getParticipantSubmissions(request: PaginatedRequest) {
+async function createSubmission(data: CreateAbstractFormValues) {
+    const { data: responseData } = await api.post<AbstractSchema>('abstracts/submissions/', data)
+    return responseData
+}
+
+
+
+async function getSubmissionsByParticipant(request: PaginatedRequest) {
     const { data } = await api.get<PaginatedResponse<AbstractSchema>>('/participants/profiles/submissions', {
         params: {
             page: request.page,
@@ -25,12 +32,6 @@ async function getParticipantSubmissions(request: PaginatedRequest) {
         }
     })
     return data
-}
-
-
-async function createSubmission(data: CreateAbstractFormValues) {
-    const { data: responseData } = await api.post<AbstractSchema>('abstracts/submissions/', data)
-    return responseData
 }
 
 
@@ -63,8 +64,6 @@ async function deleteSubmission(id: number | string) {
 
 
 export {
-    createSubmission, deleteSubmission, getAllSubmissions,
-    getParticipantSubmissions,
-    getSubmissionById, submitAbstract, updateSubmission
+    createSubmission, deleteSubmission, getAllSubmissions, getSubmissionById, getSubmissionsByParticipant, submitAbstract, updateSubmission
 }
 

@@ -6,16 +6,6 @@ import { userSchema } from "../user-schemas";
 
 const countriesArray = countries.map(country => country.value)
 
-export const presentationTypes = [
-    {
-        value: 'oral',
-        label: 'Oral Presentation'
-    },
-    {
-        value: 'poster',
-        label: 'Poster Presentation'
-    },
-]
 
 export const ABSTRACT_STATUS = [
     "draft",
@@ -25,6 +15,7 @@ export const ABSTRACT_STATUS = [
     "corrections",
     "deleted"
 ] as const;
+
 
 export const authorAffiliationSchema = z.object({
     id: z.number()
@@ -76,7 +67,7 @@ export const abstractSchema = z.object({
 
     is_for_young_watoc: z.boolean(),
 
-    presentation_type: z.enum(['oral', 'poster'], 'Opción no válida'),
+    presentation_type: z.enum(['oral', 'poster', ''], 'Invalid option'),
 
     text: z.string()
         .refine((val) => countWordsFromHTML(val) <= 350, "Abstract must be at most 350 words")
@@ -114,9 +105,6 @@ export const abstractSchema = z.object({
 
 })
 
-
-export const validateAuthorsSchema = abstractSchema.pick({ authors: true })
-
 const abstractDTO = abstractSchema.omit({ user: true }).extend({
     user: z.object({
         id: z.number()
@@ -130,8 +118,6 @@ const abstractDTO = abstractSchema.omit({ user: true }).extend({
 })
 
 export type AbstractDTO = z.infer<typeof abstractDTO>
-
-
 
 export type AbstractSchema = z.infer<typeof abstractSchema>
 

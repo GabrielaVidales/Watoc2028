@@ -1,23 +1,47 @@
 import { notify } from '@/components/custom/notify'
 import RichTextEditor, { countWordsFromHTML } from '@/components/EnrichedTextArea'
 import { Button } from '@/components/ui/button'
-import { Checkbox } from '@/components/ui/checkbox'
-import { Field, FieldContent, FieldDescription, FieldError, FieldGroup, FieldLabel, FieldLegend, FieldSet } from '@/components/ui/field'
+import { Field, FieldContent, FieldDescription, FieldError, FieldLabel, FieldLegend, FieldSet, FieldTitle } from '@/components/ui/field'
 import { InputGroupText } from '@/components/ui/input-group'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
+import { Separator } from '@/components/ui/separator'
 import { Spinner } from '@/components/ui/spinner'
 import { DEBUG } from '@/lib/constants'
 import { cn } from '@/lib/utils'
-import { presentationTypes, type AbstractSchema } from '@/schemas/abstracts/abstract-schemas'
+import { type AbstractSchema } from '@/schemas/abstracts/abstract-schemas'
 import { editAbstractSchema, type EditAbstractFormValues } from '@/schemas/abstracts/edit-abstract-schema'
 import { createSubmission, getSubmissionById, updateSubmission, type UpdateParams } from '@/services/submissions/submission-services'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { AxiosError } from 'axios'
-import { RotateCcw, Upload } from 'lucide-react'
-import { AnimatePresence, motion } from 'motion/react'
+import { ChartColumnIncreasingIcon, LightbulbIcon, RotateCcw, SparklesIcon, Upload } from 'lucide-react'
 import { Fragment, useEffect, } from 'react'
-import { Controller, useForm, useWatch } from 'react-hook-form'
+import { Controller, useForm } from 'react-hook-form'
+
+
+const presentationOptions = [
+    {
+        value: "oral",
+        id: "oral",
+        title: "Oral Presentation",
+        description: "Present your research orally during the congress.",
+        icon: LightbulbIcon,
+    },
+    {
+        value: "poster",
+        id: "poster",
+        title: "Poster",
+        description: "Present your research as a scientific poster.",
+        icon: ChartColumnIncreasingIcon,
+    },
+    {
+        value: "youngWatoc",
+        id: "youngWatoc",
+        title: "Young WATOC",
+        description: "Submit your work to the Young WATOC program.",
+        icon: SparklesIcon,
+    },
+] as const
 
 
 type AbstractFormProps = {
@@ -77,22 +101,23 @@ function AbstractContentForm({ abstractId = null }: AbstractFormProps) {
     })
 
     const {
-        control, handleSubmit, reset, formState: { isDirty, isSubmitting, isValid }
+        reset,
+        control,
+        handleSubmit,
+        formState: {
+            isDirty,
+            isSubmitting,
+            isValid,
+        }
     } = useForm<EditAbstractFormValues, any, AbstractSchema>({
         resolver: zodResolver(editAbstractSchema),
         mode: 'onChange',
         defaultValues: {
-            is_for_young_watoc: false,
             presentation_type: null,
             references: '',
             title: '',
             text: '',
         },
-    })
-
-    const isForYoungWatoc = useWatch({
-        name: 'is_for_young_watoc',
-        control,
     })
 
     const onFormSubmit = handleSubmit(
@@ -111,7 +136,6 @@ function AbstractContentForm({ abstractId = null }: AbstractFormProps) {
         if (abstractId === null) {
             reset({
                 id: null,
-                is_for_young_watoc: false,
                 presentation_type: null,
                 references: '',
                 title: '',
@@ -119,10 +143,14 @@ function AbstractContentForm({ abstractId = null }: AbstractFormProps) {
             })
         }
         else if (abstract) {
+            const presentationType: EditAbstractFormValues['presentation_type'] =
+                abstract.presentation_type === ''
+                    ? 'youngWatoc'
+                    : abstract.presentation_type
+
             reset({
                 id: abstract.id,
-                is_for_young_watoc: abstract.is_for_young_watoc,
-                presentation_type: abstract.presentation_type,
+                presentation_type: presentationType,
                 references: abstract.references,
                 title: abstract.title,
                 text: abstract.text,
@@ -179,78 +207,77 @@ function AbstractContentForm({ abstractId = null }: AbstractFormProps) {
                         </Field>
                     )}
                 />
-                <FieldSet>
-                    <FieldLegend className="text-sm!">Presentation Format</FieldLegend>
-                    <FieldGroup>
-                        <Controller
-                            name="is_for_young_watoc"
-                            control={control}
-                            render={({ field, fieldState }) => (
-                                <Field orientation="horizontal" data-invalid={fieldState.invalid}>
-                                    <Checkbox
-                                        id={field.name}
-                                        name={field.name}
-                                        aria-invalid={fieldState.invalid}
-                                        checked={field.value}
-                                        onCheckedChange={field.onChange}
-                                        className="size-5"
-                                    />
-                                    <FieldContent>
-                                        <FieldLabel className="font-normal cursor-pointer" htmlFor={field.name}>
-                                            Submit for Young WATOC
-                                        </FieldLabel>
-                                    </FieldContent>
-                                </Field>
-                            )}
-                        />
-
-                        <AnimatePresence mode="wait" initial={false}>
-                            {!isForYoungWatoc && (
-                                <motion.div
-                                    key="presentation-type-select"
-                                    initial={{ opacity: 0, height: 0 }}
-                                    animate={{ opacity: 1, height: 'auto' }}
-                                    exit={{ opacity: 0, height: 0 }}
-                                    transition={{ duration: 0.15, ease: "easeIn" }}
-                                    className="overflow-hidden p-1"
-                                >
-                                    <Controller
-                                        name="presentation_type"
-                                        defaultValue="oral"
-                                        control={control}
-                                        render={({ field, fieldState }) => (
-                                            <Field orientation="responsive" data-invalid={fieldState.invalid} className="pt-2">
-                                                <Select
-                                                    name={field.name}
-                                                    value={field.value}
-                                                    onValueChange={field.onChange}
-                                                >
-                                                    <SelectTrigger
-                                                        id="presentationType"
-                                                        aria-invalid={fieldState.invalid}
-                                                        className="min-w-30"
-                                                    >
-                                                        <SelectValue placeholder="Choose an option..." />
-                                                    </SelectTrigger>
-                                                    <SelectContent position="item-aligned">
-                                                        {presentationTypes.map((item) => (
-                                                            <SelectItem key={item.value} value={item.value}>
-                                                                {item.label}
-                                                            </SelectItem>
-                                                        ))}
-                                                    </SelectContent>
-                                                </Select>
-                                                <FieldDescription className="max-sm:text-xs">
-                                                    Select the preferred format for presenting your work.
-                                                </FieldDescription>
-                                            </Field>
+                <Separator />
+                <Controller
+                    name="presentation_type"
+                    control={control}
+                    render={({ field, fieldState }) => (
+                        <FieldSet>
+                            <FieldLegend className="text-sm" variant='label'>Presentation Format</FieldLegend>
+                            <RadioGroup
+                                name={field.name}
+                                value={field.value}
+                                onValueChange={field.onChange}
+                                className="w-full grid grid-cols-1 sm:grid-cols-3 md:grid-cols-3"
+                            >
+                                {presentationOptions.map(item => (
+                                    <FieldLabel
+                                        key={item.id}
+                                        htmlFor={item.id}
+                                        className={cn(
+                                            "cursor-pointer border-2! border-input/50",
+                                            "hover:border-primary-light",
+                                            "has-data-[state=checked]:border-primary-main",
+                                            "has-data-[state=checked]:bg-primary-main/10!",
+                                            "transition-all duration-150 hover:-translate-y-1 hover:shadow-md",
+                                            fieldState.invalid && "border-destructive! hover:border-destructive! bg-destructive/5 has-data-[state=checked]:bg-destructive/10!",
                                         )}
-                                    />
-                                </motion.div>
-                            )}
-                        </AnimatePresence>
-                    </FieldGroup>
-                </FieldSet>
+                                    >
+                                        <Field
+                                            data-invalid={fieldState.invalid}
+                                            orientation="vertical"
+                                        >
+                                            <div className="relative flex items-start justify-between gap-3">
+                                                <FieldContent>
+                                                    <FieldTitle className={cn(
+                                                        "font-semibold mb-2",
+                                                        fieldState.invalid
+                                                            ? 'text-destructive'
+                                                            : 'text-primary-main dark:text-white',
+                                                    )}>
+                                                        {item.title}
+                                                    </FieldTitle>
+
+                                                    <div className="flex items-start justify-between gap-2">
+                                                        <div className={cn(
+                                                            "flex size-10 shrink-0 items-center justify-center rounded-xl border-2",
+                                                            fieldState.invalid
+                                                                ? "border-destructive bg-destructive/10"
+                                                                : "border-primary-main/20 bg-primary-light/20",
+                                                        )}>
+                                                            <item.icon className={cn(
+                                                                fieldState.invalid
+                                                                    ? 'text-destructive'
+                                                                    : 'text-primary-main',
+                                                            )} />
+                                                        </div>
+                                                        <FieldContent>
+                                                            <FieldDescription className="text-xs text-accent-foreground">
+                                                                {item.description}
+                                                            </FieldDescription>
+                                                        </FieldContent>
+                                                    </div>
+                                                </FieldContent>
+                                                <RadioGroupItem className='absolute top-0 right-0' value={item.value} id={item.id} />
+                                            </div>
+                                        </Field>
+                                    </FieldLabel>
+                                ))}
+                            </RadioGroup>
+                        </FieldSet>
+                    )}
+                />
+                <Separator />
                 <Controller
                     name="text"
                     control={control}
@@ -287,6 +314,7 @@ function AbstractContentForm({ abstractId = null }: AbstractFormProps) {
                         </Field>
                     )}
                 />
+                <Separator />
                 <Controller
                     name="references"
                     control={control}
@@ -337,7 +365,7 @@ function AbstractContentForm({ abstractId = null }: AbstractFormProps) {
                     <Button
                         type="submit"
                         form="abstract-submission-form"
-                        // disabled={!isValid || !isDirty || formDisabled}
+                        disabled={!isValid || !isDirty || formDisabled}
                     >
                         {formDisabled ? (
                             <Fragment>

@@ -4,8 +4,11 @@ from apps.participants.models import Participant, Tour
 from apps.participants.filters import ParticipantSubmissionsFilter
 from apps.participants.serializers import ParticipantSerializer, TourSerializer, AbstractSerializer
 from rest_framework.viewsets import ModelViewSet
-from rest_framework import permissions
+from rest_framework import permissions, status
+from rest_framework.request import Request
+from rest_framework.response import Response
 from rest_framework.decorators import action
+from rest_framework.parsers import JSONParser, MultiPartParser, FormParser
 
 
 class ParticipantView(ModelViewSet):
@@ -14,8 +17,31 @@ class ParticipantView(ModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
     pagination_class = Pagination
     filter_backends = [DjangoFilterBackend]
-    filterset_class = ParticipantSubmissionsFilter
+    # filterset_class = ParticipantSubmissionsFilter
+    parser_classes = [
+        JSONParser,
+        MultiPartParser,
+        FormParser,
+    ]
 
+    @action(detail=True, methods=["patch"], url_path="student-proof")
+    def update_student_proof(self, request: Request, pk=None):
+        file = request.FILES.get("student_proof", None)
+        if file is None:
+            return Response(
+                {"errors": {"student_proof": ["No file was sent to save"]}},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        instance: Participant = self.get_object()
+        old_file = instance.student_proof
+        instance.student_proof = file
+        instance.save(update_fields=["student_proof"])
+        
+        if old_file:
+            old_file.delete(save=False)
+
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
     @action(detail=False, methods=["get"], url_path="submissions")
     def get_participant_submissions(self, request):

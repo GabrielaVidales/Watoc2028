@@ -1,25 +1,23 @@
-import api from '@/clients/api'
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import React, { useState } from 'react'
-import { Spinner } from './ui/spinner'
-import { cn } from '@/lib/utils'
-import { Button } from './ui/button'
-import { Edit, GripVertical, MailIcon, Plus, RotateCw, Trash2, TriangleAlert, Upload, User2, UserPlus, Users2 } from 'lucide-react'
-import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar'
 import { Sortable, SortableItem, SortableItemHandle, } from "@/components/reui/sortable"
-import { Field, FieldLabel } from './ui/field'
-import { Switch } from './ui/switch'
-import { AxiosError, isAxiosError } from 'axios'
-import { AlertDialog, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from './ui/alert-dialog'
-import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from './ui/dialog'
-import { ScrollArea } from './ui/scroll-area'
+import { ConfirmProvider, useConfirm } from "@/contexts/ConfirmationDialogContext"
 import { AuthorForm, AuthorFormContent } from '@/forms/AbstractAuthorForm'
-import { CardContent, CardDescription, CardHeader, CardTitle } from './ui/card'
-import type { AuthorSchema } from '@/schemas/abstracts/author-schema'
-import { saveAbstractAuthors, type SaveAbstractAuthorsParams } from '@/services/submissions/author-services'
-import { notify } from './custom/notify'
 import { DEBUG } from '@/lib/constants'
-import { useAuth } from '@/contexts/AuthContext'
+import { cn } from '@/lib/utils'
+import type { AuthorSchema } from '@/schemas/abstracts/author-schema'
+import { deleteAuthor, getAbstractAuthors, saveAbstractAuthors, type SaveAbstractAuthorsParams } from '@/services/submissions/author-services'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { AxiosError } from 'axios'
+import { Edit, GripVertical, MailIcon, Plus, RotateCw, Trash2, Upload, User2, UserPlus, Users2 } from 'lucide-react'
+import React, { useState } from 'react'
+import { notify } from './custom/notify'
+import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar'
+import { Button } from './ui/button'
+import { CardContent, CardDescription, CardHeader, CardTitle } from './ui/card'
+import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from './ui/dialog'
+import { Field, FieldLabel } from './ui/field'
+import { ScrollArea } from './ui/scroll-area'
+import { Spinner } from './ui/spinner'
+import { Switch } from './ui/switch'
 
 
 type APIError = {
@@ -34,22 +32,19 @@ type Props = {
 }
 
 function ShowAuthorsComponent({ abstractId }: Props) {
-    const { user } = useAuth()
+    const confirm = useConfirm()
 
-    const { data = [] } = useQuery({
+    const queryClient = useQueryClient()
+
+    const { data = [] } = useQuery<AuthorSchema[]>({
         queryKey: ['authors', abstractId],
         refetchOnWindowFocus: false,
         refetchOnReconnect: false,
         enabled: !!abstractId,
-        queryFn: async () => {
-            const { data } = await api.get<AuthorSchema[]>(`/abstracts/submissions/${abstractId}/authors`)
-            return data
-        }
+        queryFn: () => getAbstractAuthors(abstractId)
     })
 
-    const queryClient = useQueryClient()
-
-    const saveAuthorsMutation = useMutation<AuthorSchema[], AxiosError, SaveAbstractAuthorsParams>({
+    const editMutation = useMutation<AuthorSchema[], AxiosError, SaveAbstractAuthorsParams>({
         mutationFn: saveAbstractAuthors,
         onSuccess: () => {
             notify.success('Information saved successfully!', {
@@ -60,10 +55,9 @@ function ShowAuthorsComponent({ abstractId }: Props) {
             })
         },
         onError: (error) => {
+            DEBUG && console.error(error.response.data)
+
             const errors = (error.response.data as any).errors as APIError
-            if (DEBUG) {
-                console.error(error.response.data)
-            }
             if (errors.root) {
                 notify.destructive('Something went wrong!', {
                     description: errors.root.join(". "),
@@ -72,29 +66,17 @@ function ShowAuthorsComponent({ abstractId }: Props) {
         }
     })
 
-    const deleteAuthorMutation = useMutation({
-        mutationFn: async (id: number) => {
-            const { data: response } = await api.delete(`/abstracts/authors/${id}/`)
-            return response
-        },
+    const deleteMutation = useMutation<void, AxiosError, number>({
+        mutationFn: deleteAuthor,
         onSuccess: () => {
-            setOpen(false)
-            setDeleteAuthor(null)
             queryClient.invalidateQueries({
                 queryKey: ["authors", abstractId]
             })
         },
         onError: (error) => {
-            if (isAxiosError(error)) {
-                if (DEBUG) {
-                    console.error(error.response?.data)
-                }
-            }
+            DEBUG && console.error(error.response?.data)
         }
     })
-
-    const [open, setOpen] = useState(false)
-    const [deleteAuthor, setDeleteAuthor] = useState<AuthorSchema>(null)
 
     const [openA, setOpenA] = useState(false)
     const [editAuthor, setEditAuthor] = useState<AuthorSchema>(null)
@@ -112,35 +94,21 @@ function ShowAuthorsComponent({ abstractId }: Props) {
 
     React.useEffect(() => { setAuthors(data) }, [data])
 
+    const handleDelete = (author: AuthorSchema) => {
+        confirm({
+            title: 'Delete Author?',
+            btnLabel: 'Delete author',
+            onConfirm: () => deleteMutation.mutate(author.id),
+            description: <span>This action <strong>cannot be undone</strong>. This will permanently remove the author from this abstract.</span>
+        })
+    }
+
     if (!data) {
         return <Spinner />
     }
 
     return (
         <div className='max-w-full space-y-4'>
-            <AlertDialog open={open} onOpenChange={(v) => { setDeleteAuthor(null); setOpen(v) }}>
-                <AlertDialogContent size='sm'>
-                    <AlertDialogHeader>
-                        <AlertDialogTitle className="p-3 bg-destructive/10 rounded-full mb-2">
-                            <TriangleAlert className='size-8 text-destructive' />
-                        </AlertDialogTitle>
-                        <AlertDialogTitle>Delete Author?</AlertDialogTitle>
-                        <AlertDialogDescription>
-                            This action <strong>cannot be undone</strong>. This will permanently remove the author from this abstract.
-                        </AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <AlertDialogFooter>
-                        <AlertDialogCancel>Cancel</AlertDialogCancel>
-                        <Button variant='destructive' onClick={() => deleteAuthorMutation.mutate(deleteAuthor.id)} disabled={deleteAuthorMutation.isPending}>
-                            {deleteAuthorMutation.isPending ? (<>
-                                <Spinner className="mr-2" />
-                                Deleting...
-                            </>) : 'Delete Author'}
-                        </Button>
-                    </AlertDialogFooter>
-                </AlertDialogContent>
-            </AlertDialog>
-
             <Dialog open={openA}
                 onOpenChange={() => {
                     setOpenA(false);
@@ -242,10 +210,10 @@ function ShowAuthorsComponent({ abstractId }: Props) {
                         <SortableItem
                             key={author.id}
                             value={String(author.id)}
-                            disabled={saveAuthorsMutation.isPending}
+                            disabled={editMutation.isPending}
                             className={cn(
                                 'relative p-2 border-2 border-border rounded-md transition-colors! duration-300',
-                                'flex flex-col gap-3',
+                                'flex flex-col gap-3 cursor-auto',
                                 'md:flex-row md:items-center md:justify-between',
                                 'bg-background active:border-primary-light active:shadow-md'
                             )}
@@ -348,14 +316,11 @@ function ShowAuthorsComponent({ abstractId }: Props) {
                                         <Edit className="size-5 text-primary-main" />
                                     </Button>
 
-                                    {author?.related_user?.id !== user.id && (
+                                    {author?.editable && (
                                         <Button
                                             variant="ghost"
                                             size="icon-sm"
-                                            onClick={() => {
-                                                setDeleteAuthor(author)
-                                                setOpen(true)
-                                            }}
+                                            onClick={() => handleDelete(author)}
                                         >
                                             <Trash2 className="size-5 text-destructive" />
                                         </Button>
@@ -372,17 +337,17 @@ function ShowAuthorsComponent({ abstractId }: Props) {
                     type='button'
                     variant='outline'
                     onClick={() => queryClient.invalidateQueries({ queryKey: ['authors', abstractId], })}
-                    disabled={data === authors || saveAuthorsMutation.isPending}
+                    disabled={data === authors || editMutation.isPending}
                 >
                     <RotateCw className='text-muted-foreground' /> Reset
                 </Button>
 
                 <Button
                     type="button"
-                    onClick={() => saveAuthorsMutation.mutate({ abstractId, authors })}
-                    disabled={data === authors || saveAuthorsMutation.isPending}
+                    onClick={() => editMutation.mutate({ abstractId, authors })}
+                    disabled={data === authors || editMutation.isPending}
                 >
-                    {saveAuthorsMutation.isPending ? (
+                    {editMutation.isPending ? (
                         <>
                             <Spinner />
                             <span>Saving...</span>
@@ -399,4 +364,8 @@ function ShowAuthorsComponent({ abstractId }: Props) {
     )
 }
 
-export default ShowAuthorsComponent
+export default (props: Props) => (
+    <ConfirmProvider>
+        <ShowAuthorsComponent {...props} />
+    </ConfirmProvider>
+)

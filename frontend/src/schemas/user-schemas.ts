@@ -1,4 +1,4 @@
-import { countryCodes, userPrefixes, userRoles } from "@/domain/constants";
+import { countryCodes, userPrefixValues, userRoleValues } from "@/domain/constants";
 import z from "zod";
 import { abstractSchema } from "./abstracts/abstract-schemas";
 
@@ -6,67 +6,80 @@ import { abstractSchema } from "./abstracts/abstract-schemas";
 export const participantSchema = z.object({
     affiliation: z.string().trim()
         .min(1, "Affiliation is required")
-        .max(100, "Institution name is too long")
-        .default(''),
+        .max(100, "Institution name is too long"),
     job_title: z.string().trim()
         .min(1, "Position or Job Title is required")
-        .max(100, "Position title is too long")
-        .default(''),
+        .max(100, "Position title is too long"),
     field_of_study: z.string().trim()
         .min(1, "Field of study is required")
-        .max(100, "Field name is too long")
-        .default(''),
+        .max(100, "Field name is too long"),
     abstracts: z.array(abstractSchema)
-        .default([])
 })
 
 export const reviewerSchema = z.object({
     assignedAbstracts: z.array(abstractSchema)
-        .default([])
 })
+
 
 export const userSchema = z.object({
     id: z.number()
         .optional(),
-    first_name: z.string().trim()
-        .min(1, "Please enter your first name")
-        .max(100, "Input too long"),
-    middle_name: z.string().trim()
-        .max(100, "Input too long")
-        .optional(),
-    full_name: z.string().trim()
-        .max(310, "Input too long")
-        .optional(),
-    last_name: z.string().trim()
-        .min(1, "Please enter your last name")
-        .max(100, "Input too long"),
-    email: z.email('Please provide a valid email address')
-        .max(100, 'Input too long'),
     email_verified: z.boolean()
         .optional(),
     is_active: z.boolean()
         .optional(),
-    prefix: z.enum(userPrefixes.map(p => p.value), 'Choose a valid option'),
+
+    first_name: z.string().trim()
+        .min(1, "Required")
+        .max(100, "Input too long"),
+    middle_name: z.string().trim()
+        .max(100, "Input too long")
+        .optional(),
+    last_name: z.string().trim()
+        .min(1, "Required")
+        .max(100, "Input too long"),
+    full_name: z.string().trim()
+        .optional(),
+
+    email: z.email('Invalid email address')
+        .max(100, 'Input too long'),
+
+    prefix: z.enum(userPrefixValues, 'Choose a valid option'),
+
     pronouns: z.string().trim()
         .max(50, 'Too long')
         .optional(),
-    nationality: z.enum(countryCodes, 'Choose a valid option'),
+
+    institution: z.string().trim()
+        .min(1, "Required")
+        .max(100, "Institution name is too long"),
+    job_title: z.string().trim()
+        .min(1, "Required")
+        .max(100, "Position title is too long"),
+    field_of_study: z.string().trim()
+        .min(1, "Required")
+        .max(100, "Field name is too long"),
+
+    nationality: z.enum(countryCodes, 'Invalid option'),
+
     city: z.string().trim()
-        .min(1, "Please enter your city")
+        .min(1, "Required")
         .max(30, 'Input too long'),
-    photo: z.union([z.instanceof(File), z.string()])
+    photo: z.url()
         .nullable()
         .optional(),
     photo_filename: z.string()
         .optional(),
-    roles: z.array(z.enum(userRoles.map(r => r.value))),
+
+    roles: z.array(z.enum(userRoleValues, 'Invalid value')),
+
     date_joined: z.coerce.date()
         .optional(),
     last_login: z.coerce.date()
         .optional(),
 
-    participant: participantSchema
-        .optional()
+    // participant: participantSchema
+    //     .optional()
 })
 
 
@@ -105,9 +118,10 @@ export const changePasswordSchema = z.object({
 
 export const editUserFormSchema = userSchema
     .extend({
-        participant: participantSchema.omit({
-            abstracts: true
-        }),
+        photo: z.instanceof(File, {
+            error: 'Invalid file',
+        })
+            .nullable(),
         email: z.object({
             value: z.email("Invalid email address")
                 .max(100, 'Input too long')
@@ -116,21 +130,34 @@ export const editUserFormSchema = userSchema
             confirm: z.string()
                 .max(100, 'Input too long'),
         })
-            .default({ value: '', confirm: '' })
             .refine(data => !data.confirm || data.value === data.confirm, {
                 error: 'Email does not match',
                 path: ['confirm']
             }),
     })
     .omit({
+        email_verified: true,
+        is_active: true,
+        photo_filename: true,
+        // participant: true,
         last_login: true,
         date_joined: true,
-        // photo: true,
-        roles: true,
         full_name: true,
+        roles: true,
+    })
+    .transform((data) => {
+
+
+        return {
+            ...data,
+           email: data.email.value,
+        }
     })
 
 
 export type UserRole = 'admin' | 'reviewer' | 'participant';
-export type EditUserFormValues = z.infer<typeof editUserFormSchema>
+
+export type EditUserFormValues = z.input<typeof editUserFormSchema>
+export type EditUserFormOutput = z.output<typeof editUserFormSchema>
+
 export type ChangePasswordFormValues = z.infer<typeof changePasswordSchema>

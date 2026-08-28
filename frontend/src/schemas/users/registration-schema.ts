@@ -34,30 +34,40 @@ const passwordConfirmation = z.object({
 
 export const registrationSchema = z.object({
     prefix: z.enum(userPrefixes.map(p => p.value), 'Choose a valid option'),
-    first_name: z.string().trim()
+
+    first_name: z.string()
+        .trim()
         .min(1, "Please enter your first name")
         .max(100, "Input too long"),
-    middle_name: z.string().trim()
+    middle_name: z.string()
+        .trim()
         .max(100, "Input too long")
         .optional(),
-    last_name: z.string().trim()
+    last_name: z.string()
+        .trim()
         .min(1, "Please enter your last name")
         .max(100, "Input too long"),
-    pronouns: z.string().trim()
+    pronouns: z.string()
+        .trim()
         .max(50, 'Too long')
         .optional(),
     nationality: z.enum(countryCodes, 'Choose a valid option'),
-    city: z.string().trim()
+
+    city: z.string()
+        .trim()
         .min(1, "Please enter your city")
         .max(30, 'Input too long'),
 
-    affiliation: z.string().trim()
+    institution: z.string()
+        .trim()
         .min(1, "Affiliation is required")
         .max(100, "Institution name is too long"),
-    job_title: z.string().trim()
+    job_title: z.string()
+        .trim()
         .min(1, "Position or Job Title is required")
         .max(100, "Position title is too long"),
-    field_of_study: z.string().trim()
+    field_of_study: z.string()
+        .trim()
         .min(1, "Field of study is required")
         .max(100, "Field name is too long"),
 
@@ -66,18 +76,13 @@ export const registrationSchema = z.object({
     password: passwordConfirmation,
 })
     .transform(data => {
-        const { email, password, affiliation, job_title, field_of_study, ...rest } = data;
+        const { email, password, ...rest } = data;
+
         return {
             ...rest,
             email: email.value,
             password: password.value,
-            participant: {
-                affiliation,
-                job_title,
-                field_of_study,
-            }
         }
-
     })
 
 

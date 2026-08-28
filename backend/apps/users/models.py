@@ -1,8 +1,18 @@
 from django.contrib.auth.models import AbstractUser
+from django.utils.translation import gettext_lazy as _
 from django.db import models
+from config.common.nationality import Nationality
 from .managers import CustomUserManager
-from .text_choices import Nationality, PrefixType
-import os
+
+
+class PrefixType(models.TextChoices):
+    MISS = "Miss", "Miss"
+    MS = "Ms.", "Ms."
+    MRS = "Mrs.", "Mrs."
+    MR = "Mr.", "Mr."
+    DR = "Dr.", "Dr."
+    PROF = "Prof.", "Prof."
+    MX = "Mx.", "Mx."
 
 
 class User(AbstractUser):
@@ -25,14 +35,52 @@ class User(AbstractUser):
             "invalid": "That email format looks wrong.",
         },
     )
-    middle_name = models.CharField(max_length=100, blank=True, default="")
-    prefix = models.CharField(max_length=10, choices=PrefixType.choices, default=PrefixType.PROF)
-    pronouns = models.CharField(max_length=50, blank=True, default="")
-    nationality = models.CharField(max_length=5, choices=Nationality.choices, default=Nationality.MEXICO)
-    city = models.CharField(max_length=30, blank=False)
-    photo = models.ImageField(upload_to="users/photos/", blank=True, null=True)
+    middle_name = models.CharField(
+        max_length=100,
+        blank=True,
+        default="",
+    )
+    prefix = models.CharField(
+        max_length=10,
+        choices=PrefixType.choices,
+        default=PrefixType.PROF,
+    )
+    pronouns = models.CharField(
+        max_length=50,
+        blank=True,
+        default="",
+    )
+    job_title = models.CharField(
+            max_length=100,
+            blank=True,
+        )
+    field_of_study = models.CharField(
+        max_length=100,
+        blank=True,
+    )
+    institution = models.CharField(
+        max_length=100,
+        blank=True,
+    )
+    nationality = models.CharField(
+        max_length=5,
+        choices=Nationality.choices,
+        default=Nationality.MEXICO,
+    )
+    city = models.CharField(
+        max_length=30,
+        blank=False,
+    )
+    photo = models.ImageField(
+        upload_to="users/photos/",
+        blank=True,
+        null=True,
+    )
+    email_verified = models.BooleanField(
+        default=False,
+    )
+
     objects = CustomUserManager()
-    email_verified = models.BooleanField(default=False)
 
     @property
     def full_name(self):

@@ -1,92 +1,119 @@
-import api from '@/clients/api'
 import { InfoAlert } from '@/components/InfoAlert'
 import { Button } from '@/components/ui/button'
 import { CardTitle } from '@/components/ui/card'
 import { Field, FieldContent, FieldDescription, FieldError, FieldLabel } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
+import { InputGroup, InputGroupAddon, InputGroupInput } from '@/components/ui/input-group'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Separator } from '@/components/ui/separator'
 import { Spinner } from '@/components/ui/spinner'
 import { AvatarUpload } from '@/components/ui/upload-avatar'
 import { useAuth } from '@/contexts/AuthContext'
+import { editUserData, editUserPicture } from '@/domain/auth'
 import { userPrefixes } from '@/domain/constants'
-import { useProfiles } from '@/hooks/use-profiles'
 import { DEBUG } from '@/lib/constants'
-import { editUserFormSchema, type EditUserFormValues } from '@/schemas/user-schemas'
+import { editUserFormSchema, type EditUserFormOutput, type EditUserFormValues } from '@/schemas/user-schemas'
 import { countries } from '@/utils/countriesInfo'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { isAxiosError } from 'axios'
-import { Building2, IdCard, Mail, Save, SquareUserRound } from 'lucide-react'
-import { useEffect } from 'react'
+import { Building2, Mail, RotateCcwIcon, SquareUserRound, UploadIcon } from 'lucide-react'
+import { Fragment, useEffect } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 
-type P = {
-    defaultValues?: EditUserFormValues
-}
 
-function EditUserForm({ defaultValues }: P) {
-    const { fetchUser } = useAuth()
-    const { profile, fetchProfile } = useProfiles()
+function EditUserForm() {
+    const { user, fetchUser } = useAuth()
 
-    const { handleSubmit, reset, control, formState } = useForm({
+    const {
+        handleSubmit,
+        reset,
+        control,
+        formState: {
+            isSubmitting,
+            isValid,
+            isDirty,
+        },
+    } = useForm<EditUserFormValues, any, EditUserFormOutput>({
         resolver: zodResolver(editUserFormSchema),
+        mode: 'onChange',
         defaultValues: {
-            ...defaultValues,
+            city: '',
+            field_of_study: '',
+            first_name: '',
+            id: null,
+            institution: '',
+            job_title: '',
+            last_name: '',
+            middle_name: '',
+            nationality: '',
+            photo: null,
+            prefix: 'not-set',
+            pronouns: '',
             email: {
                 value: '',
                 confirm: ''
             },
-            participant: {
-                affiliation: '',
-                job_title: '',
-                field_of_study: ''
-            }
         },
-        mode: 'onChange',
     })
-
-    const { isSubmitting, isValid, isDirty } = formState
 
     useEffect(() => {
-        if (defaultValues) {
-            reset({
-                ...defaultValues,
-                email: {
-                    value: '',
-                    confirm: ''
-                },
-                participant: {
-                    affiliation: profile?.participant?.affiliation,
-                    job_title: profile?.participant?.job_title,
-                    field_of_study: profile?.participant?.field_of_study
-                }
+        if (user) {
+            queueMicrotask(() => {
+                reset({
+                    city: user.city,
+                    field_of_study: user.field_of_study,
+                    first_name: user.first_name,
+                    id: user.id,
+                    institution: user.institution,
+                    job_title: user.job_title,
+                    last_name: user.last_name,
+                    middle_name: user.middle_name,
+                    nationality: user.nationality,
+                    prefix: user.prefix,
+                    pronouns: user.pronouns,
+                    email: {
+                        value: '',
+                        confirm: ''
+                    },
+                })
             })
         }
-    }, [defaultValues, profile])
+    }, [user])
 
-    const onFormSubmit = handleSubmit(async (data) => {
-        try {
-            await api.patch(`/users/${data.id}/`, {
-                ...data,
-                email: data.email.value || undefined
-            })
-            await fetchUser()
-            await fetchProfile()
-        } catch (error) {
-            if (DEBUG) {
+    const onFormSubmit = handleSubmit(
+        async (data) => {
+            try {
+                const { photo } = data
+
+                if (photo){
+                    await editUserPicture(photo)
+                }
+                await editUserData(data)
+                
+                await fetchUser()
+                
+                reset({
+                    ...data,
+                    email: {
+                        value: data.email,
+                        confirm: data.email,
+                    }
+                })
+            } catch (error) {
                 if (isAxiosError(error)) {
-                    console.log(error.response.data);
+                    DEBUG && console.log(error.response.data);
                 }
             }
-        }
-    })
+        },
+        data => console.error(data)
+    )
 
     return (
         <form onSubmit={onFormSubmit}>
-            <fieldset disabled={isSubmitting} className='space-y-5'>
+            <fieldset disabled={isSubmitting} className='space-y-8'>
                 <CardTitle className="flex gap-3 items-center">
                     <SquareUserRound className='text-primary-main' />
-                    <h2 className='text-xl font-semibold'>Profile Picture</h2>
+                    <h2 className='text-xl font-semibold'>Personal Information</h2>
                 </CardTitle>
 
                 <Controller
@@ -95,7 +122,7 @@ function EditUserForm({ defaultValues }: P) {
                     render={({ field, fieldState }) => (
                         <Field data-invalid={fieldState.invalid}>
                             <AvatarUpload
-                                defaultAvatar={defaultValues?.photo as string}
+                                defaultAvatar={user?.photo}
                                 accept=".png,.jpg,.jpeg,.webp"
                                 onFileChange={(files) => {
                                     queueMicrotask(() => {
@@ -108,14 +135,7 @@ function EditUserForm({ defaultValues }: P) {
                     )}
                 />
 
-                <Separator />
-
-                <CardTitle className="flex gap-3 items-center">
-                    <IdCard className='text-primary-main' />
-                    <h2 className='text-xl font-semibold'>Personal Information</h2>
-                </CardTitle>
-
-                <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5'>
+                <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 gap-5'>
                     <Controller
                         name="prefix"
                         control={control}
@@ -166,6 +186,23 @@ function EditUserForm({ defaultValues }: P) {
                         )}
                     />
                     <Controller
+                        name="middle_name"
+                        control={control}
+                        render={({ field, fieldState }) => (
+                            <Field data-invalid={fieldState.invalid}>
+                                <FieldLabel htmlFor={field.name}>Middle name</FieldLabel>
+                                <Input
+                                    {...field}
+                                    id={field.name}
+                                    aria-invalid={fieldState.invalid}
+                                    placeholder="First name"
+                                    autoComplete="off"
+                                />
+                                {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                            </Field>
+                        )}
+                    />
+                    <Controller
                         name="last_name"
                         control={control}
                         render={({ field, fieldState }) => (
@@ -184,7 +221,7 @@ function EditUserForm({ defaultValues }: P) {
                     />
                 </div>
 
-                <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5 justify-start items-start'>
+                <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 gap-5 justify-start items-start'>
                     <Controller
                         name="nationality"
                         control={control}
@@ -254,55 +291,70 @@ function EditUserForm({ defaultValues }: P) {
                     <h2 className='text-xl font-semibold'>Professional Affiliation</h2>
                 </CardTitle>
 
-                <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5 justify-start items-start'>
+                <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 gap-5 justify-start items-start'>
                     <Controller
-                        name="participant.affiliation"
+                        name="institution"
                         control={control}
                         render={({ field, fieldState }) => (
                             <Field data-invalid={fieldState.invalid}>
                                 <FieldLabel htmlFor={field.name}>Institution</FieldLabel>
-                                <Input
-                                    {...field}
-                                    id={field.name}
-                                    aria-invalid={fieldState.invalid}
-                                    autoComplete="off"
-                                />
+                                <InputGroup>
+                                    <InputGroupInput
+                                        {...field}
+                                        id={field.name}
+                                        aria-invalid={fieldState.invalid}
+                                        autoComplete="off"
+                                        maxLength={100}
+                                    />
+                                    <InputGroupAddon align="inline-end">
+                                        <FieldError errors={[fieldState.error]} />
+                                    </InputGroupAddon>
+                                </InputGroup>
                                 <FieldDescription>Name of institution, company, etc.</FieldDescription>
-                                {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                             </Field>
                         )}
                     />
                     <Controller
-                        name="participant.job_title"
+                        name="job_title"
                         control={control}
                         render={({ field, fieldState }) => (
                             <Field data-invalid={fieldState.invalid}>
                                 <FieldLabel htmlFor={field.name}>Job title</FieldLabel>
-                                <Input
-                                    {...field}
-                                    id={field.name}
-                                    aria-invalid={fieldState.invalid}
-                                    autoComplete="off"
-                                />
+                                <InputGroup>
+                                    <InputGroupInput
+                                        {...field}
+                                        id={field.name}
+                                        aria-invalid={fieldState.invalid}
+                                        autoComplete="off"
+                                        maxLength={100}
+                                    />
+                                    <InputGroupAddon align="inline-end">
+                                        <FieldError errors={[fieldState.error]} />
+                                    </InputGroupAddon>
+                                </InputGroup>
                                 <FieldDescription>Your current position or role</FieldDescription>
-                                {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                             </Field>
                         )}
                     />
                     <Controller
-                        name="participant.field_of_study"
+                        name="field_of_study"
                         control={control}
                         render={({ field, fieldState }) => (
                             <Field data-invalid={fieldState.invalid}>
                                 <FieldLabel htmlFor={field.name}>Field of study</FieldLabel>
-                                <Input
-                                    {...field}
-                                    id={field.name}
-                                    aria-invalid={fieldState.invalid}
-                                    autoComplete="off"
-                                />
+                                <InputGroup>
+                                    <InputGroupInput
+                                        {...field}
+                                        id={field.name}
+                                        aria-invalid={fieldState.invalid}
+                                        autoComplete="off"
+                                        maxLength={100}
+                                    />
+                                    <InputGroupAddon align="inline-end">
+                                        <FieldError errors={[fieldState.error]} />
+                                    </InputGroupAddon>
+                                </InputGroup>
                                 <FieldDescription>The major or primary area of your degree.</FieldDescription>
-                                {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                             </Field>
                         )}
                     />
@@ -365,14 +417,33 @@ function EditUserForm({ defaultValues }: P) {
                     />
                 </div>
 
-                <div className='flex justify-end'>
-                    <Button type='submit' className='p-5 w-60 uppercase' disabled={!isValid || !isDirty}>
+                <div className={"flex w-fit items-center gap-3 ml-auto"}>
+                    <Button
+                        type='button'
+                        variant='outline'
+                        onClick={() => reset()}
+                        disabled={!isDirty}
+                    >
+                        <RotateCcwIcon className='text-muted-foreground' /> Reset
+                    </Button>
+
+                    <Button
+                        type="submit"
+                        form="edit-participant-form"
+                        disabled={!isValid || !isDirty}
+                        onClick={onFormSubmit}
+                    >
                         {isSubmitting ? (
-                            <Spinner data-icon="inline-start" />
+                            <Fragment>
+                                <Spinner />
+                                <span>'Saving...'</span>
+                            </Fragment>
                         ) : (
-                            <Save data-icon="inline-start" />
+                            <Fragment>
+                                <UploadIcon />
+                                <span>{(isDirty && isValid) ? 'Save changes' : 'No Changes'}</span>
+                            </Fragment>
                         )}
-                        Save changes
                     </Button>
                 </div>
             </fieldset>
