@@ -22,6 +22,7 @@ import Home from './pages/home/Home'
 import HotelBooking from './pages/hotelBooking/HotelBooking'
 import ManageReviewsPage from './pages/protected/administration/manage-reviews/manage-reviews'
 import ManageUsersPage from './pages/protected/administration/manage-users/manage_users'
+import ProgramPage from './pages/protected/administration/program/program-page'
 import { DinnerPage } from './pages/protected/confirmation-assistance/dinner/page'
 import { SelectFeePage } from './pages/protected/confirmation-assistance/fee/page'
 import ConfirmationPage from './pages/protected/confirmation-assistance/page'
@@ -29,6 +30,7 @@ import ConfirmPaymentPage from './pages/protected/confirmation-assistance/paymen
 import { SelectTourPage } from './pages/protected/confirmation-assistance/tour/page'
 import UserDashboardPage from './pages/protected/dashboard/page'
 import NotificationsPage from './pages/protected/notifications/notifications-page'
+import PaymentSuccess from './pages/protected/payments/success/payment-success'
 import ReviewsList from './pages/protected/reviews/list/page'
 import ReviewAbstract from './pages/protected/reviews/view/page'
 import SettingsPage from './pages/protected/settings/settings-page'
@@ -87,7 +89,11 @@ function App() {
 							<Route path={routes.users.confirmAssistance.fee} element={<SelectFeePage />} />
 							<Route path={routes.users.confirmAssistance.dinner} element={<DinnerPage />} />
 							<Route path={routes.users.confirmAssistance.tour} element={<SelectTourPage />} />
+
+							
 							<Route path={routes.users.confirmAssistance.payment} element={<ConfirmPaymentPage />} />
+
+							<Route path={routes.payments.success} element={<PaymentSuccess />} />
 						</Route>
 					</Route>
 				</Route>
@@ -99,6 +105,7 @@ function App() {
 					<Route element={<ProtectedRoute allowedRoles={['admin']} />} >
 						<Route path={routes.users.administration.manageUsers} element={<ManageUsersPage />} />
 						<Route path={routes.users.administration.manageReviewers} element={<ManageReviewsPage />} />
+						<Route path={routes.users.administration.program} element={<ProgramPage />} />
 					</Route>
 
 					<Route element={<ProtectedRoute allowedRoles={['reviewer']} />} >

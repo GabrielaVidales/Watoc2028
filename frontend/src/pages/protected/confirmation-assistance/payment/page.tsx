@@ -1,27 +1,44 @@
-import React, { useState } from 'react'
-import { Link } from 'react-router'
-import { routes } from '@/routes/routes'
-import { cn } from '@/lib/utils'
+import api from '@/clients/api'
 import { Button } from '@/components/ui/button'
-import { ChevronLeft, ChevronRight, ExternalLink } from 'lucide-react'
+import { FieldSet, FieldTitle } from '@/components/ui/field'
 import { Label } from "@/components/ui/label"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
-import { FieldContent, FieldDescription, FieldLegend, FieldSet, FieldTitle } from '@/components/ui/field'
-import api from '@/clients/api'
 import { Separator } from '@/components/ui/separator'
 import { Spinner } from '@/components/ui/spinner'
+import { cn } from '@/lib/utils'
+import { routes } from '@/routes/routes'
+import { ChevronLeft, ChevronRight, ExternalLink } from 'lucide-react'
+import { useEffect, useState } from 'react'
+import { Link } from 'react-router'
 
 
 function ConfirmPaymentPage() {
     const [checked, setChecked] = useState(false)
     const [loading, setLoading] = useState(false)
 
+
+    const [idempotencyKey, setIdempotencyKey] = useState('')
+
+    useEffect(() => {
+        setIdempotencyKey(crypto.randomUUID())
+    }, [])
+
+
     const onProceedPayment = async () => {
         try {
             setLoading(true)
-            const res = await api.post('/payments/create-checkout-session/')
-            console.log(res);
-            console.log(res.data.checkout_url);
+            const res = await api.post(
+                '/payments/create-checkout-session/',
+                {
+                    line_items: ['congress']
+                },
+                {
+                    headers: {
+                        'Idempotency-Key': idempotencyKey
+                    }
+                }
+            )
+
 
             const checkoutUrl = res.data.checkout_url
             window.location.assign(checkoutUrl)

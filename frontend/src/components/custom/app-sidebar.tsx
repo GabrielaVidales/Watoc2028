@@ -4,7 +4,7 @@ import { Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupConte
 import { useAuth } from "@/contexts/AuthContext";
 import { cn } from '@/lib/utils';
 import { routes } from "@/routes/routes";
-import { ArrowLeftFromLine, BadgeCheckIcon, Bell, Bot, ChevronDown, ChevronRight, ChevronUp, FileBadge, FileCheck, FileType2, LayoutDashboard, LayoutList, LogOut, MessageSquareDot, PackageCheck, Settings2, TableProperties, Users, type LucideIcon } from "lucide-react";
+import { ArrowLeftFromLine, BadgeCheckIcon, Bell, Bot, CalendarClockIcon, ChevronDown, ChevronRight, ChevronUp, FileBadge, FileCheck, FileType2, LayoutDashboard, LayoutList, LogOut, MessageSquareDot, PackageCheck, Settings2, TableProperties, Users, type LucideIcon } from "lucide-react";
 import { Link, NavLink, useNavigate, } from "react-router";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "../ui/collapsible";
@@ -77,6 +77,11 @@ const adminModules: NavCollapsible[] = [
                 name: "Review Assignments",
                 url: routes.users.administration.manageReviewers,
                 icon: LayoutList,
+            },
+            {
+                name: "Program Schedule",
+                url: routes.users.administration.program,
+                icon: CalendarClockIcon,
             },
         ]
     }
@@ -193,7 +198,7 @@ export function AppSidebar() {
                                                                             "text-neutral-50 hover:translate-x-1 transition-transform duration-300",
                                                                             isActive && 'bg-white/30'
                                                                         )}>
-                                                                            <item.icon />
+                                                                            <subItem.icon />
                                                                             <span>{subItem.name}</span>
                                                                         </SidebarMenuButton>
                                                                     )}
@@ -244,7 +249,7 @@ export function AppSidebar() {
                                                                             "text-neutral-50 hover:translate-x-1 transition-transform duration-300",
                                                                             isActive && 'bg-white/30'
                                                                         )}>
-                                                                            <item.icon />
+                                                                            <subItem.icon />
                                                                             <span>{subItem.name}</span>
                                                                         </SidebarMenuButton>
                                                                     )}

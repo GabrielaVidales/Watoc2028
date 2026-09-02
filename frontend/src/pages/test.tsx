@@ -4,89 +4,21 @@ import { Button } from '@/components/ui/button'
 import { Card, CardAction, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Separator } from '@/components/ui/separator'
-import { ConfirmProvider, useConfirm } from '@/contexts/ConfirmationDialogContext'
-import { GenericConfirmProvider, useGenericConfirm } from '@/contexts/GenericConfirmationContext'
 import EditParticipantForm from '@/forms/participants/edit-participant-form'
+import ProgramForm from '@/forms/program/program-form'
 import ReviewAssignmentForm from '@/forms/reviews/review-assignment-form'
 import { routes } from '@/routes/routes'
-import type { AbstractSchema } from '@/schemas/abstracts/abstract-schemas'
-import { getSubmissionById } from '@/services/submissions/submission-services'
-import { IdCardLanyardIcon, PowerIcon, PowerOffIcon } from 'lucide-react'
+import { PowerIcon, PowerOffIcon } from 'lucide-react'
 import { useState } from 'react'
 import { useNavigate } from 'react-router'
 import DownloadAbstractPDFButton from './test/test-abstract-feature'
 
 
-const feePlans = [
-    {
-        value: "participant-early",
-        id: "participant-early",
-        title: "Participant",
-        description: "Early Bird",
-        label: '1 Oct 2024 — 28 Feb 2025',
-        price: 15_000,
-        currency: 'MXN',
-        student_fee: false,
-    },
-    {
-        value: "participant-regular",
-        id: "participant-regular",
-        title: "Participant",
-        description: "Regular attendee",
-        label: '1 Oct 2024 — 28 Feb 2025',
-        price: 17_000,
-        currency: 'MXN',
-        student_fee: false,
-    },
-    {
-        value: "participant-late",
-        id: "participant-late",
-        title: "Participant",
-        description: "Late",
-        label: '1 Oct 2024 — 28 Feb 2025',
-        price: 18_000,
-        currency: 'MXN',
-        student_fee: false,
-    },
-    {
-        value: "student-early",
-        id: "student-early",
-        title: "Student",
-        description: "Early Bird",
-        label: '1 Oct 2024 — 28 Feb 2025',
-        price: 7_500,
-        currency: 'MXN',
-        student_fee: true,
-    },
-    {
-        value: "student-regular",
-        id: "student-regular",
-        title: "Student",
-        description: "Regular student",
-        label: '1 Oct 2024 — 28 Feb 2025',
-        price: 7_500,
-        currency: 'MXN',
-        student_fee: true,
-    },
-    {
-        value: "student-late",
-        id: "student-late",
-        title: "Student",
-        description: "Late",
-        label: '1 Oct 2024 — 28 Feb 2025',
-        price: 7_500,
-        currency: 'MXN',
-        student_fee: true,
-    },
-];
-
-
 export default function TestPage() {
     const [id, setId] = useState<number | null>(null)
+    const [eventId, setEventId] = useState<number | null>(null)
 
     const navigate = useNavigate()
-
-    const errors = false
 
     return (
         <div className='bg-muted'>
@@ -196,30 +128,29 @@ export default function TestPage() {
                 </Dialog>
 
                 <DownloadAbstractPDFButton abstractId={38} />
-
-                <div className='flex justify-between items-center gap-3 mt-6'>
-                    <ConfirmProvider>
-                        <TestButtonComponent />
-                    </ConfirmProvider>
-
-                    <GenericConfirmProvider>
-                        <TestComponent />
-                    </GenericConfirmProvider>
-                </div>
             </div>
 
-            <div className='max-w-3xl w-full mx-auto'>
+            <div className='max-w-xl w-full mx-auto'>
+                <Card className='shadow-lg'>
+                    <CardHeader className='px-0 mb-8'>
+                        <CardAction>
+                            <Button size='icon' onClick={() => {
+                                setEventId(prev => prev === null ? 1 : null)
+                            }}>
+                                {!eventId ? <PowerIcon /> : <PowerOffIcon />}
+                            </Button>
+                        </CardAction>
+                    </CardHeader>
+
+                    <CardContent>
+                        <ProgramForm eventId={eventId} />
+                    </CardContent>
+                </Card>
+            </div>
+
+            <div className='max-w-4xl w-full mx-auto'>
                 <section className='bg-background shadow-lg p-8'>
-                    <CardHeader className='px-0 mb-8'> 
-                        <div className="flex gap-2 items-start">
-                            <div className='bg-primary-light/20 rounded-full p-1 border-3 border-primary-light'>
-                                <IdCardLanyardIcon className='text-primary-main' />
-                            </div>
-                            <div>
-                                <CardTitle className='text-xl font-semibold'>Additional Information</CardTitle>
-                                <CardDescription>Click the button to load/unload data</CardDescription>
-                            </div>
-                        </div>
+                    <CardHeader className='px-0 mb-8'>
                         <CardAction>
                             <Button size='icon' onClick={() => {
                                 setId(prev => prev === null ? 1 : null)
@@ -232,77 +163,14 @@ export default function TestPage() {
                             </Button>
                         </CardAction>
                     </CardHeader>
-                    
+
                     <CardContent>
                         <EditParticipantForm participantId={id} />
                     </CardContent>
                 </section>
             </div>
+
+
         </div>
-    )
-}
-
-
-
-function TestComponent() {
-    const {
-        confirm,
-        resolvedData,
-    } = useGenericConfirm<AbstractSchema>()
-
-    return (
-        <Button
-            onClick={async () => {
-                const selection = await confirm({
-                    resolveFn: async () => await getSubmissionById(38),
-                    keepPreviousData: false,
-                    options: {
-                        btnLabel: 'Delete',
-                        cancelBtnLabel: 'Cancel',
-                        description: 'This action cannot be undone. The abstract will be permanently deleted.',
-                        title: 'Delete Abstract?',
-                        onCancel: () => console.log('Cancel'),
-                        onConfirm: async () => {
-                            await new Promise(r => setTimeout(r, 500))
-                            console.log('Confirm')
-                        }
-                    },
-                })
-
-                console.log(selection);
-            }}
-        >
-            {resolvedData ? 'Awebo' : 'Haz click aquí'}
-        </Button>
-    )
-}
-
-
-function TestButtonComponent() {
-    const confirm = useConfirm()
-
-    return (
-        <Button
-            onClick={async () => {
-
-                const selection = await confirm({
-                    btnLabel: 'Delete',
-                    cancelBtnLabel: 'Cancel',
-                    description: 'This action cannot be undone. The abstract will be permanently deleted.',
-                    title: 'Delete Abstract?',
-                    onCancel: () => console.log('Cancel'),
-                    onConfirm: async () => {
-                        await new Promise(r => setTimeout(r, 500))
-                        console.log('Confirm')
-                    }
-                })
-
-                if (selection) {
-                    console.log('AWEBO PINCHE PUTA!');
-                }
-            }}
-        >
-            Confirm?
-        </Button>
     )
 }

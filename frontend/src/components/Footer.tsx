@@ -1,9 +1,9 @@
-import { Link } from 'react-router';
-import fieldPng from '../assets/field.png'
-import { Facebook, Instagram, Linkedin, Mail, X } from 'lucide-react';
-import { routes } from '@/routes/routes';
-import logo from '@/assets/WatocPNGLogoBlank.png'
+import logo from '@/assets/WatocPNGLogoBlank.png';
 import { cn } from '@/lib/utils';
+import { routes } from '@/routes/routes';
+import { Mail, X } from 'lucide-react';
+import { Link } from 'react-router';
+import fieldPng from '../assets/field.png';
 import { Button } from './ui/button';
 
 const navigation = {
@@ -140,10 +140,10 @@ export default function Footer() {
 
                 <div className='flex flex-row gap-2'>
                     {[
-                        { icon: <Facebook />, href: '#' },
+                        // { icon: <Facebook />, href: '#' },
                         { icon: <X />, href: '#' },
-                        { icon: <Linkedin />, href: '#' },
-                        { icon: <Instagram />, href: '#' },
+                        // { icon: <Linkedin />, href: '#' },
+                        // { icon: <Instagram />, href: '#' },
                     ].map((social, index) => (
                         <Button
                             key={index}

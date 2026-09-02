@@ -1,7 +1,6 @@
 import { notify } from '@/components/custom/notify'
 import TableFileUploader from '@/components/reui/table-upload'
 import { Button } from '@/components/ui/button'
-import { CardDescription, CardTitle } from '@/components/ui/card'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Field, FieldContent, FieldDescription, FieldGroup, FieldLabel, FieldLegend, FieldSet, FieldTitle } from '@/components/ui/field'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
@@ -15,7 +14,7 @@ import { getParticipantData, getStudentProofFile, saveParticipantData, saveStude
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useMutation, useQuery } from '@tanstack/react-query'
 import type { AxiosError } from 'axios'
-import { GraduationCap, IdCardLanyardIcon, RotateCcwIcon, UploadIcon } from 'lucide-react'
+import { FileUpIcon, GraduationCap, RotateCcwIcon, UploadIcon } from 'lucide-react'
 import { AnimatePresence, motion } from 'motion/react'
 import { Fragment, useEffect, useState } from 'react'
 import { Controller, useForm, useWatch } from 'react-hook-form'
@@ -83,8 +82,6 @@ function EditParticipantForm({ participantId = null }: Props) {
 
     const onFormSubmit = handleSubmit(
         async validData => {
-            DEBUG && console.log(validData);
-
             if (!data) {
                 notify.destructive('Invalid request', {
                     description: 'This form has no data.'
@@ -103,7 +100,9 @@ function EditParticipantForm({ participantId = null }: Props) {
             if (student_proof) {
                 saveFileMutation.mutate([validData.user, student_proof])
             }
-        }
+        },
+        invalidData => DEBUG && console.log(invalidData)
+        
     )
 
     const { data } = useQuery<ParticipantSchema>({
@@ -170,7 +169,16 @@ function EditParticipantForm({ participantId = null }: Props) {
 
     return (
         <form id='edit-participant-form' onSubmit={onFormSubmit}>
+            <h2 className='text-2xl font-medium text-primary-main mb-4'>Registration Fee</h2>
+
             <fieldset className='space-y-12' disabled={formDisabled || !data}>
+                <FieldLegend>The in-person registration fee includes</FieldLegend>
+                <ul className="list-disc pl-6 space-y-1 text-sm">
+                    {items.map((item, i) => (
+                        <li key={i}>{item}</li>
+                    ))}
+                </ul>
+
                 <Controller
                     name="fee_plan_id"
                     control={control}
@@ -188,7 +196,7 @@ function EditParticipantForm({ participantId = null }: Props) {
                                 name={field.name}
                                 value={`${field.value}`}
                                 onValueChange={value => field.onChange(Number(value))}
-                                className="w-full grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3"
+                                className="w-full grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 mt-8"
                             >
                                 {feePlans.map(item => {
                                     const errors = false;
@@ -203,7 +211,7 @@ function EditParticipantForm({ participantId = null }: Props) {
                                             key={item.id}
                                             htmlFor={item.id}
                                             className={cn(
-                                                "cursor-pointer border-2! border-input bg-card",
+                                                "cursor-pointer border-2! border-input/50 bg-card",
                                                 "hover:border-primary-light",
                                                 "hover:bg-primary-light/5",
                                                 "has-data-[state=checked]:border-primary-main",
@@ -213,7 +221,7 @@ function EditParticipantForm({ participantId = null }: Props) {
                                             )}
                                         >
                                             <Field data-invalid={errors} orientation="vertical">
-                                                <div className="relative flex flex-col items-start justify-between gap-3">
+                                                <div className="relative flex items-start justify-between gap-2">
                                                     <RadioGroupItem className='absolute top-0 right-0' value={`${item.value}`} id={item.id} />
 
                                                     <FieldContent>
@@ -241,13 +249,13 @@ function EditParticipantForm({ participantId = null }: Props) {
                                                     </FieldContent>
 
                                                     <div className={cn(
-                                                        "flex p-2 shrink-0 items-center justify-center rounded-xl border-2 ml-auto", errors
+                                                        "flex p-2 shrink-0 items-center justify-center rounded-xl border-2 mt-auto", errors
                                                         ? "border-destructive bg-destructive/10"
                                                         : "border-primary-main/20 bg-primary-light/20",
                                                     )}>
                                                         <span
                                                             className={cn(
-                                                                'text-base', errors
+                                                                'text-sm', errors
                                                                 ? 'text-destructive'
                                                                 : 'text-primary-main',
                                                             )}
@@ -278,14 +286,9 @@ function EditParticipantForm({ participantId = null }: Props) {
                             <Separator />
                             <div className='h-12' />
 
-                            <div className="flex gap-2 items-start">
-                                <div className='bg-primary-light/20 rounded-full p-1 border-3 border-primary-light'>
-                                    <IdCardLanyardIcon className='text-primary-main' />
-                                </div>
-                                <div>
-                                    <CardTitle className='text-xl font-semibold'>Additional Information</CardTitle>
-                                    <CardDescription>Click the button to load/unload data</CardDescription>
-                                </div>
+                            <div className="flex gap-2 items-center mb-4">
+                                <FileUpIcon className='text-primary-main' />
+                                <h2 className='text-2xl font-medium'>Student Fees:</h2>
                             </div>
 
                             <Controller
@@ -400,3 +403,11 @@ function EditParticipantForm({ participantId = null }: Props) {
 export default EditParticipantForm
 
 
+const items = [
+    "Admission to all scientific sessions, including plenary lectures, invited talks, and contributed presentations",
+    "Access to poster sessions presenting current research in theoretical and computational chemistry",
+    "Participation in networking and social events during the congress",
+    "Coffee breaks and lunches during the official congress days",
+    "Congress materials (delegate badge, final programme, and conference materials)",
+    "Access to conference abstracts and digital congress resources",
+]

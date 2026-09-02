@@ -73,8 +73,8 @@ const participantFormSchema = participantSchema.extend({
 
 
 type ParticipantSchema = z.infer<typeof participantApiSchema>
-type ParticipantFormSchema = z.infer<typeof participantFormSchema>
 
+type ParticipantFormSchema = z.infer<typeof participantFormSchema>
 
 export {
     participantApiSchema,

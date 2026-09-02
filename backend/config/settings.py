@@ -27,10 +27,6 @@ CSRF_COOKIE_SAMESITE = "Lax"
 
 COOKIE_SECURE = os.getenv("SESSION_COOKIE_SECURE", "False") == "True"
 
-CORS_ALLOW_ALL_ORIGINS = DEBUG
-CORS_ALLOW_CREDENTIALS = True
-CORS_ALLOWED_ORIGINS = os.getenv("CORS_ALLOWED_ORIGINS", "").split(",")
-
 AUTH_USER_MODEL = "users.User"
 
 AUTH_PASSWORD_VALIDATORS = [
@@ -171,17 +167,15 @@ SESSION_EXPIRE_AT_BROWSER_CLOSE = False
 SESSION_SAVE_EVERY_REQUEST = True
 SESSION_ENGINE = "django.contrib.sessions.backends.db"
 
-
-STRIPE_SECRET_KEY = os.getenv("STRIPE_SECRET_KEY", "invalid key")
-STRIPE_PUBLISHABLE_KEY = os.getenv("STRIPE_PUBLISHABLE_KEY", "invalid key")
-
 DOMAIN = os.getenv("DOMAIN", "invalid domain")
 
 
+from config.settings_modules.cors_settings import *
+from config.settings_modules.rest_framework_settings import *
 from config.settings_modules.channel_settings import *
 from config.settings_modules.email_settings import *
-from config.settings_modules.rest_framework_settings import *
 from config.settings_modules.logging_settings import *
+from config.settings_modules.stripe_settings import *
 
 SIMPLE_JWT = get_simple_jwt_settings(SECRET_KEY)
 LOGGING = get_logging_settigns(BASE_DIR)

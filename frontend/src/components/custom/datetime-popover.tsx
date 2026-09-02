@@ -12,7 +12,8 @@ import type { Matcher } from 'react-day-picker'
 
 type DateDayPreset = {
     label: string
-    days: number
+    days?: number
+    date?: Date
 }
 
 
@@ -178,3 +179,123 @@ export function DateTimePopover({
         </Popover>
     )
 }
+
+
+
+
+interface DatePickerProps {
+    value?: Date | null
+    onChange?: (date: Date | undefined) => void
+    onBlur?: () => void
+    name?: string
+    error?: string
+    disabled?: boolean
+    defaultValue?: Date
+    presets?: DateDayPreset[]
+    disableDates?: Matcher | Matcher[]
+}
+
+export function DatePicker({
+    value,
+    onChange,
+    onBlur,
+    name = 'datetime',
+    disabled,
+    defaultValue,
+    presets = [],
+    disableDates = [],
+}: DatePickerProps) {
+    const [open, setOpen] = React.useState(false)
+    const [internalDate, setInternalDate] = React.useState<Date | undefined>(defaultValue)
+
+    const isControlled = onChange !== undefined
+    const currentDate = isControlled ? (value ?? undefined) : internalDate
+
+    const [currentMonth, setCurrentMonth] = React.useState<Date>(
+        currentDate ?? new Date()
+    )
+
+    const [timeZone, setTimeZone] = React.useState<string | undefined>(undefined)
+
+    React.useEffect(() => {
+        setTimeZone(Intl.DateTimeFormat().resolvedOptions().timeZone)
+    }, [])
+
+    const emit = (next: Date | undefined) => {
+        if (isControlled) onChange(next)
+        else setInternalDate(next)
+    }
+
+    const handleDateSelect = (selected: Date | undefined) => {
+        if (!selected) return
+        emit(selected)
+        setCurrentMonth(selected)
+        setOpen(false)
+    }
+
+    const onPresetSelected = (preset: DateDayPreset) => {
+        const presetDate = preset.date ? preset.date : new Date()
+        const newDate = addDays(presetDate, preset.days || 0);
+        emit(newDate)
+        setCurrentMonth(newDate)
+    }
+
+    return (
+        <Popover
+            open={open}
+            onOpenChange={next => {
+                setOpen(next)
+                if (!next) onBlur?.()
+            }}
+        >
+            <PopoverTrigger asChild>
+                <Button variant='outline' id={`${name}-date`} disabled={disabled} className='flex-1 justify-between font-normal border-input'>
+                    <span className="flex items-center gap-2 group-aria-invalid:text-destructive">
+                        <CalendarIcon className="size-4" />
+                        {currentDate ? format(currentDate, "dd MMMM yyyy") : 'Pick a date'}
+                    </span>
+                    <ChevronDownIcon />
+                </Button>
+            </PopoverTrigger>
+            <PopoverContent className='w-auto overflow-hidden rounded-xl p-0 shadow-lg' align='start'>
+                <Calendar
+                    mode="single"
+                    selected={currentDate}
+                    onSelect={handleDateSelect}
+                    captionLayout="label"
+                    timeZone={timeZone}
+                    disabled={disableDates}
+                    month={currentMonth}
+                    onMonthChange={setCurrentMonth}
+                    fixedWeeks
+                    className="border-r p-3"
+                    classNames={{
+                        today: "bg-primary/15 text-primary rounded-md",
+                    }}
+                />
+
+                {presets.length > 0 && (
+                    <div className="w-full text-center space-y-2 p-4 pt-2">
+                        <p className="text-xs font-medium uppercase tracking-wider">
+                            Quick select
+                        </p>
+
+                        <div className="flex flex-wrap gap-2">
+                            {presets.map((preset) => (
+                                <Button
+                                    key={preset.days}
+                                    size='sm'
+                                    variant="outline"
+                                    onClick={() => onPresetSelected(preset)}
+                                >
+                                    {preset.label}
+                                </Button>
+                            ))}
+                        </div>
+                    </div>
+                )}
+            </PopoverContent>
+        </Popover>
+    )
+}
+

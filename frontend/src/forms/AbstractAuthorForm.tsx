@@ -362,7 +362,7 @@ export function AuthorFormContent({ abstractId, onSubmit, values }: Props) {
                                 triggerClassName='size-4 text-primary'
                                 content={(
                                     <p>
-                                        Select a previously used affiliation to autofill its details, 
+                                        Select a previously used affiliation to autofill its details,
                                         or fill out the fields to create a new one.
                                     </p>
                                 )}

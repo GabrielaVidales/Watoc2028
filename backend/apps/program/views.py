@@ -1,14 +1,10 @@
-from rest_framework import permissions, status
+from rest_framework import permissions
 from rest_framework.viewsets import ModelViewSet
-from rest_framework.request import Request
-from rest_framework.response import Response
 from django.contrib.auth import get_user_model
-from django.conf import settings
-from django.http import HttpResponse
 from config.pagination import Pagination
-from .models import ScheduledEvent
-from .serializers import ScheduledEventSerializer
-import os, logging
+from .models import ScheduledEvent, Tag
+from .serializers import ScheduledEventSerializer, TagSerializer
+import logging
 
 User = get_user_model()
 
@@ -21,3 +17,9 @@ class ScheduledEventViewSet(ModelViewSet):
     serializer_class = ScheduledEventSerializer
     pagination_class = Pagination
 
+
+class TagViewSet(ModelViewSet):
+    queryset = Tag.objects.all()
+    permission_classes = [permissions.AllowAny]
+    serializer_class = TagSerializer
+    pagination_class = Pagination

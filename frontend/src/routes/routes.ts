@@ -78,6 +78,7 @@ export const routes = {
         administration: createRouteGroup('/administration', {
             manageUsers: '/manage-users',
             manageReviewers: '/manage-reviewers',
+            program: '/program',
         }),
 
         submissions: createRouteGroup('/submissions', {
@@ -96,7 +97,7 @@ export const routes = {
         reviews: createRouteGroup('/reviews', {
             list: '/list',
             view: routeWithParams('/view/:id')
-        })
+        }),
     }),
     payments: createRouteGroup('/payments', {
         success: '/success',
