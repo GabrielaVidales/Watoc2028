@@ -5,13 +5,13 @@ import { useEffect, useMemo, useRef, useState } from "react"
 import 'react-image-crop/dist/ReactCrop.css';
 import '@/components/upload-file.css'
 import ImageUpload, { type ImageUploadRef } from "@/components/upload-file"
-import { changePhotoSchema, type ChangePhotoFormValues } from "@/schemas/update-profile-photo-schema"
+import { changePhotoSchema, type ChangePhotoFormValues } from "@/features/users/schemas/update-profile-photo-schema"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { PhotoCropDialog } from "./photo-crop-dialog"
 import { Save, Trash2 } from "lucide-react"
 import { Spinner } from "@/components/ui/spinner";
 import api from "@/clients/api";
-import { useAuth } from "@/contexts/AuthContext";
+import { useAuth } from "@/features/auth/contexts/AuthContext";
 
 type Props = {
     data?: ChangePhotoFormValues

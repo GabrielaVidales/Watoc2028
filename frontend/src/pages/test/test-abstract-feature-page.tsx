@@ -3,30 +3,30 @@ import DownloadAbstractPDFButton from './test-abstract-feature'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { FileText, Trash2, TriangleAlertIcon } from 'lucide-react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import type { AbstractSchema } from '@/schemas/abstracts/abstract-schemas'
 import type { PaginatedResponse } from '@/domain/pagination'
 import api from '@/clients/api'
 import { Item, ItemActions, ItemContent, ItemMedia, } from "@/components/ui/item"
-import AbstractContentForm from '@/forms/submissions/abstract-content-form'
+import AbstractContentForm from '@/features/submissions/forms/abstract-content-form'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { PaginationController } from '@/components/custom/pagination-controller'
-import ShowAuthorsComponent from '@/components/ShowAuthors'
+import ShowAuthorsComponent from '@/features/submissions/components/ShowAuthors'
 import { Separator } from '@/components/ui/separator'
-import { CreateAbstractDialog } from '@/forms/submissions/abstract-create-dialog'
+import { CreateAbstractDialog } from '@/features/submissions/forms/abstract-create-dialog'
 import type { AxiosError } from 'axios'
-import { deleteSubmission } from '@/services/submissions/submission-services'
-import { useAuth } from '@/contexts/AuthContext'
+import { deleteSubmission } from '@/features/submissions/services/submission-services'
+import { useAuth } from '@/features/auth/contexts/AuthContext'
 import { Button } from '@/components/ui/button'
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger, } from "@/components/ui/alert-dialog"
 import { Spinner } from '@/components/ui/spinner'
 import { cn } from '@/lib/utils'
 import { DEBUG } from '@/lib/constants'
 import { formatDate } from '@/utils/formatDate'
-import ShowAffiliations from '@/components/ShowAffiliations'
+import ShowAffiliations from '@/features/submissions/components/ShowAffiliations'
 import { InfoAlert } from '@/components/InfoAlert'
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger, } from "@/components/ui/accordion"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import ChangeThemeButton from '@/components/custom/change-theme-button'
+import type { AbstractSchema } from '@/features/submissions/schemas/abstract-schemas'
 
 function TestAbstractFeaturePage() {
     const { user, handleLogin, } = useAuth()

@@ -1,7 +1,7 @@
 import { Separator } from '@/components/ui/separator';
+import type { AbstractSchema } from '@/features/submissions/schemas/abstract-schemas';
+import type { AuthorSchema } from '@/features/submissions/schemas/author-schema';
 import { cn } from '@/lib/utils';
-import type { AbstractSchema } from '@/schemas/abstracts/abstract-schemas';
-import type { AuthorSchema } from '@/schemas/abstracts/author-schema';
 import { countries } from '@/utils/countriesInfo';
 import { BookOpen, FileTextIcon, Quote } from 'lucide-react';
 import React from 'react';

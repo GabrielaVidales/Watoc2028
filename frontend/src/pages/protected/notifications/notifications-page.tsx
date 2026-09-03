@@ -4,13 +4,13 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import type { NotificationResponse } from '@/domain/notifications';
+import type { NotificationResponse } from '@/features/notifications/types/notifications';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { cn } from '@/lib/utils';
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { BellOff, BellRing, CheckCheck, RotateCw, Settings2 } from 'lucide-react';
 import { useState } from 'react';
-import NotificationItem from './notification-item-component';
+import NotificationItem from '../../../features/notifications/components/notification-item-component';
 
 function NotificationsPage() {
     const isMobile = useIsMobile()

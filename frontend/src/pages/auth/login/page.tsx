@@ -3,7 +3,7 @@ import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
 import { Link } from 'react-router'
 import { ClipboardSignature, CheckCircle2, SquareUserRound } from 'lucide-react'
 import { routes } from '@/routes/routes'
-import LoginForm from '@/pages/auth/login/LoginForm'
+import LoginForm from '@/features/auth/forms/LoginForm'
 import { AnimatePresence, motion } from 'motion/react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Separator } from '@/components/ui/separator'

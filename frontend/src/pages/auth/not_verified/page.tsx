@@ -3,7 +3,7 @@ import { Clock, LogOut, Mail, Shield } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
 import api from '@/clients/api';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuth } from '@/features/auth/contexts/AuthContext';
 import { toast } from "sonner"
 import { DEBUG } from '@/lib/constants';
 

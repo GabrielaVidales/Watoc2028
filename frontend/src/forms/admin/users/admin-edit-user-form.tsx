@@ -6,7 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Separator } from "@/components/ui/separator"
 import { AvatarUpload } from "@/components/ui/upload-avatar"
 import { userPrefixes, userRoles } from "@/domain/constants"
-import { editUserFormSchema, type EditUserFormValues } from "@/schemas/users/edit-user-schema"
+import { editUserFormSchema, type EditUserFormValues } from "@/features/auth/schemas/edit-user-schema"
 import { countries } from "@/utils/countriesInfo"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { IdCard, UserSquare2 } from "lucide-react"

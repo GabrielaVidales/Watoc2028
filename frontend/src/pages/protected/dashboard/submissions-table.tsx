@@ -1,12 +1,12 @@
 import { PaginationController } from '@/components/custom/pagination-controller'
 import { DataTable } from '@/components/ui/data-table'
-import { useAuth } from '@/contexts/AuthContext'
+import { useAuth } from '@/features/auth/contexts/AuthContext'
 import type { PaginatedResponse } from '@/domain/pagination'
-import type { AbstractSchema } from '@/schemas/abstracts/abstract-schemas'
-import { getSubmissionsByParticipant } from '@/services/submissions/submission-services'
+import { getSubmissionsByParticipant } from '@/features/submissions/services/submission-services'
 import { useQuery } from '@tanstack/react-query'
 import React from 'react'
 import { columns } from './columns'
+import type { AbstractSchema } from '@/features/submissions/schemas/abstract-schemas'
 
 
 function SubmissionsSummaryTable() {

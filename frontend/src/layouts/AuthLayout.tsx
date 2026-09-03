@@ -2,7 +2,7 @@ import logo from '@/assets/WatocPNGLogoBlank.png';
 import mayaBackground from '@/assets/field.png';
 import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuth } from '@/features/auth/contexts/AuthContext';
 import { routes } from '@/routes/routes';
 import { ChevronsLeft, ClipboardList, FileText, IdCard, LogIn } from 'lucide-react';
 import { Link, Outlet } from 'react-router';

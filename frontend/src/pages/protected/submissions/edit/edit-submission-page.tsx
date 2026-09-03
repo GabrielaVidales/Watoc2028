@@ -1,22 +1,22 @@
-import ShowAffiliations from '@/components/ShowAffiliations'
-import ShowAuthorsComponent from '@/components/ShowAuthors'
+import ShowAffiliations from '@/features/submissions/components/ShowAffiliations'
+import ShowAuthorsComponent from '@/features/submissions/components/ShowAuthors'
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger, } from "@/components/ui/accordion"
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardAction, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { ConfirmProvider, useConfirm } from '@/contexts/ConfirmationDialogContext'
-import AbstractContentForm from '@/forms/submissions/abstract-content-form'
+import AbstractContentForm from '@/features/submissions/forms/abstract-content-form'
 import { DEBUG } from '@/lib/constants'
 import { cn, } from '@/lib/utils'
 import { routes } from '@/routes/routes'
-import type { AbstractSchema } from '@/schemas/abstracts/abstract-schemas'
-import { getSubmissionById, submitAbstract } from '@/services/submissions/submission-services'
+import { getSubmissionById, submitAbstract } from '@/features/submissions/services/submission-services'
 import { formatDate } from '@/utils/formatDate'
 import { useMutation, useQuery } from '@tanstack/react-query'
 import type { AxiosError } from 'axios'
 import { LucideFileEdit, RotateCw, ScanText, SendIcon } from 'lucide-react'
 import { Navigate, useParams } from 'react-router'
 import DeadlinesCard from '../summary/deadlines-card'
+import type { AbstractSchema } from '@/features/submissions/schemas/abstract-schemas'
 
 
 function EditAbstractPage() {

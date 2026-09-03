@@ -2,7 +2,7 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardAction, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { AppStoreButton, PlayStoreButton } from '@/components/ui/play-store-button'
-import { useAuth } from '@/contexts/AuthContext'
+import { useAuth } from '@/features/auth/contexts/AuthContext'
 import { useProfiles } from '@/hooks/use-profiles'
 import useTimeBefore from '@/hooks/use-remaining-time'
 import { routes } from '@/routes/routes'

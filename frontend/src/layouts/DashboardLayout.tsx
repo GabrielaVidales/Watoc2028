@@ -6,11 +6,11 @@ import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbP
 import { Button } from "@/components/ui/button"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger, } from "@/components/ui/dropdown-menu"
 import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar"
-import { useAuth } from "@/contexts/AuthContext"
 import { RightSidebarProvider, useRightSidebar } from '@/contexts/RightSidebarContext'
+import { useAuth } from "@/features/auth/contexts/AuthContext"
+import { NotificationsButton } from '@/features/notifications/components/notifications-btn'
+import { useNotificationsWebsocket } from "@/features/notifications/hooks/use-notifications-websocket"
 import { useIsMobile } from '@/hooks/use-mobile'
-import { useNotificationsWebsocket } from "@/hooks/use-notifications-websocket"
-import { NotificationsBell } from '@/pages/protected/notifications/notifications-btn'
 import { routes } from "@/routes/routes"
 import { BadgeCheckIcon, LogOutIcon, Settings2 } from "lucide-react"
 import React, { Fragment } from 'react'
@@ -116,7 +116,7 @@ function DashboardLayoutContent() {
                     <DynamicBreadcrumb />
                 </div>
                 <div className='flex flex-row items-center gap-3'>
-                    <NotificationsBell />
+                    <NotificationsButton />
 
                     <ChangeThemeButton variant='ghost' />
 

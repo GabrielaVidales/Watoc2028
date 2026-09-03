@@ -3,8 +3,8 @@ import { notify } from "@/components/custom/notify";
 import { mapErrors } from "@/lib/mapErrors";
 import { filtersToQueryParams } from "@/utils/filter-operations";
 import type { PaginatedRequest, PaginatedResponse } from "@/domain/pagination";
-import type { ReviewAssignment } from "@/domain/reviews";
-import type { AssignmentFormInput, AssignmentFormOutput } from "@/schemas/reviews/review-assignment-schema";
+import type { ReviewAssignment } from "@/features/reviews/types/reviews";
+import type { AssignmentFormInput, AssignmentFormOutput } from "@/features/reviews/schemas/review-assignment-schema";
 import type { AxiosError } from "axios";
 import type { UseFormReturn } from "react-hook-form";
 

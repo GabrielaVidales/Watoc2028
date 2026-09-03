@@ -4,7 +4,7 @@ import { notify } from '@/components/custom/notify'
 import { Button, type ButtonProps } from '@/components/ui/button'
 import { ButtonGroup, ButtonGroupSeparator, } from "@/components/ui/button-group"
 import { Spinner } from '@/components/ui/spinner'
-import type { PDFGenerationJob } from '@/domain/pdf-generation-job'
+import type { PDFGenerationJob } from '@/features/submissions/types/pdf-generation-job'
 import { DEBUG } from '@/lib/constants'
 import { cn } from '@/lib/utils'
 import websocketDispatcher from '@/stores/websocket-dispatcher'

@@ -1,16 +1,16 @@
-import { Field, FieldContent, FieldDescription, FieldError, FieldLabel, FieldLegend, FieldSet, FieldTitle } from '@/components/ui/field'
-import React, { useEffect } from 'react'
-import { Controller, useForm } from 'react-hook-form'
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
-import { zodResolver } from '@hookform/resolvers/zod'
-import { selectFeeSchema, type SelectFeeValues } from "@/schemas/select-fee-schema"
 import { UploadFile } from '@/components/UploadFile'
 import { Button } from '@/components/ui/button'
-import { FileCheck, FileText, Trash2 } from 'lucide-react'
-import { Separator } from '@/components/ui/separator'
-import { cn } from '@/lib/utils'
-import { useRegistrationStore } from '@/data/store'
+import { Field, FieldContent, FieldDescription, FieldError, FieldLabel, FieldLegend, FieldSet, FieldTitle } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
+import { Separator } from '@/components/ui/separator'
+import { useRegistrationStore } from '@/data/store'
+import { selectFeeSchema, type SelectFeeValues } from "@/features/participants/schemas/select-fee-schema"
+import { cn } from '@/lib/utils'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { FileCheck, FileText, Trash2 } from 'lucide-react'
+import { useEffect } from 'react'
+import { Controller, useForm } from 'react-hook-form'
 
 
 type FeeOption = {

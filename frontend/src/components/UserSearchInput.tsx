@@ -1,4 +1,4 @@
-import type { UserSchema } from "@/schemas/user-schemas"
+import type { UserSchema } from "@/features/users/schemas/user-schemas"
 import api from "@/clients/api"
 import { cn } from "@/lib/utils"
 import { useEffect, useState, type HTMLAttributes } from "react"

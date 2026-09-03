@@ -1,6 +1,5 @@
 import { createColumnHelper } from "@tanstack/react-table";
 import type { DataTableFeatures } from "./features";
-import type { AbstractSchema } from "@/schemas/abstracts/abstract-schemas";
 import { ArrowUpDownIcon, ClipboardCopy, ClipboardCopyIcon, EyeIcon, MoreHorizontal } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
@@ -14,9 +13,10 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { useNavigate } from "react-router";
 import { routes } from "@/routes/routes";
-import { useAuth } from "@/contexts/AuthContext";
+import { useAuth } from "@/features/auth/contexts/AuthContext";
 import { Badge } from "@/components/ui/badge";
 import { DataTableColumnHeader } from "@/components/ui/data-table";
+import type { AbstractSchema } from "@/features/submissions/schemas/abstract-schemas";
 
 
 const columnHelper = createColumnHelper<DataTableFeatures, AbstractSchema>()

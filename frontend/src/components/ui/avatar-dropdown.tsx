@@ -8,7 +8,7 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { useAuth } from '@/contexts/AuthContext'
+import { useAuth } from '@/features/auth/contexts/AuthContext'
 import { routes } from '@/routes/routes'
 import { ChevronDown } from 'lucide-react'
 import { Link } from 'react-router'

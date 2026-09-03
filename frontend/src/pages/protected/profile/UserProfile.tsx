@@ -1,14 +1,14 @@
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import { useAuth, type UserProfile } from '@/contexts/AuthContext'
+import { useAuth, type UserProfile } from '@/features/auth/contexts/AuthContext'
 import React from 'react'
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Calendar, Mail, MapPin, UserRoundPen, House, Image, LockKeyhole, LogOut, Clock, FileText, ArrowRight } from "lucide-react";
 import { formatDate } from '@/utils/formatDate';
-import { UserPictureForm } from '@/forms/UserPictureForm';
+import { UserPictureForm } from '@/features/users/forms/UserPictureForm';
 import { Link, NavLink } from 'react-router';
-import ChangePasswordForm from '@/forms/ChangePasswordForm';
-import EditUserForm from '@/forms/EditUserForm';
+import ChangePasswordForm from '@/features/users/forms/ChangePasswordForm';
+import EditUserForm from '@/features/users/forms/EditUserForm';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { routes } from '@/routes/routes';
 import { useProfiles } from '@/hooks/use-profiles';
@@ -133,7 +133,7 @@ export default function UserProfile() {
 									<p>
 										<b>Submit an abstract</b>: start a new submission or continue working on an existing one.
 									</p>
-									
+
 									<InfoAlert
 										title="Abstract submission deadline: To be announced"
 										messages={[
@@ -164,18 +164,7 @@ export default function UserProfile() {
 							<TabsContent value="account" className='w-full py-9 pt-4 space-y-5 px-5 sm:px-9'>
 								<h2 className='text-2xl font-semibold text-primary-main'>Edit your profile data</h2>
 								{profile?.participant && (
-									<EditUserForm defaultValues={{
-										...user,
-										email: {
-											value: '',
-											confirm: ''
-										},
-										participant: {
-											affiliation: profile.participant.affiliation,
-											job_title: profile.participant.job_title,
-											field_of_study: profile.participant.field_of_study
-										}
-									}} />
+									<EditUserForm />
 								)}
 							</TabsContent>
 							<TabsContent value="picture" className='w-full py-9 pt-4 space-y-5 px-5 sm:px-9'>

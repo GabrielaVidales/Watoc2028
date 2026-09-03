@@ -1,7 +1,7 @@
 import App from './App.js'
 import { createRoot } from 'react-dom/client'
 import { BrowserRouter } from 'react-router'
-import { AuthProvider } from './contexts/AuthContext.js'
+import { AuthProvider } from './features/auth/contexts/AuthContext.jsx'
 import React, { StrictMode } from 'react'
 import { Toaster } from './components/ui/sonner.jsx'
 import './index.css'

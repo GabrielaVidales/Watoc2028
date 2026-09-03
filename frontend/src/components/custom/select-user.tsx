@@ -1,6 +1,6 @@
 import { cn } from "@/lib/utils";
-import type { AbstractDTO } from "@/schemas/abstracts/abstract-schemas";
-import type { UserSchema } from "@/schemas/user-schemas";
+import type { AbstractDTO } from '@/features/submissions/schemas/abstract-schemas'
+import type { UserSchema } from "@/features/users/schemas/user-schemas";
 import type { ButtonHTMLAttributes } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { SelectCommand, type GetTriggerLabel } from "./select-command-generic";

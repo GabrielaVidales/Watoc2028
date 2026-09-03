@@ -1,7 +1,7 @@
 import api from "@/clients/api"
 import { Filters, type Filter, type FilterFieldConfig, type FilterOperator, type FilterOption, } from "@/components/reui/filters"
 import type { PaginatedResponse } from "@/domain/pagination"
-import type { UserSchema } from "@/schemas/user-schemas"
+import type { UserSchema } from "@/features/users/schemas/user-schemas"
 import { format } from "date-fns"
 import { CalendarIcon, CheckCircle2, Circle, FilterIcon, IdCard, Mail, ShieldCheck, UsersIcon } from 'lucide-react'
 import { useEffect, useMemo, useRef, useState } from "react"

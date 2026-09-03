@@ -6,7 +6,7 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger, } from "@/componen
 import { HoverCard, HoverCardContent, HoverCardTrigger, } from "@/components/ui/hover-card"
 import { Item, ItemContent, } from "@/components/ui/item"
 import { Button } from './ui/button';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuth } from '@/features/auth/contexts/AuthContext';
 import { useScroll } from '@/hooks/use-scroll';
 import { routes } from '@/routes/routes';
 import { cn } from '@/lib/utils';

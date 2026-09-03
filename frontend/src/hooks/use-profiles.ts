@@ -1,5 +1,5 @@
-import { useAuth, type UserProfile } from "@/contexts/AuthContext";
-import { getParticipantData } from "@/services/auth/auth-services";
+import { useAuth, type UserProfile } from "@/features/auth/contexts/AuthContext";
+import { getParticipantData } from "@/features/auth/services/auth-services";
 import { useQuery } from "@tanstack/react-query";
 import { isAxiosError } from "axios";
 import { useEffect, useState } from "react";

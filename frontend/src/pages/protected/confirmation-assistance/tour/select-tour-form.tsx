@@ -8,9 +8,9 @@ import { Separator } from '@/components/ui/separator'
 import { Spinner } from '@/components/ui/spinner'
 import { useRegistrationStore } from '@/data/store'
 import type { Tour } from '@/data/tours-data'
+import { selectTourSchema, type SelectTourValues } from "@/features/participants/schemas/select-tour-schema"
 import { useFetch } from '@/hooks/use-fetch'
 import { routes } from '@/routes/routes'
-import { selectTourSchema, type SelectTourValues } from "@/schemas/select-tour-schema"
 import { zodResolver } from '@hookform/resolvers/zod'
 import React, { useEffect } from 'react'
 import { Controller, useForm } from 'react-hook-form'

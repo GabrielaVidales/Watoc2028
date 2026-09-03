@@ -1,7 +1,7 @@
-import type { CongressRegistrationValues } from "@/schemas/registration-confirmation-schema";
-import { create } from "zustand";
-import { persist, createJSONStorage } from 'zustand/middleware'
+import type { CongressRegistrationValues } from "@/features/participants/schemas/registration-confirmation-schema";
 import localforage from "localforage";
+import { create } from "zustand";
+import { createJSONStorage, persist } from 'zustand/middleware';
 
 
 type RegistrationConfirmationState = Partial<CongressRegistrationValues> & {
