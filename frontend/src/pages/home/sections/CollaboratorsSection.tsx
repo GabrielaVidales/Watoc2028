@@ -34,7 +34,7 @@ export default function CollaboratorsSection() {
                 <div className='size-15 bg-primary-main flex justify-center items-center rounded-full'>
                     <UsersRound className='size-8' color="white" />
                 </div>
-                <h2 className='font-bold text-4xl text-primary-main'>
+                <h2 className='font-semibold text-4xl'>
                     Organized In Collaboration With
                 </h2>
             </div>

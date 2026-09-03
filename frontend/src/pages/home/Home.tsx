@@ -4,7 +4,6 @@ import GenericCTASection from '../../components/GenericCTASection'
 import { Link } from 'react-router'
 import { ArrowRight } from 'lucide-react'
 import { HeroSection } from '@/components/HeroSection'
-import VenueSection from './sections/VenueSection'
 import WelcomeSection from './sections/WelcomeSection'
 import { HomeHeroContent } from './components/HomeHeroContent'
 import { routes } from '@/routes/routes'
@@ -133,8 +132,6 @@ const CounterCard = () => {
                 maxWidth: 800,
                 mx: 'auto',
                 textAlign: 'center',
-                bgcolor: 'white',
-                color: 'white',
                 zIndex: 99999
             }}
         >
@@ -159,9 +156,9 @@ export default function Home() {
                 px: { xs: 1, sm: 3, md: 10, lg: 15 },
                 py: { xs: 2, md: 3 },
             }}>
-                <Typography variant="h4" fontWeight="bold">
+                <h2 className='font-semibold text-4xl'>
                     Countdown to WATOC 2028
-                </Typography>
+                </h2>
                 <CounterCard />
             </Box>
             <CollaboratorsSection />

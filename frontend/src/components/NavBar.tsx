@@ -11,6 +11,7 @@ import { useScroll } from '@/hooks/use-scroll';
 import { routes } from '@/routes/routes';
 import { cn } from '@/lib/utils';
 import logo from '../assets/WatocPNGLogo.png';
+import { HIDE_LOGIN } from '@/lib/constants';
 
 type Props = {
     enableScroll?: boolean,
@@ -77,24 +78,26 @@ export default function NavBar({
 
     const { user: user } = useAuth()
 
-    const menus = [
-        ...menuItems,
-        user ? {
-            label: 'Profile',
-            url: routes.users.profile,
-            submenus: [],
-        } : {
-            label: 'Registration',
-            url: routes.auth.login,
-            submenus: [],
-        }
-    ]
+    const menus = HIDE_LOGIN
+        ? menuItems
+        : [
+            ...menuItems,
+            user ? {
+                label: 'Profile',
+                url: routes.users.profile,
+                submenus: [],
+            } : {
+                label: 'Registration',
+                url: routes.auth.login,
+                submenus: [],
+            }
+        ]
 
     return (
         <header className={cn(
-            'h-18 lg:h-22 w-full z-50 fixed top-0',
-            'transition-all duration-300 bg-white',
-            !enableScroll || scroll ? 'bg-white shadow-lg' : 'bg-white/5',
+            'h-18 lg:h-20 w-full z-50 fixed top-0',
+            'transition-all duration-300',
+            !enableScroll || scroll ? 'bg-white shadow-lg' : 'bg-transparent',
             variant,
         )}>
             <div className="max-w-7xl h-full flex justify-between items-center gap-3 mx-auto p-2">
@@ -105,7 +108,7 @@ export default function NavBar({
                             alt="WATOC 2028 Logo"
                             className={cn(
                                 'w-auto transition-all duration-300',
-                                'max-h-14 lg:max-h-18 w-full',
+                                'max-h-14 lg:max-h-16 w-full',
                                 'transition-transform hover:scale-105',
                                 (scroll || !invertImg) ? 'invert-0' : 'invert',
                             )}

@@ -1,4 +1,6 @@
 export const DEBUG = import.meta.env.VITE_DEBUG === 'true'
+export const USE_THEME = import.meta.env.VITE_USE_THEME === 'true'
+export const HIDE_LOGIN = import.meta.env.VITE_HIDE_LOGIN === 'true'
 
 export const feePlans = [
     {

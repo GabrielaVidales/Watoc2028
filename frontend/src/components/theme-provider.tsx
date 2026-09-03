@@ -1,4 +1,5 @@
 /* eslint-disable react-refresh/only-export-components */
+import { USE_THEME } from "@/lib/constants"
 import * as React from "react"
 
 type Theme = "dark" | "light" | "system"
@@ -158,7 +159,7 @@ export function ThemeProvider({
         return
       }
 
-      if (event.key.toLowerCase() !== "d") {
+      if (!USE_THEME || event.key.toLowerCase() !== "d") {
         return
       }
 

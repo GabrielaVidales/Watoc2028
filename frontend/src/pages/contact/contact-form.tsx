@@ -310,7 +310,7 @@ function ContactForm() {
                     control={form.control}
                     render={({ field, fieldState }) => (
                         <Field orientation="responsive" data-invalid={fieldState.invalid} className='relative col-span-full'>
-                            <FieldLabel htmlFor="presentationType">Presentation Format</FieldLabel>
+                            <FieldLabel htmlFor="presentationType">Subject <span className='text-destructive'>*</span></FieldLabel>
                             <Select
                                 name={field.name}
                                 value={field.value}
@@ -319,7 +319,7 @@ function ContactForm() {
                                 <SelectTrigger
                                     id="presentationType"
                                     aria-invalid={fieldState.invalid}
-                                    className="min-w-30 border-2"
+                                    className="min-w-30"
                                 >
                                     <SelectValue placeholder="Choose an option..." />
                                 </SelectTrigger>

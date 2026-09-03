@@ -8,7 +8,7 @@ import AuthLayout from './layouts/AuthLayout'
 import DashboardLayout from './layouts/DashboardLayout'
 import HomeLayout from './layouts/HomeLayout'
 import LoginLayout from './layouts/LoginLayout'
-import { DEBUG } from './lib/constants'
+import { DEBUG, HIDE_LOGIN } from './lib/constants'
 import NotFound from './pages/404/NotFound'
 import AboutWATOC from './pages/aboutWATOC/AboutWATOC'
 import AbstractSubmissionInfo from './pages/abstractSubmission/AbstractSubmissionInfo'
@@ -71,14 +71,16 @@ function App() {
 			</Route>
 
 			{/* Rutas sólo para usuarios no loggeados */}
-			<Route element={<GuestRoute redirectTo={routes.users.profile} />}>
-				<Route element={<LoginLayout />}>
-					<Route path={routes.auth.login} element={<LoginPage />} />
-					<Route path={routes.auth.register} element={<RegisterPage />} />
-					<Route path={routes.auth.forgotPassword} element={<ForgotPasswordPage />} />
-					<Route path={routes.auth.resetPassword} element={<CreatePasswordPage />} />
+			{!HIDE_LOGIN && (
+				<Route element={<GuestRoute redirectTo={routes.users.profile} />}>
+					<Route element={<LoginLayout />}>
+						<Route path={routes.auth.login} element={<LoginPage />} />
+						<Route path={routes.auth.register} element={<RegisterPage />} />
+						<Route path={routes.auth.forgotPassword} element={<ForgotPasswordPage />} />
+						<Route path={routes.auth.resetPassword} element={<CreatePasswordPage />} />
+					</Route>
 				</Route>
-			</Route>
+			)}
 
 			{DEBUG && (
 				<Route element={<ProtectedRoute allowedRoles={['admin', 'participant', 'reviewer']} />} >
@@ -90,7 +92,7 @@ function App() {
 							<Route path={routes.users.confirmAssistance.dinner} element={<DinnerPage />} />
 							<Route path={routes.users.confirmAssistance.tour} element={<SelectTourPage />} />
 
-							
+
 							<Route path={routes.users.confirmAssistance.payment} element={<ConfirmPaymentPage />} />
 
 							<Route path={routes.payments.success} element={<PaymentSuccess />} />
@@ -99,32 +101,34 @@ function App() {
 				</Route>
 			)}
 
-			<Route element={<ProtectedRoute allowedRoles={['admin', 'participant', 'reviewer']} />} >
-				<Route element={<DashboardLayout />}>
+			{!HIDE_LOGIN && (
+				<Route element={<ProtectedRoute allowedRoles={['admin', 'participant', 'reviewer']} />} >
+					<Route element={<DashboardLayout />}>
 
-					<Route element={<ProtectedRoute allowedRoles={['admin']} />} >
-						<Route path={routes.users.administration.manageUsers} element={<ManageUsersPage />} />
-						<Route path={routes.users.administration.manageReviewers} element={<ManageReviewsPage />} />
-						<Route path={routes.users.administration.program} element={<ProgramPage />} />
+						<Route element={<ProtectedRoute allowedRoles={['admin']} />} >
+							<Route path={routes.users.administration.manageUsers} element={<ManageUsersPage />} />
+							<Route path={routes.users.administration.manageReviewers} element={<ManageReviewsPage />} />
+							<Route path={routes.users.administration.program} element={<ProgramPage />} />
+						</Route>
+
+						<Route element={<ProtectedRoute allowedRoles={['reviewer']} />} >
+							<Route path={routes.users.reviews.list} element={<ReviewsList />} />
+							<Route path={routes.users.reviews.view.url} element={<ReviewAbstract />} />
+						</Route>
+
+						<Route element={<ProtectedRoute allowedRoles={['participant']} />} >
+							<Route path={routes.users.submissions.summary} element={<AbstractSubmissionsPage />} />
+							<Route path={routes.users.submissions.edit.url} element={<EditAbstractPage />} />
+						</Route>
+
+
+						{/* Rutas para todos los usuarios */}
+						<Route path={routes.users.profile} element={<UserDashboardPage />} />
+						<Route path={routes.users.settings} element={<SettingsPage />} />
+						<Route path={routes.users.notifications} element={<NotificationsPage />} />
 					</Route>
-
-					<Route element={<ProtectedRoute allowedRoles={['reviewer']} />} >
-						<Route path={routes.users.reviews.list} element={<ReviewsList />} />
-						<Route path={routes.users.reviews.view.url} element={<ReviewAbstract />} />
-					</Route>
-
-					<Route element={<ProtectedRoute allowedRoles={['participant']} />} >
-						<Route path={routes.users.submissions.summary} element={<AbstractSubmissionsPage />} />
-						<Route path={routes.users.submissions.edit.url} element={<EditAbstractPage />} />
-					</Route>
-
-
-					{/* Rutas para todos los usuarios */}
-					<Route path={routes.users.profile} element={<UserDashboardPage />} />
-					<Route path={routes.users.settings} element={<SettingsPage />} />
-					<Route path={routes.users.notifications} element={<NotificationsPage />} />
 				</Route>
-			</Route>
+			)}
 
 			<Route path={'/test'} element={<TestPage />} />
 			<Route path={'/test/abstract-submission'} element={<TestAbstractFeaturePage />} />
