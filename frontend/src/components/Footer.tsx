@@ -39,7 +39,7 @@ export default function Footer() {
                 className="absolute inset-0 bg-cover bg-center bg-fixed pointer-events-none -z-10"
                 style={{ backgroundImage: `url(${fieldPng})` }}
             />
-            
+
             <div className='max-w-6xl justify-self-center px-6'>
                 <div className="grid grid-cols-1 lg:grid-cols-12 md:grid-cols-12 gap-5 mb-3">
                     <section className="lg:col-span-5 md:col-span-12 flex flex-col gap-3">
@@ -145,9 +145,18 @@ export default function Footer() {
                     </p>
 
                     {[
-                        { icon: <InstagramIcon className='size-6' />, href: '#' },
-                        { icon: <LinkedInIcon className='size-6' />, href: '#' },
-                        { icon: <XIcon className='size-6' />, href: '#' },
+                        {
+                            icon: <InstagramIcon className='size-6' />,
+                            href: 'https://www.instagram.com/watoc2028/'
+                        },
+                        {
+                            icon: <LinkedInIcon className='size-6' />,
+                            href: 'https://www.linkedin.com/company/watoc2028?trk=blended-typeahead'
+                        },
+                        {
+                            icon: <XIcon className='size-6' />,
+                            href: 'https://x.com/Watoc2028'
+                        },
                     ].map((social, index) => (
                         <Button
                             key={index}
@@ -156,8 +165,15 @@ export default function Footer() {
                             className={cn(
                                 'transition-all hover:bg-white/20 hover:text-white'
                             )}
+                            asChild
                         >
-                            {social.icon}
+                            <a
+                                href={social.href}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                            >
+                                {social.icon}
+                            </a>
                         </Button>
                     ))}
                 </section>
