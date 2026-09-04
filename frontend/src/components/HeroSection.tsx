@@ -3,20 +3,19 @@ import { memo, useEffect, useId, useMemo, useState, type CSSProperties, type Rea
 
 import meridaWebp from '@/assets/merida.webp';
 import meridaJpg from '@/assets/merida.jpg';
-import hotel from '@/assets/hotel.webp';
 import congresoEntrada from '@/assets/congresoEntrada.webp';
-import mayaBackground from '@/assets/chichen itza night.png';
-
+import mayaBackground from '@/assets/Sharon Hahn Darlin, CC BY 2.0.jpg';
+import cc1 from '@/assets/Cecilia Ortiz, CC BY 2.0.jpg'
 
 const DEFAULT_BACKGROUNDS: readonly string[] = [
-    meridaWebp,
     meridaJpg,
     congresoEntrada,
-    hotel,
+    meridaWebp,
     mayaBackground,
+    cc1,
 ];
 
-const DEFAULT_GRADIENT_COLORS = 'rgba(13, 27, 42, 0.5) 0%, rgba(27, 38, 59, 0.25) 50%, rgba(13, 27, 42, 0.5) 100%';
+const DEFAULT_GRADIENT_COLORS = 'rgba(0,0,0,0.6) 0%, rgba(0,0,0,0.3) 50%, rgba(0,0,0,0.6) 100%';
 
 const RADIAL_OVERLAY = 'radial-gradient(circle at 50% 50%, rgba(25, 118, 210, 0.15) 0%, transparent 70%)';
 
@@ -26,7 +25,7 @@ const WAVE_PATH_VALUES = `
     M0 0 H1 V0.95 C0.80 1.00 0.65 0.90 0.50 0.95 C0.35 1.00 0.20 0.90 0 0.95 Z
 `;
 
-const SLIDE_TRANSITION = { delay: 3, duration: 1 } as const;
+const SLIDE_TRANSITION = { duration: 1 } as const;
 const CONTENT_TRANSITION = { duration: 1, delay: 0.5 } as const;
 
 const PARTICLE_ANIMATION_NAME = 'heroParticleFloat';
@@ -122,7 +121,6 @@ const FloatingParticles = memo(
 
 FloatingParticles.displayName = 'FloatingParticles';
 
-
 interface BackgroundSlideshowProps {
     images: readonly string[];
     index: number;
@@ -130,16 +128,15 @@ interface BackgroundSlideshowProps {
 }
 
 const BackgroundSlideshow = memo(({ images, index, gradient }: BackgroundSlideshowProps) => (
-    <AnimatePresence mode="sync">
+    <AnimatePresence mode="popLayout">
         <motion.div
             key={index}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={SLIDE_TRANSITION}
-            className="absolute inset-0 bg-position-[50%_50%] bg-cover bg-fixed"
+            className="absolute inset-0 bg-cover bg-center bg-no-repeat"
             style={{
-                zIndex: -1,
                 backgroundImage: `${gradient ? `${gradient}, ` : ''}url("${images[index]}")`,
             }}
         />
@@ -154,12 +151,12 @@ const useImageRotation = (length: number, delay: number, offset = 0) => {
     useEffect(() => {
         if (length <= 1) return;
 
-        const timeoutId = setTimeout(() => {
+        const intervalId = setInterval(() => {
             setIndex(prev => (prev + 1) % length);
         }, delay);
 
-        return () => clearTimeout(timeoutId);
-    }, [index, length, delay]);
+        return () => clearInterval(intervalId);
+    }, [length, delay]);
 
     return index;
 };
@@ -186,7 +183,7 @@ export const HeroSection = ({
     enableRadialGradient = true,
     gradientColors = DEFAULT_GRADIENT_COLORS,
     enableWave = true,
-    timeBetweenImages = 5000,
+    timeBetweenImages = 4000,
     offset = 0,
     className = '',
     children,
@@ -209,7 +206,7 @@ export const HeroSection = ({
 
             <div
                 id="back-to-top-anchor"
-                className={`relative flex w-full flex-col overflow-hidden bg-black bg-center bg-cover bg-fixed ${className}`}
+                className={`relative flex w-full flex-col overflow-hidden bg-black ${className}`}
                 style={{
                     height,
                     clipPath: enableWave ? `url(#${waveClipId})` : 'none',
@@ -231,7 +228,7 @@ export const HeroSection = ({
                     />
                 )}
 
-                <div className={`relative z-2 flex flex-1 flex-col items-center justify-center py-8 text-center min-[900px]:py-12 w-full mx-auto max-w-300 px-4 min-[600px]:px-6`}>
+                <div className="relative z-10 flex flex-1 flex-col items-center justify-center py-8 text-center min-[900px]:py-12 w-full mx-auto max-w-300 px-4 min-[600px]:px-6">
                     <motion.div
                         initial={{ opacity: 0, y: -50 }}
                         animate={{ opacity: 1, y: 0 }}
